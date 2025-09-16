@@ -162,6 +162,7 @@ mod test {
         assert!(value.is_slice());
         assert!(value.to_slice().is_unsized());
         assert_eq!(value.len(), 3);
+        assert_eq!(value.to_type().id(), "[i32]");
 
         for (i, value) in value.to_slice().iter().enumerate() {
             assert!(value.is_i32());

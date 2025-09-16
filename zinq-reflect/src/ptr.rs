@@ -121,6 +121,7 @@ mod test {
 
         assert!(value.is_ptr());
         assert!(value.is_ptr_of(type_of!(i32)));
+        assert_eq!(value.to_type().id(), "&i32");
         assert_eq!(value.to_ptr().get().to_i32().get(), 3);
     }
 
@@ -130,6 +131,7 @@ mod test {
 
         assert!(value.is_ptr());
         assert!(value.is_ptr_of(type_of!(bool)));
+        assert_eq!(value.to_type().id(), "&bool");
         assert!(value.to_ptr().get().to_bool().get());
     }
 }

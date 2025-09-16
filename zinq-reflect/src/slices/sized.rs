@@ -175,6 +175,7 @@ mod test {
         assert!(value.to_slice().is_sized());
         assert_eq!(value.len(), 3);
         assert_eq!(value.to_type().len(), 3);
+        assert_eq!(value.to_type().id(), "[i32; 3]");
 
         for (i, value) in value.to_slice().iter().enumerate() {
             assert!(value.is_i32());
