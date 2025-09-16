@@ -1,17 +1,19 @@
-pub mod bool;
-pub mod number;
-pub mod ptr;
-pub mod slice;
-pub mod string;
+mod bool;
+pub mod numbers;
+mod ptr;
+pub mod slices;
+mod string;
+pub mod structs;
 mod type_of;
 mod value;
 mod value_of;
 
 pub use bool::*;
-pub use number::*;
+pub use numbers::*;
 pub use ptr::*;
-pub use slice::*;
+pub use slices::*;
 pub use string::*;
+pub use structs::*;
 pub use type_of::*;
 pub use value::*;
 pub use value_of::*;
@@ -24,6 +26,7 @@ pub enum Type {
     String(StringType),
     Ptr(PtrType),
     Slice(SliceType),
+    Struct(StructType),
 }
 
 impl Type {
@@ -34,6 +37,7 @@ impl Type {
             Self::String(v) => v.id(),
             Self::Ptr(v) => v.id(),
             Self::Slice(v) => v.id(),
+            Self::Struct(v) => v.id(),
         };
     }
 
@@ -44,12 +48,14 @@ impl Type {
             Self::String(v) => v.name(),
             Self::Ptr(v) => v.name(),
             Self::Slice(v) => v.name(),
+            Self::Struct(v) => v.name(),
         };
     }
 
     pub fn len(&self) -> usize {
         return match self {
             Self::Slice(v) => v.len(),
+            Self::Struct(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.name()),
         };
     }
@@ -85,6 +91,13 @@ impl Type {
     pub fn is_slice_of(&self, _type: Self) -> bool {
         return match self {
             Self::Slice(v) => v.is_slice_of(_type),
+            _ => false,
+        };
+    }
+
+    pub fn is_struct(&self) -> bool {
+        return match self {
+            Self::Struct(_) => true,
             _ => false,
         };
     }
@@ -145,6 +158,13 @@ impl Type {
         };
     }
 
+    pub fn to_struct(&self) -> StructType {
+        return match self {
+            Self::Struct(v) => v.clone(),
+            _ => panic!("called 'to_struct' on '{}'", self.name()),
+        };
+    }
+
     pub fn to_number(&self) -> NumberType {
         return match self {
             Self::Number(v) => v.clone(),
@@ -180,6 +200,7 @@ impl Type {
             Self::String(v) => v.assignable_to(_type),
             Self::Ptr(v) => v.assignable_to(_type),
             Self::Slice(v) => v.assignable_to(_type),
+            Self::Struct(v) => v.assignable_to(_type),
         };
     }
 
@@ -190,6 +211,7 @@ impl Type {
             Self::String(v) => v.convertable_to(_type),
             Self::Ptr(v) => v.convertable_to(_type),
             Self::Slice(v) => v.convertable_to(_type),
+            Self::Struct(v) => v.convertable_to(_type),
         };
     }
 }
@@ -202,6 +224,7 @@ impl std::fmt::Display for Type {
             Self::String(v) => write!(f, "{}", v),
             Self::Ptr(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
+            Self::Struct(v) => write!(f, "{}", v),
         };
     }
 }
