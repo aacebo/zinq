@@ -2,13 +2,13 @@ use crate::Visibility;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct FieldType {
+pub struct Field {
     visibility: Visibility,
     name: String,
     _type: Box<crate::Type>,
 }
 
-impl FieldType {
+impl Field {
     pub fn vis(&self) -> Visibility {
         return self.visibility.clone();
     }
@@ -22,7 +22,7 @@ impl FieldType {
     }
 }
 
-impl std::fmt::Display for FieldType {
+impl std::fmt::Display for Field {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{} {}: {},", &self.visibility, &self.name, &self._type);
     }

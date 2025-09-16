@@ -11,8 +11,8 @@ pub use visibility::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum MemberType {
-    Field(FieldType),
-    Method(MethodType),
+    Field(Field),
+    Method(Method),
 }
 
 impl MemberType {
@@ -44,14 +44,14 @@ impl MemberType {
         };
     }
 
-    pub fn to_field(&self) -> FieldType {
+    pub fn to_field(&self) -> Field {
         return match self {
             Self::Field(v) => v.clone(),
             _ => panic!("called 'to_field' on 'method' member"),
         };
     }
 
-    pub fn to_method(&self) -> MethodType {
+    pub fn to_method(&self) -> Method {
         return match self {
             Self::Method(v) => v.clone(),
             _ => panic!("called 'to_method' on 'field' member"),

@@ -1,15 +1,15 @@
-use crate::{ParamType, Visibility};
+use crate::{Param, Visibility};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct MethodType {
+pub struct Method {
     visibility: Visibility,
     name: String,
-    params: Vec<ParamType>,
+    params: Vec<Param>,
     return_type: Option<Box<crate::Type>>,
 }
 
-impl MethodType {
+impl Method {
     pub fn vis(&self) -> Visibility {
         return self.visibility.clone();
     }
@@ -18,11 +18,11 @@ impl MethodType {
         return &self.name;
     }
 
-    pub fn params(&self) -> &[ParamType] {
+    pub fn params(&self) -> &[Param] {
         return &self.params;
     }
 
-    pub fn param(&self, name: &str) -> &ParamType {
+    pub fn param(&self, name: &str) -> &Param {
         return self.params.iter().find(|v| v.name() == name).unwrap();
     }
 
@@ -30,7 +30,7 @@ impl MethodType {
         return self.params.iter().any(|v| v.name() == name);
     }
 
-    pub fn param_mut(&mut self, name: &str) -> &mut ParamType {
+    pub fn param_mut(&mut self, name: &str) -> &mut Param {
         return self.params.iter_mut().find(|v| v.name() == name).unwrap();
     }
 
@@ -42,7 +42,7 @@ impl MethodType {
     }
 }
 
-impl std::fmt::Display for MethodType {
+impl std::fmt::Display for Method {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {}(", &self.visibility, &self.name)?;
 
