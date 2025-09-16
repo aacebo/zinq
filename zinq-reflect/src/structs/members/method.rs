@@ -10,12 +10,28 @@ pub struct MethodType {
 }
 
 impl MethodType {
+    pub fn vis(&self) -> Visibility {
+        return self.visibility.clone();
+    }
+
     pub fn name(&self) -> &str {
         return &self.name;
     }
 
     pub fn params(&self) -> &[ParamType] {
         return &self.params;
+    }
+
+    pub fn param(&self, name: &str) -> &ParamType {
+        return self.params.iter().find(|v| v.name() == name).unwrap();
+    }
+
+    pub fn has_param(&self, name: &str) -> bool {
+        return self.params.iter().any(|v| v.name() == name);
+    }
+
+    pub fn param_mut(&mut self, name: &str) -> &mut ParamType {
+        return self.params.iter_mut().find(|v| v.name() == name).unwrap();
     }
 
     pub fn return_type(&self) -> Option<&crate::Type> {

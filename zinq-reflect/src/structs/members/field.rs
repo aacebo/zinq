@@ -9,6 +9,10 @@ pub struct FieldType {
 }
 
 impl FieldType {
+    pub fn vis(&self) -> Visibility {
+        return self.visibility.clone();
+    }
+
     pub fn name(&self) -> &str {
         return &self.name;
     }

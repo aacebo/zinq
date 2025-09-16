@@ -16,6 +16,13 @@ pub enum MemberType {
 }
 
 impl MemberType {
+    pub fn vis(&self) -> Visibility {
+        return match self {
+            Self::Field(v) => v.vis(),
+            Self::Method(v) => v.vis(),
+        };
+    }
+
     pub fn name(&self) -> &str {
         return match self {
             Self::Field(v) => v.name(),
