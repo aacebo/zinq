@@ -1,0 +1,17 @@
+[package]
+name = "zinq-validate"
+description = "validate zinq schemas."
+readme = "README.md"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[features]
+macros = ["dep:zinq-validate-macros", "zinq-schema/macros"]
+
+[dependencies]
+zinq-schema = { path = "../zinq-schema", version = "*" }
+zinq-validate-macros = { path = "../zinq-validate-macros", version = "*", optional = true }

@@ -1,0 +1,156 @@
+use std::ops::{Deref, DerefMut};
+
+use crate::{Reflect, TypeOf};
+
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct BoolType;
+
+impl BoolType {
+    pub fn id(&self) -> std::any::TypeId {
+        return std::any::TypeId::of::<bool>();
+    }
+
+    pub fn name(&self) -> std::string::String {
+        return format!("{}", "type::bool");
+    }
+
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Bool(self.clone());
+    }
+
+    pub fn assignable_to(&self, _type: crate::Type) -> bool {
+        return self.id() == _type.id();
+    }
+
+    pub fn convertable_to(&self, _type: crate::Type) -> bool {
+        return _type.is_bool();
+    }
+}
+
+impl std::fmt::Display for BoolType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "{}", self.name());
+    }
+}
+
+impl TypeOf for bool {
+    fn type_of() -> crate::Type {
+        return crate::Type::Bool(BoolType::default());
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Bool(bool);
+
+impl Bool {
+    pub fn is_true(&self) -> bool {
+        return self.0 == true;
+    }
+
+    pub fn is_false(&self) -> bool {
+        return self.0 == false;
+    }
+
+    pub fn get(&self) -> bool {
+        return self.0;
+    }
+}
+
+impl From<bool> for crate::Value {
+    fn from(value: bool) -> Self {
+        return Self::Bool(Bool(value));
+    }
+}
+
+impl Into<bool> for crate::Value {
+    fn into(self) -> bool {
+        return self.to_bool().get();
+    }
+}
+
+impl From<bool> for Bool {
+    fn from(value: bool) -> Self {
+        return Self(value);
+    }
+}
+
+impl Into<bool> for Bool {
+    fn into(self) -> bool {
+        return self.0;
+    }
+}
+
+impl std::fmt::Display for Bool {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "{}", self.as_ref());
+    }
+}
+
+impl TypeOf for Bool {
+    fn type_of() -> crate::Type {
+        return bool::type_of();
+    }
+}
+
+impl Reflect for Bool {
+    fn reflect(self) -> crate::Value {
+        return crate::Value::Bool(self.clone());
+    }
+}
+
+impl Reflect for bool {
+    fn reflect(self) -> crate::Value {
+        return crate::Value::Bool(Bool(self.clone()));
+    }
+}
+
+impl AsRef<bool> for Bool {
+    fn as_ref(&self) -> &bool {
+        return &self.0;
+    }
+}
+
+impl AsMut<bool> for Bool {
+    fn as_mut(&mut self) -> &mut bool {
+        return &mut self.0;
+    }
+}
+
+impl Deref for Bool {
+    type Target = bool;
+
+    fn deref(&self) -> &Self::Target {
+        return &self.0;
+    }
+}
+
+impl DerefMut for Bool {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        return &mut self.0;
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::*;
+
+    #[test]
+    pub fn truthy() {
+        let value = value_of!(true);
+
+        assert!(value.is_bool());
+        assert!(value.is_true());
+        assert!(value.to_bool().get());
+    }
+
+    #[test]
+    pub fn falsy() {
+        let value = value_of!(false);
+
+        assert!(value.is_bool());
+        assert!(value.is_false());
+        assert!(!value.to_bool().get());
+    }
+}

@@ -1,0 +1,15 @@
+[package]
+name = "zinq-schema-macros"
+description = "macros for the zinq-schema crate."
+readme = "README.md"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]

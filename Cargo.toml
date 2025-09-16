@@ -1,0 +1,18 @@
+[workspace]
+resolver = "3"
+members = [ "zinq", "zinq-*"]
+default-members = ["zinq", "zinq-*"]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+readme = "README.md"
+description = "a family of tools that facilitate schema based use cases, including querying, validation, and more."
+documentation = "https://www.github.com/aacebo/zinq"
+homepage = "https://www.github.com/aacebo/zinq"
+repository = "https://www.github.com/aacebo/zinq"
+
+[workspace.dependencies]
+bytes = { version = "1" }
+serde = { version = "1" }

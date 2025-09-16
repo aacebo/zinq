@@ -1,0 +1,152 @@
+pub mod float;
+pub mod int;
+
+pub use float::*;
+pub use int::*;
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum NumberType {
+    Int(IntType),
+    Float(FloatType),
+}
+
+impl NumberType {
+    pub fn id(&self) -> std::any::TypeId {
+        return match self {
+            Self::Int(v) => v.id(),
+            Self::Float(v) => v.id(),
+        };
+    }
+
+    pub fn name(&self) -> String {
+        return match self {
+            Self::Int(v) => v.name(),
+            Self::Float(v) => v.name(),
+        };
+    }
+
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Number(self.clone());
+    }
+
+    pub fn is_int(&self) -> bool {
+        return match self {
+            Self::Int(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_float(&self) -> bool {
+        return match self {
+            Self::Float(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_signed(&self) -> bool {
+        return match self {
+            Self::Int(v) => v.is_signed(),
+            Self::Float(_) => true,
+        };
+    }
+
+    pub fn to_int(&self) -> IntType {
+        return match self {
+            Self::Int(v) => v.clone(),
+            _ => panic!("called 'to_int' on type '{}'", self.name()),
+        };
+    }
+
+    pub fn to_float(&self) -> FloatType {
+        return match self {
+            Self::Float(v) => v.clone(),
+            _ => panic!("called 'to_float' on type '{}'", self.name()),
+        };
+    }
+
+    pub fn assignable_to(&self, _type: crate::Type) -> bool {
+        return match self {
+            Self::Int(v) => v.assignable_to(_type),
+            Self::Float(v) => v.assignable_to(_type),
+        };
+    }
+
+    pub fn convertable_to(&self, _type: crate::Type) -> bool {
+        return match self {
+            Self::Int(v) => v.convertable_to(_type),
+            Self::Float(v) => v.convertable_to(_type),
+        };
+    }
+}
+
+impl std::fmt::Display for NumberType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return match self {
+            Self::Int(v) => write!(f, "{}", v),
+            Self::Float(v) => write!(f, "{}", v),
+        };
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum Number {
+    Int(Int),
+    Float(Float),
+}
+
+impl Number {
+    pub fn to_type(&self) -> crate::Type {
+        return match self {
+            Self::Int(v) => v.to_type(),
+            Self::Float(v) => v.to_type(),
+        };
+    }
+
+    pub fn is_int(&self) -> bool {
+        return match self {
+            Self::Int(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_float(&self) -> bool {
+        return match self {
+            Self::Float(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn to_int(&self) -> Int {
+        return match self {
+            Self::Int(v) => v.clone(),
+            _ => panic!("called 'to_int' on type '{}'", self.to_type().name()),
+        };
+    }
+
+    pub fn to_float(&self) -> Float {
+        return match self {
+            Self::Float(v) => v.clone(),
+            _ => panic!("called 'to_float' on type '{}'", self.to_type().name()),
+        };
+    }
+}
+
+impl crate::Reflect for Number {
+    fn reflect(self) -> crate::Value {
+        return match self {
+            Self::Int(v) => v.reflect(),
+            Self::Float(v) => v.reflect(),
+        };
+    }
+}
+
+impl std::fmt::Display for Number {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return match self {
+            Self::Int(v) => write!(f, "{}", v),
+            Self::Float(v) => write!(f, "{}", v),
+        };
+    }
+}

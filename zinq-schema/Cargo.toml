@@ -1,0 +1,18 @@
+[package]
+name = "zinq-schema"
+description = "the core schema abstractions for zinq crates."
+readme = "README.md"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[features]
+macros = ["dep:zinq-schema-macros"]
+serde = ["dep:serde", "serde/derive"]
+
+[dependencies]
+zinq-schema-macros = { path = "../zinq-schema-macros", version = "*", optional = true }
+serde = { workspace = true, optional = true }

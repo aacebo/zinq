@@ -1,0 +1,23 @@
+[package]
+name = "zinq"
+description = "a relational schema framework."
+readme = "README.md"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[features]
+macros = ["zinq-schema/macros", "zinq-query/macros", "zinq-validate/macros"]
+query = ["dep:zinq-query"]
+validate = ["dep:zinq-validate"]
+serde = ["dep:serde", "serde/derive", "zinq-schema/serde", "zinq-query/serde", "zinq-reflect/serde"]
+
+[dependencies]
+zinq-schema = { path = "../zinq-schema", version = "*" }
+zinq-reflect = { path = "../zinq-reflect", version = "*" }
+zinq-query = { path = "../zinq-query", version = "*", optional = true }
+zinq-validate = { path = "../zinq-validate", version = "*", optional = true }
+serde = { workspace = true, optional = true }
