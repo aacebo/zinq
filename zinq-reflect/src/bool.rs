@@ -11,8 +11,8 @@ impl BoolType {
         return std::any::TypeId::of::<bool>();
     }
 
-    pub fn name(&self) -> std::string::String {
-        return format!("{}", "type::bool");
+    pub fn name(&self) -> &str {
+        return "bool";
     }
 
     pub fn to_type(&self) -> crate::Type {

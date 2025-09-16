@@ -51,7 +51,7 @@ macro_rules! float_type {
                 };
             }
 
-            pub fn name(&self) -> String {
+            pub fn name(&self) -> &str {
                 return match self {
                     $(Self::$name(v) => v.name(),)*
                 };
@@ -126,8 +126,8 @@ macro_rules! float_type {
                     return std::any::TypeId::of::<$type>();
                 }
 
-                pub fn name(&self) -> String {
-                    return format!("type::{}", stringify!($name));
+                pub fn name(&self) -> &str {
+                    return &stringify!($type);
                 }
 
                 pub fn assignable_to(&self, _type: crate::Type) -> bool {

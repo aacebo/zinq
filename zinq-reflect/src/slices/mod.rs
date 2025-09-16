@@ -21,7 +21,7 @@ impl SliceType {
         };
     }
 
-    pub fn name(&self) -> String {
+    pub fn name(&self) -> &str {
         return match self {
             Self::Sized(v) => v.name(),
             Self::UnSized(v) => v.name(),

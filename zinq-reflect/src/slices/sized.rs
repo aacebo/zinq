@@ -14,8 +14,8 @@ impl SizedSliceType {
         return std::any::TypeId::of::<&Self>();
     }
 
-    pub fn name(&self) -> std::string::String {
-        return format!("type::slice<{}; {}>", self._type.name(), self.size);
+    pub fn name(&self) -> &str {
+        return stringify!(format!("[{}; {}]", &self._type.name(), &self.size));
     }
 
     pub fn len(&self) -> usize {

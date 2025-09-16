@@ -11,8 +11,8 @@ impl PtrType {
         return std::any::TypeId::of::<&Self>();
     }
 
-    pub fn name(&self) -> std::string::String {
-        return format!("type::ptr<{}>", self.0.name());
+    pub fn name(&self) -> &str {
+        return stringify!(format!("&{}", self.0.name()));
     }
 
     pub fn to_type(&self) -> crate::Type {

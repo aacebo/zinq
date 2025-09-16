@@ -4,6 +4,7 @@ mod ptr;
 pub mod slices;
 mod string;
 pub mod structs;
+mod type_id;
 mod type_of;
 mod value;
 mod value_of;
@@ -14,6 +15,7 @@ pub use ptr::*;
 pub use slices::*;
 pub use string::*;
 pub use structs::*;
+pub use type_id::*;
 pub use type_of::*;
 pub use value::*;
 pub use value_of::*;
@@ -41,7 +43,7 @@ impl Type {
         };
     }
 
-    pub fn name(&self) -> std::string::String {
+    pub fn name(&self) -> &str {
         return match self {
             Self::Bool(v) => v.name(),
             Self::Number(v) => v.name(),

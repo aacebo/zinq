@@ -13,8 +13,8 @@ impl UnSizedSliceType {
         return std::any::TypeId::of::<&Self>();
     }
 
-    pub fn name(&self) -> std::string::String {
-        return format!("type::slice<{}>", self._type.name());
+    pub fn name(&self) -> &str {
+        return stringify!(format!("[{}]", self._type.name()));
     }
 
     pub fn to_type(&self) -> crate::Type {

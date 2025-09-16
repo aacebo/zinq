@@ -11,8 +11,8 @@ impl StringType {
         return std::any::TypeId::of::<String>();
     }
 
-    pub fn name(&self) -> std::string::String {
-        return format!("{}", "type::string");
+    pub fn name(&self) -> &str {
+        return "string";
     }
 
     pub fn to_type(&self) -> crate::Type {

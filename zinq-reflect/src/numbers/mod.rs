@@ -19,7 +19,7 @@ impl NumberType {
         };
     }
 
-    pub fn name(&self) -> String {
+    pub fn name(&self) -> &str {
         return match self {
             Self::Int(v) => v.name(),
             Self::Float(v) => v.name(),

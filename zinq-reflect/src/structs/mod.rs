@@ -14,8 +14,8 @@ impl StructType {
         return std::any::TypeId::of::<bool>();
     }
 
-    pub fn name(&self) -> std::string::String {
-        return format!("type::struct::{}", &self.name);
+    pub fn name(&self) -> &str {
+        return &self.name;
     }
 
     pub fn len(&self) -> usize {
