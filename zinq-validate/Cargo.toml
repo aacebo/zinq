@@ -13,5 +13,5 @@ repository.workspace = true
 macros = ["dep:zinq-validate-macros", "zinq-schema/macros"]
 
 [dependencies]
-zinq-schema = { path = "../zinq-schema", version = "*" }
-zinq-validate-macros = { path = "../zinq-validate-macros", version = "*", optional = true }
+zinq-schema = { workspace = true }
+zinq-validate-macros = { workspace = true, optional = true }

@@ -14,7 +14,7 @@ macros = ["dep:zinq-query-macros", "zinq-schema/macros"]
 serde = ["dep:serde", "serde/derive", "zinq-schema/serde"]
 
 [dependencies]
-zinq-schema = { path = "../zinq-schema", version = "*" }
-zinq-query-macros = { path = "../zinq-query-macros", version = "*", optional = true }
+zinq-schema = { workspace = true }
+zinq-query-macros = { workspace = true, optional = true }
 bytes = { workspace = true }
 serde = { workspace = true, optional = true }
