@@ -32,7 +32,7 @@ pub enum Type {
 }
 
 impl Type {
-    pub fn id(&self) -> std::any::TypeId {
+    pub fn id(&self) -> TypeId {
         return match self {
             Self::Bool(v) => v.id(),
             Self::Number(v) => v.id(),
@@ -43,22 +43,11 @@ impl Type {
         };
     }
 
-    pub fn name(&self) -> &str {
-        return match self {
-            Self::Bool(v) => v.name(),
-            Self::Number(v) => v.name(),
-            Self::String(v) => v.name(),
-            Self::Ptr(v) => v.name(),
-            Self::Slice(v) => v.name(),
-            Self::Struct(v) => v.name(),
-        };
-    }
-
     pub fn len(&self) -> usize {
         return match self {
             Self::Slice(v) => v.len(),
             Self::Struct(v) => v.len(),
-            _ => panic!("called 'len' on '{}'", self.name()),
+            _ => panic!("called 'len' on '{}'", self.id()),
         };
     }
 
@@ -142,56 +131,56 @@ impl Type {
     pub fn to_bool(&self) -> BoolType {
         return match self {
             Self::Bool(v) => v.clone(),
-            _ => panic!("called 'to_bool' on '{}'", self.name()),
+            _ => panic!("called 'to_bool' on '{}'", self.id()),
         };
     }
 
     pub fn to_ptr(&self) -> PtrType {
         return match self {
             Self::Ptr(v) => v.clone(),
-            _ => panic!("called 'to_ptr' on '{}'", self.name()),
+            _ => panic!("called 'to_ptr' on '{}'", self.id()),
         };
     }
 
     pub fn to_slice(&self) -> SliceType {
         return match self {
             Self::Slice(v) => v.clone(),
-            _ => panic!("called 'to_slice' on '{}'", self.name()),
+            _ => panic!("called 'to_slice' on '{}'", self.id()),
         };
     }
 
     pub fn to_struct(&self) -> StructType {
         return match self {
             Self::Struct(v) => v.clone(),
-            _ => panic!("called 'to_struct' on '{}'", self.name()),
+            _ => panic!("called 'to_struct' on '{}'", self.id()),
         };
     }
 
     pub fn to_number(&self) -> NumberType {
         return match self {
             Self::Number(v) => v.clone(),
-            _ => panic!("called 'to_number' on '{}'", self.name()),
+            _ => panic!("called 'to_number' on '{}'", self.id()),
         };
     }
 
     pub fn to_int(&self) -> IntType {
         return match self {
             Self::Number(v) => v.to_int(),
-            _ => panic!("called 'to_int' on '{}'", self.name()),
+            _ => panic!("called 'to_int' on '{}'", self.id()),
         };
     }
 
     pub fn to_float(&self) -> FloatType {
         return match self {
             Self::Number(v) => v.to_float(),
-            _ => panic!("called 'to_float' on '{}'", self.name()),
+            _ => panic!("called 'to_float' on '{}'", self.id()),
         };
     }
 
     pub fn to_string(&self) -> StringType {
         return match self {
             Self::String(v) => v.clone(),
-            _ => panic!("called 'to_string' on '{}'", self.name()),
+            _ => panic!("called 'to_string' on '{}'", self.id()),
         };
     }
 

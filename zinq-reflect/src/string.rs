@@ -7,12 +7,8 @@ use crate::{Reflect, TypeOf};
 pub struct StringType;
 
 impl StringType {
-    pub fn id(&self) -> std::any::TypeId {
-        return std::any::TypeId::of::<String>();
-    }
-
-    pub fn name(&self) -> &str {
-        return "string";
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_str("string");
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -30,7 +26,7 @@ impl StringType {
 
 impl std::fmt::Display for StringType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.name());
+        return write!(f, "{}", self.id());
     }
 }
 

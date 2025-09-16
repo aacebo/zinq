@@ -45,15 +45,9 @@ macro_rules! float_type {
         }
 
         impl FloatType {
-            pub fn id(&self) -> std::any::TypeId {
+            pub fn id(&self) -> crate::TypeId {
                 return match self {
                     $(Self::$name(v) => v.id(),)*
-                };
-            }
-
-            pub fn name(&self) -> &str {
-                return match self {
-                    $(Self::$name(v) => v.name(),)*
                 };
             }
 
@@ -122,12 +116,8 @@ macro_rules! float_type {
             pub struct $type_name;
 
             impl $type_name {
-                pub fn id(&self) -> std::any::TypeId {
-                    return std::any::TypeId::of::<$type>();
-                }
-
-                pub fn name(&self) -> &str {
-                    return &stringify!($type);
+                pub fn id(&self) -> crate::TypeId {
+                    return crate::TypeId::from_str(&stringify!($type));
                 }
 
                 pub fn assignable_to(&self, _type: crate::Type) -> bool {
@@ -141,7 +131,7 @@ macro_rules! float_type {
 
             impl std::fmt::Display for $type_name {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    return write!(f, "{}", self.name());
+                    return write!(f, "{}", self.id());
                 }
             }
 

@@ -12,17 +12,10 @@ pub enum NumberType {
 }
 
 impl NumberType {
-    pub fn id(&self) -> std::any::TypeId {
+    pub fn id(&self) -> crate::TypeId {
         return match self {
             Self::Int(v) => v.id(),
             Self::Float(v) => v.id(),
-        };
-    }
-
-    pub fn name(&self) -> &str {
-        return match self {
-            Self::Int(v) => v.name(),
-            Self::Float(v) => v.name(),
         };
     }
 
@@ -54,14 +47,14 @@ impl NumberType {
     pub fn to_int(&self) -> IntType {
         return match self {
             Self::Int(v) => v.clone(),
-            _ => panic!("called 'to_int' on type '{}'", self.name()),
+            _ => panic!("called 'to_int' on type '{}'", self.id()),
         };
     }
 
     pub fn to_float(&self) -> FloatType {
         return match self {
             Self::Float(v) => v.clone(),
-            _ => panic!("called 'to_float' on type '{}'", self.name()),
+            _ => panic!("called 'to_float' on type '{}'", self.id()),
         };
     }
 
@@ -121,14 +114,14 @@ impl Number {
     pub fn to_int(&self) -> Int {
         return match self {
             Self::Int(v) => v.clone(),
-            _ => panic!("called 'to_int' on type '{}'", self.to_type().name()),
+            _ => panic!("called 'to_int' on type '{}'", self.to_type().id()),
         };
     }
 
     pub fn to_float(&self) -> Float {
         return match self {
             Self::Float(v) => v.clone(),
-            _ => panic!("called 'to_float' on type '{}'", self.to_type().name()),
+            _ => panic!("called 'to_float' on type '{}'", self.to_type().id()),
         };
     }
 }

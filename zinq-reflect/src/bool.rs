@@ -7,12 +7,8 @@ use crate::{Reflect, TypeOf};
 pub struct BoolType;
 
 impl BoolType {
-    pub fn id(&self) -> std::any::TypeId {
-        return std::any::TypeId::of::<bool>();
-    }
-
-    pub fn name(&self) -> &str {
-        return "bool";
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_str("bool");
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -30,7 +26,7 @@ impl BoolType {
 
 impl std::fmt::Display for BoolType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.name());
+        return write!(f, "{}", self.id());
     }
 }
 

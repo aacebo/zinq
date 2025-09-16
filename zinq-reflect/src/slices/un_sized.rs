@@ -5,38 +5,34 @@ use crate::{Reflect, TypeOf};
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UnSizedSliceType {
-    _type: Box<crate::Type>,
+    ty: Box<crate::Type>,
 }
 
 impl UnSizedSliceType {
-    pub fn id(&self) -> std::any::TypeId {
-        return std::any::TypeId::of::<&Self>();
-    }
-
-    pub fn name(&self) -> &str {
-        return stringify!(format!("[{}]", self._type.name()));
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_string(format!("[{}]", self.ty.id()));
     }
 
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Slice(crate::SliceType::UnSized(self.clone()));
     }
 
-    pub fn is_slice_of(&self, _type: crate::Type) -> bool {
-        return _type.eq(&self._type);
+    pub fn is_slice_of(&self, ty: crate::Type) -> bool {
+        return ty.eq(&self.ty);
     }
 
-    pub fn assignable_to(&self, _type: crate::Type) -> bool {
-        return self.id() == _type.id();
+    pub fn assignable_to(&self, ty: crate::Type) -> bool {
+        return self.id() == ty.id();
     }
 
-    pub fn convertable_to(&self, _type: crate::Type) -> bool {
-        return _type.is_slice_of(*self._type.clone());
+    pub fn convertable_to(&self, ty: crate::Type) -> bool {
+        return ty.is_slice_of(*self.ty.clone());
     }
 }
 
 impl std::fmt::Display for UnSizedSliceType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.name());
+        return write!(f, "{}", self.id());
     }
 }
 
@@ -46,7 +42,7 @@ where
 {
     fn type_of() -> crate::Type {
         return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
-            _type: Box::new(T::type_of()),
+            ty: Box::new(T::type_of()),
         }));
     }
 }
@@ -61,7 +57,7 @@ pub struct UnSizedSlice {
 impl UnSizedSlice {
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
-            _type: Box::new(self._type.clone()),
+            ty: Box::new(self._type.clone()),
         }));
     }
 

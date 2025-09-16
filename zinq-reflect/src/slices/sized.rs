@@ -5,17 +5,13 @@ use crate::{Reflect, TypeOf};
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SizedSliceType {
-    _type: Box<crate::Type>,
+    ty: Box<crate::Type>,
     size: usize,
 }
 
 impl SizedSliceType {
-    pub fn id(&self) -> std::any::TypeId {
-        return std::any::TypeId::of::<&Self>();
-    }
-
-    pub fn name(&self) -> &str {
-        return stringify!(format!("[{}; {}]", &self._type.name(), &self.size));
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_string(format!("[{}; {}]", &self.ty.id(), &self.size));
     }
 
     pub fn len(&self) -> usize {
@@ -26,22 +22,22 @@ impl SizedSliceType {
         return crate::Type::Slice(crate::SliceType::Sized(self.clone()));
     }
 
-    pub fn is_slice_of(&self, _type: crate::Type) -> bool {
-        return _type.eq(&self._type);
+    pub fn is_slice_of(&self, ty: crate::Type) -> bool {
+        return ty.eq(&self.ty);
     }
 
-    pub fn assignable_to(&self, _type: crate::Type) -> bool {
-        return self.id() == _type.id();
+    pub fn assignable_to(&self, ty: crate::Type) -> bool {
+        return self.id() == ty.id();
     }
 
-    pub fn convertable_to(&self, _type: crate::Type) -> bool {
-        return _type.is_slice_of(*self._type.clone());
+    pub fn convertable_to(&self, ty: crate::Type) -> bool {
+        return ty.is_slice_of(*self.ty.clone());
     }
 }
 
 impl std::fmt::Display for SizedSliceType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.name());
+        return write!(f, "{}", self.id());
     }
 }
 
@@ -50,8 +46,10 @@ where
     T: TypeOf,
 {
     fn type_of() -> crate::Type {
+        let ty = T::type_of();
+
         return crate::Type::Slice(crate::SliceType::Sized(SizedSliceType {
-            _type: Box::new(T::type_of()),
+            ty: Box::new(ty),
             size: N,
         }));
     }
@@ -60,7 +58,7 @@ where
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SizedSlice {
-    _type: crate::Type,
+    ty: crate::Type,
     size: usize,
     value: Vec<crate::Value>,
 }
@@ -68,7 +66,7 @@ pub struct SizedSlice {
 impl SizedSlice {
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Slice(crate::SliceType::Sized(SizedSliceType {
-            _type: Box::new(self._type.clone()),
+            ty: Box::new(self.ty.clone()),
             size: self.size,
         }));
     }
@@ -89,7 +87,7 @@ impl SizedSlice {
 impl<const N: usize> From<[crate::Value; N]> for SizedSlice {
     fn from(value: [crate::Value; N]) -> Self {
         return Self {
-            _type: value.first().unwrap().to_type(),
+            ty: value.first().unwrap().to_type(),
             size: N,
             value: value.to_vec(),
         };
@@ -118,7 +116,7 @@ where
 {
     fn reflect(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::Sized(SizedSlice {
-            _type: T::type_of(),
+            ty: T::type_of(),
             size: N,
             value: self.iter().map(|v| v.clone().reflect()).collect(),
         }));

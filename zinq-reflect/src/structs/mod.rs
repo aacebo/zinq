@@ -10,12 +10,8 @@ pub struct StructType {
 }
 
 impl StructType {
-    pub fn id(&self) -> std::any::TypeId {
-        return std::any::TypeId::of::<bool>();
-    }
-
-    pub fn name(&self) -> &str {
-        return &self.name;
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_str(&self.name);
     }
 
     pub fn len(&self) -> usize {

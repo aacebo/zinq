@@ -14,24 +14,17 @@ pub enum SliceType {
 }
 
 impl SliceType {
-    pub fn id(&self) -> std::any::TypeId {
+    pub fn id(&self) -> crate::TypeId {
         return match self {
             Self::Sized(v) => v.id(),
             Self::UnSized(v) => v.id(),
         };
     }
 
-    pub fn name(&self) -> &str {
-        return match self {
-            Self::Sized(v) => v.name(),
-            Self::UnSized(v) => v.name(),
-        };
-    }
-
     pub fn len(&self) -> usize {
         return match self {
             Self::Sized(v) => v.len(),
-            Self::UnSized(_) => panic!("called 'len' on type '{}'", self.name()),
+            Self::UnSized(_) => panic!("called 'len' on type '{}'", self.id()),
         };
     }
 
@@ -63,14 +56,14 @@ impl SliceType {
     pub fn to_sized(&self) -> SizedSliceType {
         return match self {
             Self::Sized(v) => v.clone(),
-            _ => panic!("called 'to_sized' on type '{}'", self.name()),
+            _ => panic!("called 'to_sized' on type '{}'", self.id()),
         };
     }
 
     pub fn to_unsized(&self) -> UnSizedSliceType {
         return match self {
             Self::UnSized(v) => v.clone(),
-            _ => panic!("called 'to_unsized' on type '{}'", self.name()),
+            _ => panic!("called 'to_unsized' on type '{}'", self.id()),
         };
     }
 
@@ -144,14 +137,14 @@ impl Slice {
     pub fn to_sized(&self) -> SizedSlice {
         return match self {
             Self::Sized(v) => v.clone(),
-            _ => panic!("called 'to_sized' on type '{}'", self.to_type().name()),
+            _ => panic!("called 'to_sized' on type '{}'", self.to_type().id()),
         };
     }
 
     pub fn to_unsized(&self) -> UnSizedSlice {
         return match self {
             Self::UnSized(v) => v.clone(),
-            _ => panic!("called 'to_unsized' on type '{}'", self.to_type().name()),
+            _ => panic!("called 'to_unsized' on type '{}'", self.to_type().id()),
         };
     }
 
