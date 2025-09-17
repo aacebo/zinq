@@ -50,14 +50,14 @@ where
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UnSizedSlice {
-    _type: crate::Type,
+    ty: crate::Type,
     value: Vec<crate::Value>,
 }
 
 impl UnSizedSlice {
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
-            ty: Box::new(self._type.clone()),
+            ty: Box::new(self.ty.clone()),
         }));
     }
 
@@ -77,7 +77,7 @@ impl UnSizedSlice {
 impl From<&[crate::Value]> for UnSizedSlice {
     fn from(value: &[crate::Value]) -> Self {
         return Self {
-            _type: value.first().unwrap().to_type(),
+            ty: value.first().unwrap().to_type(),
             value: value.to_vec(),
         };
     }
@@ -105,7 +105,7 @@ where
 {
     fn reflect(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::UnSized(UnSizedSlice {
-            _type: T::type_of(),
+            ty: T::type_of(),
             value: self.iter().map(|v| v.clone().reflect()).collect(),
         }));
     }

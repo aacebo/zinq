@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Param {
     name: String,
-    _type: Box<crate::Type>,
+    ty: Box<crate::Type>,
 }
 
 impl Param {
@@ -11,12 +11,12 @@ impl Param {
     }
 
     pub fn ty(&self) -> &crate::Type {
-        return &self._type;
+        return &self.ty;
     }
 }
 
 impl std::fmt::Display for Param {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}: {}", &self.name, &self._type);
+        return write!(f, "{}: {}", &self.name, &self.ty);
     }
 }

@@ -15,12 +15,12 @@ impl StringType {
         return crate::Type::String(self.clone());
     }
 
-    pub fn assignable_to(&self, _type: crate::Type) -> bool {
-        return self.id() == _type.id();
+    pub fn assignable_to(&self, ty: crate::Type) -> bool {
+        return self.id() == ty.id();
     }
 
-    pub fn convertable_to(&self, _type: crate::Type) -> bool {
-        return _type.is_string();
+    pub fn convertable_to(&self, ty: crate::Type) -> bool {
+        return ty.is_string();
     }
 }
 

@@ -5,7 +5,7 @@ use crate::Visibility;
 pub struct Field {
     visibility: Visibility,
     name: String,
-    _type: Box<crate::Type>,
+    ty: Box<crate::Type>,
 }
 
 impl Field {
@@ -18,12 +18,12 @@ impl Field {
     }
 
     pub fn ty(&self) -> &crate::Type {
-        return &self._type;
+        return &self.ty;
     }
 }
 
 impl std::fmt::Display for Field {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{} {}: {},", &self.visibility, &self.name, &self._type);
+        return write!(f, "{} {}: {},", &self.visibility, &self.name, &self.ty);
     }
 }

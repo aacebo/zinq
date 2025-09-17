@@ -65,9 +65,9 @@ impl Type {
         };
     }
 
-    pub fn is_ptr_of(&self, _type: Self) -> bool {
+    pub fn is_ptr_of(&self, ty: Self) -> bool {
         return match self {
-            Self::Ptr(v) => v.is_ptr_of(_type),
+            Self::Ptr(v) => v.is_ptr_of(ty),
             _ => false,
         };
     }
@@ -79,9 +79,9 @@ impl Type {
         };
     }
 
-    pub fn is_slice_of(&self, _type: Self) -> bool {
+    pub fn is_slice_of(&self, ty: Self) -> bool {
         return match self {
-            Self::Slice(v) => v.is_slice_of(_type),
+            Self::Slice(v) => v.is_slice_of(ty),
             _ => false,
         };
     }
@@ -184,25 +184,25 @@ impl Type {
         };
     }
 
-    pub fn assignable_to(&self, _type: Self) -> bool {
+    pub fn assignable_to(&self, ty: Self) -> bool {
         return match self {
-            Self::Bool(v) => v.assignable_to(_type),
-            Self::Number(v) => v.assignable_to(_type),
-            Self::String(v) => v.assignable_to(_type),
-            Self::Ptr(v) => v.assignable_to(_type),
-            Self::Slice(v) => v.assignable_to(_type),
-            Self::Struct(v) => v.assignable_to(_type),
+            Self::Bool(v) => v.assignable_to(ty),
+            Self::Number(v) => v.assignable_to(ty),
+            Self::String(v) => v.assignable_to(ty),
+            Self::Ptr(v) => v.assignable_to(ty),
+            Self::Slice(v) => v.assignable_to(ty),
+            Self::Struct(v) => v.assignable_to(ty),
         };
     }
 
-    pub fn convertable_to(&self, _type: Self) -> bool {
+    pub fn convertable_to(&self, ty: Self) -> bool {
         return match self {
-            Self::Bool(v) => v.convertable_to(_type),
-            Self::Number(v) => v.convertable_to(_type),
-            Self::String(v) => v.convertable_to(_type),
-            Self::Ptr(v) => v.convertable_to(_type),
-            Self::Slice(v) => v.convertable_to(_type),
-            Self::Struct(v) => v.convertable_to(_type),
+            Self::Bool(v) => v.convertable_to(ty),
+            Self::Number(v) => v.convertable_to(ty),
+            Self::String(v) => v.convertable_to(ty),
+            Self::Ptr(v) => v.convertable_to(ty),
+            Self::Slice(v) => v.convertable_to(ty),
+            Self::Struct(v) => v.convertable_to(ty),
         };
     }
 }

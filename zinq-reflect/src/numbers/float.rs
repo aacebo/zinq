@@ -71,15 +71,15 @@ macro_rules! float_type {
                 }
             )*
 
-            pub fn assignable_to(&self, _type: crate::Type) -> bool {
+            pub fn assignable_to(&self, ty: crate::Type) -> bool {
                 return match self {
-                    $(Self::$name(v) => v.assignable_to(_type),)*
+                    $(Self::$name(v) => v.assignable_to(ty),)*
                 };
             }
 
-            pub fn convertable_to(&self, _type: crate::Type) -> bool {
+            pub fn convertable_to(&self, ty: crate::Type) -> bool {
                 return match self {
-                    $(Self::$name(v) => v.convertable_to(_type),)*
+                    $(Self::$name(v) => v.convertable_to(ty),)*
                 };
             }
         }
@@ -120,12 +120,12 @@ macro_rules! float_type {
                     return crate::TypeId::from_str(&stringify!($type));
                 }
 
-                pub fn assignable_to(&self, _type: crate::Type) -> bool {
-                    return self.id() == _type.id();
+                pub fn assignable_to(&self, ty: crate::Type) -> bool {
+                    return self.id() == ty.id();
                 }
 
-                pub fn convertable_to(&self, _type: crate::Type) -> bool {
-                    return _type.is_float();
+                pub fn convertable_to(&self, ty: crate::Type) -> bool {
+                    return ty.is_float();
                 }
             }
 

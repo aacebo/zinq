@@ -46,10 +46,10 @@ impl SliceType {
         };
     }
 
-    pub fn is_slice_of(&self, _type: crate::Type) -> bool {
+    pub fn is_slice_of(&self, ty: crate::Type) -> bool {
         return match self {
-            Self::Sized(v) => v.is_slice_of(_type),
-            Self::UnSized(v) => v.is_slice_of(_type),
+            Self::Sized(v) => v.is_slice_of(ty),
+            Self::UnSized(v) => v.is_slice_of(ty),
         };
     }
 
@@ -67,17 +67,17 @@ impl SliceType {
         };
     }
 
-    pub fn assignable_to(&self, _type: crate::Type) -> bool {
+    pub fn assignable_to(&self, ty: crate::Type) -> bool {
         return match self {
-            Self::Sized(v) => v.assignable_to(_type),
-            Self::UnSized(v) => v.assignable_to(_type),
+            Self::Sized(v) => v.assignable_to(ty),
+            Self::UnSized(v) => v.assignable_to(ty),
         };
     }
 
-    pub fn convertable_to(&self, _type: crate::Type) -> bool {
+    pub fn convertable_to(&self, ty: crate::Type) -> bool {
         return match self {
-            Self::Sized(v) => v.convertable_to(_type),
-            Self::UnSized(v) => v.convertable_to(_type),
+            Self::Sized(v) => v.convertable_to(ty),
+            Self::UnSized(v) => v.convertable_to(ty),
         };
     }
 }

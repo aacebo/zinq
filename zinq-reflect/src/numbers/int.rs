@@ -83,15 +83,15 @@ macro_rules! int_type {
                 }
             )*
 
-            pub fn assignable_to(&self, _type: crate::Type) -> bool {
+            pub fn assignable_to(&self, ty: crate::Type) -> bool {
                 return match self {
-                    $(Self::$name(v) => v.assignable_to(_type),)*
+                    $(Self::$name(v) => v.assignable_to(ty),)*
                 };
             }
 
-            pub fn convertable_to(&self, _type: crate::Type) -> bool {
+            pub fn convertable_to(&self, ty: crate::Type) -> bool {
                 return match self {
-                    $(Self::$name(v) => v.convertable_to(_type),)*
+                    $(Self::$name(v) => v.convertable_to(ty),)*
                 };
             }
         }
@@ -126,12 +126,12 @@ macro_rules! int_type {
                     return crate::Type::Number(crate::NumberType::Int(IntType::$name($type_name)));
                 }
 
-                pub fn assignable_to(&self, _type: crate::Type) -> bool {
-                    return self.id() == _type.id();
+                pub fn assignable_to(&self, ty: crate::Type) -> bool {
+                    return self.id() == ty.id();
                 }
 
-                pub fn convertable_to(&self, _type: crate::Type) -> bool {
-                    return _type.is_int() && self.is_signed() == _type.is_signed();
+                pub fn convertable_to(&self, ty: crate::Type) -> bool {
+                    return ty.is_int() && self.is_signed() == ty.is_signed();
                 }
             }
 

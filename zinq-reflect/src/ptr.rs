@@ -15,16 +15,16 @@ impl PtrType {
         return crate::Type::Ptr(self.clone());
     }
 
-    pub fn is_ptr_of(&self, _type: crate::Type) -> bool {
-        return _type.eq(&self.0);
+    pub fn is_ptr_of(&self, ty: crate::Type) -> bool {
+        return ty.eq(&self.0);
     }
 
-    pub fn assignable_to(&self, _type: crate::Type) -> bool {
-        return self.id() == _type.id();
+    pub fn assignable_to(&self, ty: crate::Type) -> bool {
+        return self.id() == ty.id();
     }
 
-    pub fn convertable_to(&self, _type: crate::Type) -> bool {
-        return _type.is_ptr_of(*self.0.clone());
+    pub fn convertable_to(&self, ty: crate::Type) -> bool {
+        return ty.is_ptr_of(*self.0.clone());
     }
 }
 

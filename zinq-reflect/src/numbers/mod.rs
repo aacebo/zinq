@@ -58,17 +58,17 @@ impl NumberType {
         };
     }
 
-    pub fn assignable_to(&self, _type: crate::Type) -> bool {
+    pub fn assignable_to(&self, ty: crate::Type) -> bool {
         return match self {
-            Self::Int(v) => v.assignable_to(_type),
-            Self::Float(v) => v.assignable_to(_type),
+            Self::Int(v) => v.assignable_to(ty),
+            Self::Float(v) => v.assignable_to(ty),
         };
     }
 
-    pub fn convertable_to(&self, _type: crate::Type) -> bool {
+    pub fn convertable_to(&self, ty: crate::Type) -> bool {
         return match self {
-            Self::Int(v) => v.convertable_to(_type),
-            Self::Float(v) => v.convertable_to(_type),
+            Self::Int(v) => v.convertable_to(ty),
+            Self::Float(v) => v.convertable_to(ty),
         };
     }
 }

@@ -66,9 +66,9 @@ impl Value {
         };
     }
 
-    pub fn is_ptr_of(&self, _type: Type) -> bool {
+    pub fn is_ptr_of(&self, ty: Type) -> bool {
         return match self {
-            Self::Ptr(v) => v.to_type().is_ptr_of(_type),
+            Self::Ptr(v) => v.to_type().is_ptr_of(ty),
             _ => false,
         };
     }
