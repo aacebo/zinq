@@ -1,3 +1,5 @@
+use std::ops::{Deref, DerefMut};
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TypeId(String);
@@ -35,5 +37,31 @@ impl PartialEq<&str> for TypeId {
 impl PartialEq<String> for TypeId {
     fn eq(&self, other: &String) -> bool {
         return &self.0 == other;
+    }
+}
+
+impl AsRef<TypeId> for TypeId {
+    fn as_ref(&self) -> &TypeId {
+        return self;
+    }
+}
+
+impl AsMut<TypeId> for TypeId {
+    fn as_mut(&mut self) -> &mut TypeId {
+        return self;
+    }
+}
+
+impl Deref for TypeId {
+    type Target = Self;
+
+    fn deref(&self) -> &Self::Target {
+        return self;
+    }
+}
+
+impl DerefMut for TypeId {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        return self;
     }
 }
