@@ -6,7 +6,7 @@ pub use members::*;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
     name: String,
-    members: Vec<MemberType>,
+    members: Vec<Member>,
 }
 
 impl StructType {
@@ -30,7 +30,7 @@ impl StructType {
         return _type.is_bool();
     }
 
-    pub fn iter(&self) -> std::slice::Iter<'_, MemberType> {
+    pub fn iter(&self) -> std::slice::Iter<'_, Member> {
         return self.members.iter();
     }
 
@@ -38,11 +38,11 @@ impl StructType {
         return self.members.iter().any(|v| v.name() == name);
     }
 
-    pub fn member(&self, name: &str) -> &MemberType {
+    pub fn member(&self, name: &str) -> &Member {
         return self.members.iter().find(|v| v.name() == name).unwrap();
     }
 
-    pub fn member_mut(&mut self, name: &str) -> &mut MemberType {
+    pub fn member_mut(&mut self, name: &str) -> &mut Member {
         return self.members.iter_mut().find(|v| v.name() == name).unwrap();
     }
 }

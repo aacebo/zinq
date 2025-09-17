@@ -10,12 +10,12 @@ pub use visibility::*;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum MemberType {
+pub enum Member {
     Field(Field),
     Method(Method),
 }
 
-impl MemberType {
+impl Member {
     pub fn vis(&self) -> Visibility {
         return match self {
             Self::Field(v) => v.vis(),
@@ -59,7 +59,7 @@ impl MemberType {
     }
 }
 
-impl std::fmt::Display for MemberType {
+impl std::fmt::Display for Member {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
             Self::Field(v) => write!(f, "{}", v),
