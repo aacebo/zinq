@@ -1,4 +1,5 @@
 mod bool;
+pub mod enums;
 pub mod numbers;
 mod ptr;
 pub mod slices;
@@ -10,6 +11,7 @@ mod value;
 mod value_of;
 
 pub use bool::*;
+pub use enums::*;
 pub use numbers::*;
 pub use ptr::*;
 pub use slices::*;
@@ -27,6 +29,7 @@ pub use zinq_reflect_macros::*;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {
     Bool(BoolType),
+    Enum(EnumType),
     Number(NumberType),
     String(StringType),
     Ptr(PtrType),
@@ -38,6 +41,7 @@ impl Type {
     pub fn id(&self) -> TypeId {
         return match self {
             Self::Bool(v) => v.id(),
+            Self::Enum(v) => v.id(),
             Self::Number(v) => v.id(),
             Self::String(v) => v.id(),
             Self::Ptr(v) => v.id(),
@@ -48,6 +52,7 @@ impl Type {
 
     pub fn len(&self) -> usize {
         return match self {
+            Self::Enum(v) => v.len(),
             Self::Slice(v) => v.len(),
             Self::Struct(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.id()),
@@ -57,6 +62,13 @@ impl Type {
     pub fn is_bool(&self) -> bool {
         return match self {
             Self::Bool(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_enum(&self) -> bool {
+        return match self {
+            Self::Enum(_) => true,
             _ => false,
         };
     }
@@ -138,6 +150,13 @@ impl Type {
         };
     }
 
+    pub fn to_enum(&self) -> EnumType {
+        return match self {
+            Self::Enum(v) => v.clone(),
+            _ => panic!("called 'to_enum' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_ptr(&self) -> PtrType {
         return match self {
             Self::Ptr(v) => v.clone(),
@@ -190,6 +209,7 @@ impl Type {
     pub fn assignable_to(&self, ty: Self) -> bool {
         return match self {
             Self::Bool(v) => v.assignable_to(ty),
+            Self::Enum(v) => v.assignable_to(ty),
             Self::Number(v) => v.assignable_to(ty),
             Self::String(v) => v.assignable_to(ty),
             Self::Ptr(v) => v.assignable_to(ty),
@@ -201,6 +221,7 @@ impl Type {
     pub fn convertable_to(&self, ty: Self) -> bool {
         return match self {
             Self::Bool(v) => v.convertable_to(ty),
+            Self::Enum(v) => v.convertable_to(ty),
             Self::Number(v) => v.convertable_to(ty),
             Self::String(v) => v.convertable_to(ty),
             Self::Ptr(v) => v.convertable_to(ty),
@@ -214,6 +235,7 @@ impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
             Self::Bool(v) => write!(f, "{}", v),
+            Self::Enum(v) => write!(f, "{}", v),
             Self::Number(v) => write!(f, "{}", v),
             Self::String(v) => write!(f, "{}", v),
             Self::Ptr(v) => write!(f, "{}", v),
