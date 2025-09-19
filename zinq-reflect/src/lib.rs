@@ -20,6 +20,9 @@ pub use type_of::*;
 pub use value::*;
 pub use value_of::*;
 
+#[cfg(feature = "macros")]
+pub use zinq_reflect_macros::*;
+
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {

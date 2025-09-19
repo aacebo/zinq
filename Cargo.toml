@@ -15,6 +15,7 @@ repository = "https://www.github.com/aacebo/zinq"
 
 [workspace.dependencies]
 zinq-reflect = { path = "./zinq-reflect", version = "0.0.0" }
+zinq-reflect-macros = { path = "./zinq-reflect-macros", version = "0.0.0" }
 zinq-schema = { path = "./zinq-schema", version = "0.0.0" }
 zinq-schema-macros = { path = "./zinq-schema-macros", version = "0.0.0" }
 zinq-query = { path = "./zinq-query", version = "0.0.0" }
@@ -24,3 +25,6 @@ zinq-validate-macros = { path = "./zinq-validate-macros", version = "0.0.0" }
 
 bytes = { version = "1" }
 serde = { version = "1" }
+syn = { version = "2" }
+quote = { version = "1" }
+proc-macro2 = { version = "1" }

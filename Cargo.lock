@@ -93,6 +93,17 @@ name = "zinq-reflect"
 version = "0.0.0"
 dependencies = [
  "serde",
+ "zinq-reflect-macros",
+]
+
+[[package]]
+name = "zinq-reflect-macros"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "zinq-reflect",
 ]
 
 [[package]]

@@ -10,6 +10,13 @@ pub struct StructType {
 }
 
 impl StructType {
+    pub fn new(name: &str, members: &[Member]) -> Self {
+        return Self {
+            name: name.to_string(),
+            members: members.to_vec(),
+        };
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_str(&self.name);
     }
