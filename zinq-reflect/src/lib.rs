@@ -9,6 +9,7 @@ mod type_id;
 mod type_of;
 mod value;
 mod value_of;
+mod visibility;
 
 pub use bool::*;
 pub use enums::*;
@@ -21,6 +22,7 @@ pub use type_id::*;
 pub use type_of::*;
 pub use value::*;
 pub use value_of::*;
+pub use visibility::*;
 
 #[cfg(feature = "macros")]
 pub use zinq_reflect_macros::*;

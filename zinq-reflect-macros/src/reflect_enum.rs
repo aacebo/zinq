@@ -1,7 +1,6 @@
-use proc_macro::TokenStream;
 use quote::quote;
 
-pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> TokenStream {
+pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
     let variants = ty
         .variants
@@ -68,7 +67,7 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> TokenStream
         })
         .collect::<Vec<_>>();
 
-    return TokenStream::from(quote! {
+    return quote! {
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
                 return ::zinq_reflect::EnumType::new(
@@ -77,5 +76,5 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> TokenStream
                 ).to_type();
             }
         }
-    });
+    };
 }

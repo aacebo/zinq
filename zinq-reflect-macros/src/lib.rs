@@ -1,8 +1,10 @@
 mod reflect_enum;
 mod reflect_struct;
+mod reflect_visibility;
 
 use reflect_enum::*;
 use reflect_struct::*;
+use reflect_visibility::*;
 
 use proc_macro::TokenStream;
 
@@ -14,5 +16,6 @@ pub fn reflect(tokens: TokenStream) -> TokenStream {
         syn::Data::Struct(ty) => reflect_struct(&input, ty),
         syn::Data::Enum(ty) => reflect_enum(&input, ty),
         _ => panic!("unsupported Reflect type '{}'", &input.ident),
-    };
+    }
+    .into();
 }

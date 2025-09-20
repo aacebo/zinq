@@ -1,12 +1,10 @@
 mod field;
 mod method;
 mod param;
-mod visibility;
 
 pub use field::*;
 pub use method::*;
 pub use param::*;
-pub use visibility::*;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -16,7 +14,7 @@ pub enum Member {
 }
 
 impl Member {
-    pub fn vis(&self) -> Visibility {
+    pub fn vis(&self) -> Option<crate::Visibility> {
         return match self {
             Self::Field(v) => v.vis(),
             Self::Method(v) => v.vis(),

@@ -1,38 +1,47 @@
-use std::collections::BTreeMap;
-
-use proc_macro::TokenStream;
 use quote::quote;
 
-pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> TokenStream {
+use crate::reflect_visibility;
+
+pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let fields = match &ty.fields {
-        syn::Fields::Named(field) => {
-            let mut fields = BTreeMap::<syn::Ident, syn::Type>::new();
+    let members = match &ty.fields {
+        syn::Fields::Named(named_fields) => named_fields
+            .named
+            .iter()
+            .map(|field| {
+                let field_name = &field.ident;
+                let field_type = &field.ty;
+                let field_vis = reflect_visibility(&field.vis);
 
-            for f in &field.named {
-                let name = f.ident.as_ref().unwrap().clone();
-                fields.insert(name, f.ty.clone());
-            }
+                quote! {
+                    ::zinq_reflect::Member::Field(::zinq_reflect::Field::new(
+                        #field_vis,
+                        stringify!(#field_name),
+                        &(::zinq_reflect::type_of!(#field_type)),
+                    ))
+                }
+            })
+            .collect::<Vec<_>>(),
+        syn::Fields::Unnamed(unnamed_fields) => unnamed_fields
+            .unnamed
+            .iter()
+            .map(|field| {
+                let field_name = &field.ident;
+                let field_type = &field.ty;
 
-            fields
-        }
-        _ => BTreeMap::<syn::Ident, syn::Type>::new(),
+                quote! {
+                    ::zinq_reflect::Member::Field(::zinq_reflect::Field::new(
+                        zinq_reflect::Visibility::Public,
+                        stringify!(#field_name),
+                        &(::zinq_reflect::type_of!(#field_type)),
+                    ))
+                }
+            })
+            .collect::<Vec<_>>(),
+        syn::Fields::Unit => vec![],
     };
 
-    let members = fields
-        .iter()
-        .map(|(name, ty)| {
-            quote! {
-                ::zinq_reflect::Member::Field(::zinq_reflect::Field::new(
-                    zinq_reflect::Visibility::Public,
-                    stringify!(#name),
-                    &(::zinq_reflect::type_of!(#ty)),
-                ))
-            }
-        })
-        .collect::<Vec<_>>();
-
-    return TokenStream::from(quote! {
+    return quote! {
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
                 return ::zinq_reflect::StructType::new(
@@ -41,5 +50,5 @@ pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> TokenSt
                 ).to_type();
             }
         }
-    });
+    };
 }
