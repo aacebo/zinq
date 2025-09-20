@@ -1,29 +1,24 @@
+#![allow(unused)]
+
 use zinq_reflect::TypeOf;
 use zinq_reflect_macros::*;
 
 #[derive(Reflect)]
 enum Kind {
-    #[allow(unused)]
     Admin,
-
-    #[allow(unused)]
     Moderator,
-
-    #[allow(unused)]
     Basic,
 }
 
 #[derive(Reflect)]
 struct User {
-    #[allow(unused)]
     pub kind: Kind,
-
-    #[allow(unused)]
     pub name: String,
-
-    #[allow(unused)]
     pub password: String,
 }
+
+#[derive(Reflect)]
+struct Position(f64, f64);
 
 #[test]
 pub fn should_reflect_struct() {
@@ -34,7 +29,7 @@ pub fn should_reflect_struct() {
     };
 
     assert!(user.to_type().is_struct());
-    assert_eq!(user.to_type().to_struct().len(), 3);
+    assert_eq!(user.to_type().len(), 3);
     assert!(
         user.to_type()
             .to_struct()
@@ -51,4 +46,20 @@ pub fn should_reflect_enum() {
 
     assert!(kind.to_type().is_enum());
     assert_eq!(kind.to_type().len(), 3);
+}
+
+#[test]
+pub fn should_reflect_tuple_struct() {
+    let pos = Position(-500.1, 1034.45);
+
+    assert!(pos.to_type().is_struct());
+    assert_eq!(pos.to_type().len(), 2);
+    assert!(
+        pos.to_type()
+            .to_struct()
+            .member("0")
+            .to_field()
+            .ty()
+            .is_f64()
+    );
 }

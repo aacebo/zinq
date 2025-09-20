@@ -28,8 +28,9 @@ pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_ma
         syn::Fields::Unnamed(unnamed_fields) => unnamed_fields
             .unnamed
             .iter()
-            .map(|field| {
-                let field_name = &field.ident;
+            .enumerate()
+            .map(|(i, field)| {
+                let field_name = &i.to_string();
                 let field_type = &field.ty;
                 let field_vis = reflect_visibility(&field.vis);
 
@@ -37,7 +38,7 @@ pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_ma
                     ::zinq_reflect::Member::Field(
                         ::zinq_reflect::Field::new(
                             #field_vis,
-                            stringify!(#field_name),
+                            #field_name,
                             &(::zinq_reflect::type_of!(#field_type)),
                         )
                     )
