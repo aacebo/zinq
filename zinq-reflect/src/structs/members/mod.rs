@@ -14,7 +14,7 @@ pub enum Member {
 }
 
 impl Member {
-    pub fn vis(&self) -> Option<crate::Visibility> {
+    pub fn vis(&self) -> crate::Visibility {
         return match self {
             Self::Field(v) => v.vis(),
             Self::Method(v) => v.vis(),

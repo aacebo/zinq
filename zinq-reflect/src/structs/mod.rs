@@ -5,13 +5,15 @@ pub use members::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
+    vis: crate::Visibility,
     name: String,
     members: Vec<Member>,
 }
 
 impl StructType {
-    pub fn new(name: &str, members: &[Member]) -> Self {
+    pub fn new(vis: crate::Visibility, name: &str, members: &[Member]) -> Self {
         return Self {
+            vis,
             name: name.to_string(),
             members: members.to_vec(),
         };
@@ -23,6 +25,14 @@ impl StructType {
 
     pub fn len(&self) -> usize {
         return self.members.len();
+    }
+
+    pub fn vis(&self) -> crate::Visibility {
+        return self.vis.clone();
+    }
+
+    pub fn name(&self) -> &str {
+        return &self.name;
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -56,6 +66,10 @@ impl StructType {
 
 impl std::fmt::Display for StructType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.vis != crate::Visibility::Private {
+            write!(f, "{} ", &self.vis)?;
+        }
+
         write!(f, "struct {} {{", &self.name)?;
 
         for member in &self.members {

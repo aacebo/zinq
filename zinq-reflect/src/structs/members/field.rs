@@ -3,13 +3,13 @@ use crate::Visibility;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Field {
-    vis: Option<Visibility>,
+    vis: Visibility,
     name: String,
     ty: Box<crate::Type>,
 }
 
 impl Field {
-    pub fn new(vis: Option<Visibility>, name: &str, ty: &crate::Type) -> Self {
+    pub fn new(vis: Visibility, name: &str, ty: &crate::Type) -> Self {
         return Self {
             vis,
             name: name.to_string(),
@@ -17,7 +17,7 @@ impl Field {
         };
     }
 
-    pub fn vis(&self) -> Option<Visibility> {
+    pub fn vis(&self) -> Visibility {
         return self.vis.clone();
     }
 
@@ -32,9 +32,10 @@ impl Field {
 
 impl std::fmt::Display for Field {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return match &self.vis {
-            None => write!(f, "{}: {},", &self.name, &self.ty),
-            Some(vis) => write!(f, "{} {}: {},", vis, &self.name, &self.ty),
-        };
+        if self.vis != Visibility::Private {
+            write!(f, "{} ", &self.vis)?;
+        }
+
+        return write!(f, "{}: {},", &self.name, &self.ty);
     }
 }

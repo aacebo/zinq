@@ -3,7 +3,7 @@ use crate::{Param, Visibility};
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Method {
-    vis: Option<Visibility>,
+    vis: Visibility,
     name: String,
     params: Vec<Param>,
     return_type: Option<Box<crate::Type>>,
@@ -11,7 +11,7 @@ pub struct Method {
 
 impl Method {
     pub fn new(
-        vis: Option<Visibility>,
+        vis: Visibility,
         name: &str,
         params: &[Param],
         return_type: Option<&crate::Type>,
@@ -27,7 +27,7 @@ impl Method {
         };
     }
 
-    pub fn vis(&self) -> Option<Visibility> {
+    pub fn vis(&self) -> Visibility {
         return self.vis.clone();
     }
 
@@ -61,8 +61,8 @@ impl Method {
 
 impl std::fmt::Display for Method {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(vis) = &self.vis {
-            write!(f, "{} ", vis)?;
+        if self.vis != Visibility::Private {
+            write!(f, "{} ", &self.vis)?;
         }
 
         write!(f, "{}(", &self.name)?;

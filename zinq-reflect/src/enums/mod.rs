@@ -5,13 +5,15 @@ pub use variants::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EnumType {
+    vis: crate::Visibility,
     name: String,
     variants: Vec<Variant>,
 }
 
 impl EnumType {
-    pub fn new(name: &str, variants: &[Variant]) -> Self {
+    pub fn new(vis: crate::Visibility, name: &str, variants: &[Variant]) -> Self {
         return Self {
+            vis,
             name: name.to_string(),
             variants: variants.to_vec(),
         };
@@ -23,6 +25,14 @@ impl EnumType {
 
     pub fn len(&self) -> usize {
         return self.variants.len();
+    }
+
+    pub fn vis(&self) -> crate::Visibility {
+        return self.vis.clone();
+    }
+
+    pub fn name(&self) -> &str {
+        return &self.name;
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -56,6 +66,10 @@ impl EnumType {
 
 impl std::fmt::Display for EnumType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.vis != crate::Visibility::Private {
+            write!(f, "{} ", &self.vis)?;
+        }
+
         write!(f, "enum {} {{", &self.name)?;
 
         for variant in &self.variants {

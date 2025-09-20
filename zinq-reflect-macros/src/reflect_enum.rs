@@ -1,7 +1,10 @@
 use quote::quote;
 
+use crate::reflect_visibility;
+
 pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
+    let vis = reflect_visibility(&input.vis);
     let variants = ty
         .variants
         .iter()
@@ -11,22 +14,23 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2
             match &variant.fields {
                 syn::Fields::Unit => quote! {
                     ::zinq_reflect::Variant::Unit(
-                        ::zinq_reflect::UnitVariant::new(stringify!(#variant_name)),
+                        ::zinq_reflect::UnitVariant::new(stringify!(#variant_name))
                     )
                 },
-                syn::Fields::Named(field) => {
-                    let fields = field
+                syn::Fields::Named(named_fields) => {
+                    let fields = named_fields
                         .named
                         .iter()
-                        .map(|f| {
-                            let field_name = &f.ident;
-                            let ty = &f.ty;
+                        .map(|field| {
+                            let field_name = &field.ident;
+                            let field_type = &field.ty;
+                            let field_vis = reflect_visibility(&field.vis);
 
                             quote! {
                                 ::zinq_reflect::Field::new(
-                                    zinq_reflect::Visibility::Public,
+                                    #field_vis,
                                     stringify!(#field_name),
-                                    &(::zinq_reflect::type_of!(#ty)),
+                                    &(::zinq_reflect::type_of!(#field_type)),
                                 )
                             }
                         })
@@ -37,19 +41,19 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2
                             ::zinq_reflect::StructVariant::new(
                                 stringify!(#variant_name),
                                 &[#(#fields,)*],
-                            ),
-                        ),
+                            )
+                        )
                     }
                 }
-                syn::Fields::Unnamed(field) => {
-                    let types = field
+                syn::Fields::Unnamed(unnamed_fields) => {
+                    let types = unnamed_fields
                         .unnamed
                         .iter()
-                        .map(|f| {
-                            let ty = &f.ty;
+                        .map(|field| {
+                            let field_type = &field.ty;
 
                             quote! {
-                                ::zinq_reflect::type_of!(#ty)
+                                ::zinq_reflect::type_of!(#field_type)
                             }
                         })
                         .collect::<Vec<_>>();
@@ -59,8 +63,8 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2
                             ::zinq_reflect::TupleVariant::new(
                                 stringify!(#variant_name),
                                 &[#(#types,)*],
-                            ),
-                        ),
+                            )
+                        )
                     }
                 }
             }
@@ -71,6 +75,7 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
                 return ::zinq_reflect::EnumType::new(
+                    #vis,
                     stringify!(#name),
                     &[#(#variants,)*],
                 ).to_type();

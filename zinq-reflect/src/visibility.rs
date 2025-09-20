@@ -5,11 +5,17 @@ pub enum Visibility {
     Private,
 }
 
+impl Default for Visibility {
+    fn default() -> Self {
+        return Visibility::Private;
+    }
+}
+
 impl std::fmt::Display for Visibility {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
             Self::Public(v) => write!(f, "{}", v),
-            Self::Private => write!(f, "priv"),
+            Self::Private => Ok(()),
         };
     }
 }
