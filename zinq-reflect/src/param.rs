@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Param {
-    name: String,
-    ty: Box<crate::Type>,
+    pub(crate) name: String,
+    pub(crate) ty: Box<crate::Type>,
 }
 
 impl Param {

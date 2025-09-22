@@ -3,30 +3,13 @@ use crate::{Param, Visibility};
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Method {
-    vis: Visibility,
-    name: String,
-    params: Vec<Param>,
-    return_type: Option<Box<crate::Type>>,
+    pub(crate) vis: Visibility,
+    pub(crate) name: String,
+    pub(crate) params: Vec<Param>,
+    pub(crate) return_type: Option<Box<crate::Type>>,
 }
 
 impl Method {
-    pub fn new(
-        vis: Visibility,
-        name: &str,
-        params: &[Param],
-        return_type: Option<&crate::Type>,
-    ) -> Self {
-        return Self {
-            vis,
-            name: name.to_string(),
-            params: params.to_vec(),
-            return_type: match return_type {
-                None => None,
-                Some(ty) => Some(Box::new(ty.clone())),
-            },
-        };
-    }
-
     pub fn vis(&self) -> Visibility {
         return self.vis.clone();
     }

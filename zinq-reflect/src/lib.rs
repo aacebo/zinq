@@ -1,7 +1,8 @@
+mod _enum;
 mod _struct;
 mod bool;
 pub mod build;
-pub mod enums;
+mod field;
 pub mod fields;
 mod layout;
 mod method;
@@ -16,11 +17,13 @@ mod type_id;
 mod type_of;
 mod value;
 mod value_of;
+mod variant;
 mod visibility;
 
+pub use _enum::*;
 pub use _struct::*;
 pub use bool::*;
-pub use enums::*;
+pub use field::*;
 pub use fields::*;
 pub use layout::*;
 pub use method::*;
@@ -35,6 +38,7 @@ pub use type_id::*;
 pub use type_of::*;
 pub use value::*;
 pub use value_of::*;
+pub use variant::*;
 pub use visibility::*;
 
 #[cfg(feature = "macros")]

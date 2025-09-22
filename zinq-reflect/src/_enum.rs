@@ -1,14 +1,10 @@
-mod variant;
-
-pub use variant::*;
-
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EnumType {
     pub(crate) module: crate::Module,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
-    pub(crate) variants: Vec<Variant>,
+    pub(crate) variants: Vec<crate::Variant>,
 }
 
 impl EnumType {
@@ -48,7 +44,7 @@ impl EnumType {
         return ty.is_enum();
     }
 
-    pub fn iter(&self) -> std::slice::Iter<'_, Variant> {
+    pub fn iter(&self) -> std::slice::Iter<'_, crate::Variant> {
         return self.variants.iter();
     }
 
@@ -56,11 +52,11 @@ impl EnumType {
         return self.variants.iter().any(|v| v.name() == name);
     }
 
-    pub fn variant(&self, name: &str) -> &Variant {
+    pub fn variant(&self, name: &str) -> &crate::Variant {
         return self.variants.iter().find(|v| v.name() == name).unwrap();
     }
 
-    pub fn variant_mut(&mut self, name: &str) -> &mut Variant {
+    pub fn variant_mut(&mut self, name: &str) -> &mut crate::Variant {
         return self.variants.iter_mut().find(|v| v.name() == name).unwrap();
     }
 }
