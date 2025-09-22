@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{Bool, Float, Int, Number, Ptr, Slice, String, Type, TypeOf};
+use crate::{Bool, Enum, Float, Int, Number, Ptr, Slice, String, Struct, Type, TypeOf};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -10,6 +10,9 @@ pub enum Value {
     String(String),
     Ptr(Ptr),
     Slice(Slice),
+    Struct(Struct),
+    Enum(Enum),
+    Null,
 }
 
 impl Value {
@@ -20,6 +23,9 @@ impl Value {
             Self::String(v) => v.to_type(),
             Self::Ptr(v) => v.to_type(),
             Self::Slice(v) => v.to_type(),
+            Self::Struct(v) => v.to_type(),
+            Self::Enum(v) => v.to_type(),
+            _ => panic!("called 'to_type' on null"),
         };
     }
 
@@ -80,6 +86,13 @@ impl Value {
         };
     }
 
+    pub fn is_struct(&self) -> bool {
+        return match self {
+            Self::Struct(_) => true,
+            _ => false,
+        };
+    }
+
     pub fn is_number(&self) -> bool {
         return match self {
             Self::Number(_) => true,
@@ -108,6 +121,20 @@ impl Value {
         };
     }
 
+    pub fn is_enum(&self) -> bool {
+        return match self {
+            Self::Enum(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_null(&self) -> bool {
+        return match self {
+            Self::Null => true,
+            _ => false,
+        };
+    }
+
     pub fn to_bool(&self) -> Bool {
         return match self {
             Self::Bool(v) => v.clone(),
@@ -126,6 +153,13 @@ impl Value {
         return match self {
             Self::Slice(v) => v.clone(),
             _ => panic!("called 'to_slice' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn to_struct(&self) -> Struct {
+        return match self {
+            Self::Struct(v) => v.clone(),
+            _ => panic!("called 'to_struct' on '{}'", self.to_type()),
         };
     }
 
@@ -156,6 +190,13 @@ impl Value {
             _ => panic!("called 'to_string' on '{}'", self.to_type()),
         };
     }
+
+    pub fn to_enum(&self) -> Enum {
+        return match self {
+            Self::Enum(v) => v.clone(),
+            _ => panic!("called 'to_enum' on '{}'", self.to_type()),
+        };
+    }
 }
 
 impl std::fmt::Display for Value {
@@ -166,6 +207,9 @@ impl std::fmt::Display for Value {
             Self::String(v) => write!(f, "{}", v),
             Self::Ptr(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
+            Self::Struct(v) => write!(f, "{}", v),
+            Self::Enum(v) => write!(f, "{}", v),
+            Self::Null => write!(f, "<null>"),
         };
     }
 }
@@ -197,6 +241,26 @@ impl IndexMut<usize> for Value {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         return match self {
             Self::Slice(v) => v.index_mut(index),
+            _ => panic!("called 'index' on '{}'", self.to_type()),
+        };
+    }
+}
+
+impl Index<&str> for Value {
+    type Output = Self;
+
+    fn index(&self, index: &str) -> &Self::Output {
+        return match self {
+            Self::Struct(v) => v.index(index),
+            _ => panic!("called 'index' on '{}'", self.to_type()),
+        };
+    }
+}
+
+impl IndexMut<&str> for Value {
+    fn index_mut(&mut self, index: &str) -> &mut Self::Output {
+        return match self {
+            Self::Struct(v) => v.index_mut(index),
             _ => panic!("called 'index' on '{}'", self.to_type()),
         };
     }

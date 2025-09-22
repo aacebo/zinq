@@ -1,22 +1,18 @@
-pub mod variants;
+mod variant;
 
-pub use variants::*;
+pub use variant::*;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EnumType {
-    vis: crate::Visibility,
-    name: String,
-    variants: Vec<Variant>,
+    pub(crate) vis: crate::Visibility,
+    pub(crate) name: String,
+    pub(crate) variants: Vec<Variant>,
 }
 
 impl EnumType {
-    pub fn new(vis: crate::Visibility, name: &str, variants: &[Variant]) -> Self {
-        return Self {
-            vis,
-            name: name.to_string(),
-            variants: variants.to_vec(),
-        };
+    pub fn new(name: &str) -> crate::build::EnumTypeBuilder {
+        return crate::build::EnumTypeBuilder::new(name);
     }
 
     pub fn id(&self) -> crate::TypeId {
@@ -81,5 +77,67 @@ impl std::fmt::Display for EnumType {
         }
 
         return write!(f, "}}");
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Enum {
+    ty: EnumType,
+    value: Box<crate::Value>,
+}
+
+impl Enum {
+    pub fn new(ty: &EnumType, value: &crate::Value) -> Self {
+        return Self {
+            ty: ty.clone(),
+            value: Box::new(value.clone()),
+        };
+    }
+
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Enum(self.ty.clone());
+    }
+
+    pub fn get(&self) -> &crate::Value {
+        return &self.value;
+    }
+}
+
+impl AsRef<crate::Value> for Enum {
+    fn as_ref(&self) -> &crate::Value {
+        return &self.value;
+    }
+}
+
+impl AsMut<crate::Value> for Enum {
+    fn as_mut(&mut self) -> &mut crate::Value {
+        return &mut self.value;
+    }
+}
+
+impl std::ops::Deref for Enum {
+    type Target = crate::Value;
+
+    fn deref(&self) -> &Self::Target {
+        return &self.value;
+    }
+}
+
+impl std::ops::DerefMut for Enum {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        return &mut self.value;
+    }
+}
+
+impl crate::Reflect for Enum {
+    fn reflect(self) -> crate::Value {
+        return crate::Value::Enum(self.clone());
+    }
+}
+
+impl std::fmt::Display for Enum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "{}", &self.value);
     }
 }

@@ -1,23 +1,34 @@
+mod _struct;
 mod bool;
+pub mod build;
 pub mod enums;
+pub mod fields;
+mod layout;
+mod method;
 pub mod numbers;
+mod param;
 mod ptr;
 pub mod slices;
 mod string;
-pub mod structs;
+mod tuple;
 mod type_id;
 mod type_of;
 mod value;
 mod value_of;
 mod visibility;
 
+pub use _struct::*;
 pub use bool::*;
 pub use enums::*;
+pub use fields::*;
+pub use layout::*;
+pub use method::*;
 pub use numbers::*;
+pub use param::*;
 pub use ptr::*;
 pub use slices::*;
 pub use string::*;
-pub use structs::*;
+pub use tuple::*;
 pub use type_id::*;
 pub use type_of::*;
 pub use value::*;
@@ -37,6 +48,7 @@ pub enum Type {
     Ptr(PtrType),
     Slice(SliceType),
     Struct(StructType),
+    Tuple(TupleType),
 }
 
 impl Type {
@@ -49,6 +61,7 @@ impl Type {
             Self::Ptr(v) => v.id(),
             Self::Slice(v) => v.id(),
             Self::Struct(v) => v.id(),
+            Self::Tuple(v) => v.id(),
         };
     }
 
@@ -56,7 +69,8 @@ impl Type {
         return match self {
             Self::Enum(v) => v.len(),
             Self::Slice(v) => v.len(),
-            Self::Struct(v) => v.len(),
+            Self::Struct(v) => v.fields().len(),
+            Self::Tuple(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.id()),
         };
     }
@@ -145,6 +159,13 @@ impl Type {
         };
     }
 
+    pub fn is_tuple(&self) -> bool {
+        return match self {
+            Self::Tuple(_) => true,
+            _ => false,
+        };
+    }
+
     pub fn to_bool(&self) -> BoolType {
         return match self {
             Self::Bool(v) => v.clone(),
@@ -208,6 +229,13 @@ impl Type {
         };
     }
 
+    pub fn to_tuple(&self) -> TupleType {
+        return match self {
+            Self::Tuple(v) => v.clone(),
+            _ => panic!("called 'to_tuple' on '{}'", self.id()),
+        };
+    }
+
     pub fn assignable_to(&self, ty: Self) -> bool {
         return match self {
             Self::Bool(v) => v.assignable_to(ty),
@@ -217,6 +245,7 @@ impl Type {
             Self::Ptr(v) => v.assignable_to(ty),
             Self::Slice(v) => v.assignable_to(ty),
             Self::Struct(v) => v.assignable_to(ty),
+            Self::Tuple(v) => v.assignable_to(ty),
         };
     }
 
@@ -229,6 +258,7 @@ impl Type {
             Self::Ptr(v) => v.convertable_to(ty),
             Self::Slice(v) => v.convertable_to(ty),
             Self::Struct(v) => v.convertable_to(ty),
+            Self::Tuple(v) => v.convertable_to(ty),
         };
     }
 }
@@ -243,6 +273,7 @@ impl std::fmt::Display for Type {
             Self::Ptr(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
+            Self::Tuple(v) => write!(f, "{}", v),
         };
     }
 }

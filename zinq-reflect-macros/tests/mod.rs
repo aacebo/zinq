@@ -30,14 +30,7 @@ pub fn should_reflect_struct() {
 
     assert!(user.to_type().is_struct());
     assert_eq!(user.to_type().len(), 3);
-    assert!(
-        user.to_type()
-            .to_struct()
-            .member("kind")
-            .to_field()
-            .ty()
-            .is_enum()
-    );
+    assert!(user.to_type().to_struct().fields()["kind"].ty().is_enum());
 }
 
 #[test]
@@ -54,12 +47,5 @@ pub fn should_reflect_tuple_struct() {
 
     assert!(pos.to_type().is_struct());
     assert_eq!(pos.to_type().len(), 2);
-    assert!(
-        pos.to_type()
-            .to_struct()
-            .member("0")
-            .to_field()
-            .ty()
-            .is_f64()
-    );
+    assert!(pos.to_type().to_struct().fields()[0].ty().is_f64());
 }
