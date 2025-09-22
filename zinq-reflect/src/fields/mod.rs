@@ -14,6 +14,10 @@ impl Fields {
         return crate::build::FieldsBuilder::new();
     }
 
+    pub fn layout(&self) -> &crate::Layout {
+        return &self.layout;
+    }
+
     pub fn len(&self) -> usize {
         return self.fields.len();
     }

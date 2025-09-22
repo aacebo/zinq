@@ -2,8 +2,9 @@
 pub struct StructTypeBuilder(crate::StructType);
 
 impl StructTypeBuilder {
-    pub fn new(name: &str) -> Self {
+    pub fn new(module: &crate::Module, name: &str) -> Self {
         return Self(crate::StructType {
+            module: module.clone(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
             fields: super::FieldsBuilder::new().build(),

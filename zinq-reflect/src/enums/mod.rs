@@ -5,14 +5,15 @@ pub use variant::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EnumType {
+    pub(crate) module: crate::Module,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) variants: Vec<Variant>,
 }
 
 impl EnumType {
-    pub fn new(name: &str) -> crate::build::EnumTypeBuilder {
-        return crate::build::EnumTypeBuilder::new(name);
+    pub fn new(module: &crate::Module, name: &str) -> crate::build::EnumTypeBuilder {
+        return crate::build::EnumTypeBuilder::new(module, name);
     }
 
     pub fn id(&self) -> crate::TypeId {
@@ -23,8 +24,12 @@ impl EnumType {
         return self.variants.len();
     }
 
-    pub fn vis(&self) -> crate::Visibility {
-        return self.vis.clone();
+    pub fn module(&self) -> &crate::Module {
+        return &self.module;
+    }
+
+    pub fn vis(&self) -> &crate::Visibility {
+        return &self.vis;
     }
 
     pub fn name(&self) -> &str {

@@ -2,8 +2,9 @@
 pub struct EnumTypeBuilder(crate::EnumType);
 
 impl EnumTypeBuilder {
-    pub fn new(name: &str) -> Self {
+    pub fn new(module: &crate::Module, name: &str) -> Self {
         return Self(crate::EnumType {
+            module: module.clone(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
             variants: vec![],
