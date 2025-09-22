@@ -117,6 +117,10 @@ impl std::fmt::Display for Fields {
             write!(f, "(")?;
 
             for (i, field) in self.fields.iter().enumerate() {
+                if !field.vis.is_private() {
+                    write!(f, "{} ", field.vis())?;
+                }
+
                 write!(f, "{}", field.ty())?;
 
                 if i < self.fields.len() - 1 {

@@ -42,6 +42,7 @@ pub fn should_reflect_enum() {
 
     assert!(kind.to_type().is_enum());
     assert_eq!(kind.to_type().len(), 3);
+    println!("{}", kind.to_type());
 }
 
 #[test]
@@ -51,6 +52,7 @@ pub fn should_reflect_tuple_struct() {
     assert!(pos.to_type().is_struct());
     assert_eq!(pos.to_type().len(), 2);
     assert!(pos.to_type().to_struct().fields()[0].ty().is_f64());
+    println!("{}", pos.to_type());
 }
 
 #[test]
