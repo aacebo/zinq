@@ -74,7 +74,7 @@ impl std::fmt::Display for EnumType {
         write!(f, "enum {} {{", &self.name)?;
 
         for variant in &self.variants {
-            write!(f, "\n\t{}", variant)?;
+            write!(f, "\n\t{},", variant)?;
         }
 
         if self.variants.len() > 0 {

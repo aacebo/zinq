@@ -2,9 +2,9 @@ use quote::quote;
 
 use crate::reflect_visibility;
 
-pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2::TokenStream {
+pub fn derive(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let vis = reflect_visibility(&input.vis);
+    let vis = reflect_visibility::derive(&input.vis);
     let variants = ty
         .variants
         .iter()
@@ -22,7 +22,7 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2
                         .map(|field| {
                             let field_name = &field.ident;
                             let field_type = &field.ty;
-                            let field_vis = reflect_visibility(&field.vis);
+                            let field_vis = reflect_visibility::derive(&field.vis);
 
                             quote! {
                                 ::zinq_reflect::Field::new(
@@ -54,7 +54,7 @@ pub fn reflect_enum(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2
                         .enumerate()
                         .map(|(i, field)| {
                             let field_type = &field.ty;
-                            let field_vis = reflect_visibility(&field.vis);
+                            let field_vis = reflect_visibility::derive(&field.vis);
 
                             quote! {
                                 ::zinq_reflect::Field::new(

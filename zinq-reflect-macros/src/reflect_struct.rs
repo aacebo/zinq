@@ -2,9 +2,9 @@ use quote::quote;
 
 use crate::reflect_visibility;
 
-pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::TokenStream {
+pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let vis = reflect_visibility(&input.vis);
+    let vis = reflect_visibility::derive(&input.vis);
     let layout = match &ty.fields {
         syn::Fields::Named(_) => quote!(::zinq_reflect::Layout::Key),
         syn::Fields::Unnamed(_) => quote!(::zinq_reflect::Layout::Index),
@@ -18,7 +18,7 @@ pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_ma
             .map(|field| {
                 let field_name = &field.ident;
                 let field_type = &field.ty;
-                let field_vis = reflect_visibility(&field.vis);
+                let field_vis = reflect_visibility::derive(&field.vis);
 
                 quote! {
                     ::zinq_reflect::Field::new(
@@ -36,7 +36,7 @@ pub fn reflect_struct(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_ma
             .enumerate()
             .map(|(i, field)| {
                 let field_type = &field.ty;
-                let field_vis = reflect_visibility(&field.vis);
+                let field_vis = reflect_visibility::derive(&field.vis);
 
                 quote! {
                     ::zinq_reflect::Field::new(
