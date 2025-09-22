@@ -77,6 +77,14 @@ impl Type {
         };
     }
 
+    pub fn module(&self) -> &crate::Module {
+        return match self {
+            Self::Struct(v) => v.module(),
+            Self::Enum(v) => v.module(),
+            _ => panic!("called 'module' on '{}'", self.id()),
+        };
+    }
+
     pub fn is_bool(&self) -> bool {
         return match self {
             Self::Bool(_) => true,

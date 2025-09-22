@@ -1,29 +1,32 @@
 #![allow(unused)]
 
 use zinq_reflect::TypeOf;
-use zinq_reflect_macros::*;
 
-#[derive(Reflect)]
-enum Kind {
-    Admin,
-    Moderator,
-    Basic,
+mod models {
+    use zinq_reflect_macros::*;
+
+    #[derive(Reflect)]
+    pub enum Kind {
+        Admin,
+        Moderator,
+        Basic,
+    }
+
+    #[derive(Reflect)]
+    pub struct User {
+        pub kind: Kind,
+        pub name: String,
+        pub password: String,
+    }
+
+    #[derive(Reflect)]
+    pub struct Position(pub f64, pub f64);
 }
-
-#[derive(Reflect)]
-struct User {
-    pub kind: Kind,
-    pub name: String,
-    pub password: String,
-}
-
-#[derive(Reflect)]
-struct Position(f64, f64);
 
 #[test]
 pub fn should_reflect_struct() {
-    let user = User {
-        kind: Kind::Basic,
+    let user = models::User {
+        kind: models::Kind::Basic,
         name: String::from("dev"),
         password: String::from("test"),
     };
@@ -35,7 +38,7 @@ pub fn should_reflect_struct() {
 
 #[test]
 pub fn should_reflect_enum() {
-    let kind = Kind::Admin;
+    let kind = models::Kind::Admin;
 
     assert!(kind.to_type().is_enum());
     assert_eq!(kind.to_type().len(), 3);
@@ -43,9 +46,20 @@ pub fn should_reflect_enum() {
 
 #[test]
 pub fn should_reflect_tuple_struct() {
-    let pos = Position(-500.1, 1034.45);
+    let pos = models::Position(-500.1, 1034.45);
 
     assert!(pos.to_type().is_struct());
     assert_eq!(pos.to_type().len(), 2);
     assert!(pos.to_type().to_struct().fields()[0].ty().is_f64());
+}
+
+#[test]
+pub fn should_reflect_module() {
+    let user = models::User {
+        kind: models::Kind::Basic,
+        name: String::from("dev"),
+        password: String::from("test"),
+    };
+
+    assert_eq!(user.to_type().module().to_string(), "r#mod::models");
 }
