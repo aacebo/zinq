@@ -10,7 +10,7 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["zinq-schema/macros", "zinq-query/macros", "zinq-validate/macros"]
+macros = ["zinq-schema/macros", "zinq-query/macros", "zinq-validate/macros", "zinq-reflect/macros"]
 query = ["dep:zinq-query"]
 validate = ["dep:zinq-validate"]
 serde = ["dep:serde", "serde/derive", "zinq-schema/serde", "zinq-query/serde", "zinq-reflect/serde"]
