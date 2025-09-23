@@ -1,8 +1,10 @@
+use std::collections::BTreeMap;
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Success<T> {
     #[cfg_attr(feature = "serde", serde(rename = "$meta"))]
-    pub meta: zinq_schema::value::Object,
+    pub meta: BTreeMap<String, zinq_reflect::Value>,
 
     #[cfg_attr(feature = "serde", serde(rename = "data"))]
     pub data: T,
@@ -11,7 +13,7 @@ pub struct Success<T> {
 impl<T> Success<T> {
     pub fn new(data: T) -> Self {
         return Self {
-            meta: zinq_schema::value::Object::new(),
+            meta: BTreeMap::new(),
             data,
         };
     }

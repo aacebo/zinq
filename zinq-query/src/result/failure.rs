@@ -1,8 +1,10 @@
+use std::collections::BTreeMap;
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Failure {
     #[cfg_attr(feature = "serde", serde(rename = "$meta"))]
-    pub meta: zinq_schema::value::Object,
+    pub meta: BTreeMap<String, zinq_reflect::Value>,
 
     #[cfg_attr(feature = "serde", serde(rename = "error"))]
     pub error: zinq_schema::error::Error,
@@ -11,7 +13,7 @@ pub struct Failure {
 impl Failure {
     pub fn new(error: zinq_schema::error::Error) -> Self {
         return Self {
-            meta: zinq_schema::value::Object::new(),
+            meta: BTreeMap::new(),
             error,
         };
     }

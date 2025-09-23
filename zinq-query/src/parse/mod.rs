@@ -15,7 +15,7 @@ impl crate::Query {
         let _ = expression::Expression::parse(&mut scan)?;
 
         return Ok(Self {
-            args: zinq_schema::value::Object::new(),
+            args: BTreeMap::new(),
             fields: BTreeMap::new(),
         });
     }

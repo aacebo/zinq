@@ -10,11 +10,12 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["dep:zinq-query-macros", "zinq-schema/macros"]
-serde = ["dep:serde", "serde/derive", "zinq-schema/serde"]
+macros = ["dep:zinq-query-macros", "zinq-schema/macros", "zinq-reflect/macros"]
+serde = ["dep:serde", "serde/derive", "zinq-schema/serde", "zinq-reflect/serde"]
 
 [dependencies]
 zinq-schema = { workspace = true }
+zinq-reflect = { workspace = true }
 zinq-query-macros = { workspace = true, optional = true }
 bytes = { workspace = true }
 serde = { workspace = true, optional = true }

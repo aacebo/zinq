@@ -81,6 +81,7 @@ dependencies = [
  "bytes",
  "serde",
  "zinq-query-macros",
+ "zinq-reflect",
  "zinq-schema",
 ]
 

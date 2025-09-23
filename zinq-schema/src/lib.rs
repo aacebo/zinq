@@ -1,7 +1,6 @@
 mod any;
 pub mod error;
 mod string;
-pub mod value;
 
 #[cfg(feature = "macros")]
 pub use zinq_schema_macros::*;

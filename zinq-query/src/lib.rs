@@ -17,6 +17,6 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Query {
-    pub args: zinq_schema::value::Object,
+    pub args: BTreeMap<String, zinq_reflect::Value>,
     pub fields: BTreeMap<String, Query>,
 }
