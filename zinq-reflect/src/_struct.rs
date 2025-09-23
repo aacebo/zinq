@@ -10,7 +10,7 @@ pub struct StructType {
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) fields: crate::Fields,
-    pub(crate) methods: Vec<crate::Method>,
+    pub(crate) impls: Vec<crate::Impl>,
 }
 
 impl StructType {
@@ -38,8 +38,8 @@ impl StructType {
         return &self.fields;
     }
 
-    pub fn methods(&self) -> &[crate::Method] {
-        return &self.methods;
+    pub fn impls(&self) -> &[crate::Impl] {
+        return &self.impls;
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -61,7 +61,13 @@ impl std::fmt::Display for StructType {
             write!(f, "{} ", &self.vis)?;
         }
 
-        return write!(f, "struct {}{}", &self.name, &self.fields);
+        write!(f, "struct {}{}", &self.name, &self.fields)?;
+
+        for _impl in &self.impls {
+            write!(f, "{}", _impl)?;
+        }
+
+        return Ok(());
     }
 }
 

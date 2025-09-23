@@ -8,7 +8,7 @@ impl StructTypeBuilder {
             vis: crate::Visibility::Private,
             name: name.to_string(),
             fields: super::FieldsBuilder::new().build(),
-            methods: vec![],
+            impls: vec![],
         });
     }
 
@@ -24,9 +24,15 @@ impl StructTypeBuilder {
         return next;
     }
 
-    pub fn methods(&self, methods: &[crate::Method]) -> Self {
+    pub fn implements(&self, impls: &[crate::Impl]) -> Self {
         let mut next = self.clone();
-        next.0.methods = methods.to_vec();
+        next.0.impls.append(&mut impls.to_vec());
+        return next;
+    }
+
+    pub fn implement(&self, _impl: &crate::Impl) -> Self {
+        let mut next = self.clone();
+        next.0.impls.push(_impl.clone());
         return next;
     }
 
