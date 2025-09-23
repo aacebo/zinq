@@ -1,5 +1,4 @@
 mod reflect_enum;
-mod reflect_method;
 mod reflect_struct;
 mod reflect_trait;
 mod reflect_visibility;
@@ -23,7 +22,6 @@ pub fn reflect(_attr_tokens: TokenStream, item_tokens: TokenStream) -> TokenStre
     let item = syn::parse_macro_input!(item_tokens as syn::Item);
 
     return match &item {
-        syn::Item::Fn(v) => reflect_method::attr(v),
         syn::Item::Trait(v) => reflect_trait::attr(v),
         _ => panic!("unsupported reflect type"),
     }
