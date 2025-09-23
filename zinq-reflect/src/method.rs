@@ -3,13 +3,22 @@ use crate::{Param, Visibility};
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Method {
+    pub(crate) is_async: bool,
     pub(crate) vis: Visibility,
     pub(crate) name: String,
     pub(crate) params: Vec<Param>,
-    pub(crate) return_type: Option<Box<crate::Type>>,
+    pub(crate) return_type: Box<crate::Type>,
 }
 
 impl Method {
+    pub fn new(name: &str) -> crate::build::MethodBuilder {
+        return crate::build::MethodBuilder::new(name);
+    }
+
+    pub fn is_async(&self) -> bool {
+        return self.is_async;
+    }
+
     pub fn vis(&self) -> Visibility {
         return self.vis.clone();
     }
@@ -22,33 +31,34 @@ impl Method {
         return &self.params;
     }
 
-    pub fn param(&self, name: &str) -> &Param {
-        return self.params.iter().find(|v| v.name() == name).unwrap();
-    }
-
     pub fn has_param(&self, name: &str) -> bool {
         return self.params.iter().any(|v| v.name() == name);
+    }
+
+    pub fn param(&self, name: &str) -> &Param {
+        return self.params.iter().find(|v| v.name() == name).unwrap();
     }
 
     pub fn param_mut(&mut self, name: &str) -> &mut Param {
         return self.params.iter_mut().find(|v| v.name() == name).unwrap();
     }
 
-    pub fn return_type(&self) -> Option<&crate::Type> {
-        return match &self.return_type {
-            None => None,
-            Some(v) => Some(&v),
-        };
+    pub fn return_type(&self) -> &crate::Type {
+        return &self.return_type;
     }
 }
 
 impl std::fmt::Display for Method {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.vis != Visibility::Private {
+        if !self.vis.is_private() {
             write!(f, "{} ", &self.vis)?;
         }
 
-        write!(f, "{}(", &self.name)?;
+        if self.is_async {
+            write!(f, "async ")?;
+        }
+
+        write!(f, "fn {}(", &self.name)?;
 
         for (i, param) in self.params.iter().enumerate() {
             write!(f, "{}", param)?;
@@ -60,8 +70,8 @@ impl std::fmt::Display for Method {
 
         write!(f, ")")?;
 
-        if let Some(return_type) = &self.return_type {
-            write!(f, " -> {}", return_type)?;
+        if !self.return_type.is_void() {
+            write!(f, " -> {}", &self.return_type)?;
         }
 
         return write!(f, ";");

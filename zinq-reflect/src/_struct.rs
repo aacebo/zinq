@@ -19,7 +19,7 @@ impl StructType {
     }
 
     pub fn id(&self) -> crate::TypeId {
-        return crate::TypeId::from_str(&self.name);
+        return crate::TypeId::from_string(format!("{}::{}", &self.module, &self.name));
     }
 
     pub fn module(&self) -> &crate::Module {

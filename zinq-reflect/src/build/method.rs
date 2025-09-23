@@ -4,11 +4,18 @@ pub struct MethodBuilder(crate::Method);
 impl MethodBuilder {
     pub fn new(name: &str) -> Self {
         return Self(crate::Method {
+            is_async: false,
             vis: crate::Visibility::Private,
             name: name.to_string(),
             params: vec![],
-            return_type: None,
+            return_type: Box::new(crate::Type::Void),
         });
+    }
+
+    pub fn is_async(&self, is_async: bool) -> Self {
+        let mut next = self.clone();
+        next.0.is_async = is_async;
+        return next;
     }
 
     pub fn visibility(&self, vis: crate::Visibility) -> Self {
@@ -17,30 +24,21 @@ impl MethodBuilder {
         return next;
     }
 
-    pub fn params(&self, params: &[(&str, &crate::Type)]) -> Self {
+    pub fn params(&self, params: &[crate::Param]) -> Self {
         let mut next = self.clone();
-
-        for (name, ty) in params {
-            next = next.param(name, ty);
-        }
-
+        next.0.params.append(&mut params.to_vec());
         return next;
     }
 
-    pub fn param(&self, name: &str, ty: &crate::Type) -> Self {
+    pub fn param(&self, param: &crate::Param) -> Self {
         let mut next = self.clone();
-
-        next.0.params.push(crate::Param {
-            name: name.to_string(),
-            ty: Box::new(ty.clone()),
-        });
-
+        next.0.params.push(param.clone());
         return next;
     }
 
     pub fn return_type(&self, ty: &crate::Type) -> Self {
         let mut next = self.clone();
-        next.0.return_type = Some(Box::new(ty.clone()));
+        next.0.return_type = Box::new(ty.clone());
         return next;
     }
 

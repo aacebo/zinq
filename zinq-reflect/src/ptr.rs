@@ -7,12 +7,20 @@ use crate::{Reflect, TypeOf};
 pub struct PtrType(Box<crate::Type>);
 
 impl PtrType {
+    pub fn new(ty: &crate::Type) -> Self {
+        return Self(Box::new(ty.clone()));
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("&{}", self.0.id()));
     }
 
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Ptr(self.clone());
+    }
+
+    pub fn ty(&self) -> &crate::Type {
+        return &self.0;
     }
 
     pub fn is_ptr_of(&self, ty: crate::Type) -> bool {
@@ -30,7 +38,7 @@ impl PtrType {
 
 impl std::fmt::Display for PtrType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.id());
+        return write!(f, "&{}", &self.0);
     }
 }
 

@@ -1,6 +1,7 @@
 mod reflect_enum;
 mod reflect_method;
 mod reflect_struct;
+mod reflect_trait;
 mod reflect_visibility;
 
 use proc_macro::TokenStream;
@@ -23,7 +24,8 @@ pub fn reflect(_attr_tokens: TokenStream, item_tokens: TokenStream) -> TokenStre
 
     return match &item {
         syn::Item::Fn(v) => reflect_method::attr(v),
-        _ => panic!("unsupported Reflect type"),
+        syn::Item::Trait(v) => reflect_trait::attr(v),
+        _ => panic!("unsupported reflect type"),
     }
     .into();
 }

@@ -1,5 +1,9 @@
 mod _enum;
+mod _impl;
+mod _mut;
+mod _self;
 mod _struct;
+mod _trait;
 mod bool;
 pub mod build;
 mod field;
@@ -21,7 +25,11 @@ mod variant;
 mod visibility;
 
 pub use _enum::*;
+pub use _impl::*;
+pub use _mut::*;
+pub use _self::*;
 pub use _struct::*;
+pub use _trait::*;
 pub use bool::*;
 pub use field::*;
 pub use fields::*;
@@ -54,7 +62,11 @@ pub enum Type {
     Ptr(PtrType),
     Slice(SliceType),
     Struct(StructType),
+    _Self(SelfType),
     Tuple(TupleType),
+    Trait(TraitType),
+    Mut(MutType),
+    Void,
 }
 
 impl Type {
@@ -67,7 +79,11 @@ impl Type {
             Self::Ptr(v) => v.id(),
             Self::Slice(v) => v.id(),
             Self::Struct(v) => v.id(),
+            Self::_Self(v) => v.id(),
             Self::Tuple(v) => v.id(),
+            Self::Trait(v) => v.id(),
+            Self::Mut(v) => v.id(),
+            Self::Void => TypeId::from_str("void"),
         };
     }
 
@@ -77,6 +93,7 @@ impl Type {
             Self::Slice(v) => v.len(),
             Self::Struct(v) => v.fields().len(),
             Self::Tuple(v) => v.len(),
+            Self::Trait(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.id()),
         };
     }
@@ -85,6 +102,7 @@ impl Type {
         return match self {
             Self::Struct(v) => v.module(),
             Self::Enum(v) => v.module(),
+            Self::Trait(v) => v.module(),
             _ => panic!("called 'module' on '{}'", self.id()),
         };
     }
@@ -113,6 +131,27 @@ impl Type {
     pub fn is_ptr_of(&self, ty: Self) -> bool {
         return match self {
             Self::Ptr(v) => v.is_ptr_of(ty),
+            _ => false,
+        };
+    }
+
+    pub fn is_ptr_self(&self) -> bool {
+        return match self {
+            Self::Ptr(v) => v.ty().is_self(),
+            _ => false,
+        };
+    }
+
+    pub fn is_ptr_mut(&self) -> bool {
+        return match self {
+            Self::Ptr(v) => v.ty().is_mut(),
+            _ => false,
+        };
+    }
+
+    pub fn is_ptr_mut_self(&self) -> bool {
+        return match self {
+            Self::Ptr(v) => v.ty().is_mut_self(),
             _ => false,
         };
     }
@@ -173,9 +212,51 @@ impl Type {
         };
     }
 
+    pub fn is_self(&self) -> bool {
+        return match self {
+            Self::_Self(_) => true,
+            _ => false,
+        };
+    }
+
     pub fn is_tuple(&self) -> bool {
         return match self {
             Self::Tuple(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_trait(&self) -> bool {
+        return match self {
+            Self::Trait(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_mut(&self) -> bool {
+        return match self {
+            Self::Mut(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_mut_of(&self, ty: crate::Type) -> bool {
+        return match self {
+            Self::Mut(v) => v.is_mut_of(ty),
+            _ => false,
+        };
+    }
+
+    pub fn is_mut_self(&self) -> bool {
+        return match self {
+            Self::Mut(v) => v.ty().is_self(),
+            _ => false,
+        };
+    }
+
+    pub fn is_void(&self) -> bool {
+        return match self {
+            Self::Void => true,
             _ => false,
         };
     }
@@ -243,10 +324,31 @@ impl Type {
         };
     }
 
+    pub fn to_self(&self) -> SelfType {
+        return match self {
+            Self::_Self(v) => v.clone(),
+            _ => panic!("called 'to_self' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_tuple(&self) -> TupleType {
         return match self {
             Self::Tuple(v) => v.clone(),
             _ => panic!("called 'to_tuple' on '{}'", self.id()),
+        };
+    }
+
+    pub fn to_trait(&self) -> TraitType {
+        return match self {
+            Self::Trait(v) => v.clone(),
+            _ => panic!("called 'to_trait' on '{}'", self.id()),
+        };
+    }
+
+    pub fn to_mut(&self) -> MutType {
+        return match self {
+            Self::Mut(v) => v.clone(),
+            _ => panic!("called 'to_mut' on '{}'", self.id()),
         };
     }
 
@@ -259,7 +361,11 @@ impl Type {
             Self::Ptr(v) => v.assignable_to(ty),
             Self::Slice(v) => v.assignable_to(ty),
             Self::Struct(v) => v.assignable_to(ty),
+            Self::_Self(v) => v.assignable_to(ty),
             Self::Tuple(v) => v.assignable_to(ty),
+            Self::Trait(v) => v.assignable_to(ty),
+            Self::Mut(v) => v.assignable_to(ty),
+            Self::Void => false,
         };
     }
 
@@ -272,7 +378,11 @@ impl Type {
             Self::Ptr(v) => v.convertable_to(ty),
             Self::Slice(v) => v.convertable_to(ty),
             Self::Struct(v) => v.convertable_to(ty),
+            Self::_Self(v) => v.convertable_to(ty),
             Self::Tuple(v) => v.convertable_to(ty),
+            Self::Trait(v) => v.convertable_to(ty),
+            Self::Mut(v) => v.convertable_to(ty),
+            Self::Void => false,
         };
     }
 }
@@ -287,7 +397,11 @@ impl std::fmt::Display for Type {
             Self::Ptr(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
+            Self::_Self(v) => write!(f, "{}", v),
             Self::Tuple(v) => write!(f, "{}", v),
+            Self::Trait(v) => write!(f, "{}", v),
+            Self::Mut(v) => write!(f, "{}", v),
+            Self::Void => write!(f, "void"),
         };
     }
 }

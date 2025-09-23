@@ -1,13 +1,13 @@
 #[macro_export]
 macro_rules! type_of {
     [&$value:expr] => {
-        crate::TypeOf::to_type(&$value.clone())
+        (&$value).to_type()
     };
     [$($type:ty)*] => {
         $(<$type>::type_of())*
     };
     [$value:expr] => {
-        crate::TypeOf::to_type(&$value)
+        (&$value).to_type()
     };
 }
 

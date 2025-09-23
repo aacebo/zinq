@@ -1,5 +1,6 @@
 mod _enum;
 mod _struct;
+mod _trait;
 mod field;
 mod fields;
 mod method;
@@ -7,6 +8,7 @@ mod variant;
 
 pub use _enum::*;
 pub use _struct::*;
+pub use _trait::*;
 pub use field::*;
 pub use fields::*;
 pub use method::*;
