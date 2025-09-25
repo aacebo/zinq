@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use zinq_reflect::TypeOf;
+use zinq_reflect::{Reflect, TypeOf};
 
 mod models {
     use zinq_reflect_macros::*;
@@ -14,7 +14,7 @@ mod models {
 
     #[derive(Reflect)]
     pub struct User {
-        #[reflect]
+        #[reflect(hello = "world")]
         pub kind: Kind,
         pub name: String,
         pub password: String,
@@ -35,6 +35,24 @@ pub fn should_reflect_struct() {
     assert!(user.to_type().is_struct());
     assert_eq!(user.to_type().len(), 3);
     assert!(user.to_type().to_struct().fields()["kind"].ty().is_enum());
+}
+
+#[test]
+pub fn should_reflect_field() {
+    let user = models::User {
+        kind: models::Kind::Basic,
+        name: String::from("dev"),
+        password: String::from("test"),
+    };
+
+    assert!(user.to_type().is_struct());
+
+    let field = user.to_type().to_struct().fields()["kind"].clone();
+
+    assert!(field.ty().is_enum());
+    assert_eq!(field.meta().len(), 1);
+    assert!(field.meta().has("hello"));
+    assert_eq!(field.meta().get("hello").unwrap(), &"world".reflect());
 }
 
 #[test]

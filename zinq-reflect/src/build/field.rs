@@ -11,6 +11,12 @@ impl FieldBuilder {
         });
     }
 
+    pub fn meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
     pub fn visibility(&self, vis: crate::Visibility) -> Self {
         let mut next = self.clone();
         next.0.vis = vis;

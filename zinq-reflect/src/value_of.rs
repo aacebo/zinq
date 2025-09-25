@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! value_of {
     [$value:expr] => {
-        crate::Reflect::reflect($value)
+        $crate::Reflect::reflect($value)
     };
 }
 

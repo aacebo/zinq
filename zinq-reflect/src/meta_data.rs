@@ -38,6 +38,12 @@ impl MetaData {
     }
 }
 
+impl<const N: usize> From<[(String, crate::Value); N]> for MetaData {
+    fn from(value: [(String, crate::Value); N]) -> Self {
+        return Self(BTreeMap::from(value));
+    }
+}
+
 impl std::fmt::Display for MetaData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{{")?;
