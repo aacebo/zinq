@@ -2,9 +2,9 @@
 pub struct TraitTypeBuilder(crate::TraitType);
 
 impl TraitTypeBuilder {
-    pub fn new(module: &crate::Module, name: &str) -> Self {
+    pub fn new(path: &crate::Path, name: &str) -> Self {
         return Self(crate::TraitType {
-            module: module.clone(),
+            path: path.clone(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
             methods: vec![],

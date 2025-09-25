@@ -11,9 +11,9 @@ pub mod fields;
 mod layout;
 mod meta_data;
 mod method;
-mod module;
 pub mod numbers;
 mod param;
+mod path;
 mod ptr;
 pub mod slices;
 mod string;
@@ -37,9 +37,9 @@ pub use fields::*;
 pub use layout::*;
 pub use meta_data::*;
 pub use method::*;
-pub use module::*;
 pub use numbers::*;
 pub use param::*;
+pub use path::*;
 pub use ptr::*;
 pub use slices::*;
 pub use string::*;
@@ -100,12 +100,12 @@ impl Type {
         };
     }
 
-    pub fn module(&self) -> &crate::Module {
+    pub fn path(&self) -> &crate::Path {
         return match self {
-            Self::Struct(v) => v.module(),
-            Self::Enum(v) => v.module(),
-            Self::Trait(v) => v.module(),
-            _ => panic!("called 'module' on '{}'", self.id()),
+            Self::Struct(v) => v.path(),
+            Self::Enum(v) => v.path(),
+            Self::Trait(v) => v.path(),
+            _ => panic!("called 'path' on '{}'", self.id()),
         };
     }
 

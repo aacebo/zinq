@@ -88,7 +88,7 @@ pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
 
         impl ::zinq_reflect::TypeOf for dyn #name {
             fn type_of() -> ::zinq_reflect::Type {
-                return ::zinq_reflect::TraitType::new(&(::zinq_reflect::Module::from(module_path!())), stringify!(#name))
+                return ::zinq_reflect::TraitType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
                     .visibility(#vis)
                     .methods(&[#(#methods,)*])
                     .build()

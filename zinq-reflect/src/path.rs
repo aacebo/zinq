@@ -1,10 +1,10 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Module(Vec<String>);
+pub struct Path(Vec<String>);
 
-impl Module {}
+impl Path {}
 
-impl From<&str> for Module {
+impl From<&str> for Path {
     fn from(value: &str) -> Self {
         return Self(
             value
@@ -16,7 +16,7 @@ impl From<&str> for Module {
     }
 }
 
-impl From<String> for Module {
+impl From<String> for Path {
     fn from(value: String) -> Self {
         return Self(
             value
@@ -28,7 +28,7 @@ impl From<String> for Module {
     }
 }
 
-impl std::fmt::Display for Module {
+impl std::fmt::Display for Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{}", &self.0.join("::"));
     }

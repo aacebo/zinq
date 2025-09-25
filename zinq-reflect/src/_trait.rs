@@ -1,19 +1,19 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TraitType {
-    pub(crate) module: crate::Module,
+    pub(crate) path: crate::Path,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) methods: Vec<crate::Method>,
 }
 
 impl TraitType {
-    pub fn new(module: &crate::Module, name: &str) -> crate::build::TraitTypeBuilder {
-        return crate::build::TraitTypeBuilder::new(module, name);
+    pub fn new(path: &crate::Path, name: &str) -> crate::build::TraitTypeBuilder {
+        return crate::build::TraitTypeBuilder::new(path, name);
     }
 
     pub fn id(&self) -> crate::TypeId {
-        return crate::TypeId::from_string(format!("{}::{}", &self.module, &self.name));
+        return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -30,8 +30,8 @@ impl TraitType {
 }
 
 impl TraitType {
-    pub fn module(&self) -> &crate::Module {
-        return &self.module;
+    pub fn path(&self) -> &crate::Path {
+        return &self.path;
     }
 
     pub fn vis(&self) -> &crate::Visibility {

@@ -62,7 +62,7 @@ pub fn derive(input: &syn::DeriveInput, ty: &syn::DataEnum) -> proc_macro2::Toke
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
-                return ::zinq_reflect::EnumType::new(&(::zinq_reflect::Module::from(module_path!())), stringify!(#name))
+                return ::zinq_reflect::EnumType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
                     .visibility(#vis)
                     .variants(&[#(#variants,)*])
                     .build()

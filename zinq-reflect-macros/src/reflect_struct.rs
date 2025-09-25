@@ -38,7 +38,7 @@ pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::To
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
-                return ::zinq_reflect::StructType::new(&(::zinq_reflect::Module::from(module_path!())), stringify!(#name))
+                return ::zinq_reflect::StructType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
                     .visibility(#vis)
                     .meta(&(::zinq_reflect::MetaData::from([#(#pairs,)*])))
                     .fields(

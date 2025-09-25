@@ -6,7 +6,7 @@ use std::{
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
-    pub(crate) module: crate::Module,
+    pub(crate) path: crate::Path,
     pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
@@ -15,16 +15,16 @@ pub struct StructType {
 }
 
 impl StructType {
-    pub fn new(module: &crate::Module, name: &str) -> crate::build::StructTypeBuilder {
-        return crate::build::StructTypeBuilder::new(module, name);
+    pub fn new(path: &crate::Path, name: &str) -> crate::build::StructTypeBuilder {
+        return crate::build::StructTypeBuilder::new(path, name);
     }
 
     pub fn id(&self) -> crate::TypeId {
-        return crate::TypeId::from_string(format!("{}::{}", &self.module, &self.name));
+        return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
     }
 
-    pub fn module(&self) -> &crate::Module {
-        return &self.module;
+    pub fn path(&self) -> &crate::Path {
+        return &self.path;
     }
 
     pub fn meta(&self) -> &crate::MetaData {

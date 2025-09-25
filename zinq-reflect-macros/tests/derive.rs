@@ -87,5 +87,5 @@ pub fn should_reflect_module() {
         password: String::from("test"),
     };
 
-    assert_eq!(user.to_type().module().to_string(), "derive::models");
+    assert_eq!(user.to_type().path().to_string(), "derive::models");
 }
