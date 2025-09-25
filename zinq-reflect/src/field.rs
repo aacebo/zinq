@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Field {
+    pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: FieldName,
     pub(crate) ty: Box<crate::Type>,
@@ -9,6 +10,10 @@ pub struct Field {
 impl Field {
     pub fn new(name: &FieldName, ty: &crate::Type) -> crate::build::FieldBuilder {
         return crate::build::FieldBuilder::new(name, ty);
+    }
+
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
     }
 
     pub fn vis(&self) -> &crate::Visibility {

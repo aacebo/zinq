@@ -1,18 +1,19 @@
 mod reflect_enum;
+mod reflect_field;
 mod reflect_struct;
 mod reflect_trait;
 mod reflect_visibility;
 
 use proc_macro::TokenStream;
 
-#[proc_macro_derive(Reflect)]
+#[proc_macro_derive(Reflect, attributes(reflect))]
 pub fn derive(tokens: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(tokens as syn::DeriveInput);
 
     return match &input.data {
         syn::Data::Struct(ty) => reflect_struct::derive(&input, ty),
         syn::Data::Enum(ty) => reflect_enum::derive(&input, ty),
-        _ => panic!("unsupported Reflect type '{}'", &input.ident),
+        _ => quote::quote!(compile_error!("unsupported Reflect type")),
     }
     .into();
 }
@@ -23,7 +24,7 @@ pub fn reflect(_attr_tokens: TokenStream, item_tokens: TokenStream) -> TokenStre
 
     return match &item {
         syn::Item::Trait(v) => reflect_trait::attr(v),
-        _ => panic!("unsupported reflect type"),
+        _ => quote::quote!(compile_error!("unsupported reflect type")),
     }
     .into();
 }

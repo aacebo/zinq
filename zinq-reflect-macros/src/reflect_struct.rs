@@ -1,6 +1,6 @@
 use quote::quote;
 
-use crate::reflect_visibility;
+use crate::{reflect_field, reflect_visibility};
 
 pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::TokenStream {
     let name = &input.ident;
@@ -15,69 +15,17 @@ pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::To
         syn::Fields::Named(named_fields) => named_fields
             .named
             .iter()
-            .map(|field| {
-                let field_name = &field.ident;
-                let field_type = &field.ty;
-                let field_vis = reflect_visibility::derive(&field.vis);
-
-                quote! {
-                    ::zinq_reflect::Field::new(
-                        &(::zinq_reflect::FieldName::from(stringify!(#field_name))),
-                        &(::zinq_reflect::type_of!(#field_type)),
-                    )
-                    .visibility(#field_vis)
-                    .build()
-                }
-            })
+            .enumerate()
+            .map(|(i, field)| reflect_field::derive(field, i, true))
             .collect::<Vec<_>>(),
         syn::Fields::Unnamed(unnamed_fields) => unnamed_fields
             .unnamed
             .iter()
             .enumerate()
-            .map(|(i, field)| {
-                let field_type = &field.ty;
-                let field_vis = reflect_visibility::derive(&field.vis);
-
-                quote! {
-                    ::zinq_reflect::Field::new(
-                        &(::zinq_reflect::FieldName::from(#i)),
-                        &(::zinq_reflect::type_of!(#field_type)),
-                    )
-                    .visibility(#field_vis)
-                    .build()
-                }
-            })
+            .map(|(i, field)| reflect_field::derive(field, i, false))
             .collect::<Vec<_>>(),
         syn::Fields::Unit => vec![],
     };
-
-    // let field_values = match &ty.fields {
-    //     syn::Fields::Named(named_fields) => named_fields
-    //         .named
-    //         .iter()
-    //         .map(|field| {
-    //             let field_name = &field.ident;
-
-    //             quote! {
-    //                 value[stringify!(#field_name)] = self.#field_name.reflect();
-    //             }
-    //         })
-    //         .collect::<Vec<_>>(),
-    //     syn::Fields::Unnamed(unnamed_fields) => unnamed_fields
-    //         .unnamed
-    //         .iter()
-    //         .enumerate()
-    //         .map(|(i, _)| {
-    //             let field_name = &i.to_string();
-    //             let field_index = syn::Index::from(i);
-
-    //             quote! {
-    //                 value[#field_name] = self.#field_index.reflect();
-    //             }
-    //         })
-    //         .collect::<Vec<_>>(),
-    //     syn::Fields::Unit => vec![],
-    // };
 
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
@@ -95,13 +43,5 @@ pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::To
                     .to_type();
             }
         }
-
-        // impl ::zinq_reflect::Reflect for #name {
-        //     fn reflect(self) -> ::zinq_reflect::Value {
-        //         let mut value = ::zinq_reflect::Struct::new(&self.to_type().to_struct());
-        //         #(#field_values)*
-        //         return value.reflect();
-        //     }
-        // }
     };
 }

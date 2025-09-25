@@ -4,6 +4,7 @@ pub struct FieldBuilder(crate::Field);
 impl FieldBuilder {
     pub fn new(name: &crate::FieldName, ty: &crate::Type) -> Self {
         return Self(crate::Field {
+            meta: crate::MetaData::new(),
             vis: crate::Visibility::Private,
             name: name.clone(),
             ty: Box::new(ty.clone()),

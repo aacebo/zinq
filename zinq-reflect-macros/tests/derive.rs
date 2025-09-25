@@ -14,6 +14,7 @@ mod models {
 
     #[derive(Reflect)]
     pub struct User {
+        #[reflect]
         pub kind: Kind,
         pub name: String,
         pub password: String,
