@@ -7,6 +7,7 @@ use std::{
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
     pub(crate) module: crate::Module,
+    pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) fields: crate::Fields,
@@ -24,6 +25,10 @@ impl StructType {
 
     pub fn module(&self) -> &crate::Module {
         return &self.module;
+    }
+
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
     }
 
     pub fn vis(&self) -> &crate::Visibility {

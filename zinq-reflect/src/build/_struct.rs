@@ -5,11 +5,18 @@ impl StructTypeBuilder {
     pub fn new(module: &crate::Module, name: &str) -> Self {
         return Self(crate::StructType {
             module: module.clone(),
+            meta: crate::MetaData::new(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
             fields: super::FieldsBuilder::new().build(),
             impls: vec![],
         });
+    }
+
+    pub fn meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
     }
 
     pub fn visibility(&self, vis: crate::Visibility) -> Self {

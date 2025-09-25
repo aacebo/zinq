@@ -1,3 +1,4 @@
+mod parse;
 mod reflect_enum;
 mod reflect_field;
 mod reflect_struct;
