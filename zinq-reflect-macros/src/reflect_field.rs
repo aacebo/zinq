@@ -27,7 +27,7 @@ pub fn derive(field: &syn::Field, index: usize, is_named: bool) -> proc_macro2::
             &(::zinq_reflect::type_of!(#field_type)),
         )
         .visibility(#field_vis)
-        .meta(&(::zinq_reflect::MetaData::from([#(#pairs)*])))
+        .meta(&(::zinq_reflect::MetaData::from([#(#pairs,)*])))
         .build()
     };
 }
