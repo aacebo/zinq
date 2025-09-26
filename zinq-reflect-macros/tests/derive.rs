@@ -39,8 +39,8 @@ pub fn should_reflect_struct() {
     assert!(user.to_type().is_struct());
     assert_eq!(user.to_type().len(), 3);
     assert!(user.to_type().to_struct().fields()["kind"].ty().is_enum());
-    assert_eq!(user.to_type().to_struct().meta().len(), 1);
-    assert!(user.to_type().to_struct().meta().has("name"));
+    assert_eq!(user.to_type().meta().len(), 1);
+    assert!(user.to_type().meta().has("name"));
     assert_eq!(
         user.to_type().to_struct().meta().get("name").unwrap(),
         &"alex".reflect()

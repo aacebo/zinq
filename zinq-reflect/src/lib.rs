@@ -115,6 +115,14 @@ impl Type {
         };
     }
 
+    pub fn meta(&self) -> &crate::MetaData {
+        return match self {
+            Self::Struct(v) => v.meta(),
+            Self::Mod(v) => v.meta(),
+            _ => panic!("called 'meta' on '{}'", self.id()),
+        };
+    }
+
     pub fn is_bool(&self) -> bool {
         return match self {
             Self::Bool(_) => true,
