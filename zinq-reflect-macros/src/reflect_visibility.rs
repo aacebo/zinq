@@ -1,6 +1,6 @@
 use quote::{ToTokens, quote};
 
-pub fn derive(vis: &syn::Visibility) -> proc_macro2::TokenStream {
+pub fn build(vis: &syn::Visibility) -> proc_macro2::TokenStream {
     return match vis {
         syn::Visibility::Inherited => quote!(::zinq_reflect::Visibility::Private),
         syn::Visibility::Public(_) => quote! {

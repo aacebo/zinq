@@ -2,7 +2,7 @@ use quote::quote;
 
 use crate::parse;
 
-pub fn ty(attributes: &[syn::Attribute]) -> proc_macro2::TokenStream {
+pub fn build(attributes: &[syn::Attribute]) -> proc_macro2::TokenStream {
     let mut pairs = vec![];
 
     for attr in attributes.iter().filter(|a| a.path().is_ident("reflect")) {

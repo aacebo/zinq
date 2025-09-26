@@ -4,7 +4,7 @@ use crate::{reflect_meta, reflect_visibility};
 
 pub fn attr(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
     if item.content.is_some() {
-        let value = ty(meta, item);
+        let value = build(meta, item);
         item.content
             .as_mut()
             .unwrap()
@@ -19,16 +19,16 @@ pub fn attr(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_mac
     return quote!(#item);
 }
 
-pub fn ty(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
-    let vis = reflect_visibility::derive(&item.vis);
-    let inner_meta = reflect_meta::ty(&item.attrs);
-    let mut types = vec![];
+pub fn build(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
+    let vis = reflect_visibility::build(&item.vis);
+    let inner_meta = reflect_meta::build(&item.attrs);
+    let mut children = vec![];
 
     if let Some((_, items)) = &mut item.content {
         for item in items.iter_mut() {
-            match super::reflect_ty(item) {
+            match super::reflect_item(item) {
                 None => continue,
-                Some(v) => types.push(v),
+                Some(v) => children.push(v),
             };
         }
     }
@@ -37,7 +37,7 @@ pub fn ty(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_macro
         ::zinq_reflect::ModType::new(&(::zinq_reflect::Path::from(module_path!())))
             .meta(&#meta.merge(&#inner_meta))
             .visibility(#vis)
-            .types(&[#(#types,)*])
+            .items(&[#(#children,)*])
             .build()
             .to_type()
     };

@@ -11,7 +11,6 @@ pub struct StructType {
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) fields: crate::Fields,
-    pub(crate) impls: Vec<crate::Impl>,
 }
 
 impl StructType {
@@ -21,6 +20,10 @@ impl StructType {
 
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
+    }
+
+    pub fn len(&self) -> usize {
+        return self.fields.len();
     }
 
     pub fn path(&self) -> &crate::Path {
@@ -43,10 +46,6 @@ impl StructType {
         return &self.fields;
     }
 
-    pub fn impls(&self) -> &[crate::Impl] {
-        return &self.impls;
-    }
-
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Struct(self.clone());
     }
@@ -66,13 +65,7 @@ impl std::fmt::Display for StructType {
             write!(f, "{} ", &self.vis)?;
         }
 
-        write!(f, "struct {}{}", &self.name, &self.fields)?;
-
-        for _impl in &self.impls {
-            write!(f, "{}", _impl)?;
-        }
-
-        return Ok(());
+        return write!(f, "struct {}{}", &self.name, &self.fields);
     }
 }
 

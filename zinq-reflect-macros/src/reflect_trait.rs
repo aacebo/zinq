@@ -4,7 +4,7 @@ use crate::reflect_visibility;
 
 pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let ty = ty(item);
+    let ty = build(item);
 
     return quote! {
         #item
@@ -17,9 +17,9 @@ pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     };
 }
 
-pub fn ty(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
+pub fn build(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let vis = reflect_visibility::derive(&item.vis);
+    let vis = reflect_visibility::build(&item.vis);
     let methods = item.items
         .iter()
         .filter_map(|item| {

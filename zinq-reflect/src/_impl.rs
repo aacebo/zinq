@@ -1,21 +1,41 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Impl {
-    pub(crate) of_trait: Option<crate::TraitType>,
+    pub(crate) path: crate::Path,
+    pub(crate) meta: crate::MetaData,
+    pub(crate) of_trait: Option<crate::Path>,
     pub(crate) self_ty: crate::Type,
     pub(crate) methods: Vec<crate::Method>,
 }
 
 impl Impl {
-    pub fn new(self_ty: &crate::Type) -> crate::build::ImplBuilder {
-        return crate::build::ImplBuilder::new(self_ty);
+    pub fn new(path: &crate::Path, self_ty: &crate::Type) -> crate::build::ImplBuilder {
+        return crate::build::ImplBuilder::new(path, self_ty);
+    }
+
+    pub fn to_item(&self) -> crate::Item {
+        return crate::Item::Impl(self.clone());
+    }
+
+    pub fn id(&self) -> crate::TypeId {
+        let mut path = self.path.clone() + self.self_ty.path();
+
+        if let Some(of) = &self.of_trait {
+            path = path + of;
+        }
+
+        return crate::TypeId::from_string(path.to_string());
     }
 
     pub fn len(&self) -> usize {
         return self.methods.len();
     }
 
-    pub fn of_trait(&self) -> Option<&crate::TraitType> {
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
+    }
+
+    pub fn of_trait(&self) -> Option<&crate::Path> {
         return match &self.of_trait {
             None => None,
             Some(v) => Some(v),

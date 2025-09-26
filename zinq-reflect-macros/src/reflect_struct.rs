@@ -4,7 +4,7 @@ use crate::{reflect_field, reflect_meta, reflect_visibility};
 
 pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let ty = ty(&syn::ItemStruct {
+    let ty = build(&syn::ItemStruct {
         attrs: input.attrs.clone(),
         fields: data.fields.clone(),
         generics: input.generics.clone(),
@@ -25,7 +25,7 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::
 
 pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let ty = ty(item);
+    let ty = build(item);
 
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
@@ -36,28 +36,28 @@ pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
     };
 }
 
-pub fn ty(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
+pub fn build(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let vis = reflect_visibility::derive(&item.vis);
+    let vis = reflect_visibility::build(&item.vis);
     let layout = match &item.fields {
         syn::Fields::Named(_) => quote!(::zinq_reflect::Layout::Key),
         syn::Fields::Unnamed(_) => quote!(::zinq_reflect::Layout::Index),
         syn::Fields::Unit => quote!(::zinq_reflect::Layout::Unit),
     };
 
-    let meta = reflect_meta::ty(&item.attrs);
+    let meta = reflect_meta::build(&item.attrs);
     let fields = match &item.fields {
         syn::Fields::Named(named_fields) => named_fields
             .named
             .iter()
             .enumerate()
-            .map(|(i, field)| reflect_field::derive(field, i, true))
+            .map(|(i, field)| reflect_field::build(field, i, true))
             .collect::<Vec<_>>(),
         syn::Fields::Unnamed(unnamed_fields) => unnamed_fields
             .unnamed
             .iter()
             .enumerate()
-            .map(|(i, field)| reflect_field::derive(field, i, false))
+            .map(|(i, field)| reflect_field::build(field, i, false))
             .collect::<Vec<_>>(),
         syn::Fields::Unit => vec![],
     };

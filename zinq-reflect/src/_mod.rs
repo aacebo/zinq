@@ -4,7 +4,7 @@ pub struct ModType {
     pub(crate) path: crate::Path,
     pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
-    pub(crate) tys: Vec<crate::Type>,
+    pub(crate) items: Vec<crate::Item>,
 }
 
 impl ModType {
@@ -14,6 +14,10 @@ impl ModType {
 
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(self.path.to_string());
+    }
+
+    pub fn len(&self) -> usize {
+        return self.items.len();
     }
 
     pub fn path(&self) -> &crate::Path {
@@ -28,8 +32,8 @@ impl ModType {
         return &self.vis;
     }
 
-    pub fn tys(&self) -> &[crate::Type] {
-        return &self.tys;
+    pub fn items(&self) -> &[crate::Item] {
+        return &self.items;
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -53,11 +57,11 @@ impl std::fmt::Display for ModType {
 
         write!(f, "{} {{", self.path.name())?;
 
-        for ty in &self.tys {
-            write!(f, "\n\t{}", ty)?;
+        for item in &self.items {
+            write!(f, "\n\t{}", item)?;
         }
 
-        if self.tys.len() > 0 {
+        if self.items.len() > 0 {
             write!(f, "\n")?;
         }
 

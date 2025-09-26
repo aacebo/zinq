@@ -1,6 +1,7 @@
 mod parse;
 mod reflect_enum;
 mod reflect_field;
+mod reflect_impl;
 mod reflect_meta;
 mod reflect_mod;
 mod reflect_struct;
@@ -27,14 +28,14 @@ pub fn derive_reflect(tokens: TokenStream) -> TokenStream {
 pub fn reflect(attrs: TokenStream, item_tokens: TokenStream) -> TokenStream {
     let mut item = syn::parse_macro_input!(item_tokens as syn::Item);
 
-    return match reflect_item(attrs, &mut item) {
+    return match reflect_attr(attrs, &mut item) {
         None => quote!(compile_error!("invalid reflect type")),
         Some(v) => v,
     }
     .into();
 }
 
-fn reflect_item(attrs: TokenStream, item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
+fn reflect_attr(attrs: TokenStream, item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
     let mut pairs = vec![];
     let parser = syn::meta::parser(|meta| {
         pairs.push(parse::meta_data_item(meta));
@@ -58,10 +59,22 @@ fn reflect_item(attrs: TokenStream, item: &mut syn::Item) -> Option<proc_macro2:
 
 fn reflect_ty(item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
     return match item {
-        syn::Item::Mod(v) => Some(reflect_mod::ty(quote!(), v)),
-        syn::Item::Trait(v) => Some(reflect_trait::ty(v)),
-        syn::Item::Struct(v) => Some(reflect_struct::ty(v)),
-        syn::Item::Enum(v) => Some(reflect_enum::ty(v)),
+        syn::Item::Mod(v) => Some(reflect_mod::build(quote!(), v)),
+        syn::Item::Trait(v) => Some(reflect_trait::build(v)),
+        syn::Item::Struct(v) => Some(reflect_struct::build(v)),
+        syn::Item::Enum(v) => Some(reflect_enum::build(v)),
         _ => None,
+    };
+}
+
+fn reflect_item(item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
+    let value = match item {
+        syn::Item::Impl(v) => Some(reflect_impl::build(v)),
+        other => reflect_ty(other),
+    };
+
+    return match &value {
+        None => None,
+        Some(value) => Some(quote!(#value.to_item())),
     };
 }

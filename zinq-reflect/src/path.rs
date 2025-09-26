@@ -27,7 +27,7 @@ impl From<&str> for Path {
             value
                 .split("::")
                 .filter(|v| *v != "r#mod")
-                .map(|v| v.to_string())
+                .map(|v| v.trim().to_string())
                 .collect::<Vec<_>>(),
         );
     }
@@ -39,7 +39,7 @@ impl From<String> for Path {
             value
                 .split("::")
                 .filter(|v| *v != "r#mod")
-                .map(|v| v.to_string())
+                .map(|v| v.trim().to_string())
                 .collect::<Vec<_>>(),
         );
     }
@@ -48,5 +48,19 @@ impl From<String> for Path {
 impl std::fmt::Display for Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{}", &self.0.join("::"));
+    }
+}
+
+impl std::ops::Add<&Self> for Path {
+    type Output = Self;
+
+    fn add(self, rhs: &Self) -> Self::Output {
+        let mut next = self.clone();
+
+        for part in rhs.iter() {
+            next = next.add(part);
+        }
+
+        return next;
     }
 }

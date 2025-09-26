@@ -4,7 +4,7 @@ use crate::{reflect_field, reflect_visibility};
 
 pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let ty = ty(&syn::ItemEnum {
+    let ty = build(&syn::ItemEnum {
         attrs: input.attrs.clone(),
         variants: data.variants.clone(),
         generics: input.generics.clone(),
@@ -25,7 +25,7 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
 
 pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let ty = ty(item);
+    let ty = build(item);
 
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
@@ -36,9 +36,9 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     };
 }
 
-pub fn ty(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
+pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let vis = reflect_visibility::derive(&item.vis);
+    let vis = reflect_visibility::build(&item.vis);
     let variants = item
         .variants
         .iter()
@@ -54,7 +54,7 @@ pub fn ty(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                         .named
                         .iter()
                         .enumerate()
-                        .map(|(i, field)| reflect_field::derive(field, i, true))
+                        .map(|(i, field)| reflect_field::build(field, i, true))
                         .collect::<Vec<_>>();
 
                     quote! {
@@ -74,7 +74,7 @@ pub fn ty(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                         .unnamed
                         .iter()
                         .enumerate()
-                        .map(|(i, field)| reflect_field::derive(field, i, false))
+                        .map(|(i, field)| reflect_field::build(field, i, false))
                         .collect::<Vec<_>>();
 
                     quote! {

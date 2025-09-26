@@ -9,6 +9,7 @@ mod bool;
 pub mod build;
 mod field;
 pub mod fields;
+mod item;
 mod layout;
 mod meta_data;
 mod method;
@@ -36,6 +37,7 @@ pub use _trait::*;
 pub use bool::*;
 pub use field::*;
 pub use fields::*;
+pub use item::*;
 pub use layout::*;
 pub use meta_data::*;
 pub use method::*;
@@ -97,10 +99,10 @@ impl Type {
         return match self {
             Self::Enum(v) => v.len(),
             Self::Slice(v) => v.len(),
-            Self::Struct(v) => v.fields().len(),
+            Self::Struct(v) => v.len(),
             Self::Tuple(v) => v.len(),
             Self::Trait(v) => v.len(),
-            Self::Mod(v) => v.tys().len(),
+            Self::Mod(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.id()),
         };
     }
@@ -121,6 +123,10 @@ impl Type {
             Self::Mod(v) => v.meta(),
             _ => panic!("called 'meta' on '{}'", self.id()),
         };
+    }
+
+    pub fn to_item(&self) -> crate::Item {
+        return crate::Item::Type(self.clone());
     }
 
     pub fn is_bool(&self) -> bool {

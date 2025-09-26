@@ -7,7 +7,7 @@ impl ModTypeBuilder {
             path: path.clone(),
             meta: crate::MetaData::new(),
             vis: crate::Visibility::Private,
-            tys: vec![],
+            items: vec![],
         });
     }
 
@@ -23,9 +23,9 @@ impl ModTypeBuilder {
         return next;
     }
 
-    pub fn types(&self, tys: &[crate::Type]) -> Self {
+    pub fn items(&self, items: &[crate::Item]) -> Self {
         let mut next = self.clone();
-        next.0.tys.append(&mut tys.to_vec());
+        next.0.items.append(&mut items.to_vec());
         return next;
     }
 

@@ -15,6 +15,16 @@ mod models {
         Basic,
     }
 
+    impl std::fmt::Display for Kind {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            return match self {
+                Self::Admin(v) => write!(f, "{}", v),
+                Self::Moderator => write!(f, "mod"),
+                Self::Basic => write!(f, "basic"),
+            };
+        }
+    }
+
     #[derive(Reflect)]
     #[reflect(name = "alex")]
     pub struct User {
@@ -107,25 +117,34 @@ pub fn should_reflect_mod() {
     assert!(ty.is_mod());
     assert_eq!(ty.to_mod().path().name(), "models");
     assert!(ty.to_mod().vis().is_private());
-    assert_eq!(ty.to_mod().tys().len(), 3);
+    assert_eq!(ty.to_mod().items().len(), 4);
 
     let module = ty.to_mod();
 
     assert!(module.meta().has("version"));
     assert_eq!(module.meta().get("version").unwrap(), &value_of!(2));
 
-    let one = &module.tys()[0];
+    let one = &module.items()[0].to_type();
 
     assert!(one.is_enum());
     assert_eq!(one.to_enum().name(), "Kind");
 
-    let two = &module.tys()[1];
+    let two = &module.items()[1];
 
-    assert!(two.is_struct());
-    assert_eq!(two.to_struct().name(), "User");
+    assert!(two.is_impl());
+    assert_eq!(two.to_impl().self_ty().to_enum().name(), "Kind");
+    assert_eq!(
+        two.to_impl().of_trait().unwrap().to_string(),
+        "std::fmt::Display"
+    );
 
-    let three = &module.tys()[2];
+    let three = &module.items()[2].to_type();
 
     assert!(three.is_struct());
-    assert_eq!(three.to_struct().name(), "Position");
+    assert_eq!(three.to_struct().name(), "User");
+
+    let four = &module.items()[3].to_type();
+
+    assert!(four.is_struct());
+    assert_eq!(four.to_struct().name(), "Position");
 }
