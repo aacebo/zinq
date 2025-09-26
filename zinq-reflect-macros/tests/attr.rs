@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use zinq_reflect::{TypeOf, type_of};
+use zinq_reflect::{TypeOf, type_of, value_of};
 use zinq_reflect_macros::*;
 
 #[reflect(a = "b")]
@@ -19,4 +19,5 @@ pub fn should_reflect_trait() {
     assert!(ty.to_trait().get("world").unwrap().has_param("self"));
     assert!(ty.to_trait().get("world").unwrap().has_param("a"));
     assert!(ty.to_trait().meta().has("a"));
+    assert_eq!(ty.to_trait().meta().get("a").unwrap(), &value_of!("b"));
 }
