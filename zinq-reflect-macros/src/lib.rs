@@ -1,6 +1,7 @@
 mod parse;
 mod reflect_enum;
 mod reflect_field;
+mod reflect_generics;
 mod reflect_impl;
 mod reflect_meta;
 mod reflect_mod;

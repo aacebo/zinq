@@ -5,7 +5,7 @@ pub struct TraitType {
     pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
-    pub(crate) params: crate::Generics,
+    pub(crate) generics: crate::Generics,
     pub(crate) methods: Vec<crate::Method>,
 }
 
@@ -48,8 +48,8 @@ impl TraitType {
         return &self.name;
     }
 
-    pub fn params(&self) -> &crate::Generics {
-        return &self.params;
+    pub fn generics(&self) -> &crate::Generics {
+        return &self.generics;
     }
 
     pub fn methods(&self) -> &[crate::Method] {
@@ -123,7 +123,7 @@ impl std::fmt::Display for TraitType {
             write!(f, "{} ", &self.vis)?;
         }
 
-        write!(f, "trait {}{} {{", &self.name, &self.params)?;
+        write!(f, "trait {}{} {{", &self.name, &self.generics)?;
 
         for method in &self.methods {
             write!(f, "\n\t{}", method)?;

@@ -5,6 +5,12 @@ pub struct LifetimeBound {
 }
 
 impl LifetimeBound {
+    pub fn new(name: &str) -> Self {
+        return Self {
+            name: name.to_string(),
+        };
+    }
+
     pub fn to_bound(&self) -> crate::Bound {
         return crate::Bound::Lifetime(self.clone());
     }

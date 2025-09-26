@@ -4,7 +4,7 @@ use zinq_reflect::{TypeOf, type_of, value_of};
 use zinq_reflect_macros::*;
 
 #[reflect(a = "b")]
-trait Hello {
+trait Hello<T = String> {
     fn world(&self, a: u8) -> bool;
 }
 
@@ -20,4 +20,10 @@ pub fn should_reflect_trait() {
     assert!(ty.to_trait().get("world").unwrap().has_param("a"));
     assert!(ty.to_trait().meta().has("a"));
     assert_eq!(ty.to_trait().meta().get("a").unwrap(), &value_of!("b"));
+    assert_eq!(ty.to_trait().generics().len(), 1);
+    assert_eq!(ty.to_trait().generics()[0].to_type().name(), "T");
+    assert_eq!(
+        ty.to_trait().generics()[0].to_type().default().unwrap(),
+        &type_of!(String)
+    );
 }

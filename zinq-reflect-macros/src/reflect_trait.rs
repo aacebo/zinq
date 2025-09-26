@@ -1,6 +1,6 @@
 use quote::quote;
 
-use crate::{reflect_meta, reflect_visibility};
+use crate::{reflect_generics, reflect_meta, reflect_visibility};
 
 pub fn attr(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     let name = &item.ident;
@@ -21,6 +21,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
     let name = &item.ident;
     let vis = reflect_visibility::build(&item.vis);
     let inner_meta = reflect_meta::build(&item.attrs);
+    let generics = reflect_generics::build(&item.generics);
     let methods = item.items
         .iter()
         .filter_map(|item| {
@@ -104,6 +105,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
     return quote! {
         ::zinq_reflect::TraitType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
             .meta(&#meta.merge(&#inner_meta))
+            .generics(&#generics)
             .visibility(#vis)
             .methods(&[#(#methods,)*])
             .build()

@@ -6,6 +6,7 @@ mod _trait;
 mod field;
 mod fields;
 mod method;
+mod type_param;
 mod variant;
 
 pub use _enum::*;
@@ -16,4 +17,5 @@ pub use _trait::*;
 pub use field::*;
 pub use fields::*;
 pub use method::*;
+pub use type_param::*;
 pub use variant::*;

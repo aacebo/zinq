@@ -8,7 +8,7 @@ impl EnumTypeBuilder {
             meta: crate::MetaData::new(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
-            params: crate::Generics::new(),
+            generics: crate::Generics::new(),
             variants: vec![],
         });
     }
@@ -25,9 +25,9 @@ impl EnumTypeBuilder {
         return next;
     }
 
-    pub fn params(&self, params: &crate::Generics) -> Self {
+    pub fn generics(&self, generics: &crate::Generics) -> Self {
         let mut next = self.clone();
-        next.0.params = params.clone();
+        next.0.generics = generics.clone();
         return next;
     }
 

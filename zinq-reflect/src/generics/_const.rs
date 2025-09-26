@@ -7,6 +7,20 @@ pub struct ConstParam {
 }
 
 impl ConstParam {
+    pub fn new(name: &str, ty: &crate::Type) -> Self {
+        return Self {
+            name: name.to_string(),
+            ty: ty.clone(),
+            default: None,
+        };
+    }
+
+    pub fn with_default(self, default: &crate::Value) -> Self {
+        let mut next = self.clone();
+        next.default = Some(default.clone());
+        return next;
+    }
+
     pub fn to_generic(&self) -> crate::Generic {
         return crate::Generic::Const(self.clone());
     }

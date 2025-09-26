@@ -7,6 +7,10 @@ pub struct TypeParam {
 }
 
 impl TypeParam {
+    pub fn new(name: &str) -> crate::build::TypeParamBuilder {
+        return crate::build::TypeParamBuilder::new(name);
+    }
+
     pub fn to_generic(&self) -> crate::Generic {
         return crate::Generic::Type(self.clone());
     }

@@ -6,6 +6,13 @@ pub struct TraitBound {
 }
 
 impl TraitBound {
+    pub fn new(path: &crate::Path, modifier: TraitBoundModifier) -> Self {
+        return Self {
+            path: path.clone(),
+            modifier,
+        };
+    }
+
     pub fn to_bound(&self) -> crate::Bound {
         return crate::Bound::Trait(self.clone());
     }

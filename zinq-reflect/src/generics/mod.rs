@@ -28,8 +28,8 @@ impl Generics {
     }
 }
 
-impl From<&[Generic]> for Generics {
-    fn from(value: &[Generic]) -> Self {
+impl<const N: usize> From<[Generic; N]> for Generics {
+    fn from(value: [Generic; N]) -> Self {
         return Self(value.to_vec());
     }
 }
