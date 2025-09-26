@@ -61,6 +61,6 @@ impl std::fmt::Display for ModType {
             write!(f, "\n")?;
         }
 
-        return write!(f, "}};");
+        return write!(f, "}}");
     }
 }
