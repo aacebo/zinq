@@ -1,5 +1,6 @@
 pub use zinq_schema::*;
 
+#[macro_use]
 pub mod reflect {
     pub use zinq_reflect::*;
 }
