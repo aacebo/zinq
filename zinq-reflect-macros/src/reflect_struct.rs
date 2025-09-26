@@ -2,17 +2,51 @@ use quote::quote;
 
 use crate::{parse, reflect_field, reflect_visibility};
 
-pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::TokenStream {
+pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let vis = reflect_visibility::derive(&input.vis);
-    let layout = match &ty.fields {
+    let ty = ty(&syn::ItemStruct {
+        attrs: input.attrs.clone(),
+        fields: data.fields.clone(),
+        generics: input.generics.clone(),
+        ident: input.ident.clone(),
+        semi_token: data.semi_token.clone(),
+        struct_token: data.struct_token.clone(),
+        vis: input.vis.clone(),
+    });
+
+    return quote! {
+        impl ::zinq_reflect::TypeOf for #name {
+            fn type_of() -> ::zinq_reflect::Type {
+                return #ty;
+            }
+        }
+    };
+}
+
+pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
+    let name = &item.ident;
+    let ty = ty(item);
+
+    return quote! {
+        impl ::zinq_reflect::TypeOf for #name {
+            fn type_of() -> ::zinq_reflect::Type {
+                return #ty;
+            }
+        }
+    };
+}
+
+pub fn ty(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
+    let name = &item.ident;
+    let vis = reflect_visibility::derive(&item.vis);
+    let layout = match &item.fields {
         syn::Fields::Named(_) => quote!(::zinq_reflect::Layout::Key),
         syn::Fields::Unnamed(_) => quote!(::zinq_reflect::Layout::Index),
         syn::Fields::Unit => quote!(::zinq_reflect::Layout::Unit),
     };
 
     let mut pairs = vec![];
-    let fields = match &ty.fields {
+    let fields = match &item.fields {
         syn::Fields::Named(named_fields) => named_fields
             .named
             .iter()
@@ -28,7 +62,7 @@ pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::To
         syn::Fields::Unit => vec![],
     };
 
-    for attr in input.attrs.iter().filter(|a| a.path().is_ident("reflect")) {
+    for attr in item.attrs.iter().filter(|a| a.path().is_ident("reflect")) {
         let _ = attr.parse_nested_meta(|meta| {
             pairs.push(parse::meta_data_item(meta));
             Ok(())
@@ -36,21 +70,17 @@ pub fn derive(input: &syn::DeriveInput, ty: &syn::DataStruct) -> proc_macro2::To
     }
 
     return quote! {
-        impl ::zinq_reflect::TypeOf for #name {
-            fn type_of() -> ::zinq_reflect::Type {
-                return ::zinq_reflect::StructType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
-                    .visibility(#vis)
-                    .meta(&(::zinq_reflect::MetaData::from([#(#pairs,)*])))
-                    .fields(
-                        ::zinq_reflect::Fields::new()
-                            .layout(#layout)
-                            .fields(&[#(#fields,)*])
-                            .build()
-                            .as_ref()
-                    )
+        ::zinq_reflect::StructType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
+            .visibility(#vis)
+            .meta(&(::zinq_reflect::MetaData::from([#(#pairs,)*])))
+            .fields(
+                ::zinq_reflect::Fields::new()
+                    .layout(#layout)
+                    .fields(&[#(#fields,)*])
                     .build()
-                    .to_type();
-            }
-        }
+                    .as_ref()
+            )
+            .build()
+            .to_type()
     };
 }

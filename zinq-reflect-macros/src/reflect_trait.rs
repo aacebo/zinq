@@ -4,6 +4,21 @@ use crate::reflect_visibility;
 
 pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     let name = &item.ident;
+    let ty = ty(item);
+
+    return quote! {
+        #item
+
+        impl ::zinq_reflect::TypeOf for dyn #name {
+            fn type_of() -> ::zinq_reflect::Type {
+                return #ty;
+            }
+        }
+    };
+}
+
+pub fn ty(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
+    let name = &item.ident;
     let vis = reflect_visibility::derive(&item.vis);
     let methods = item.items
         .iter()
@@ -84,16 +99,10 @@ pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
         .collect::<Vec<_>>();
 
     return quote! {
-        #item
-
-        impl ::zinq_reflect::TypeOf for dyn #name {
-            fn type_of() -> ::zinq_reflect::Type {
-                return ::zinq_reflect::TraitType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
-                    .visibility(#vis)
-                    .methods(&[#(#methods,)*])
-                    .build()
-                    .to_type();
-            }
-        }
+        ::zinq_reflect::TraitType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
+            .visibility(#vis)
+            .methods(&[#(#methods,)*])
+            .build()
+            .to_type()
     };
 }

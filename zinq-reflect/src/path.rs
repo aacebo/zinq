@@ -2,7 +2,24 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Path(Vec<String>);
 
-impl Path {}
+impl Path {
+    pub fn len(&self) -> usize {
+        return self.0.len();
+    }
+
+    pub fn name(&self) -> &str {
+        return &self.0.last().unwrap();
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<'_, String> {
+        return self.0.iter();
+    }
+
+    pub fn add(mut self, part: &str) -> Self {
+        self.0.push(part.to_string());
+        return self;
+    }
+}
 
 impl From<&str> for Path {
     fn from(value: &str) -> Self {

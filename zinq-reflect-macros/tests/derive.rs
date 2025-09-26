@@ -1,8 +1,11 @@
 #![allow(unused)]
 
 use zinq_reflect::{Reflect, TypeOf};
+use zinq_reflect_macros::*;
 
+#[reflect]
 mod models {
+    use zinq_reflect::TypeOf;
     use zinq_reflect_macros::*;
 
     #[derive(Reflect)]
@@ -80,7 +83,7 @@ pub fn should_reflect_tuple_struct() {
 }
 
 #[test]
-pub fn should_reflect_module() {
+pub fn should_reflect_path() {
     let user = models::User {
         kind: models::Kind::Basic,
         name: String::from("dev"),
@@ -88,4 +91,30 @@ pub fn should_reflect_module() {
     };
 
     assert_eq!(user.to_type().path().to_string(), "derive::models");
+}
+
+#[test]
+pub fn should_reflect_mod() {
+    let ty = models::type_of();
+
+    assert!(ty.is_mod());
+    assert_eq!(ty.to_mod().path().name(), "models");
+    assert!(ty.to_mod().vis().is_private());
+    assert_eq!(ty.to_mod().tys().len(), 3);
+
+    let module = ty.to_mod();
+    let one = &module.tys()[0];
+
+    assert!(one.is_enum());
+    assert_eq!(one.to_enum().name(), "Kind");
+
+    let two = &module.tys()[1];
+
+    assert!(two.is_struct());
+    assert_eq!(two.to_struct().name(), "User");
+
+    let three = &module.tys()[2];
+
+    assert!(three.is_struct());
+    assert_eq!(three.to_struct().name(), "Position");
 }
