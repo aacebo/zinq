@@ -10,6 +10,7 @@ mod models {
 
     #[derive(Reflect)]
     pub enum Kind {
+        #[reflect(lowercase)]
         Admin(String),
         Moderator,
         Basic,
@@ -87,6 +88,22 @@ pub fn should_reflect_enum() {
         kind.to_type().to_enum().variant("Admin").fields()[0]
             .ty()
             .is_string()
+    );
+    assert!(
+        kind.to_type()
+            .to_enum()
+            .variant("Admin")
+            .meta()
+            .has("lowercase")
+    );
+    assert_eq!(
+        kind.to_type()
+            .to_enum()
+            .variant("Admin")
+            .meta()
+            .get("lowercase")
+            .unwrap(),
+        &zinq_reflect::Value::Null
     );
 }
 
