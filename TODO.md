@@ -4,10 +4,6 @@
 
 - add new `UnionType` and `Union`
 - add `MetaData` to:
-    - `TraitType`
-    - `EnumType`
-    - `Variant`
-    - `Impl`
     - `UnionType`
 - refactor `Struct` value ??
 - add `Generic` concept to:
