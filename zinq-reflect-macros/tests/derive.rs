@@ -10,7 +10,7 @@ mod models {
 
     #[derive(Reflect)]
     pub enum Kind {
-        Admin,
+        Admin(String),
         Moderator,
         Basic,
     }
@@ -67,10 +67,17 @@ pub fn should_reflect_field() {
 
 #[test]
 pub fn should_reflect_enum() {
-    let kind = models::Kind::Admin;
+    let kind = models::Kind::Admin("test".to_string());
 
     assert!(kind.to_type().is_enum());
     assert_eq!(kind.to_type().len(), 3);
+    assert!(kind.to_type().to_enum().has_variant("Admin"));
+    assert_eq!(kind.to_type().to_enum().variant("Admin").len(), 1);
+    assert!(
+        kind.to_type().to_enum().variant("Admin").fields()[0]
+            .ty()
+            .is_string()
+    );
 }
 
 #[test]
