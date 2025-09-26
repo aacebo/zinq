@@ -1,6 +1,6 @@
 use quote::quote;
 
-use crate::{reflect_field, reflect_visibility};
+use crate::{reflect_field, reflect_meta, reflect_visibility};
 
 pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
@@ -39,11 +39,13 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     let name = &item.ident;
     let vis = reflect_visibility::build(&item.vis);
+    let meta = reflect_meta::build(&item.attrs);
     let variants = item
         .variants
         .iter()
         .map(|variant| {
             let variant_name = &variant.ident;
+            let variant_meta = reflect_meta::build(&variant.attrs);
 
             match &variant.fields {
                 syn::Fields::Unit => quote! {
@@ -59,6 +61,7 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
                     quote! {
                         ::zinq_reflect::Variant::new(stringify!(#variant_name))
+                            .meta(&#variant_meta)
                             .fields(
                                 ::zinq_reflect::Fields::new()
                                     .layout(::zinq_reflect::Layout::Key)
@@ -79,6 +82,7 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
                     quote! {
                         ::zinq_reflect::Variant::new(stringify!(#variant_name))
+                            .meta(&#variant_meta)
                             .fields(
                                 ::zinq_reflect::Fields::new()
                                     .layout(::zinq_reflect::Layout::Index)
@@ -95,6 +99,7 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
     return quote! {
         ::zinq_reflect::EnumType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
+            .meta(&#meta)
             .visibility(#vis)
             .variants(&[#(#variants,)*])
             .build()

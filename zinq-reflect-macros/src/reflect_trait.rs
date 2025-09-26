@@ -1,10 +1,10 @@
 use quote::quote;
 
-use crate::reflect_visibility;
+use crate::{reflect_meta, reflect_visibility};
 
-pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
+pub fn attr(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     let name = &item.ident;
-    let ty = build(item);
+    let ty = build(meta, item);
 
     return quote! {
         #item
@@ -17,14 +17,16 @@ pub fn attr(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     };
 }
 
-pub fn build(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
+pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macro2::TokenStream {
     let name = &item.ident;
     let vis = reflect_visibility::build(&item.vis);
+    let inner_meta = reflect_meta::build(&item.attrs);
     let methods = item.items
         .iter()
         .filter_map(|item| {
             if let syn::TraitItem::Fn(func) = item {
                 let fn_name = &func.sig.ident;
+                let fn_meta = reflect_meta::build(&func.attrs);
                 let fn_is_async = match &func.sig.asyncness {
                     None => false,
                     Some(_) => true,
@@ -86,6 +88,7 @@ pub fn build(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
 
                 return Some(quote! {
                     ::zinq_reflect::Method::new(stringify!(#fn_name))
+                        .meta(&#fn_meta)
                         .is_async(#fn_is_async)
                         .visibility(::zinq_reflect::Visibility::Public(::zinq_reflect::Public::Full))
                         .params(&[#(#fn_params,)*])
@@ -100,6 +103,7 @@ pub fn build(item: &syn::ItemTrait) -> proc_macro2::TokenStream {
 
     return quote! {
         ::zinq_reflect::TraitType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
+            .meta(&#meta.merge(&#inner_meta))
             .visibility(#vis)
             .methods(&[#(#methods,)*])
             .build()

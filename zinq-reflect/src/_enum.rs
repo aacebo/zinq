@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EnumType {
     pub(crate) path: crate::Path,
+    pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) variants: Vec<crate::Variant>,
@@ -22,6 +23,10 @@ impl EnumType {
 
     pub fn path(&self) -> &crate::Path {
         return &self.path;
+    }
+
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
     }
 
     pub fn vis(&self) -> &crate::Visibility {

@@ -4,12 +4,19 @@ pub struct MethodBuilder(crate::Method);
 impl MethodBuilder {
     pub fn new(name: &str) -> Self {
         return Self(crate::Method {
+            meta: crate::MetaData::new(),
             is_async: false,
             vis: crate::Visibility::Private,
             name: name.to_string(),
             params: vec![],
             return_type: Box::new(crate::Type::Void),
         });
+    }
+
+    pub fn meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
     }
 
     pub fn is_async(&self, is_async: bool) -> Self {

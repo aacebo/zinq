@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TraitType {
     pub(crate) path: crate::Path,
+    pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
     pub(crate) methods: Vec<crate::Method>,
@@ -32,6 +33,10 @@ impl TraitType {
 impl TraitType {
     pub fn path(&self) -> &crate::Path {
         return &self.path;
+    }
+
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
     }
 
     pub fn vis(&self) -> &crate::Visibility {

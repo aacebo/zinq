@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Variant {
+    pub(crate) meta: crate::MetaData,
     pub(crate) name: String,
     pub(crate) fields: crate::Fields,
 }
@@ -8,6 +9,10 @@ pub struct Variant {
 impl Variant {
     pub fn new(name: &str) -> crate::build::VariantBuilder {
         return crate::build::VariantBuilder::new(name);
+    }
+
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
     }
 
     pub fn name(&self) -> &str {

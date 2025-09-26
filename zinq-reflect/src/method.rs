@@ -3,6 +3,7 @@ use crate::{Param, Visibility};
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Method {
+    pub(crate) meta: crate::MetaData,
     pub(crate) is_async: bool,
     pub(crate) vis: Visibility,
     pub(crate) name: String,
@@ -13,6 +14,10 @@ pub struct Method {
 impl Method {
     pub fn new(name: &str) -> crate::build::MethodBuilder {
         return crate::build::MethodBuilder::new(name);
+    }
+
+    pub fn meta(&self) -> &crate::MetaData {
+        return &self.meta;
     }
 
     pub fn is_async(&self) -> bool {

@@ -50,7 +50,7 @@ fn reflect_attr(attrs: TokenStream, item: &mut syn::Item) -> Option<proc_macro2:
 
     return match item {
         syn::Item::Mod(v) => Some(reflect_mod::attr(meta, v)),
-        syn::Item::Trait(v) => Some(reflect_trait::attr(v)),
+        syn::Item::Trait(v) => Some(reflect_trait::attr(meta, v)),
         syn::Item::Struct(v) => Some(reflect_struct::attr(v)),
         syn::Item::Enum(v) => Some(reflect_enum::attr(v)),
         _ => None,
@@ -60,7 +60,7 @@ fn reflect_attr(attrs: TokenStream, item: &mut syn::Item) -> Option<proc_macro2:
 fn reflect_ty(item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
     return match item {
         syn::Item::Mod(v) => Some(reflect_mod::build(quote!(), v)),
-        syn::Item::Trait(v) => Some(reflect_trait::build(v)),
+        syn::Item::Trait(v) => Some(reflect_trait::build(quote!(), v)),
         syn::Item::Struct(v) => Some(reflect_struct::build(v)),
         syn::Item::Enum(v) => Some(reflect_enum::build(v)),
         _ => None,

@@ -5,10 +5,17 @@ impl EnumTypeBuilder {
     pub fn new(path: &crate::Path, name: &str) -> Self {
         return Self(crate::EnumType {
             path: path.clone(),
+            meta: crate::MetaData::new(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
             variants: vec![],
         });
+    }
+
+    pub fn meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
     }
 
     pub fn visibility(&self, vis: crate::Visibility) -> Self {
