@@ -1,9 +1,9 @@
 #![allow(unused)]
 
-use zinq_reflect::{Reflect, TypeOf};
+use zinq_reflect::{Reflect, TypeOf, value_of};
 use zinq_reflect_macros::*;
 
-#[reflect]
+#[reflect(version = 2)]
 mod models {
     use zinq_reflect::TypeOf;
     use zinq_reflect_macros::*;
@@ -103,6 +103,10 @@ pub fn should_reflect_mod() {
     assert_eq!(ty.to_mod().tys().len(), 3);
 
     let module = ty.to_mod();
+
+    assert!(module.meta().has("version"));
+    assert_eq!(module.meta().get("version").unwrap(), &value_of!(2));
+
     let one = &module.tys()[0];
 
     assert!(one.is_enum());

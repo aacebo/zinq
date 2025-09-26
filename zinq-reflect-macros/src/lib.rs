@@ -9,6 +9,7 @@ mod reflect_visibility;
 
 use proc_macro::TokenStream;
 use quote::quote;
+use syn::parse::Parser;
 
 #[proc_macro_derive(Reflect, attributes(reflect))]
 pub fn derive_reflect(tokens: TokenStream) -> TokenStream {
@@ -23,19 +24,31 @@ pub fn derive_reflect(tokens: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn reflect(_attr_tokens: TokenStream, item_tokens: TokenStream) -> TokenStream {
+pub fn reflect(attrs: TokenStream, item_tokens: TokenStream) -> TokenStream {
     let mut item = syn::parse_macro_input!(item_tokens as syn::Item);
 
-    return match reflect_item(&mut item) {
+    return match reflect_item(attrs, &mut item) {
         None => quote!(compile_error!("invalid reflect type")),
         Some(v) => v,
     }
     .into();
 }
 
-fn reflect_item(item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
+fn reflect_item(attrs: TokenStream, item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
+    let mut pairs = vec![];
+    let parser = syn::meta::parser(|meta| {
+        pairs.push(parse::meta_data_item(meta));
+        Ok(())
+    });
+
+    if let Err(err) = &parser.parse(attrs) {
+        return err.to_compile_error().into();
+    }
+
+    let meta = quote!(::zinq_reflect::MetaData::from([#(#pairs,)*]));
+
     return match item {
-        syn::Item::Mod(v) => Some(reflect_mod::attr(v)),
+        syn::Item::Mod(v) => Some(reflect_mod::attr(meta, v)),
         syn::Item::Trait(v) => Some(reflect_trait::attr(v)),
         syn::Item::Struct(v) => Some(reflect_struct::attr(v)),
         syn::Item::Enum(v) => Some(reflect_enum::attr(v)),
@@ -45,7 +58,7 @@ fn reflect_item(item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
 
 fn reflect_ty(item: &mut syn::Item) -> Option<proc_macro2::TokenStream> {
     return match item {
-        syn::Item::Mod(v) => Some(reflect_mod::ty(v)),
+        syn::Item::Mod(v) => Some(reflect_mod::ty(quote!(), v)),
         syn::Item::Trait(v) => Some(reflect_trait::ty(v)),
         syn::Item::Struct(v) => Some(reflect_struct::ty(v)),
         syn::Item::Enum(v) => Some(reflect_enum::ty(v)),

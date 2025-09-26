@@ -1,10 +1,10 @@
 use quote::quote;
 
-use crate::reflect_visibility;
+use crate::{reflect_meta, reflect_visibility};
 
-pub fn attr(item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
+pub fn attr(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
     if item.content.is_some() {
-        let value = ty(item);
+        let value = ty(meta, item);
         item.content
             .as_mut()
             .unwrap()
@@ -19,8 +19,9 @@ pub fn attr(item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
     return quote!(#item);
 }
 
-pub fn ty(item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
+pub fn ty(meta: proc_macro2::TokenStream, item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
     let vis = reflect_visibility::derive(&item.vis);
+    let inner_meta = reflect_meta::ty(&item.attrs);
     let mut types = vec![];
 
     if let Some((_, items)) = &mut item.content {
@@ -34,6 +35,7 @@ pub fn ty(item: &mut syn::ItemMod) -> proc_macro2::TokenStream {
 
     return quote! {
         ::zinq_reflect::ModType::new(&(::zinq_reflect::Path::from(module_path!())))
+            .meta(&#meta.merge(&#inner_meta))
             .visibility(#vis)
             .types(&[#(#types,)*])
             .build()

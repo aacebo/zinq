@@ -36,6 +36,14 @@ impl MetaData {
     pub fn get_mut(&mut self, key: &str) -> Option<&mut crate::Value> {
         return self.0.get_mut(key);
     }
+
+    pub fn merge(mut self, other: &Self) -> Self {
+        for (key, value) in &other.0 {
+            self.set(&key, &value);
+        }
+
+        return self;
+    }
 }
 
 impl<const N: usize> From<[(String, crate::Value); N]> for MetaData {
