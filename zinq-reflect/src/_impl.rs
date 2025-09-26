@@ -5,6 +5,7 @@ pub struct Impl {
     pub(crate) meta: crate::MetaData,
     pub(crate) of_trait: Option<crate::Path>,
     pub(crate) self_ty: crate::Type,
+    pub(crate) params: crate::Generics,
     pub(crate) methods: Vec<crate::Method>,
 }
 
@@ -46,6 +47,10 @@ impl Impl {
         return &self.self_ty;
     }
 
+    pub fn params(&self) -> &crate::Generics {
+        return &self.params;
+    }
+
     pub fn methods(&self) -> &[crate::Method] {
         return &self.methods;
     }
@@ -65,13 +70,13 @@ impl Impl {
 
 impl std::fmt::Display for Impl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "impl ")?;
+        write!(f, "impl{}", &self.params)?;
 
         if let Some(of) = &self.of_trait {
-            write!(f, "{} for ", of.name())?;
+            write!(f, " {} for ", of.name())?;
         }
 
-        write!(f, "{} {{", &self.self_ty)?;
+        write!(f, " {} {{", &self.self_ty)?;
 
         for method in &self.methods {
             write!(f, "\n\t{}", method)?;

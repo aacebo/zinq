@@ -8,6 +8,7 @@ impl TraitTypeBuilder {
             meta: crate::MetaData::new(),
             vis: crate::Visibility::Private,
             name: name.to_string(),
+            params: crate::Generics::new(),
             methods: vec![],
         });
     }
@@ -21,6 +22,12 @@ impl TraitTypeBuilder {
     pub fn visibility(&self, vis: crate::Visibility) -> Self {
         let mut next = self.clone();
         next.0.vis = vis;
+        return next;
+    }
+
+    pub fn params(&self, params: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.params = params.clone();
         return next;
     }
 

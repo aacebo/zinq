@@ -8,6 +8,7 @@ impl ImplBuilder {
             meta: crate::MetaData::new(),
             of_trait: None,
             self_ty: self_ty.clone(),
+            params: crate::Generics::new(),
             methods: vec![],
         });
     }
@@ -21,6 +22,12 @@ impl ImplBuilder {
     pub fn of(&self, _trait: &crate::Path) -> Self {
         let mut next = self.clone();
         next.0.of_trait = Some(_trait.clone());
+        return next;
+    }
+
+    pub fn params(&self, params: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.params = params.clone();
         return next;
     }
 

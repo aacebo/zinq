@@ -10,6 +10,7 @@ pub struct StructType {
     pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
+    pub(crate) params: crate::Generics,
     pub(crate) fields: crate::Fields,
 }
 
@@ -42,6 +43,10 @@ impl StructType {
         return &self.name;
     }
 
+    pub fn params(&self) -> &crate::Generics {
+        return &self.params;
+    }
+
     pub fn fields(&self) -> &crate::Fields {
         return &self.fields;
     }
@@ -65,7 +70,7 @@ impl std::fmt::Display for StructType {
             write!(f, "{} ", &self.vis)?;
         }
 
-        return write!(f, "struct {}{}", &self.name, &self.fields);
+        return write!(f, "struct {}{}{}", &self.name, &self.params, &self.fields);
     }
 }
 

@@ -5,6 +5,7 @@ pub struct EnumType {
     pub(crate) meta: crate::MetaData,
     pub(crate) vis: crate::Visibility,
     pub(crate) name: String,
+    pub(crate) params: crate::Generics,
     pub(crate) variants: Vec<crate::Variant>,
 }
 
@@ -35,6 +36,10 @@ impl EnumType {
 
     pub fn name(&self) -> &str {
         return &self.name;
+    }
+
+    pub fn params(&self) -> &crate::Generics {
+        return &self.params;
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -72,7 +77,7 @@ impl std::fmt::Display for EnumType {
             write!(f, "{} ", &self.vis)?;
         }
 
-        write!(f, "enum {} {{", &self.name)?;
+        write!(f, "enum {}{} {{", &self.name, &self.params)?;
 
         for variant in &self.variants {
             write!(f, "\n\t{},", variant)?;

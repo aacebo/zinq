@@ -8,6 +8,7 @@ impl MethodBuilder {
             is_async: false,
             vis: crate::Visibility::Private,
             name: name.to_string(),
+            generics: crate::Generics::new(),
             params: vec![],
             return_type: Box::new(crate::Type::Void),
         });
@@ -28,6 +29,12 @@ impl MethodBuilder {
     pub fn visibility(&self, vis: crate::Visibility) -> Self {
         let mut next = self.clone();
         next.0.vis = vis;
+        return next;
+    }
+
+    pub fn generics(&self, generics: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.generics = generics.clone();
         return next;
     }
 

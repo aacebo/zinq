@@ -7,6 +7,7 @@ pub struct Method {
     pub(crate) is_async: bool,
     pub(crate) vis: Visibility,
     pub(crate) name: String,
+    pub(crate) generics: crate::Generics,
     pub(crate) params: Vec<Param>,
     pub(crate) return_type: Box<crate::Type>,
 }
@@ -30,6 +31,10 @@ impl Method {
 
     pub fn name(&self) -> &str {
         return &self.name;
+    }
+
+    pub fn generics(&self) -> &crate::Generics {
+        return &self.generics;
     }
 
     pub fn params(&self) -> &[Param] {
@@ -63,7 +68,7 @@ impl std::fmt::Display for Method {
             write!(f, "async ")?;
         }
 
-        write!(f, "fn {}(", &self.name)?;
+        write!(f, "fn {}{}(", &self.name, &self.generics)?;
 
         for (i, param) in self.params.iter().enumerate() {
             write!(f, "{}", param)?;
