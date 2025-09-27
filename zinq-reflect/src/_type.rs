@@ -5,7 +5,7 @@ pub enum Type {
     Enum(crate::EnumType),
     Number(crate::NumberType),
     String(crate::StringType),
-    Ptr(crate::PtrType),
+    Ref(crate::RefType),
     Slice(crate::SliceType),
     Struct(crate::StructType),
     _Self(crate::SelfType),
@@ -23,7 +23,7 @@ impl Type {
             Self::Enum(v) => v.id(),
             Self::Number(v) => v.id(),
             Self::String(v) => v.id(),
-            Self::Ptr(v) => v.id(),
+            Self::Ref(v) => v.id(),
             Self::Slice(v) => v.id(),
             Self::Struct(v) => v.id(),
             Self::_Self(v) => v.id(),
@@ -87,35 +87,35 @@ impl Type {
 
     pub fn is_ptr(&self) -> bool {
         return match self {
-            Self::Ptr(_) => true,
+            Self::Ref(_) => true,
             _ => false,
         };
     }
 
     pub fn is_ptr_of(&self, ty: Self) -> bool {
         return match self {
-            Self::Ptr(v) => v.is_ptr_of(ty),
+            Self::Ref(v) => v.is_ptr_of(ty),
             _ => false,
         };
     }
 
     pub fn is_ptr_self(&self) -> bool {
         return match self {
-            Self::Ptr(v) => v.ty().is_self(),
+            Self::Ref(v) => v.ty().is_self(),
             _ => false,
         };
     }
 
     pub fn is_ptr_mut(&self) -> bool {
         return match self {
-            Self::Ptr(v) => v.ty().is_mut(),
+            Self::Ref(v) => v.ty().is_mut(),
             _ => false,
         };
     }
 
     pub fn is_ptr_mut_self(&self) -> bool {
         return match self {
-            Self::Ptr(v) => v.ty().is_mut_self(),
+            Self::Ref(v) => v.ty().is_mut_self(),
             _ => false,
         };
     }
@@ -246,9 +246,9 @@ impl Type {
         };
     }
 
-    pub fn to_ptr(&self) -> crate::PtrType {
+    pub fn to_ptr(&self) -> crate::RefType {
         return match self {
-            Self::Ptr(v) => v.clone(),
+            Self::Ref(v) => v.clone(),
             _ => panic!("called 'to_ptr' on '{}'", self.id()),
         };
     }
@@ -336,7 +336,7 @@ impl Type {
             Self::Enum(v) => v.assignable_to(ty),
             Self::Number(v) => v.assignable_to(ty),
             Self::String(v) => v.assignable_to(ty),
-            Self::Ptr(v) => v.assignable_to(ty),
+            Self::Ref(v) => v.assignable_to(ty),
             Self::Slice(v) => v.assignable_to(ty),
             Self::Struct(v) => v.assignable_to(ty),
             Self::_Self(v) => v.assignable_to(ty),
@@ -354,7 +354,7 @@ impl Type {
             Self::Enum(v) => v.convertable_to(ty),
             Self::Number(v) => v.convertable_to(ty),
             Self::String(v) => v.convertable_to(ty),
-            Self::Ptr(v) => v.convertable_to(ty),
+            Self::Ref(v) => v.convertable_to(ty),
             Self::Slice(v) => v.convertable_to(ty),
             Self::Struct(v) => v.convertable_to(ty),
             Self::_Self(v) => v.convertable_to(ty),
@@ -374,7 +374,7 @@ impl std::fmt::Display for Type {
             Self::Enum(v) => write!(f, "{}", v),
             Self::Number(v) => write!(f, "{}", v),
             Self::String(v) => write!(f, "{}", v),
-            Self::Ptr(v) => write!(f, "{}", v),
+            Self::Ref(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
             Self::_Self(v) => write!(f, "{}", v),

@@ -51,7 +51,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                             }
 
                             if let syn::Type::Reference(_) = recv.ty.as_ref() {
-                                param_ty = quote!(::zinq_reflect::PtrType::new(&#param_ty).to_type());
+                                param_ty = quote!(::zinq_reflect::RefType::new(&#param_ty).to_type());
                             }
 
                             quote! {
@@ -72,7 +72,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                                 }
 
                                 if let syn::Type::Ptr(_) = typed.ty.as_ref() {
-                                    param_ty = quote!(::zinq_reflect::PtrType::new(&#param_ty).to_type());
+                                    param_ty = quote!(::zinq_reflect::RefType::new(&#param_ty).to_type());
                                 }
 
                                 quote! {

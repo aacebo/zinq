@@ -45,6 +45,12 @@ impl From<String> for Path {
     }
 }
 
+impl<const N: usize> From<[&str; N]> for Path {
+    fn from(value: [&str; N]) -> Self {
+        return Self::from(value.join("::"));
+    }
+}
+
 impl std::fmt::Display for Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{}", &self.0.join("::"));

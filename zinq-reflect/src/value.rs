@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{Bool, Enum, Float, Int, Number, Ptr, Slice, String, Struct, Type, TypeOf};
+use crate::{Bool, Enum, Float, Int, Number, Ref, Slice, String, Struct, Type, TypeOf};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -8,7 +8,7 @@ pub enum Value {
     Bool(Bool),
     Number(Number),
     String(String),
-    Ptr(Ptr),
+    Ref(Ref),
     Slice(Slice),
     Struct(Struct),
     Enum(Enum),
@@ -21,7 +21,7 @@ impl Value {
             Self::Bool(v) => v.to_type(),
             Self::Number(v) => v.to_type(),
             Self::String(v) => v.to_type(),
-            Self::Ptr(v) => v.to_type(),
+            Self::Ref(v) => v.to_type(),
             Self::Slice(v) => v.to_type(),
             Self::Struct(v) => v.to_type(),
             Self::Enum(v) => v.to_type(),
@@ -67,14 +67,14 @@ impl Value {
 
     pub fn is_ptr(&self) -> bool {
         return match self {
-            Self::Ptr(_) => true,
+            Self::Ref(_) => true,
             _ => false,
         };
     }
 
     pub fn is_ptr_of(&self, ty: Type) -> bool {
         return match self {
-            Self::Ptr(v) => v.to_type().is_ptr_of(ty),
+            Self::Ref(v) => v.to_type().is_ptr_of(ty),
             _ => false,
         };
     }
@@ -142,9 +142,9 @@ impl Value {
         };
     }
 
-    pub fn to_ptr(&self) -> Ptr {
+    pub fn to_ptr(&self) -> Ref {
         return match self {
-            Self::Ptr(v) => v.clone(),
+            Self::Ref(v) => v.clone(),
             _ => panic!("called 'to_ptr' on '{}'", self.to_type()),
         };
     }
@@ -205,7 +205,7 @@ impl std::fmt::Display for Value {
             Self::Bool(v) => write!(f, "{}", v),
             Self::Number(v) => write!(f, "{}", v),
             Self::String(v) => write!(f, "{}", v),
-            Self::Ptr(v) => write!(f, "{}", v),
+            Self::Ref(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
             Self::Enum(v) => write!(f, "{}", v),

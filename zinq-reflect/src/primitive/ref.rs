@@ -4,9 +4,9 @@ use crate::{Reflect, TypeOf};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct PtrType(Box<crate::Type>);
+pub struct RefType(Box<crate::Type>);
 
-impl PtrType {
+impl RefType {
     pub fn new(ty: &crate::Type) -> Self {
         return Self(Box::new(ty.clone()));
     }
@@ -16,7 +16,7 @@ impl PtrType {
     }
 
     pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Ptr(self.clone());
+        return crate::Type::Ref(self.clone());
     }
 
     pub fn ty(&self) -> &crate::Type {
@@ -36,7 +36,7 @@ impl PtrType {
     }
 }
 
-impl std::fmt::Display for PtrType {
+impl std::fmt::Display for RefType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "&{}", &self.0);
     }
@@ -53,11 +53,11 @@ where
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Ptr(Box<crate::Value>);
+pub struct Ref(Box<crate::Value>);
 
-impl Ptr {
+impl Ref {
     pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Ptr(PtrType(Box::new(self.0.to_type())));
+        return crate::Type::Ref(RefType(Box::new(self.0.to_type())));
     }
 
     pub fn get(&self) -> Box<crate::Value> {
@@ -65,21 +65,21 @@ impl Ptr {
     }
 }
 
-impl<T: Clone + Reflect> From<&T> for Ptr {
+impl<T: Clone + Reflect> From<&T> for Ref {
     fn from(value: &T) -> Self {
         return Self(Box::new(value.reflect()));
     }
 }
 
-impl std::fmt::Display for Ptr {
+impl std::fmt::Display for Ref {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{}", self.as_ref());
     }
 }
 
-impl Reflect for Ptr {
+impl Reflect for Ref {
     fn reflect(self) -> crate::Value {
-        return crate::Value::Ptr(self.clone());
+        return crate::Value::Ref(self.clone());
     }
 }
 
@@ -89,23 +89,23 @@ where
 {
     fn reflect(self) -> crate::Value {
         let value = self.clone();
-        return crate::Value::Ptr(Ptr(Box::new(value.reflect())));
+        return crate::Value::Ref(Ref(Box::new(value.reflect())));
     }
 }
 
-impl AsRef<crate::Value> for Ptr {
+impl AsRef<crate::Value> for Ref {
     fn as_ref(&self) -> &crate::Value {
         return &self.0;
     }
 }
 
-impl AsMut<crate::Value> for Ptr {
+impl AsMut<crate::Value> for Ref {
     fn as_mut(&mut self) -> &mut crate::Value {
         return &mut self.0;
     }
 }
 
-impl Deref for Ptr {
+impl Deref for Ref {
     type Target = crate::Value;
 
     fn deref(&self) -> &Self::Target {
@@ -113,7 +113,7 @@ impl Deref for Ptr {
     }
 }
 
-impl DerefMut for Ptr {
+impl DerefMut for Ref {
     fn deref_mut(&mut self) -> &mut Self::Target {
         return &mut self.0;
     }
