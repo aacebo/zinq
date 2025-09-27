@@ -1,6 +1,6 @@
 use quote::quote;
 
-use crate::{reflect_field, reflect_meta, reflect_visibility};
+use crate::{reflect_field, reflect_generics, reflect_meta, reflect_visibility};
 
 pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::TokenStream {
     let name = &input.ident;
@@ -39,13 +39,14 @@ pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
 pub fn build(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
     let name = &item.ident;
     let vis = reflect_visibility::build(&item.vis);
+    let meta = reflect_meta::build(&item.attrs);
+    let generics = reflect_generics::build(&item.generics);
     let layout = match &item.fields {
         syn::Fields::Named(_) => quote!(::zinq_reflect::Layout::Key),
         syn::Fields::Unnamed(_) => quote!(::zinq_reflect::Layout::Index),
         syn::Fields::Unit => quote!(::zinq_reflect::Layout::Unit),
     };
 
-    let meta = reflect_meta::build(&item.attrs);
     let fields = match &item.fields {
         syn::Fields::Named(named_fields) => named_fields
             .named
@@ -66,6 +67,7 @@ pub fn build(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
         ::zinq_reflect::StructType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
             .visibility(#vis)
             .meta(&#meta)
+            .generics(&#generics)
             .fields(
                 ::zinq_reflect::Fields::new()
                     .layout(#layout)

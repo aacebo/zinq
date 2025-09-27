@@ -1,6 +1,6 @@
 use quote::quote;
 
-use crate::{reflect_field, reflect_meta, reflect_visibility};
+use crate::{reflect_field, reflect_generics, reflect_meta, reflect_visibility};
 
 pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
@@ -40,6 +40,7 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     let name = &item.ident;
     let vis = reflect_visibility::build(&item.vis);
     let meta = reflect_meta::build(&item.attrs);
+    let generics = reflect_generics::build(&item.generics);
     let variants = item
         .variants
         .iter()
@@ -100,6 +101,7 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     return quote! {
         ::zinq_reflect::EnumType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
             .meta(&#meta)
+            .generics(&#generics)
             .visibility(#vis)
             .variants(&[#(#variants,)*])
             .build()
