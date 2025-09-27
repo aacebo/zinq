@@ -124,7 +124,7 @@ pub fn should_reflect_path() {
         password: String::from("test"),
     };
 
-    assert_eq!(user.to_type().path().to_string(), "derive::models");
+    assert_eq!(user.to_type().path().to_string(), "struct_tests::models");
 }
 
 #[test]

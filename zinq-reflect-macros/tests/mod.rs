@@ -1,2 +1,2 @@
-pub mod attr;
-pub mod derive;
+pub mod struct_tests;
+pub mod trait_tests;
