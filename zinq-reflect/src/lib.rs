@@ -125,6 +125,8 @@ impl Type {
     pub fn meta(&self) -> &crate::MetaData {
         return match self {
             Self::Struct(v) => v.meta(),
+            Self::Enum(v) => v.meta(),
+            Self::Trait(v) => v.meta(),
             Self::Mod(v) => v.meta(),
             _ => panic!("called 'meta' on '{}'", self.id()),
         };
