@@ -3,17 +3,12 @@
 ## Reflect
 
 - add new `UnionType` and `Union`
+- add new `TypeAlias`
 - add `MetaData` to:
     - `UnionType`
 - refactor `Struct` value ??
 - add `Generic` concept to:
-    - `StructType`
-    - `EnumType`
-    - `Method`
-    - `TraitType`
-    - `Impl`
     - `UnionType`
 - refactor `Reflect` trait (rename to `ValueOf`)
-- change `Ptr` and `PtrType` to `Ref` and `RefType`
 - add new `Ptr` and `PtrType` to represent raw pointers (ex `*int`)
 - fix trait import issue for `TypeOf` and `Reflect` traits.

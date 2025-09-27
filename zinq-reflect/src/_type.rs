@@ -13,6 +13,8 @@ pub enum Type {
     Trait(crate::TraitType),
     Mut(crate::MutType),
     Mod(crate::ModType),
+    Seq(crate::SeqType),
+    Map(crate::MapType),
     Void,
 }
 
@@ -31,6 +33,8 @@ impl Type {
             Self::Trait(v) => v.id(),
             Self::Mut(v) => v.id(),
             Self::Mod(v) => v.id(),
+            Self::Seq(v) => v.id(),
+            Self::Map(v) => v.id(),
             Self::Void => crate::TypeId::from_str("void"),
         };
     }
@@ -43,6 +47,7 @@ impl Type {
             Self::Tuple(v) => v.len(),
             Self::Trait(v) => v.len(),
             Self::Mod(v) => v.len(),
+            Self::Seq(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.id()),
         };
     }
@@ -53,6 +58,8 @@ impl Type {
             Self::Enum(v) => v.path(),
             Self::Trait(v) => v.path(),
             Self::Mod(v) => v.path(),
+            Self::Seq(v) => v.path(),
+            Self::Map(v) => v.path(),
             _ => panic!("called 'path' on '{}'", self.id()),
         };
     }
@@ -63,6 +70,8 @@ impl Type {
             Self::Enum(v) => v.meta(),
             Self::Trait(v) => v.meta(),
             Self::Mod(v) => v.meta(),
+            Self::Seq(v) => v.meta(),
+            Self::Map(v) => v.meta(),
             _ => panic!("called 'meta' on '{}'", self.id()),
         };
     }
@@ -225,6 +234,20 @@ impl Type {
         };
     }
 
+    pub fn is_seq(&self) -> bool {
+        return match self {
+            Self::Seq(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_map(&self) -> bool {
+        return match self {
+            Self::Map(_) => true,
+            _ => false,
+        };
+    }
+
     pub fn is_void(&self) -> bool {
         return match self {
             Self::Void => true,
@@ -330,6 +353,20 @@ impl Type {
         };
     }
 
+    pub fn to_seq(&self) -> crate::SeqType {
+        return match self {
+            Self::Seq(v) => v.clone(),
+            _ => panic!("called 'to_seq' on '{}'", self.id()),
+        };
+    }
+
+    pub fn to_map(&self) -> crate::MapType {
+        return match self {
+            Self::Map(v) => v.clone(),
+            _ => panic!("called 'to_map' on '{}'", self.id()),
+        };
+    }
+
     pub fn assignable_to(&self, ty: Self) -> bool {
         return match self {
             Self::Bool(v) => v.assignable_to(ty),
@@ -344,6 +381,8 @@ impl Type {
             Self::Trait(v) => v.assignable_to(ty),
             Self::Mut(v) => v.assignable_to(ty),
             Self::Mod(v) => v.assignable_to(ty),
+            Self::Seq(v) => v.assignable_to(ty),
+            Self::Map(v) => v.assignable_to(ty),
             Self::Void => false,
         };
     }
@@ -362,6 +401,8 @@ impl Type {
             Self::Trait(v) => v.convertable_to(ty),
             Self::Mut(v) => v.convertable_to(ty),
             Self::Mod(v) => v.convertable_to(ty),
+            Self::Seq(v) => v.convertable_to(ty),
+            Self::Map(v) => v.convertable_to(ty),
             Self::Void => false,
         };
     }
@@ -382,6 +423,8 @@ impl std::fmt::Display for Type {
             Self::Trait(v) => write!(f, "{}", v),
             Self::Mut(v) => write!(f, "{}", v),
             Self::Mod(v) => write!(f, "{}", v),
+            Self::Seq(v) => write!(f, "{}", v),
+            Self::Map(v) => write!(f, "{}", v),
             Self::Void => write!(f, "void"),
         };
     }

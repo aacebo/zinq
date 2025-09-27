@@ -6,6 +6,7 @@ mod _trait;
 mod field;
 mod fields;
 mod method;
+mod seq;
 mod type_param;
 mod variant;
 
@@ -17,5 +18,6 @@ pub use _trait::*;
 pub use field::*;
 pub use fields::*;
 pub use method::*;
+pub use seq::*;
 pub use type_param::*;
 pub use variant::*;
