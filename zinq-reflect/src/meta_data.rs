@@ -70,6 +70,12 @@ impl std::fmt::Display for MetaData {
     }
 }
 
+impl crate::ToType for MetaData {
+    fn to_type(&self) -> crate::Type {
+        return crate::type_of!(BTreeMap<String, crate::Value>);
+    }
+}
+
 impl crate::ToValue for MetaData {
     fn to_value(self) -> crate::Value {
         let mut map = crate::Map::new(&crate::type_of!(BTreeMap<String, crate::Value>).to_map());
