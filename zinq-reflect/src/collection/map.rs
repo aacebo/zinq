@@ -142,6 +142,10 @@ impl Map {
     pub fn get_mut(&mut self, key: &crate::Value) -> Option<&mut crate::Value> {
         return self.data.get_mut(key);
     }
+
+    pub fn set(&mut self, key: &crate::Value, value: &crate::Value) {
+        self.data.insert(key.clone(), value.clone());
+    }
 }
 
 impl crate::Reflect for Map {

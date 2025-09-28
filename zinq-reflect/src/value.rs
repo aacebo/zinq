@@ -318,3 +318,9 @@ impl Ord for Value {
         };
     }
 }
+
+impl crate::TypeOf for Value {
+    fn type_of() -> crate::Type {
+        return crate::Type::Any;
+    }
+}

@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {
+    Any,
     Bool(crate::BoolType),
     Enum(crate::EnumType),
     Number(crate::NumberType),
@@ -21,6 +22,7 @@ pub enum Type {
 impl Type {
     pub fn id(&self) -> crate::TypeId {
         return match self {
+            Self::Any => crate::TypeId::from_str("any"),
             Self::Bool(v) => v.id(),
             Self::Enum(v) => v.id(),
             Self::Number(v) => v.id(),
@@ -78,6 +80,13 @@ impl Type {
 
     pub fn to_item(&self) -> crate::Item {
         return crate::Item::Type(self.clone());
+    }
+
+    pub fn is_any(&self) -> bool {
+        return match self {
+            Self::Any => true,
+            _ => false,
+        };
     }
 
     pub fn is_bool(&self) -> bool {
@@ -383,7 +392,7 @@ impl Type {
             Self::Mod(v) => v.assignable_to(ty),
             Self::Seq(v) => v.assignable_to(ty),
             Self::Map(v) => v.assignable_to(ty),
-            Self::Void => false,
+            _ => false,
         };
     }
 
@@ -403,7 +412,7 @@ impl Type {
             Self::Mod(v) => v.convertable_to(ty),
             Self::Seq(v) => v.convertable_to(ty),
             Self::Map(v) => v.convertable_to(ty),
-            Self::Void => false,
+            _ => false,
         };
     }
 }
@@ -411,6 +420,7 @@ impl Type {
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
+            Self::Any => write!(f, "any"),
             Self::Bool(v) => write!(f, "{}", v),
             Self::Enum(v) => write!(f, "{}", v),
             Self::Number(v) => write!(f, "{}", v),

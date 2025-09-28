@@ -60,6 +60,13 @@ impl FieldName {
             _ => false,
         };
     }
+
+    pub fn as_str(&self) -> &str {
+        return match self {
+            Self::Key(v) => &v,
+            _ => panic!("called 'as_str' on 'Index'"),
+        };
+    }
 }
 
 impl From<&FieldName> for FieldName {

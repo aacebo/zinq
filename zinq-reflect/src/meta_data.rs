@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+use crate::TypeOf;
+
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(
     feature = "serde",
@@ -65,5 +67,17 @@ impl std::fmt::Display for MetaData {
         }
 
         return write!(f, "}}");
+    }
+}
+
+impl crate::Reflect for MetaData {
+    fn reflect(self) -> crate::Value {
+        let mut map = crate::Map::new(&crate::type_of!(BTreeMap<String, crate::Value>).to_map());
+
+        for (key, value) in &self.0 {
+            map.set(&key.reflect(), value);
+        }
+
+        return crate::Value::Map(map);
     }
 }
