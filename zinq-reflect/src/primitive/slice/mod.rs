@@ -156,11 +156,11 @@ impl Slice {
     }
 }
 
-impl crate::Reflect for Slice {
-    fn reflect(self) -> crate::Value {
+impl crate::ToValue for Slice {
+    fn to_value(self) -> crate::Value {
         return match self {
-            Self::Sized(v) => v.reflect(),
-            Self::UnSized(v) => v.reflect(),
+            Self::Sized(v) => v.to_value(),
+            Self::UnSized(v) => v.to_value(),
         };
     }
 }

@@ -70,12 +70,12 @@ impl std::fmt::Display for MetaData {
     }
 }
 
-impl crate::Reflect for MetaData {
-    fn reflect(self) -> crate::Value {
+impl crate::ToValue for MetaData {
+    fn to_value(self) -> crate::Value {
         let mut map = crate::Map::new(&crate::type_of!(BTreeMap<String, crate::Value>).to_map());
 
         for (key, value) in &self.0 {
-            map.set(&key.reflect(), value);
+            map.set(&key.to_value(), value);
         }
 
         return crate::Value::Map(map);

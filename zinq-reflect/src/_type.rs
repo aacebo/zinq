@@ -103,16 +103,16 @@ impl Type {
         };
     }
 
-    pub fn is_ptr(&self) -> bool {
+    pub fn is_ref(&self) -> bool {
         return match self {
             Self::Ref(_) => true,
             _ => false,
         };
     }
 
-    pub fn is_ptr_of(&self, ty: Self) -> bool {
+    pub fn is_ref_of(&self, ty: Self) -> bool {
         return match self {
-            Self::Ref(v) => v.is_ptr_of(ty),
+            Self::Ref(v) => v.is_ref_of(ty),
             _ => false,
         };
     }

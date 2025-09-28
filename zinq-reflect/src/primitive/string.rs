@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut, Index};
 
-use crate::{Reflect, TypeOf};
+use crate::{ToValue, TypeOf};
 
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -96,20 +96,20 @@ impl TypeOf for String {
     }
 }
 
-impl Reflect for String {
-    fn reflect(self) -> crate::Value {
+impl ToValue for String {
+    fn to_value(self) -> crate::Value {
         return crate::Value::String(self.clone());
     }
 }
 
-impl Reflect for std::string::String {
-    fn reflect(self) -> crate::Value {
+impl ToValue for std::string::String {
+    fn to_value(self) -> crate::Value {
         return crate::Value::String(String(self.clone()));
     }
 }
 
-impl Reflect for &str {
-    fn reflect(self) -> crate::Value {
+impl ToValue for &str {
+    fn to_value(self) -> crate::Value {
         return crate::Value::String(String(self.to_string()));
     }
 }

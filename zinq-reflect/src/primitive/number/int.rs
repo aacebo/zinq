@@ -228,10 +228,10 @@ macro_rules! int_value {
             }
         }
 
-        impl crate::Reflect for Int {
-            fn reflect(self) -> crate::Value {
+        impl crate::ToValue for Int {
+            fn to_value(self) -> crate::Value {
                 return match self {
-                    $(Self::$name(v) => v.reflect(),)*
+                    $(Self::$name(v) => v.to_value(),)*
                 };
             }
         }
@@ -325,14 +325,14 @@ macro_rules! int_value {
                 }
             }
 
-            impl crate::Reflect for $name {
-                fn reflect(self) -> crate::Value {
+            impl crate::ToValue for $name {
+                fn to_value(self) -> crate::Value {
                     return crate::Value::Number(crate::Number::Int(Int::$name(self.clone())));
                 }
             }
 
-            impl crate::Reflect for $type {
-                fn reflect(self) -> crate::Value {
+            impl crate::ToValue for $type {
+                fn to_value(self) -> crate::Value {
                     return crate::Value::Number(crate::Number::Int(Int::$name($name(self.clone()))));
                 }
             }

@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use zinq_reflect::{Reflect, TypeOf, value_of};
+use zinq_reflect::{Reflect, ToValue, TypeOf, value_of};
 use zinq_reflect_macros::*;
 
 #[reflect(version = 2)]
@@ -54,7 +54,7 @@ pub fn should_reflect_struct() {
     assert!(user.to_type().meta().has("name"));
     assert_eq!(
         user.to_type().to_struct().meta().get("name").unwrap(),
-        &"alex".reflect()
+        &"alex".to_value()
     );
 }
 
@@ -73,7 +73,7 @@ pub fn should_reflect_field() {
     assert!(field.ty().is_enum());
     assert_eq!(field.meta().len(), 1);
     assert!(field.meta().has("hello"));
-    assert_eq!(field.meta().get("hello").unwrap(), &"world".reflect());
+    assert_eq!(field.meta().get("hello").unwrap(), &"world".to_value());
 }
 
 #[test]

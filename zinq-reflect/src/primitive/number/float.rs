@@ -212,10 +212,10 @@ macro_rules! float_value {
             )*
         }
 
-        impl crate::Reflect for Float {
-            fn reflect(self) -> crate::Value {
+        impl crate::ToValue for Float {
+            fn to_value(self) -> crate::Value {
                 return match self {
-                    $(Self::$name(v) => v.reflect(),)*
+                    $(Self::$name(v) => v.to_value(),)*
                 };
             }
         }
@@ -301,14 +301,14 @@ macro_rules! float_value {
                 }
             }
 
-            impl crate::Reflect for $name {
-                fn reflect(self) -> crate::Value {
+            impl crate::ToValue for $name {
+                fn to_value(self) -> crate::Value {
                     return crate::Value::Number(crate::Number::Float(Float::$name(self.clone())));
                 }
             }
 
-            impl crate::Reflect for $type {
-                fn reflect(self) -> crate::Value {
+            impl crate::ToValue for $type {
+                fn to_value(self) -> crate::Value {
                     return crate::Value::Number(crate::Number::Float(Float::$name($name(self.clone()))));
                 }
             }

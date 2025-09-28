@@ -146,11 +146,11 @@ impl PartialOrd for Number {
     }
 }
 
-impl crate::Reflect for Number {
-    fn reflect(self) -> crate::Value {
+impl crate::ToValue for Number {
+    fn to_value(self) -> crate::Value {
         return match self {
-            Self::Int(v) => v.reflect(),
-            Self::Float(v) => v.reflect(),
+            Self::Int(v) => v.to_value(),
+            Self::Float(v) => v.to_value(),
         };
     }
 }

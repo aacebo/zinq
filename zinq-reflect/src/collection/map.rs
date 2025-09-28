@@ -148,8 +148,8 @@ impl Map {
     }
 }
 
-impl crate::Reflect for Map {
-    fn reflect(self) -> crate::Value {
+impl crate::ToValue for Map {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Map(self.clone());
     }
 }

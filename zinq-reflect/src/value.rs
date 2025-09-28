@@ -68,16 +68,16 @@ impl Value {
         };
     }
 
-    pub fn is_ptr(&self) -> bool {
+    pub fn is_ref(&self) -> bool {
         return match self {
             Self::Ref(_) => true,
             _ => false,
         };
     }
 
-    pub fn is_ptr_of(&self, ty: Type) -> bool {
+    pub fn is_ref_of(&self, ty: Type) -> bool {
         return match self {
-            Self::Ref(v) => v.to_type().is_ptr_of(ty),
+            Self::Ref(v) => v.to_type().is_ref_of(ty),
             _ => false,
         };
     }

@@ -141,8 +141,8 @@ impl std::ops::DerefMut for Enum {
     }
 }
 
-impl crate::Reflect for Enum {
-    fn reflect(self) -> crate::Value {
+impl crate::ToValue for Enum {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Enum(self.clone());
     }
 }

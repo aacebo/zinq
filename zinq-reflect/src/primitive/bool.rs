@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use crate::{Reflect, TypeOf};
+use crate::{ToValue, TypeOf};
 
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -90,14 +90,14 @@ impl TypeOf for Bool {
     }
 }
 
-impl Reflect for Bool {
-    fn reflect(self) -> crate::Value {
+impl ToValue for Bool {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Bool(self.clone());
     }
 }
 
-impl Reflect for bool {
-    fn reflect(self) -> crate::Value {
+impl ToValue for bool {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Bool(Bool(self.clone()));
     }
 }

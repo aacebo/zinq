@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut, Index, IndexMut};
 
-use crate::{Reflect, TypeOf};
+use crate::{ToValue, TypeOf};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -104,21 +104,21 @@ impl std::fmt::Display for SizedSlice {
     }
 }
 
-impl Reflect for SizedSlice {
-    fn reflect(self) -> crate::Value {
+impl ToValue for SizedSlice {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::Sized(self.clone()));
     }
 }
 
-impl<const N: usize, T> Reflect for [T; N]
+impl<const N: usize, T> ToValue for [T; N]
 where
-    T: Clone + TypeOf + Reflect,
+    T: Clone + TypeOf + ToValue,
 {
-    fn reflect(self) -> crate::Value {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::Sized(SizedSlice {
             ty: T::type_of(),
             size: N,
-            value: self.iter().map(|v| v.clone().reflect()).collect(),
+            value: self.iter().map(|v| v.clone().to_value()).collect(),
         }));
     }
 }

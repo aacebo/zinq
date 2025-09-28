@@ -112,8 +112,8 @@ impl Struct {
     }
 }
 
-impl crate::Reflect for Struct {
-    fn reflect(self) -> crate::Value {
+impl crate::ToValue for Struct {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Struct(self.clone());
     }
 }

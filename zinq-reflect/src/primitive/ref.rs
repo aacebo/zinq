@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use crate::{Reflect, TypeOf};
+use crate::{ToValue, TypeOf};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -23,7 +23,7 @@ impl RefType {
         return &self.0;
     }
 
-    pub fn is_ptr_of(&self, ty: crate::Type) -> bool {
+    pub fn is_ref_of(&self, ty: crate::Type) -> bool {
         return ty.eq(&self.0);
     }
 
@@ -32,7 +32,7 @@ impl RefType {
     }
 
     pub fn convertable_to(&self, ty: crate::Type) -> bool {
-        return ty.is_ptr_of(*self.0.clone());
+        return ty.is_ref_of(*self.0.clone());
     }
 }
 
@@ -65,9 +65,9 @@ impl Ref {
     }
 }
 
-impl<T: Clone + Reflect> From<&T> for Ref {
+impl<T: Clone + ToValue> From<&T> for Ref {
     fn from(value: &T) -> Self {
-        return Self(Box::new(value.reflect()));
+        return Self(Box::new(value.to_value()));
     }
 }
 
@@ -77,19 +77,19 @@ impl std::fmt::Display for Ref {
     }
 }
 
-impl Reflect for Ref {
-    fn reflect(self) -> crate::Value {
+impl ToValue for Ref {
+    fn to_value(self) -> crate::Value {
         return crate::Value::Ref(self.clone());
     }
 }
 
-impl<T> Reflect for &T
+impl<T> ToValue for &T
 where
-    T: Clone + Reflect,
+    T: Clone + ToValue,
 {
-    fn reflect(self) -> crate::Value {
+    fn to_value(self) -> crate::Value {
         let value = self.clone();
-        return crate::Value::Ref(Ref(Box::new(value.reflect())));
+        return crate::Value::Ref(Ref(Box::new(value.to_value())));
     }
 }
 
@@ -127,8 +127,8 @@ mod test {
     pub fn int() {
         let value = value_of!(&3_i32);
 
-        assert!(value.is_ptr());
-        assert!(value.is_ptr_of(type_of!(i32)));
+        assert!(value.is_ref());
+        assert!(value.is_ref_of(type_of!(i32)));
         assert_eq!(value.to_type().id(), "&i32");
         assert_eq!(value.to_ptr().get().to_i32().get(), 3);
     }
@@ -137,8 +137,8 @@ mod test {
     pub fn bool() {
         let value = value_of!(&true);
 
-        assert!(value.is_ptr());
-        assert!(value.is_ptr_of(type_of!(bool)));
+        assert!(value.is_ref());
+        assert!(value.is_ref_of(type_of!(bool)));
         assert_eq!(value.to_type().id(), "&bool");
         assert!(value.to_ptr().get().to_bool().get());
     }
