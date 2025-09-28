@@ -96,6 +96,84 @@ impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::BTr
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Map {
+    ty: MapType,
+    data: std::collections::BTreeMap<crate::Value, crate::Value>,
+}
+
+impl Map {
+    pub fn new(ty: &MapType) -> Self {
+        return Self {
+            ty: ty.clone(),
+            data: std::collections::BTreeMap::new(),
+        };
+    }
+
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Map(self.ty.clone());
+    }
+
+    pub fn iter(&self) -> std::collections::btree_map::Iter<'_, crate::Value, crate::Value> {
+        return self.data.iter();
+    }
+
+    pub fn keys(&self) -> Vec<crate::Value> {
+        return self.data.clone().into_keys().collect::<Vec<_>>();
+    }
+
+    pub fn values(&self) -> Vec<crate::Value> {
+        return self.data.clone().into_values().collect::<Vec<_>>();
+    }
+
+    pub fn len(&self) -> usize {
+        return self.data.len();
+    }
+
+    pub fn has(&self, key: &crate::Value) -> bool {
+        return self.data.contains_key(key);
+    }
+
+    pub fn get(&self, key: &crate::Value) -> Option<&crate::Value> {
+        return self.data.get(key);
+    }
+
+    pub fn get_mut(&mut self, key: &crate::Value) -> Option<&mut crate::Value> {
+        return self.data.get_mut(key);
+    }
+}
+
+impl crate::Reflect for Map {
+    fn reflect(self) -> crate::Value {
+        return crate::Value::Map(self.clone());
+    }
+}
+
+impl std::ops::Index<&crate::Value> for Map {
+    type Output = crate::Value;
+
+    fn index(&self, index: &crate::Value) -> &Self::Output {
+        return self.data.index(index);
+    }
+}
+
+impl std::fmt::Display for Map {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{")?;
+
+        for (key, value) in &self.data {
+            write!(f, "\n\t{}: {}", key, value)?;
+        }
+
+        if self.data.len() > 0 {
+            write!(f, "\n")?;
+        }
+
+        return write!(f, "}}");
+    }
+}
+
 #[cfg(test)]
 mod test {
     use std::collections::HashMap;

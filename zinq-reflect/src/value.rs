@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{Bool, Enum, Float, Int, Number, Ref, Slice, String, Struct, Type, TypeOf};
+use crate::{Bool, Enum, Float, Int, Map, Number, Ref, Slice, String, Struct, Type, TypeOf};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -12,6 +12,7 @@ pub enum Value {
     Slice(Slice),
     Struct(Struct),
     Enum(Enum),
+    Map(Map),
     Null,
 }
 
@@ -25,6 +26,7 @@ impl Value {
             Self::Slice(v) => v.to_type(),
             Self::Struct(v) => v.to_type(),
             Self::Enum(v) => v.to_type(),
+            Self::Map(v) => v.to_type(),
             _ => panic!("called 'to_type' on null"),
         };
     }
@@ -33,6 +35,7 @@ impl Value {
         return match self {
             Self::String(v) => v.len(),
             Self::Slice(v) => v.len(),
+            Self::Map(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.to_type().id()),
         };
     }
@@ -128,6 +131,13 @@ impl Value {
         };
     }
 
+    pub fn is_map(&self) -> bool {
+        return match self {
+            Self::Map(_) => true,
+            _ => false,
+        };
+    }
+
     pub fn is_null(&self) -> bool {
         return match self {
             Self::Null => true,
@@ -197,6 +207,13 @@ impl Value {
             _ => panic!("called 'to_enum' on '{}'", self.to_type()),
         };
     }
+
+    pub fn to_map(&self) -> Map {
+        return match self {
+            Self::Map(v) => v.clone(),
+            _ => panic!("called 'to_map' on '{}'", self.to_type()),
+        };
+    }
 }
 
 impl std::fmt::Display for Value {
@@ -209,6 +226,7 @@ impl std::fmt::Display for Value {
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
             Self::Enum(v) => write!(f, "{}", v),
+            Self::Map(v) => write!(f, "{}", v),
             Self::Null => write!(f, "<null>"),
         };
     }
@@ -262,6 +280,41 @@ impl IndexMut<&str> for Value {
         return match self {
             Self::Struct(v) => v.index_mut(index),
             _ => panic!("called 'index' on '{}'", self.to_type()),
+        };
+    }
+}
+
+impl Index<&Self> for Value {
+    type Output = Self;
+
+    fn index(&self, index: &Self) -> &Self::Output {
+        return match self {
+            Self::Map(v) => v.index(index),
+            _ => panic!("called 'index' on '{}'", self.to_type()),
+        };
+    }
+}
+
+impl Eq for Value {}
+
+impl PartialOrd for Value {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        return match self {
+            Self::Bool(v) => v.partial_cmp(&other.to_bool()),
+            Self::Number(v) => v.partial_cmp(&other.to_number()),
+            Self::String(v) => v.partial_cmp(&other.to_string()),
+            _ => panic!("called 'PartialOrd::partial_cmp' on '{}'", self.to_type()),
+        };
+    }
+}
+
+impl Ord for Value {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        return match self {
+            Self::Bool(v) => v.cmp(&other.to_bool()),
+            Self::Number(v) => v.cmp(&other.to_number()),
+            Self::String(v) => v.cmp(&other.to_string()),
+            _ => panic!("called 'Ord::cmp' on '{}'", self.to_type()),
         };
     }
 }

@@ -36,7 +36,7 @@ impl TypeOf for bool {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Bool(bool);
 
@@ -125,6 +125,14 @@ impl Deref for Bool {
 impl DerefMut for Bool {
     fn deref_mut(&mut self) -> &mut Self::Target {
         return &mut self.0;
+    }
+}
+
+impl Eq for Bool {}
+
+impl Ord for Bool {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        return self.0.cmp(&other.0);
     }
 }
 

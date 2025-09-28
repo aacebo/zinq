@@ -42,7 +42,7 @@ impl TypeOf for str {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct String(std::string::String);
 
@@ -145,6 +145,14 @@ impl Index<usize> for String {
 
     fn index(&self, index: usize) -> &Self::Output {
         return self.as_bytes().index(index);
+    }
+}
+
+impl Eq for String {}
+
+impl Ord for String {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        return self.0.cmp(&other.0);
     }
 }
 

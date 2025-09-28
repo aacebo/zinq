@@ -152,7 +152,7 @@ macro_rules! int_type {
 
 macro_rules! int_value {
     ($($name:ident $type_name:ident $is_type:ident $to_type:ident $type:ty)*) => {
-        #[derive(Debug, Copy, Clone, PartialEq)]
+        #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum Int {
             $($name($name),)*
@@ -218,6 +218,16 @@ macro_rules! int_value {
             )*
         }
 
+        impl Eq for Int {}
+
+        impl Ord for Int {
+            fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                return match self {
+                    $(Self::$name(v) => other.$to_type().cmp(v),)*
+                };
+            }
+        }
+
         impl crate::Reflect for Int {
             fn reflect(self) -> crate::Value {
                 return match self {
@@ -235,13 +245,21 @@ macro_rules! int_value {
         }
 
         $(
-            #[derive(Debug, Copy, Clone, PartialEq)]
+            #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             pub struct $name($type);
 
             impl $name {
                 pub fn get(&self) -> $type {
                     return self.0;
+                }
+            }
+
+            impl Eq for crate::$name {}
+
+            impl Ord for crate::$name {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    return self.0.cmp(&other.0);
                 }
             }
 

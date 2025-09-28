@@ -126,6 +126,26 @@ impl Number {
     }
 }
 
+impl Eq for Number {}
+
+impl Ord for Number {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        return match self {
+            Self::Float(_) => panic!("called 'Ord::cmp' on Float"),
+            Self::Int(v) => v.cmp(&other.to_int()),
+        };
+    }
+}
+
+impl PartialOrd for Number {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        return match self {
+            Self::Float(_) => None,
+            Self::Int(v) => v.partial_cmp(&other.to_int()),
+        };
+    }
+}
+
 impl crate::Reflect for Number {
     fn reflect(self) -> crate::Value {
         return match self {
