@@ -6,8 +6,6 @@ use std::ops::{Deref, DerefMut, Index, IndexMut};
 pub use sized::*;
 pub use un_sized::*;
 
-use crate::ToType;
-
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SliceType {
@@ -16,6 +14,13 @@ pub enum SliceType {
 }
 
 impl SliceType {
+    pub fn to_type(&self) -> crate::Type {
+        return match self {
+            Self::Sized(v) => v.to_type(),
+            Self::UnSized(v) => v.to_type(),
+        };
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return match self {
             Self::Sized(v) => v.id(),

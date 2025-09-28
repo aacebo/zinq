@@ -7,6 +7,10 @@ use crate::TypeOf;
 pub struct BoolType;
 
 impl BoolType {
+    pub fn to_type(&self) -> crate::Type {
+        return bool::type_of();
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_str("bool");
     }

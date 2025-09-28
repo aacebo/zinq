@@ -112,6 +112,10 @@ impl Enum {
         };
     }
 
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Enum(self.ty.clone());
+    }
+
     pub fn get(&self) -> &crate::Value {
         return &self.value;
     }

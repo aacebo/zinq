@@ -153,6 +153,10 @@ impl Map {
         };
     }
 
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Map(self.ty.clone());
+    }
+
     pub fn iter(&self) -> std::collections::btree_map::Iter<'_, crate::Value, crate::Value> {
         return self.data.iter();
     }

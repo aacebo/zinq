@@ -9,6 +9,10 @@ pub struct UnSizedSliceType {
 }
 
 impl UnSizedSliceType {
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::UnSized(self.clone()));
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("[{}]", self.ty.id()));
     }
@@ -57,6 +61,12 @@ pub struct UnSizedSlice {
 }
 
 impl UnSizedSlice {
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
+            ty: Box::new(self.ty.clone()),
+        }));
+    }
+
     pub fn len(&self) -> usize {
         return self.value.len();
     }

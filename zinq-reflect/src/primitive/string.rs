@@ -7,6 +7,10 @@ use crate::TypeOf;
 pub struct StringType;
 
 impl StringType {
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::String(self.clone());
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_str("string");
     }
@@ -61,6 +65,10 @@ impl crate::ToType for str {
 pub struct String(std::string::String);
 
 impl String {
+    pub fn to_type(&self) -> crate::Type {
+        return String::type_of();
+    }
+
     pub fn len(&self) -> usize {
         return self.0.len();
     }
