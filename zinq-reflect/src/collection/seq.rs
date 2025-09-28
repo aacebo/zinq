@@ -13,6 +13,10 @@ impl SeqType {
         return crate::build::SeqTypeBuilder::new(ty, elem);
     }
 
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Seq(self.clone());
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return self.ty.id();
     }
@@ -22,10 +26,6 @@ impl SeqType {
             None => panic!("called 'len' on type '{}'", self.id()),
             Some(v) => v,
         };
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Seq(self.clone());
     }
 
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -70,6 +70,32 @@ impl SeqType {
 impl std::fmt::Display for SeqType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{}", &self.ty);
+    }
+}
+
+impl crate::ToType for SeqType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Seq(self.clone());
+    }
+}
+
+impl<T: crate::TypeOf> crate::ToType for Vec<T> {
+    fn to_type(&self) -> crate::Type {
+        let path = crate::Path::from("std::vec");
+        let elem = T::type_of();
+        let ty = crate::StructType::new(&path, "Vec")
+            .visibility(crate::Visibility::Public(crate::Public::Full))
+            .generics(&crate::Generics::from([crate::TypeParam::new("T")
+                .build()
+                .to_generic()]))
+            .build()
+            .to_type();
+
+        return SeqType::new(&ty, &elem)
+            .contiguous(true)
+            .growable(true)
+            .build()
+            .to_type();
     }
 }
 

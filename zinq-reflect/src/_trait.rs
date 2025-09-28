@@ -14,12 +14,12 @@ impl TraitType {
         return crate::build::TraitTypeBuilder::new(path, name);
     }
 
-    pub fn id(&self) -> crate::TypeId {
-        return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
-    }
-
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Trait(self.clone());
+    }
+
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
     }
 
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -74,6 +74,12 @@ impl TraitType {
 
     pub fn get_mut(&mut self, name: &str) -> Option<&mut crate::Method> {
         return self.methods.iter_mut().find(|v| v.name() == name);
+    }
+}
+
+impl crate::ToType for TraitType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Trait(self.clone());
     }
 }
 

@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use crate::{ToValue, TypeOf};
+use crate::TypeOf;
 
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -9,10 +9,6 @@ pub struct BoolType;
 impl BoolType {
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_str("bool");
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Bool(self.clone());
     }
 
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -30,9 +26,21 @@ impl std::fmt::Display for BoolType {
     }
 }
 
-impl TypeOf for bool {
+impl crate::ToType for BoolType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Bool(self.clone());
+    }
+}
+
+impl crate::TypeOf for bool {
     fn type_of() -> crate::Type {
         return crate::Type::Bool(BoolType::default());
+    }
+}
+
+impl crate::ToType for bool {
+    fn to_type(&self) -> crate::Type {
+        return Self::type_of();
     }
 }
 
@@ -84,19 +92,25 @@ impl std::fmt::Display for Bool {
     }
 }
 
-impl TypeOf for Bool {
+impl crate::TypeOf for Bool {
     fn type_of() -> crate::Type {
         return bool::type_of();
     }
 }
 
-impl ToValue for Bool {
+impl crate::ToType for Bool {
+    fn to_type(&self) -> crate::Type {
+        return bool::type_of();
+    }
+}
+
+impl crate::ToValue for Bool {
     fn to_value(self) -> crate::Value {
         return crate::Value::Bool(self.clone());
     }
 }
 
-impl ToValue for bool {
+impl crate::ToValue for bool {
     fn to_value(self) -> crate::Value {
         return crate::Value::Bool(Bool(self.clone()));
     }

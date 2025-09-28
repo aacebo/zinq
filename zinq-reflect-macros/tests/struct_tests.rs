@@ -1,11 +1,11 @@
 #![allow(unused)]
 
-use zinq_reflect::{Reflect, ToValue, TypeOf, value_of};
+use zinq_reflect::{Reflect, ToType, ToValue, TypeOf, value_of};
 use zinq_reflect_macros::*;
 
 #[reflect(version = 2)]
 mod models {
-    use zinq_reflect::TypeOf;
+    use zinq_reflect::{ToType, TypeOf};
     use zinq_reflect_macros::*;
 
     #[derive(Reflect)]

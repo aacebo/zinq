@@ -1,21 +1,22 @@
 #[macro_export]
 macro_rules! type_of {
     [&$value:expr] => {
-        $crate::TypeOf::to_type(&$value)
+        $crate::ToType::to_type(&$value)
     };
     [$($type:ty)*] => {
         $(<$type>::type_of())*
     };
     [$value:expr] => {
-        $crate::TypeOf::to_type(&$value)
+        $crate::ToType::to_type(&$value)
     };
 }
 
 pub trait TypeOf {
     fn type_of() -> crate::Type;
-    fn to_type(&self) -> crate::Type {
-        return Self::type_of();
-    }
+}
+
+pub trait ToType {
+    fn to_type(&self) -> crate::Type;
 }
 
 #[cfg(test)]

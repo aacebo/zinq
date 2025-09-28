@@ -1,3 +1,5 @@
+use crate::ToType;
+
 macro_rules! tuple_type {
     ($($name:ident $type_name:ident $to_type:ident $len:literal)*) => {
         #[derive(Debug, Clone, PartialEq)]
@@ -18,10 +20,6 @@ macro_rules! tuple_type {
         }
 
         impl TupleType {
-            pub fn to_type(&self) -> crate::Type {
-                return crate::Type::Tuple(self.clone());
-            }
-
             pub fn id(&self) -> crate::TypeId {
                 return match self {
                     $(Self::$name(v) => v.id(),)*
@@ -60,6 +58,12 @@ macro_rules! tuple_type {
                     };
                 }
             )*
+        }
+
+        impl crate::ToType for TupleType {
+            fn to_type(&self) -> crate::Type {
+                return crate::Type::Tuple(self.clone());
+            }
         }
 
         impl std::ops::Index<usize> for TupleType {
@@ -112,10 +116,6 @@ macro_rules! tuple_type {
                     return crate::TypeId::from_string(value + ")");
                 }
 
-                pub fn to_type(&self) -> crate::Type {
-                    return crate::Type::Tuple(crate::TupleType::$name(self.clone()));
-                }
-
                 pub fn len(&self) -> usize {
                     return self.0.len();
                 }
@@ -134,6 +134,12 @@ macro_rules! tuple_type {
 
                 pub fn get_ref(&self) -> &[Box<crate::Type>] {
                     return &self.0;
+                }
+            }
+
+            impl crate::ToType for $type_name {
+                fn to_type(&self) -> crate::Type {
+                    return crate::Type::Tuple(crate::TupleType::$name(self.clone()));
                 }
             }
 
@@ -170,6 +176,16 @@ where
     }
 }
 
+impl<A, B> crate::ToType for (A, B)
+where
+    A: crate::TypeOf,
+    B: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
+        return T2Type::new([Box::new(A::type_of()), Box::new(B::type_of())]).to_type();
+    }
+}
+
 impl<A, B, C> crate::TypeOf for (A, B, C)
 where
     A: crate::TypeOf,
@@ -177,6 +193,22 @@ where
     C: crate::TypeOf,
 {
     fn type_of() -> crate::Type {
+        return T3Type::new([
+            Box::new(A::type_of()),
+            Box::new(B::type_of()),
+            Box::new(C::type_of()),
+        ])
+        .to_type();
+    }
+}
+
+impl<A, B, C> crate::ToType for (A, B, C)
+where
+    A: crate::TypeOf,
+    B: crate::TypeOf,
+    C: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
         return T3Type::new([
             Box::new(A::type_of()),
             Box::new(B::type_of()),
@@ -204,6 +236,24 @@ where
     }
 }
 
+impl<A, B, C, D> crate::ToType for (A, B, C, D)
+where
+    A: crate::TypeOf,
+    B: crate::TypeOf,
+    C: crate::TypeOf,
+    D: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
+        return T4Type::new([
+            Box::new(A::type_of()),
+            Box::new(B::type_of()),
+            Box::new(C::type_of()),
+            Box::new(D::type_of()),
+        ])
+        .to_type();
+    }
+}
+
 impl<A, B, C, D, E> crate::TypeOf for (A, B, C, D, E)
 where
     A: crate::TypeOf,
@@ -213,6 +263,26 @@ where
     E: crate::TypeOf,
 {
     fn type_of() -> crate::Type {
+        return T5Type::new([
+            Box::new(A::type_of()),
+            Box::new(B::type_of()),
+            Box::new(C::type_of()),
+            Box::new(D::type_of()),
+            Box::new(E::type_of()),
+        ])
+        .to_type();
+    }
+}
+
+impl<A, B, C, D, E> crate::ToType for (A, B, C, D, E)
+where
+    A: crate::TypeOf,
+    B: crate::TypeOf,
+    C: crate::TypeOf,
+    D: crate::TypeOf,
+    E: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
         return T5Type::new([
             Box::new(A::type_of()),
             Box::new(B::type_of()),
@@ -246,6 +316,28 @@ where
     }
 }
 
+impl<A, B, C, D, E, F> crate::ToType for (A, B, C, D, E, F)
+where
+    A: crate::TypeOf,
+    B: crate::TypeOf,
+    C: crate::TypeOf,
+    D: crate::TypeOf,
+    E: crate::TypeOf,
+    F: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
+        return T6Type::new([
+            Box::new(A::type_of()),
+            Box::new(B::type_of()),
+            Box::new(C::type_of()),
+            Box::new(D::type_of()),
+            Box::new(E::type_of()),
+            Box::new(F::type_of()),
+        ])
+        .to_type();
+    }
+}
+
 impl<A, B, C, D, E, F, G> crate::TypeOf for (A, B, C, D, E, F, G)
 where
     A: crate::TypeOf,
@@ -257,6 +349,30 @@ where
     G: crate::TypeOf,
 {
     fn type_of() -> crate::Type {
+        return T7Type::new([
+            Box::new(A::type_of()),
+            Box::new(B::type_of()),
+            Box::new(C::type_of()),
+            Box::new(D::type_of()),
+            Box::new(E::type_of()),
+            Box::new(F::type_of()),
+            Box::new(G::type_of()),
+        ])
+        .to_type();
+    }
+}
+
+impl<A, B, C, D, E, F, G> crate::ToType for (A, B, C, D, E, F, G)
+where
+    A: crate::TypeOf,
+    B: crate::TypeOf,
+    C: crate::TypeOf,
+    D: crate::TypeOf,
+    E: crate::TypeOf,
+    F: crate::TypeOf,
+    G: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
         return T7Type::new([
             Box::new(A::type_of()),
             Box::new(B::type_of()),

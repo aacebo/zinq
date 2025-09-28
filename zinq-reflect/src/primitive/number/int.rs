@@ -63,10 +63,6 @@ macro_rules! int_type {
                 };
             }
 
-            pub fn to_type(&self) -> crate::Type {
-                return crate::Type::Number(crate::NumberType::Int(self.clone()));
-            }
-
             $(
                 pub fn $is_type(&self) -> bool {
                     return match self {
@@ -96,6 +92,12 @@ macro_rules! int_type {
             }
         }
 
+        impl crate::ToType for IntType {
+            fn to_type(&self) -> crate::Type {
+                return crate::Type::Number(crate::NumberType::Int(self.clone()));
+            }
+        }
+
         impl std::fmt::Display for IntType {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
@@ -122,10 +124,6 @@ macro_rules! int_type {
                     return stringify!($name).starts_with("I");
                 }
 
-                pub fn to_type(&self) -> crate::Type {
-                    return crate::Type::Number(crate::NumberType::Int(IntType::$name($type_name)));
-                }
-
                 pub fn assignable_to(&self, ty: crate::Type) -> bool {
                     return self.id() == ty.id();
                 }
@@ -144,6 +142,12 @@ macro_rules! int_type {
             impl crate::TypeOf for $type {
                 fn type_of() -> crate::Type {
                     return crate::Type::Number(crate::NumberType::Int(crate::IntType::$name($type_name)));
+                }
+            }
+
+            impl crate::ToType for $type {
+                fn to_type(&self) -> crate::Type {
+                    return crate::Type::Number(crate::NumberType::Int(IntType::$name($type_name)));
                 }
             }
         )*
@@ -228,6 +232,14 @@ macro_rules! int_value {
             }
         }
 
+        impl crate::ToType for Int {
+            fn to_type(&self) -> crate::Type {
+                return match self {
+                    $(Self::$name(v) => v.to_type(),)*
+                };
+            }
+        }
+
         impl crate::ToValue for Int {
             fn to_value(self) -> crate::Value {
                 return match self {
@@ -250,6 +262,10 @@ macro_rules! int_value {
             pub struct $name($type);
 
             impl $name {
+                pub fn to_type(&self) -> crate::Type {
+                    return <$type>::type_of();
+                }
+
                 pub fn get(&self) -> $type {
                     return self.0;
                 }
@@ -321,6 +337,12 @@ macro_rules! int_value {
 
             impl crate::TypeOf for $name {
                 fn type_of() -> crate::Type {
+                    return <$type>::type_of();
+                }
+            }
+
+            impl crate::ToType for $name {
+                fn to_type(&self) -> crate::Type {
                     return <$type>::type_of();
                 }
             }

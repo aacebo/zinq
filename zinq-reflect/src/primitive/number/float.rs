@@ -45,14 +45,14 @@ macro_rules! float_type {
         }
 
         impl FloatType {
+            pub fn to_type(&self) -> crate::Type {
+                return crate::Type::Number(crate::NumberType::Float(self.clone()));
+            }
+
             pub fn id(&self) -> crate::TypeId {
                 return match self {
                     $(Self::$name(v) => v.id(),)*
                 };
-            }
-
-            pub fn to_type(&self) -> crate::Type {
-                return crate::Type::Number(crate::NumberType::Float(self.clone()));
             }
 
             $(
@@ -81,6 +81,12 @@ macro_rules! float_type {
                 return match self {
                     $(Self::$name(v) => v.convertable_to(ty),)*
                 };
+            }
+        }
+
+        impl crate::ToType for FloatType {
+            fn to_type(&self) -> crate::Type {
+                return crate::Type::Number(crate::NumberType::Float(self.clone()));
             }
         }
 
@@ -116,6 +122,10 @@ macro_rules! float_type {
             pub struct $type_name;
 
             impl $type_name {
+                pub fn to_type(&self) -> crate::Type {
+                    return crate::Type::Number(crate::NumberType::Float(crate::FloatType::$name($type_name)));
+                }
+
                 pub fn id(&self) -> crate::TypeId {
                     return crate::TypeId::from_str(&stringify!($type));
                 }
@@ -137,6 +147,12 @@ macro_rules! float_type {
 
             impl crate::TypeOf for $type {
                 fn type_of() -> crate::Type {
+                    return crate::Type::Number(crate::NumberType::Float(crate::FloatType::$name($type_name)));
+                }
+            }
+
+            impl crate::ToType for $type {
+                fn to_type(&self) -> crate::Type {
                     return crate::Type::Number(crate::NumberType::Float(crate::FloatType::$name($type_name)));
                 }
             }
@@ -212,6 +228,14 @@ macro_rules! float_value {
             )*
         }
 
+        impl crate::ToType for Float {
+            fn to_type(&self) -> crate::Type {
+                return match self {
+                    $(Self::$name(v) => v.to_type(),)*
+                };
+            }
+        }
+
         impl crate::ToValue for Float {
             fn to_value(self) -> crate::Value {
                 return match self {
@@ -234,6 +258,10 @@ macro_rules! float_value {
             pub struct $name($type);
 
             impl $name {
+                pub fn to_type(&self) -> crate::Type {
+                    return <$type>::type_of();
+                }
+
                 pub fn get(&self) -> $type {
                     return self.0;
                 }
@@ -297,6 +325,12 @@ macro_rules! float_value {
 
             impl crate::TypeOf for $name {
                 fn type_of() -> crate::Type {
+                    return <$type>::type_of();
+                }
+            }
+
+            impl crate::ToType for $name {
+                fn to_type(&self) -> crate::Type {
                     return <$type>::type_of();
                 }
             }

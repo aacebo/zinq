@@ -20,6 +20,12 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::
                 return #ty;
             }
         }
+
+        impl ::zinq_reflect::ToType for #name {
+            fn to_type(&self) -> ::zinq_reflect::Type {
+                return #ty;
+            }
+        }
     };
 }
 
@@ -30,6 +36,12 @@ pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
+                return #ty;
+            }
+        }
+
+        impl ::zinq_reflect::ToType for #name {
+            fn to_type(&self) -> ::zinq_reflect::Type {
                 return #ty;
             }
         }

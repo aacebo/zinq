@@ -17,8 +17,8 @@ impl Param {
         return self.name == "self"
             && (self.ty.is_self()
                 || self.ty.is_mut_self()
-                || self.ty.is_ptr_self()
-                || self.ty.is_ptr_mut_self());
+                || self.ty.is_ref_self()
+                || self.ty.is_ref_mut_self());
     }
 
     pub fn name(&self) -> &str {

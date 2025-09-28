@@ -12,6 +12,10 @@ impl ModType {
         return crate::build::ModTypeBuilder::new(path);
     }
 
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Mod(self.clone());
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(self.path.to_string());
     }
@@ -36,16 +40,18 @@ impl ModType {
         return &self.items;
     }
 
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Mod(self.clone());
-    }
-
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
         return self.id() == ty.id();
     }
 
     pub fn convertable_to(&self, ty: crate::Type) -> bool {
         return ty.is_mod();
+    }
+}
+
+impl crate::ToType for ModType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Mod(self.clone());
     }
 }
 

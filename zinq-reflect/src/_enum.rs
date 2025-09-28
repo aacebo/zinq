@@ -14,6 +14,10 @@ impl EnumType {
         return crate::build::EnumTypeBuilder::new(path, name);
     }
 
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Enum(self.clone());
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
     }
@@ -42,10 +46,6 @@ impl EnumType {
         return &self.generics;
     }
 
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Enum(self.clone());
-    }
-
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
         return self.id() == ty.id();
     }
@@ -68,6 +68,12 @@ impl EnumType {
 
     pub fn variant_mut(&mut self, name: &str) -> &mut crate::Variant {
         return self.variants.iter_mut().find(|v| v.name() == name).unwrap();
+    }
+}
+
+impl crate::ToType for EnumType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Enum(self.clone());
     }
 }
 
@@ -106,10 +112,6 @@ impl Enum {
         };
     }
 
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Enum(self.ty.clone());
-    }
-
     pub fn get(&self) -> &crate::Value {
         return &self.value;
     }
@@ -138,6 +140,12 @@ impl std::ops::Deref for Enum {
 impl std::ops::DerefMut for Enum {
     fn deref_mut(&mut self) -> &mut Self::Target {
         return &mut self.value;
+    }
+}
+
+impl crate::ToType for Enum {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Enum(self.ty.clone());
     }
 }
 

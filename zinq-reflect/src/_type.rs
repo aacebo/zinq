@@ -117,21 +117,21 @@ impl Type {
         };
     }
 
-    pub fn is_ptr_self(&self) -> bool {
+    pub fn is_ref_self(&self) -> bool {
         return match self {
             Self::Ref(v) => v.ty().is_self(),
             _ => false,
         };
     }
 
-    pub fn is_ptr_mut(&self) -> bool {
+    pub fn is_ref_mut(&self) -> bool {
         return match self {
             Self::Ref(v) => v.ty().is_mut(),
             _ => false,
         };
     }
 
-    pub fn is_ptr_mut_self(&self) -> bool {
+    pub fn is_ref_mut_self(&self) -> bool {
         return match self {
             Self::Ref(v) => v.ty().is_mut_self(),
             _ => false,

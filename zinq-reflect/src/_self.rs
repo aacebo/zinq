@@ -3,12 +3,12 @@
 pub struct SelfType;
 
 impl SelfType {
-    pub fn id(&self) -> crate::TypeId {
-        return crate::TypeId::from_str("Self");
-    }
-
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::_Self(self.clone());
+    }
+
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_str("Self");
     }
 
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -17,6 +17,12 @@ impl SelfType {
 
     pub fn convertable_to(&self, ty: crate::Type) -> bool {
         return ty.is_self();
+    }
+}
+
+impl crate::ToType for SelfType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::_Self(self.clone());
     }
 }
 

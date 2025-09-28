@@ -6,6 +6,8 @@ use std::ops::{Deref, DerefMut, Index, IndexMut};
 pub use sized::*;
 pub use un_sized::*;
 
+use crate::ToType;
+
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SliceType {
@@ -26,10 +28,6 @@ impl SliceType {
             Self::Sized(v) => v.len(),
             Self::UnSized(_) => panic!("called 'len' on type '{}'", self.id()),
         };
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Slice(self.clone());
     }
 
     pub fn is_sized(&self) -> bool {
@@ -88,6 +86,12 @@ impl std::fmt::Display for SliceType {
             Self::Sized(v) => write!(f, "{}", v),
             Self::UnSized(v) => write!(f, "{}", v),
         };
+    }
+}
+
+impl crate::ToType for SliceType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(self.clone());
     }
 }
 
@@ -152,6 +156,15 @@ impl Slice {
         return match self {
             Self::Sized(v) => v.iter(),
             Self::UnSized(v) => v.iter(),
+        };
+    }
+}
+
+impl crate::ToType for Slice {
+    fn to_type(&self) -> crate::Type {
+        return match self {
+            Self::Sized(v) => v.to_type(),
+            Self::UnSized(v) => v.to_type(),
         };
     }
 }

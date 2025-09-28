@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use zinq_reflect::{TypeOf, type_of, value_of};
+use zinq_reflect::{ToType, TypeOf, type_of, value_of};
 use zinq_reflect_macros::*;
 
 #[derive(Reflect)]

@@ -4,6 +4,8 @@ pub mod int;
 pub use float::*;
 pub use int::*;
 
+use crate::ToType;
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum NumberType {
@@ -20,7 +22,10 @@ impl NumberType {
     }
 
     pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Number(self.clone());
+        return match self {
+            Self::Int(v) => v.to_type(),
+            Self::Float(v) => v.to_type(),
+        };
     }
 
     pub fn is_int(&self) -> bool {
@@ -78,6 +83,15 @@ impl std::fmt::Display for NumberType {
         return match self {
             Self::Int(v) => write!(f, "{}", v),
             Self::Float(v) => write!(f, "{}", v),
+        };
+    }
+}
+
+impl crate::ToType for NumberType {
+    fn to_type(&self) -> crate::Type {
+        return match self {
+            Self::Int(v) => v.to_type(),
+            Self::Float(v) => v.to_type(),
         };
     }
 }
@@ -142,6 +156,15 @@ impl PartialOrd for Number {
         return match self {
             Self::Float(_) => None,
             Self::Int(v) => v.partial_cmp(&other.to_int()),
+        };
+    }
+}
+
+impl crate::ToType for Number {
+    fn to_type(&self) -> crate::Type {
+        return match self {
+            Self::Int(v) => v.to_type(),
+            Self::Float(v) => v.to_type(),
         };
     }
 }

@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{Bool, Enum, Float, Int, Map, Number, Ref, Slice, String, Struct, Type, TypeOf};
+use crate::{Bool, Enum, Float, Int, Map, Number, Ref, Slice, String, Struct, ToType};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -17,7 +17,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn to_type(&self) -> Type {
+    pub fn to_type(&self) -> crate::Type {
         return match self {
             Self::Bool(v) => v.to_type(),
             Self::Number(v) => v.to_type(),
@@ -75,7 +75,7 @@ impl Value {
         };
     }
 
-    pub fn is_ref_of(&self, ty: Type) -> bool {
+    pub fn is_ref_of(&self, ty: crate::Type) -> bool {
         return match self {
             Self::Ref(v) => v.to_type().is_ref_of(ty),
             _ => false,
@@ -216,6 +216,28 @@ impl Value {
     }
 }
 
+impl crate::TypeOf for Value {
+    fn type_of() -> crate::Type {
+        return crate::Type::Any;
+    }
+}
+
+impl crate::ToType for Value {
+    fn to_type(&self) -> crate::Type {
+        return match self {
+            Self::Bool(v) => v.to_type(),
+            Self::Number(v) => v.to_type(),
+            Self::String(v) => v.to_type(),
+            Self::Ref(v) => v.to_type(),
+            Self::Slice(v) => v.to_type(),
+            Self::Struct(v) => v.to_type(),
+            Self::Enum(v) => v.to_type(),
+            Self::Map(v) => v.to_type(),
+            _ => panic!("called 'to_type' on null"),
+        };
+    }
+}
+
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
@@ -316,11 +338,5 @@ impl Ord for Value {
             Self::String(v) => v.cmp(&other.to_string()),
             _ => panic!("called 'Ord::cmp' on '{}'", self.to_type()),
         };
-    }
-}
-
-impl crate::TypeOf for Value {
-    fn type_of() -> crate::Type {
-        return crate::Type::Any;
     }
 }

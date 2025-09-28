@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut, Index, IndexMut};
 
-use crate::{ToValue, TypeOf};
+use crate::TypeOf;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -11,10 +11,6 @@ pub struct UnSizedSliceType {
 impl UnSizedSliceType {
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("[{}]", self.ty.id()));
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Slice(crate::SliceType::UnSized(self.clone()));
     }
 
     pub fn is_slice_of(&self, ty: crate::Type) -> bool {
@@ -36,14 +32,20 @@ impl std::fmt::Display for UnSizedSliceType {
     }
 }
 
-impl<T> TypeOf for [T]
+impl<T> crate::TypeOf for [T]
 where
-    T: TypeOf,
+    T: crate::TypeOf,
 {
     fn type_of() -> crate::Type {
         return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
             ty: Box::new(T::type_of()),
         }));
+    }
+}
+
+impl crate::ToType for UnSizedSliceType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::UnSized(self.clone()));
     }
 }
 
@@ -55,12 +57,6 @@ pub struct UnSizedSlice {
 }
 
 impl UnSizedSlice {
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
-            ty: Box::new(self.ty.clone()),
-        }));
-    }
-
     pub fn len(&self) -> usize {
         return self.value.len();
     }
@@ -93,15 +89,23 @@ impl std::fmt::Display for UnSizedSlice {
     }
 }
 
-impl ToValue for UnSizedSlice {
+impl crate::ToType for UnSizedSlice {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::UnSized(UnSizedSliceType {
+            ty: Box::new(self.ty.clone()),
+        }));
+    }
+}
+
+impl crate::ToValue for UnSizedSlice {
     fn to_value(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::UnSized(self.clone()));
     }
 }
 
-impl<T> ToValue for &[T]
+impl<T> crate::ToValue for &[T]
 where
-    T: Clone + TypeOf + ToValue,
+    T: Clone + TypeOf + crate::ToValue,
 {
     fn to_value(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::UnSized(UnSizedSlice {

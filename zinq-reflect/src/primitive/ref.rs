@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use crate::{ToValue, TypeOf};
+use crate::ToValue;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -11,12 +11,12 @@ impl RefType {
         return Self(Box::new(ty.clone()));
     }
 
-    pub fn id(&self) -> crate::TypeId {
-        return crate::TypeId::from_string(format!("&{}", self.0.id()));
-    }
-
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Ref(self.clone());
+    }
+
+    pub fn id(&self) -> crate::TypeId {
+        return crate::TypeId::from_string(format!("&{}", self.0.id()));
     }
 
     pub fn ty(&self) -> &crate::Type {
@@ -42,12 +42,27 @@ impl std::fmt::Display for RefType {
     }
 }
 
-impl<T> TypeOf for &T
+impl crate::ToType for RefType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Ref(self.clone());
+    }
+}
+
+impl<T> crate::TypeOf for &T
 where
-    T: TypeOf,
+    T: crate::TypeOf,
 {
     fn type_of() -> crate::Type {
-        return T::type_of();
+        return crate::RefType::new(&T::type_of()).to_type();
+    }
+}
+
+impl<T> crate::ToType for &T
+where
+    T: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
+        return crate::RefType::new(&T::type_of()).to_type();
     }
 }
 
@@ -57,7 +72,7 @@ pub struct Ref(Box<crate::Value>);
 
 impl Ref {
     pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Ref(RefType(Box::new(self.0.to_type())));
+        return RefType::new(&self.0.to_type()).to_type();
     }
 
     pub fn get(&self) -> Box<crate::Value> {
@@ -65,7 +80,7 @@ impl Ref {
     }
 }
 
-impl<T: Clone + ToValue> From<&T> for Ref {
+impl<T: Clone + crate::ToValue> From<&T> for Ref {
     fn from(value: &T) -> Self {
         return Self(Box::new(value.to_value()));
     }
@@ -77,15 +92,21 @@ impl std::fmt::Display for Ref {
     }
 }
 
-impl ToValue for Ref {
+impl crate::ToType for Ref {
+    fn to_type(&self) -> crate::Type {
+        return RefType::new(&self.0.to_type()).to_type();
+    }
+}
+
+impl crate::ToValue for Ref {
     fn to_value(self) -> crate::Value {
         return crate::Value::Ref(self.clone());
     }
 }
 
-impl<T> ToValue for &T
+impl<T> crate::ToValue for &T
 where
-    T: Clone + ToValue,
+    T: Clone + crate::ToValue,
 {
     fn to_value(self) -> crate::Value {
         let value = self.clone();

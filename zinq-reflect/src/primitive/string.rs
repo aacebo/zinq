@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut, Index};
 
-use crate::{ToValue, TypeOf};
+use crate::TypeOf;
 
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -9,10 +9,6 @@ pub struct StringType;
 impl StringType {
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_str("string");
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::String(self.clone());
     }
 
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -30,14 +26,32 @@ impl std::fmt::Display for StringType {
     }
 }
 
-impl TypeOf for std::string::String {
+impl crate::ToType for StringType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::String(self.clone());
+    }
+}
+
+impl crate::TypeOf for std::string::String {
     fn type_of() -> crate::Type {
         return crate::Type::String(StringType::default());
     }
 }
 
-impl TypeOf for str {
+impl crate::ToType for std::string::String {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::String(StringType::default());
+    }
+}
+
+impl crate::TypeOf for str {
     fn type_of() -> crate::Type {
+        return crate::Type::String(StringType::default());
+    }
+}
+
+impl crate::ToType for str {
+    fn to_type(&self) -> crate::Type {
         return crate::Type::String(StringType::default());
     }
 }
@@ -90,25 +104,31 @@ impl std::fmt::Display for String {
     }
 }
 
-impl TypeOf for String {
+impl crate::TypeOf for String {
     fn type_of() -> crate::Type {
         return std::string::String::type_of();
     }
 }
 
-impl ToValue for String {
+impl crate::ToType for String {
+    fn to_type(&self) -> crate::Type {
+        return String::type_of();
+    }
+}
+
+impl crate::ToValue for String {
     fn to_value(self) -> crate::Value {
         return crate::Value::String(self.clone());
     }
 }
 
-impl ToValue for std::string::String {
+impl crate::ToValue for std::string::String {
     fn to_value(self) -> crate::Value {
         return crate::Value::String(String(self.clone()));
     }
 }
 
-impl ToValue for &str {
+impl crate::ToValue for &str {
     fn to_value(self) -> crate::Value {
         return crate::Value::String(String(self.to_string()));
     }

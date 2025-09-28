@@ -15,12 +15,12 @@ impl MapType {
         };
     }
 
-    pub fn id(&self) -> crate::TypeId {
-        return self.ty.id();
-    }
-
     pub fn to_type(&self) -> crate::Type {
         return crate::Type::Map(self.clone());
+    }
+
+    pub fn id(&self) -> crate::TypeId {
+        return self.ty.id();
     }
 
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -60,8 +60,32 @@ impl std::fmt::Display for MapType {
     }
 }
 
+impl crate::ToType for MapType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Map(self.clone());
+    }
+}
+
 impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::HashMap<K, V> {
     fn type_of() -> crate::Type {
+        let path = crate::Path::from("std::collections");
+        let key = K::type_of();
+        let value = V::type_of();
+        let ty = crate::StructType::new(&path, "HashMap")
+            .visibility(crate::Visibility::Public(crate::Public::Full))
+            .generics(&crate::Generics::from([
+                crate::TypeParam::new("K").build().to_generic(),
+                crate::TypeParam::new("V").build().to_generic(),
+            ]))
+            .build()
+            .to_type();
+
+        return MapType::new(&ty, &key, &value).to_type();
+    }
+}
+
+impl<K: crate::TypeOf, V: crate::TypeOf> crate::ToType for std::collections::HashMap<K, V> {
+    fn to_type(&self) -> crate::Type {
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
         let value = V::type_of();
@@ -96,6 +120,24 @@ impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::BTr
     }
 }
 
+impl<K: crate::TypeOf, V: crate::TypeOf> crate::ToType for std::collections::BTreeMap<K, V> {
+    fn to_type(&self) -> crate::Type {
+        let path = crate::Path::from("std::collections");
+        let key = K::type_of();
+        let value = V::type_of();
+        let ty = crate::StructType::new(&path, "BTreeMap")
+            .visibility(crate::Visibility::Public(crate::Public::Full))
+            .generics(&crate::Generics::from([
+                crate::TypeParam::new("K").build().to_generic(),
+                crate::TypeParam::new("V").build().to_generic(),
+            ]))
+            .build()
+            .to_type();
+
+        return MapType::new(&ty, &key, &value).to_type();
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Map {
@@ -109,10 +151,6 @@ impl Map {
             ty: ty.clone(),
             data: std::collections::BTreeMap::new(),
         };
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Map(self.ty.clone());
     }
 
     pub fn iter(&self) -> std::collections::btree_map::Iter<'_, crate::Value, crate::Value> {
@@ -145,6 +183,12 @@ impl Map {
 
     pub fn set(&mut self, key: &crate::Value, value: &crate::Value) {
         self.data.insert(key.clone(), value.clone());
+    }
+}
+
+impl crate::ToType for Map {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Map(self.ty.clone());
     }
 }
 

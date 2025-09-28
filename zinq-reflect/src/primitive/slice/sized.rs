@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut, Index, IndexMut};
 
-use crate::{ToValue, TypeOf};
+use crate::TypeOf;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -10,16 +10,16 @@ pub struct SizedSliceType {
 }
 
 impl SizedSliceType {
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::Sized(self.clone()));
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("[{}; {}]", &self.ty.id(), &self.size));
     }
 
     pub fn len(&self) -> usize {
         return self.size;
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Slice(crate::SliceType::Sized(self.clone()));
     }
 
     pub fn is_slice_of(&self, ty: crate::Type) -> bool {
@@ -41,11 +41,31 @@ impl std::fmt::Display for SizedSliceType {
     }
 }
 
-impl<const N: usize, T> TypeOf for [T; N]
+impl crate::ToType for SizedSliceType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::Sized(self.clone()));
+    }
+}
+
+impl<const N: usize, T> crate::TypeOf for [T; N]
 where
-    T: TypeOf,
+    T: crate::TypeOf,
 {
     fn type_of() -> crate::Type {
+        let ty = T::type_of();
+
+        return crate::Type::Slice(crate::SliceType::Sized(SizedSliceType {
+            ty: Box::new(ty),
+            size: N,
+        }));
+    }
+}
+
+impl<const N: usize, T> crate::ToType for [T; N]
+where
+    T: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
         let ty = T::type_of();
 
         return crate::Type::Slice(crate::SliceType::Sized(SizedSliceType {
@@ -104,15 +124,24 @@ impl std::fmt::Display for SizedSlice {
     }
 }
 
-impl ToValue for SizedSlice {
+impl crate::ToType for SizedSlice {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Slice(crate::SliceType::Sized(SizedSliceType {
+            ty: Box::new(self.ty.clone()),
+            size: self.size,
+        }));
+    }
+}
+
+impl crate::ToValue for SizedSlice {
     fn to_value(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::Sized(self.clone()));
     }
 }
 
-impl<const N: usize, T> ToValue for [T; N]
+impl<const N: usize, T> crate::ToValue for [T; N]
 where
-    T: Clone + TypeOf + ToValue,
+    T: Clone + TypeOf + crate::ToValue,
 {
     fn to_value(self) -> crate::Value {
         return crate::Value::Slice(crate::Slice::Sized(SizedSlice {

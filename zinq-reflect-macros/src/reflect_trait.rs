@@ -14,6 +14,12 @@ pub fn attr(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macro
                 return #ty;
             }
         }
+
+        impl ::zinq_reflect::ToType for dyn #name {
+            fn to_type(&self) -> ::zinq_reflect::Type {
+                return #ty;
+            }
+        }
     };
 }
 

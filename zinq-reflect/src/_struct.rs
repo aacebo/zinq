@@ -19,6 +19,10 @@ impl StructType {
         return crate::build::StructTypeBuilder::new(path, name);
     }
 
+    pub fn to_type(&self) -> crate::Type {
+        return crate::Type::Struct(self.clone());
+    }
+
     pub fn id(&self) -> crate::TypeId {
         return crate::TypeId::from_string(format!("{}::{}", &self.path, &self.name));
     }
@@ -51,16 +55,18 @@ impl StructType {
         return &self.fields;
     }
 
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Struct(self.clone());
-    }
-
     pub fn assignable_to(&self, ty: crate::Type) -> bool {
         return self.id() == ty.id();
     }
 
     pub fn convertable_to(&self, ty: crate::Type) -> bool {
         return ty.is_struct();
+    }
+}
+
+impl crate::ToType for StructType {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Struct(self.clone());
     }
 }
 
@@ -109,6 +115,12 @@ impl Struct {
 
     pub fn get_mut(&mut self, name: &str) -> Option<&mut crate::Value> {
         return self.fields.get_mut(name);
+    }
+}
+
+impl crate::ToType for Struct {
+    fn to_type(&self) -> crate::Type {
+        return crate::Type::Struct(self.ty.clone());
     }
 }
 
