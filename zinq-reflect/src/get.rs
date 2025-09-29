@@ -83,12 +83,12 @@ mod test {
     #[test]
     pub fn mutable() {
         let mut meta = crate::MetaData::from([
-            ("a", value_of!(21)),
+            ("a", value_of!(vec![1.2, 1.3, 1.4])),
             ("b", value_of!(true)),
             ("c", value_of!([3, 2, 1])),
         ]);
 
-        let out = get_mut!(meta => /c/1);
-        assert_eq!(out, &value_of!(2));
+        let out = get_mut!(meta => /a/1);
+        assert_eq!(out, &value_of!(1.3));
     }
 }
