@@ -4,8 +4,6 @@ pub mod int;
 pub use float::*;
 pub use int::*;
 
-use crate::ToType;
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum NumberType {

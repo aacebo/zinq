@@ -20,7 +20,7 @@ macro_rules! float_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::Number(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
             )*
@@ -38,7 +38,7 @@ macro_rules! float_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::Float(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
             )*
@@ -66,7 +66,7 @@ macro_rules! float_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::$name(v) => v.clone(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
             )*
@@ -180,7 +180,7 @@ macro_rules! float_value {
                 pub fn $to_type(&self) -> $name {
                     return match self {
                         Self::Number(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
 
@@ -205,7 +205,7 @@ macro_rules! float_value {
                 pub fn $to_type(&self) -> $name {
                     return match self {
                         Self::Float(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
 
@@ -242,7 +242,7 @@ macro_rules! float_value {
                 pub fn $to_type(&self) -> $name {
                     return match self {
                         Self::$name(v) => v.clone(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
 

@@ -20,7 +20,7 @@ macro_rules! int_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::Number(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
             )*
@@ -38,13 +38,17 @@ macro_rules! int_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::Int(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
             )*
         }
 
         impl IntType {
+            pub fn to_type(&self) -> crate::Type {
+                return crate::Type::Number(crate::NumberType::Int(self.clone()));
+            }
+
             pub fn id(&self) -> crate::TypeId {
                 return match self {
                     $(Self::$name(v) => v.id(),)*
@@ -74,7 +78,7 @@ macro_rules! int_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::$name(v) => v.clone(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
             )*
@@ -174,14 +178,14 @@ macro_rules! int_value {
                 pub fn $to_type(&self) -> $name {
                     return match self {
                         Self::Number(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
 
                 pub fn $set(&mut self, value: $type) {
                     return match self {
                         Self::Number(v) => v.$set(value),
-                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($set), v.to_type()),
                     };
                 }
             )*
@@ -199,14 +203,14 @@ macro_rules! int_value {
                 pub fn $to_type(&self) -> $name {
                     return match self {
                         Self::Int(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
 
                 pub fn $set(&mut self, value: $type) {
                     return match self {
                         Self::Int(v) => v.$set(value),
-                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($set), v.to_type()),
                     };
                 }
             )*
@@ -236,14 +240,14 @@ macro_rules! int_value {
                 pub fn $to_type(&self) -> $name {
                     return match self {
                         Self::$name(v) => v.clone(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
 
                 pub fn $set(&mut self, value: $type) {
                     return match self {
                         Self::$name(v) => v.$set(value),
-                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($set), v.to_type()),
                     };
                 }
             )*

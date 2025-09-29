@@ -13,7 +13,7 @@ macro_rules! tuple_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::Tuple(v) => v.$to_type(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.id()),
                     };
                 }
             )*
@@ -54,7 +54,7 @@ macro_rules! tuple_type {
                 pub fn $to_type(&self) -> $type_name {
                     return match self {
                         Self::$name(v) => v.clone(),
-                        _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
             )*
