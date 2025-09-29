@@ -9,7 +9,7 @@ macro_rules! set {
 
 #[cfg(test)]
 mod test {
-    use crate::{get_mut, set, value_of};
+    use crate::value_of;
 
     #[test]
     pub fn basic() {

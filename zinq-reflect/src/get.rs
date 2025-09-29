@@ -2,18 +2,18 @@
 macro_rules! get {
     // Entry: start with an immutable borrow of the root expression
     ($root:expr => $($path:tt)+) => {
-        get!(@acc &($root) ; $($path)+)
+        $crate::get!(@acc &($root) ; $($path)+)
     };
 
     // The path must start with a slash: /seg/seg/...
     (@acc $acc:expr ; / $($rest:tt)+ ) => {
-        get!(@seg $acc ; $($rest)+)
+        $crate::get!(@seg $acc ; $($rest)+)
     };
 
     // --- identifier segment (struct/tuple-struct field) ---
     // More segments after this one
     (@seg $acc:expr ; $field:ident / $($rest:tt)+ ) => {
-        get!(@acc ::core::ops::Index::index($acc, stringify!($field)) ; / $($rest)+ )
+        $crate::get!(@acc ::core::ops::Index::index($acc, stringify!($field)) ; / $($rest)+ )
     };
     // Terminal identifier segment
     (@seg $acc:expr ; $field:ident ) => {
@@ -23,7 +23,7 @@ macro_rules! get {
     // --- literal segment (numbers, strings, etc.) using Index ---
     // More segments after this one
     (@seg $acc:expr ; $idx:literal / $($rest:tt)+ ) => {
-        get!(@acc ::core::ops::Index::index($acc, $idx) ; / $($rest)+ )
+        $crate::get!(@acc ::core::ops::Index::index($acc, $idx) ; / $($rest)+ )
     };
     // Terminal literal segment
     (@seg $acc:expr ; $idx:literal ) => {
@@ -35,18 +35,18 @@ macro_rules! get {
 macro_rules! get_mut {
     // Entry: start with an immutable borrow of the root expression
     ($root:expr => $($path:tt)+) => {
-        get_mut!(@acc &mut ($root) ; $($path)+)
+        $crate::get_mut!(@acc &mut ($root) ; $($path)+)
     };
 
     // The path must start with a slash: /seg/seg/...
     (@acc $acc:expr ; / $($rest:tt)+ ) => {
-        get_mut!(@seg $acc ; $($rest)+)
+        $crate::get_mut!(@seg $acc ; $($rest)+)
     };
 
     // --- identifier segment (struct/tuple-struct field) ---
     // More segments after this one
     (@seg $acc:expr ; $field:ident / $($rest:tt)+ ) => {
-        get_mut!(@acc ::core::ops::IndexMut::index_mut($acc, stringify!($field)) ; / $($rest)+ )
+        $crate::get_mut!(@acc ::core::ops::IndexMut::index_mut($acc, stringify!($field)) ; / $($rest)+ )
     };
     // Terminal identifier segment
     (@seg $acc:expr ; $field:ident ) => {
@@ -56,7 +56,7 @@ macro_rules! get_mut {
     // --- literal segment (numbers, strings, etc.) using Index ---
     // More segments after this one
     (@seg $acc:expr ; $idx:literal / $($rest:tt)+ ) => {
-        get_mut!(@acc ::core::ops::IndexMut::index_mut($acc, $idx) ; / $($rest)+ )
+        $crate::get_mut!(@acc ::core::ops::IndexMut::index_mut($acc, $idx) ; / $($rest)+ )
     };
     // Terminal literal segment
     (@seg $acc:expr ; $idx:literal ) => {

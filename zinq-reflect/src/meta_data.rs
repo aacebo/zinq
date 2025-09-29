@@ -48,12 +48,12 @@ impl MetaData {
     }
 }
 
-impl<const N: usize> From<[(&str, crate::Value); N]> for MetaData {
-    fn from(value: [(&str, crate::Value); N]) -> Self {
+impl<const N: usize, V: crate::ToValue> From<[(&str, V); N]> for MetaData {
+    fn from(value: [(&str, V); N]) -> Self {
         let mut data = BTreeMap::new();
 
         for (key, value) in value {
-            data.insert(key.to_string(), value);
+            data.insert(key.to_string(), value.to_value());
         }
 
         return Self(data);

@@ -12,6 +12,10 @@ pub fn build(attributes: &[syn::Attribute]) -> proc_macro2::TokenStream {
         });
     }
 
+    if pairs.is_empty() {
+        return quote!(::zinq_reflect::MetaData::new());
+    }
+
     return quote! {
         ::zinq_reflect::MetaData::from([#(#pairs,)*])
     };
