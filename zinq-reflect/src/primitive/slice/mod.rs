@@ -63,10 +63,24 @@ impl SliceType {
         };
     }
 
+    pub fn as_sized(&self) -> &SizedSliceType {
+        return match self {
+            Self::Sized(v) => v,
+            _ => panic!("called 'as_sized' on type '{}'", self.id()),
+        };
+    }
+
     pub fn to_unsized(&self) -> UnSizedSliceType {
         return match self {
             Self::UnSized(v) => v.clone(),
             _ => panic!("called 'to_unsized' on type '{}'", self.id()),
+        };
+    }
+
+    pub fn as_unsized(&self) -> &UnSizedSliceType {
+        return match self {
+            Self::UnSized(v) => v,
+            _ => panic!("called 'as_unsized' on type '{}'", self.id()),
         };
     }
 
@@ -171,10 +185,24 @@ impl Slice {
         };
     }
 
+    pub fn as_sized(&self) -> &SizedSlice {
+        return match self {
+            Self::Sized(v) => v,
+            _ => panic!("called 'as_sized' on type '{}'", self.to_type().id()),
+        };
+    }
+
     pub fn to_unsized(&self) -> UnSizedSlice {
         return match self {
             Self::UnSized(v) => v.clone(),
             _ => panic!("called 'to_unsized' on type '{}'", self.to_type().id()),
+        };
+    }
+
+    pub fn as_unsized(&self) -> &UnSizedSlice {
+        return match self {
+            Self::UnSized(v) => v,
+            _ => panic!("called 'as_unsized' on type '{}'", self.to_type().id()),
         };
     }
 

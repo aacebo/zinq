@@ -271,6 +271,13 @@ impl Type {
         };
     }
 
+    pub fn as_bool(&self) -> &crate::BoolType {
+        return match self {
+            Self::Bool(v) => v,
+            _ => panic!("called 'as_bool' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_enum(&self) -> crate::EnumType {
         return match self {
             Self::Enum(v) => v.clone(),
@@ -278,10 +285,24 @@ impl Type {
         };
     }
 
-    pub fn to_ptr(&self) -> crate::RefType {
+    pub fn as_enum(&self) -> &crate::EnumType {
+        return match self {
+            Self::Enum(v) => v,
+            _ => panic!("called 'as_enum' on '{}'", self.id()),
+        };
+    }
+
+    pub fn to_ref(&self) -> crate::RefType {
         return match self {
             Self::Ref(v) => v.clone(),
-            _ => panic!("called 'to_ptr' on '{}'", self.id()),
+            _ => panic!("called 'to_ref' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_ref(&self) -> &crate::RefType {
+        return match self {
+            Self::Ref(v) => v,
+            _ => panic!("called 'as_ref' on '{}'", self.id()),
         };
     }
 
@@ -292,10 +313,24 @@ impl Type {
         };
     }
 
+    pub fn as_slice(&self) -> &crate::SliceType {
+        return match self {
+            Self::Slice(v) => v,
+            _ => panic!("called 'as_slice' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_struct(&self) -> crate::StructType {
         return match self {
             Self::Struct(v) => v.clone(),
             _ => panic!("called 'to_struct' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_struct(&self) -> &crate::StructType {
+        return match self {
+            Self::Struct(v) => v,
+            _ => panic!("called 'as_struct' on '{}'", self.id()),
         };
     }
 
@@ -306,10 +341,24 @@ impl Type {
         };
     }
 
+    pub fn as_number(&self) -> &crate::NumberType {
+        return match self {
+            Self::Number(v) => v,
+            _ => panic!("called 'as_number' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_int(&self) -> crate::IntType {
         return match self {
             Self::Number(v) => v.to_int(),
             _ => panic!("called 'to_int' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_int(&self) -> &crate::IntType {
+        return match self {
+            Self::Number(v) => v.as_int(),
+            _ => panic!("called 'as_int' on '{}'", self.id()),
         };
     }
 
@@ -320,10 +369,24 @@ impl Type {
         };
     }
 
+    pub fn as_float(&self) -> &crate::FloatType {
+        return match self {
+            Self::Number(v) => v.as_float(),
+            _ => panic!("called 'as_float' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_string(&self) -> crate::StringType {
         return match self {
             Self::String(v) => v.clone(),
             _ => panic!("called 'to_string' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_string(&self) -> &crate::StringType {
+        return match self {
+            Self::String(v) => v,
+            _ => panic!("called 'as_string' on '{}'", self.id()),
         };
     }
 
@@ -334,10 +397,24 @@ impl Type {
         };
     }
 
+    pub fn as_self(&self) -> &crate::SelfType {
+        return match self {
+            Self::_Self(v) => v,
+            _ => panic!("called 'as_self' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_tuple(&self) -> crate::TupleType {
         return match self {
             Self::Tuple(v) => v.clone(),
             _ => panic!("called 'to_tuple' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_tuple(&self) -> &crate::TupleType {
+        return match self {
+            Self::Tuple(v) => v,
+            _ => panic!("called 'as_tuple' on '{}'", self.id()),
         };
     }
 
@@ -348,10 +425,24 @@ impl Type {
         };
     }
 
+    pub fn as_trait(&self) -> &crate::TraitType {
+        return match self {
+            Self::Trait(v) => v,
+            _ => panic!("called 'as_trait' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_mut(&self) -> crate::MutType {
         return match self {
             Self::Mut(v) => v.clone(),
             _ => panic!("called 'to_mut' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_mut(&self) -> &crate::MutType {
+        return match self {
+            Self::Mut(v) => v,
+            _ => panic!("called 'as_mut' on '{}'", self.id()),
         };
     }
 
@@ -362,6 +453,13 @@ impl Type {
         };
     }
 
+    pub fn as_mod(&self) -> &crate::ModType {
+        return match self {
+            Self::Mod(v) => v,
+            _ => panic!("called 'as_mod' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_seq(&self) -> crate::SeqType {
         return match self {
             Self::Seq(v) => v.clone(),
@@ -369,10 +467,24 @@ impl Type {
         };
     }
 
+    pub fn as_seq(&self) -> &crate::SeqType {
+        return match self {
+            Self::Seq(v) => v,
+            _ => panic!("called 'as_seq' on '{}'", self.id()),
+        };
+    }
+
     pub fn to_map(&self) -> crate::MapType {
         return match self {
             Self::Map(v) => v.clone(),
             _ => panic!("called 'to_map' on '{}'", self.id()),
+        };
+    }
+
+    pub fn as_map(&self) -> &crate::MapType {
+        return match self {
+            Self::Map(v) => v,
+            _ => panic!("called 'as_map' on '{}'", self.id()),
         };
     }
 

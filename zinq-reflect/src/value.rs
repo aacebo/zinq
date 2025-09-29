@@ -153,6 +153,14 @@ impl Value {
         };
     }
 
+    pub fn as_bool(&self) -> &Bool {
+        return match self {
+            Self::Bool(v) => v,
+            Self::Ref(v) => v.as_ref().as_bool(),
+            _ => panic!("called 'as_bool' on '{}'", self.to_type()),
+        };
+    }
+
     pub fn to_ref(&self) -> Ref {
         return match self {
             Self::Ref(v) => v.clone(),
@@ -168,11 +176,27 @@ impl Value {
         };
     }
 
+    pub fn as_slice(&self) -> &Slice {
+        return match self {
+            Self::Slice(v) => v,
+            Self::Ref(v) => v.as_ref().as_slice(),
+            _ => panic!("called 'as_slice' on '{}'", self.to_type()),
+        };
+    }
+
     pub fn to_struct(&self) -> Struct {
         return match self {
             Self::Struct(v) => v.clone(),
             Self::Ref(v) => v.get().clone().to_struct(),
             _ => panic!("called 'to_struct' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn as_struct(&self) -> &Struct {
+        return match self {
+            Self::Struct(v) => v,
+            Self::Ref(v) => v.as_ref().as_struct(),
+            _ => panic!("called 'as_struct' on '{}'", self.to_type()),
         };
     }
 
@@ -184,11 +208,27 @@ impl Value {
         };
     }
 
+    pub fn as_number(&self) -> &Number {
+        return match self {
+            Self::Number(v) => v,
+            Self::Ref(v) => v.as_ref().as_number(),
+            _ => panic!("called 'as_number' on '{}'", self.to_type()),
+        };
+    }
+
     pub fn to_int(&self) -> Int {
         return match self {
             Self::Number(v) => v.to_int(),
             Self::Ref(v) => v.get().clone().to_int(),
             _ => panic!("called 'to_int' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn as_int(&self) -> &Int {
+        return match self {
+            Self::Number(v) => v.as_int(),
+            Self::Ref(v) => v.as_ref().as_int(),
+            _ => panic!("called 'as_int' on '{}'", self.to_type()),
         };
     }
 
@@ -200,11 +240,27 @@ impl Value {
         };
     }
 
+    pub fn as_float(&self) -> &Float {
+        return match self {
+            Self::Number(v) => v.as_float(),
+            Self::Ref(v) => v.as_ref().as_float(),
+            _ => panic!("called 'as_float' on '{}'", self.to_type()),
+        };
+    }
+
     pub fn to_string(&self) -> String {
         return match self {
             Self::String(v) => v.clone(),
             Self::Ref(v) => v.as_ref().to_string(),
             _ => panic!("called 'to_string' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn as_string(&self) -> &String {
+        return match self {
+            Self::String(v) => v,
+            Self::Ref(v) => v.as_ref().as_string(),
+            _ => panic!("called 'as_string' on '{}'", self.to_type()),
         };
     }
 
@@ -216,11 +272,27 @@ impl Value {
         };
     }
 
+    pub fn as_enum(&self) -> &Enum {
+        return match self {
+            Self::Enum(v) => v,
+            Self::Ref(v) => v.as_ref().as_enum(),
+            _ => panic!("called 'as_enum' on '{}'", self.to_type()),
+        };
+    }
+
     pub fn to_map(&self) -> Map {
         return match self {
             Self::Map(v) => v.clone(),
             Self::Ref(v) => v.get().clone().to_map(),
             _ => panic!("called 'to_map' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn as_map(&self) -> &Map {
+        return match self {
+            Self::Map(v) => v,
+            Self::Ref(v) => v.as_ref().as_map(),
+            _ => panic!("called 'as_map' on '{}'", self.to_type()),
         };
     }
 

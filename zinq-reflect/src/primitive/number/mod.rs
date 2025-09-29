@@ -54,10 +54,24 @@ impl NumberType {
         };
     }
 
+    pub fn as_int(&self) -> &IntType {
+        return match self {
+            Self::Int(v) => v,
+            _ => panic!("called 'as_int' on type '{}'", self.id()),
+        };
+    }
+
     pub fn to_float(&self) -> FloatType {
         return match self {
             Self::Float(v) => v.clone(),
             _ => panic!("called 'to_float' on type '{}'", self.id()),
+        };
+    }
+
+    pub fn as_float(&self) -> &FloatType {
+        return match self {
+            Self::Float(v) => v,
+            _ => panic!("called 'as_float' on type '{}'", self.id()),
         };
     }
 
@@ -137,10 +151,24 @@ impl Number {
         };
     }
 
+    pub fn as_int(&self) -> &Int {
+        return match self {
+            Self::Int(v) => v,
+            _ => panic!("called 'as_int' on type '{}'", self.to_type().id()),
+        };
+    }
+
     pub fn to_float(&self) -> Float {
         return match self {
             Self::Float(v) => v.clone(),
             _ => panic!("called 'to_float' on type '{}'", self.to_type().id()),
+        };
+    }
+
+    pub fn as_float(&self) -> &Float {
+        return match self {
+            Self::Float(v) => v,
+            _ => panic!("called 'as_float' on type '{}'", self.to_type().id()),
         };
     }
 }
