@@ -55,6 +55,20 @@ impl crate::ToType for ModType {
     }
 }
 
+impl std::ops::Index<usize> for ModType {
+    type Output = crate::Item;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        return self.items.index(index);
+    }
+}
+
+impl std::ops::IndexMut<usize> for ModType {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        return self.items.index_mut(index);
+    }
+}
+
 impl std::fmt::Display for ModType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if !self.vis.is_private() {
