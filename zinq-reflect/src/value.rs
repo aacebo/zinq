@@ -1,6 +1,8 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{Bool, Enum, Float, Int, Map, Number, Ref, Slice, String, Struct, ToType, ToValue};
+use crate::{
+    Bool, Enum, Float, Int, Map, Number, Ref, Seq, Slice, String, Struct, ToType, ToValue,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -13,6 +15,7 @@ pub enum Value {
     Struct(Struct),
     Enum(Enum),
     Map(Map),
+    Seq(Seq),
     Null,
 }
 
@@ -27,6 +30,7 @@ impl Value {
             Self::Struct(v) => v.to_type(),
             Self::Enum(v) => v.to_type(),
             Self::Map(v) => v.to_type(),
+            Self::Seq(v) => v.to_type(),
             _ => panic!("called 'to_type' on null"),
         };
     }
@@ -36,6 +40,7 @@ impl Value {
             Self::String(v) => v.len(),
             Self::Slice(v) => v.len(),
             Self::Map(v) => v.len(),
+            Self::Seq(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.to_type().id()),
         };
     }
@@ -43,6 +48,7 @@ impl Value {
     pub fn iter(&self) -> std::slice::Iter<'_, crate::Value> {
         return match self {
             Self::Slice(v) => v.iter(),
+            Self::Seq(v) => v.iter(),
             _ => panic!("called 'iter' on '{}'", self.to_type()),
         };
     }
@@ -134,6 +140,13 @@ impl Value {
     pub fn is_map(&self) -> bool {
         return match self {
             Self::Map(_) => true,
+            _ => false,
+        };
+    }
+
+    pub fn is_seq(&self) -> bool {
+        return match self {
+            Self::Seq(_) => true,
             _ => false,
         };
     }
@@ -296,6 +309,22 @@ impl Value {
         };
     }
 
+    pub fn to_seq(&self) -> Seq {
+        return match self {
+            Self::Seq(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_seq(),
+            _ => panic!("called 'to_seq' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn as_seq(&self) -> &Seq {
+        return match self {
+            Self::Seq(v) => v,
+            Self::Ref(v) => v.as_ref().as_seq(),
+            _ => panic!("called 'as_seq' on '{}'", self.to_type()),
+        };
+    }
+
     pub fn set_key_value(&mut self, key: crate::Value, value: crate::Value) {
         return match self {
             Self::Map(v) => v.set_key_value(key, value),
@@ -308,6 +337,8 @@ impl Value {
     pub fn set_index(&mut self, index: usize, value: crate::Value) {
         return match self {
             Self::Slice(v) => v.set_index(index, value),
+            Self::Seq(v) => v.set_index(index, value),
+            Self::Ref(v) => v.set_index(index, value),
             _ => panic!("called 'set_index' on '{}'", self.to_type()),
         };
     }
@@ -320,6 +351,7 @@ impl Value {
             Self::Slice(v) => v.set(value),
             Self::Ref(v) => v.set(value),
             Self::Map(v) => v.set(value),
+            Self::Seq(v) => v.set(value),
             _ => panic!("called 'set' on '{}'", self.to_type()),
         };
     }
@@ -364,6 +396,7 @@ impl std::fmt::Display for Value {
             Self::Struct(v) => write!(f, "{}", v),
             Self::Enum(v) => write!(f, "{}", v),
             Self::Map(v) => write!(f, "{}", v),
+            Self::Seq(v) => write!(f, "{}", v),
             Self::Null => write!(f, "<null>"),
         };
     }
@@ -387,6 +420,7 @@ impl Index<usize> for Value {
     fn index(&self, index: usize) -> &Self::Output {
         return match self {
             Self::Slice(v) => v.index(index),
+            Self::Seq(v) => v.index(index),
             _ => panic!("called 'Index<usize>::index' on '{}'", self.to_type()),
         };
     }
@@ -396,6 +430,7 @@ impl IndexMut<usize> for Value {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         return match self {
             Self::Slice(v) => v.index_mut(index),
+            Self::Seq(v) => v.index_mut(index),
             _ => panic!("called 'IndexMut<usize>::index' on '{}'", self.to_type()),
         };
     }
@@ -431,6 +466,7 @@ impl Index<&Self> for Value {
             Self::Struct(v) => v.index(index.to_string().as_str()),
             Self::Map(v) => v.index(index),
             Self::Slice(v) => v.index(index.to_i32().get() as usize),
+            Self::Seq(v) => v.index(index),
             _ => panic!("called 'Index<&Value>::index' on '{}'", self.to_type()),
         };
     }
@@ -442,6 +478,7 @@ impl IndexMut<&Self> for Value {
             Self::Struct(v) => v.index_mut(index.to_string().as_str()),
             Self::Map(v) => v.index_mut(index),
             Self::Slice(v) => v.index_mut(index.to_i32().get() as usize),
+            Self::Seq(v) => v.index_mut(index),
             _ => panic!(
                 "called 'IndexMut<&Value>::index_mut' on '{}'",
                 self.to_type()
@@ -458,6 +495,7 @@ impl PartialOrd for Value {
             Self::Bool(v) => v.partial_cmp(&other.to_bool()),
             Self::Number(v) => v.partial_cmp(&other.to_number()),
             Self::String(v) => v.partial_cmp(&other.to_string()),
+            Self::Ref(v) => v.partial_cmp(&other.to_ref()),
             _ => panic!("called 'PartialOrd::partial_cmp' on '{}'", self.to_type()),
         };
     }
