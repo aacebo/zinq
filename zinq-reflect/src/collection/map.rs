@@ -1,3 +1,49 @@
+use crate::ToType;
+
+#[macro_export]
+macro_rules! map {
+    // empty -> HashMap
+    () => {{
+        ::std::collections::HashMap::new()
+    }};
+
+    // default HashMap with tuple-ish `{ {k, v}, ... }` syntax
+    ( $( { $key:expr, $value:expr } ),+ $(,)? ) => {{
+        ::std::collections::HashMap::from([
+            $(($key, $value),)+
+        ])
+    }};
+
+    // default HashMap with `k => v` syntax
+    ( $( $key:expr => $value:expr ),+ $(,)? ) => {{
+        ::std::collections::HashMap::from([
+            $(($key, $value),)+
+        ])
+    }};
+}
+
+#[macro_export]
+macro_rules! btree_map {
+    // empty -> BTreeMap
+    () => {{
+        ::std::collections::BTreeMap::new()
+    }};
+
+    // default BTreeMap with tuple-ish `{ {k, v}, ... }` syntax
+    ( $( { $key:expr, $value:expr } ),+ $(,)? ) => {{
+        ::std::collections::BTreeMap::from([
+            $(($key, $value),)+
+        ])
+    }};
+
+    // default BTreeMap with `k => v` syntax
+    ( $( $key:expr => $value:expr ),+ $(,)? ) => {{
+        ::std::collections::BTreeMap::from([
+            $(($key, $value),)+
+        ])
+    }};
+}
+
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MapType {
@@ -240,11 +286,41 @@ impl std::fmt::Display for Map {
     }
 }
 
+impl<K: crate::TypeOf + crate::ToValue, V: crate::TypeOf + crate::ToValue> crate::ToValue
+    for std::collections::HashMap<K, V>
+{
+    fn to_value(self) -> crate::Value {
+        let ty = self.to_type();
+        let mut value = Map::new(ty.as_map());
+
+        for (k, v) in self {
+            value.set_key_value(k.to_value(), v.to_value());
+        }
+
+        return value.to_value();
+    }
+}
+
+impl<K: crate::TypeOf + crate::ToValue, V: crate::TypeOf + crate::ToValue> crate::ToValue
+    for std::collections::BTreeMap<K, V>
+{
+    fn to_value(self) -> crate::Value {
+        let ty = self.to_type();
+        let mut value = Map::new(ty.as_map());
+
+        for (k, v) in self {
+            value.set_key_value(k.to_value(), v.to_value());
+        }
+
+        return value.to_value();
+    }
+}
+
 #[cfg(test)]
 mod test {
     use std::collections::HashMap;
 
-    use crate::{TypeOf, type_of};
+    use crate::{TypeOf, type_of, value_of};
 
     #[test]
     pub fn type_of() {
@@ -253,5 +329,17 @@ mod test {
         assert!(ty.is_map());
         assert_eq!(ty.to_map().key(), &type_of!(String));
         assert_eq!(ty.to_map().value(), &type_of!(bool));
+    }
+
+    #[test]
+    pub fn to_value() {
+        let value = value_of!(btree_map! {
+            "hello".to_string() => 123,
+            "world".to_string() => 111
+        });
+
+        assert!(value.is_map());
+        assert_eq!(value.len(), 2);
+        assert_eq!(value["hello"], value_of!(123));
     }
 }
