@@ -48,9 +48,23 @@ impl MetaData {
     }
 }
 
-impl<const N: usize> From<[(String, crate::Value); N]> for MetaData {
-    fn from(value: [(String, crate::Value); N]) -> Self {
-        return Self(BTreeMap::from(value));
+impl<const N: usize> From<[(&str, crate::Value); N]> for MetaData {
+    fn from(value: [(&str, crate::Value); N]) -> Self {
+        let mut data = BTreeMap::new();
+
+        for (key, value) in value {
+            data.insert(key.to_string(), value);
+        }
+
+        return Self(data);
+    }
+}
+
+impl std::ops::Index<&str> for MetaData {
+    type Output = crate::Value;
+
+    fn index(&self, index: &str) -> &Self::Output {
+        return self.get(index).unwrap();
     }
 }
 

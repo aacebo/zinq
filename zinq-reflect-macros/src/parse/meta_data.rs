@@ -11,7 +11,7 @@ pub fn meta_data_item(meta: syn::meta::ParseNestedMeta<'_>) -> proc_macro2::Toke
     // If there is no "= …", treat as `key = "true"`
     if meta.input.is_empty() {
         let key_lit = syn::LitStr::new(&key_str, key_ident.span());
-        return quote!((#key_lit.to_string(), ::zinq_reflect::Value::Null));
+        return quote!((#key_lit, ::zinq_reflect::Value::Null));
     }
 
     // Expect `= "value"`
@@ -25,5 +25,5 @@ pub fn meta_data_item(meta: syn::meta::ParseNestedMeta<'_>) -> proc_macro2::Toke
     };
 
     let key_lit = syn::LitStr::new(&key_str, key_ident.span());
-    return quote!((#key_lit.to_string(), ::zinq_reflect::value_of!(#val)));
+    return quote!((#key_lit, ::zinq_reflect::value_of!(#val)));
 }

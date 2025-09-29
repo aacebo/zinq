@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{Bool, Enum, Float, Int, Map, Number, Ref, Slice, String, Struct, ToType};
+use crate::{Bool, Enum, Float, Int, Map, Number, Ref, Slice, String, Struct, ToType, ToValue};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -148,20 +148,22 @@ impl Value {
     pub fn to_bool(&self) -> Bool {
         return match self {
             Self::Bool(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_bool(),
             _ => panic!("called 'to_bool' on '{}'", self.to_type()),
         };
     }
 
-    pub fn to_ptr(&self) -> Ref {
+    pub fn to_ref(&self) -> Ref {
         return match self {
             Self::Ref(v) => v.clone(),
-            _ => panic!("called 'to_ptr' on '{}'", self.to_type()),
+            _ => panic!("called 'to_ref' on '{}'", self.to_type()),
         };
     }
 
     pub fn to_slice(&self) -> Slice {
         return match self {
             Self::Slice(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_slice(),
             _ => panic!("called 'to_slice' on '{}'", self.to_type()),
         };
     }
@@ -169,6 +171,7 @@ impl Value {
     pub fn to_struct(&self) -> Struct {
         return match self {
             Self::Struct(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_struct(),
             _ => panic!("called 'to_struct' on '{}'", self.to_type()),
         };
     }
@@ -176,6 +179,7 @@ impl Value {
     pub fn to_number(&self) -> Number {
         return match self {
             Self::Number(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_number(),
             _ => panic!("called 'to_number' on '{}'", self.to_type()),
         };
     }
@@ -183,6 +187,7 @@ impl Value {
     pub fn to_int(&self) -> Int {
         return match self {
             Self::Number(v) => v.to_int(),
+            Self::Ref(v) => v.get().clone().to_int(),
             _ => panic!("called 'to_int' on '{}'", self.to_type()),
         };
     }
@@ -190,6 +195,7 @@ impl Value {
     pub fn to_float(&self) -> Float {
         return match self {
             Self::Number(v) => v.to_float(),
+            Self::Ref(v) => v.get().clone().to_float(),
             _ => panic!("called 'to_float' on '{}'", self.to_type()),
         };
     }
@@ -197,6 +203,7 @@ impl Value {
     pub fn to_string(&self) -> String {
         return match self {
             Self::String(v) => v.clone(),
+            Self::Ref(v) => (*v.get().clone()).to_string(),
             _ => panic!("called 'to_string' on '{}'", self.to_type()),
         };
     }
@@ -204,6 +211,7 @@ impl Value {
     pub fn to_enum(&self) -> Enum {
         return match self {
             Self::Enum(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_enum(),
             _ => panic!("called 'to_enum' on '{}'", self.to_type()),
         };
     }
@@ -211,6 +219,7 @@ impl Value {
     pub fn to_map(&self) -> Map {
         return match self {
             Self::Map(v) => v.clone(),
+            Self::Ref(v) => v.get().clone().to_map(),
             _ => panic!("called 'to_map' on '{}'", self.to_type()),
         };
     }
@@ -272,7 +281,7 @@ impl Index<usize> for Value {
     fn index(&self, index: usize) -> &Self::Output {
         return match self {
             Self::Slice(v) => v.index(index),
-            _ => panic!("called 'index' on '{}'", self.to_type()),
+            _ => panic!("called 'Index<usize>::index' on '{}'", self.to_type()),
         };
     }
 }
@@ -281,7 +290,7 @@ impl IndexMut<usize> for Value {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         return match self {
             Self::Slice(v) => v.index_mut(index),
-            _ => panic!("called 'index' on '{}'", self.to_type()),
+            _ => panic!("called 'IndexMut<usize>::index' on '{}'", self.to_type()),
         };
     }
 }
@@ -292,7 +301,8 @@ impl Index<&str> for Value {
     fn index(&self, index: &str) -> &Self::Output {
         return match self {
             Self::Struct(v) => v.index(index),
-            _ => panic!("called 'index' on '{}'", self.to_type()),
+            Self::Map(v) => v.index(&index.to_value()),
+            _ => panic!("called 'Index<&str>::index' on '{}'", self.to_type()),
         };
     }
 }
@@ -301,7 +311,7 @@ impl IndexMut<&str> for Value {
     fn index_mut(&mut self, index: &str) -> &mut Self::Output {
         return match self {
             Self::Struct(v) => v.index_mut(index),
-            _ => panic!("called 'index' on '{}'", self.to_type()),
+            _ => panic!("called 'IndexMut<&str>::index' on '{}'", self.to_type()),
         };
     }
 }
@@ -311,8 +321,10 @@ impl Index<&Self> for Value {
 
     fn index(&self, index: &Self) -> &Self::Output {
         return match self {
+            Self::Struct(v) => v.index(index.to_string().as_str()),
             Self::Map(v) => v.index(index),
-            _ => panic!("called 'index' on '{}'", self.to_type()),
+            Self::Slice(v) => v.index(index.to_i32().get() as usize),
+            _ => panic!("called 'Index<&Value>::index' on '{}'", self.to_type()),
         };
     }
 }
@@ -336,6 +348,7 @@ impl Ord for Value {
             Self::Bool(v) => v.cmp(&other.to_bool()),
             Self::Number(v) => v.cmp(&other.to_number()),
             Self::String(v) => v.cmp(&other.to_string()),
+            Self::Ref(v) => v.cmp(&other.to_ref()),
             _ => panic!("called 'Ord::cmp' on '{}'", self.to_type()),
         };
     }

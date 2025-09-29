@@ -12,6 +12,7 @@ mod collection;
 mod field;
 pub mod fields;
 pub mod generic;
+mod get;
 mod item;
 mod layout;
 mod meta_data;
@@ -39,6 +40,8 @@ pub use collection::*;
 pub use field::*;
 pub use fields::*;
 pub use generic::*;
+#[allow(unused)]
+pub use get::*;
 pub use item::*;
 pub use layout::*;
 pub use meta_data::*;

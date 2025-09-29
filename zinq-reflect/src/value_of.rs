@@ -31,7 +31,7 @@ mod test {
 
         assert!(value.is_ref());
         assert!(value.is_ref_of(type_of!(i8)));
-        assert_eq!(value.to_ptr().get().to_i8().get(), 1);
+        assert_eq!(value.to_ref().get().to_i8().get(), 1);
         assert_eq!(value.to_type().id(), "&i8");
     }
 }

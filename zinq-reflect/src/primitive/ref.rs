@@ -66,7 +66,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Ref(Box<crate::Value>);
 
@@ -140,6 +140,14 @@ impl DerefMut for Ref {
     }
 }
 
+impl Eq for Ref {}
+
+impl Ord for Ref {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        return self.0.cmp(&other.0);
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::*;
@@ -151,7 +159,7 @@ mod test {
         assert!(value.is_ref());
         assert!(value.is_ref_of(type_of!(i32)));
         assert_eq!(value.to_type().id(), "&i32");
-        assert_eq!(value.to_ptr().get().to_i32().get(), 3);
+        assert_eq!(value.to_ref().get().to_i32().get(), 3);
     }
 
     #[test]
@@ -161,6 +169,6 @@ mod test {
         assert!(value.is_ref());
         assert!(value.is_ref_of(type_of!(bool)));
         assert_eq!(value.to_type().id(), "&bool");
-        assert!(value.to_ptr().get().to_bool().get());
+        assert!(value.to_ref().get().to_bool().get());
     }
 }
