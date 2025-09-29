@@ -3,6 +3,12 @@ macro_rules! value_of {
     [$value:expr] => {
         $crate::ToValue::to_value($value)
     };
+    [$value:ident] => {
+        $crate::ToValue::to_value($value)
+    };
+    [$value:literal] => {
+        $crate::ToValue::to_value($value)
+    };
 }
 
 /// ## ToValue

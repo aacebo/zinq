@@ -155,7 +155,7 @@ macro_rules! int_type {
 }
 
 macro_rules! int_value {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $type:ty)*) => {
+    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set:ident $type:ty)*) => {
         #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum Int {
@@ -177,6 +177,13 @@ macro_rules! int_value {
                         _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
                     };
                 }
+
+                pub fn $set(&mut self, value: $type) {
+                    return match self {
+                        Self::Number(v) => v.$set(value),
+                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                    };
+                }
             )*
         }
 
@@ -195,6 +202,13 @@ macro_rules! int_value {
                         _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
                     };
                 }
+
+                pub fn $set(&mut self, value: $type) {
+                    return match self {
+                        Self::Int(v) => v.$set(value),
+                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                    };
+                }
             )*
         }
 
@@ -202,6 +216,12 @@ macro_rules! int_value {
             pub fn to_type(&self) -> crate::Type {
                 return match self {
                     $(Self::$name(v) => v.to_type(),)*
+                };
+            }
+
+            pub fn set(&mut self, value: crate::Value) {
+                return match self {
+                    $(Self::$name(v) => v.set(value),)*
                 };
             }
 
@@ -217,6 +237,13 @@ macro_rules! int_value {
                     return match self {
                         Self::$name(v) => v.clone(),
                         _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                    };
+                }
+
+                pub fn $set(&mut self, value: $type) {
+                    return match self {
+                        Self::$name(v) => v.$set(value),
+                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
                     };
                 }
             )*
@@ -268,6 +295,14 @@ macro_rules! int_value {
 
                 pub fn get(&self) -> $type {
                     return self.0;
+                }
+
+                pub fn set(&mut self, value: crate::Value) {
+                    self.0 = value.into();
+                }
+
+                pub fn $set(&mut self, value: $type) {
+                    self.0 = value;
                 }
             }
 
@@ -375,15 +410,15 @@ int_type! {
 }
 
 int_value! {
-    I8 I8Type is_i8 to_i8 i8
-    I16 I16Type is_i16 to_i16 i16
-    I32 I32Type is_i32 to_i32 i32
-    I64 I64Type is_i64 to_i64 i64
+    I8 I8Type is_i8 to_i8 set_i8 i8
+    I16 I16Type is_i16 to_i16 set_i16 i16
+    I32 I32Type is_i32 to_i32 set_i32 i32
+    I64 I64Type is_i64 to_i64 set_i64 i64
 
-    U8 U8Type is_u8 to_u8 u8
-    U16 U16Type is_u16 to_u16 u16
-    U32 U32Type is_u32 to_u32 u32
-    U64 U64Type is_u64 to_u64 u64
+    U8 U8Type is_u8 to_u8 set_u8 u8
+    U16 U16Type is_u16 to_u16 set_u16 u16
+    U32 U32Type is_u32 to_u32 set_u32 u32
+    U64 U64Type is_u64 to_u64 set_u64 u64
 }
 
 #[cfg(test)]

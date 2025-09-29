@@ -64,6 +64,23 @@ impl Bool {
     pub fn get(&self) -> bool {
         return self.0;
     }
+
+    pub fn set(&mut self, value: crate::Value) {
+        self.0 = value.to_bool().get();
+    }
+
+    pub fn set_bool(&mut self, value: bool) {
+        self.0 = value;
+    }
+}
+
+impl crate::Value {
+    pub fn set_bool(&mut self, value: bool) {
+        return match self {
+            Self::Bool(v) => v.set_bool(value),
+            _ => panic!("called 'set_bool' on '{}'", self.to_type()),
+        };
+    }
 }
 
 impl From<bool> for crate::Value {

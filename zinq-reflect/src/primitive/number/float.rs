@@ -161,7 +161,7 @@ macro_rules! float_type {
 }
 
 macro_rules! float_value {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $type:ty)*) => {
+    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set:ident $type:ty)*) => {
         #[derive(Debug, Copy, Clone, PartialEq)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum Float {
@@ -183,6 +183,13 @@ macro_rules! float_value {
                         _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
                     };
                 }
+
+                pub fn $set(&mut self, value: $type) {
+                    return match self {
+                        Self::Number(v) => v.$set(value),
+                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                    };
+                }
             )*
         }
 
@@ -201,6 +208,13 @@ macro_rules! float_value {
                         _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
                     };
                 }
+
+                pub fn $set(&mut self, value: $type) {
+                    return match self {
+                        Self::Float(v) => v.$set(value),
+                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                    };
+                }
             )*
         }
 
@@ -208,6 +222,12 @@ macro_rules! float_value {
             pub fn to_type(&self) -> crate::Type {
                 return match self {
                     $(Self::$name(v) => v.to_type(),)*
+                };
+            }
+
+            pub fn set(&mut self, value: crate::Value) {
+                return match self {
+                    $(Self::$name(v) => v.set(value),)*
                 };
             }
 
@@ -223,6 +243,13 @@ macro_rules! float_value {
                     return match self {
                         Self::$name(v) => v.clone(),
                         _ => panic!("called '{}' on type '{}'", stringify!($to_type), stringify!($name)),
+                    };
+                }
+
+                pub fn $set(&mut self, value: $type) {
+                    return match self {
+                        Self::$name(v) => v.$set(value),
+                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
                     };
                 }
             )*
@@ -264,6 +291,14 @@ macro_rules! float_value {
 
                 pub fn get(&self) -> $type {
                     return self.0;
+                }
+
+                pub fn set(&mut self, value: crate::Value) {
+                    self.0 = value.into();
+                }
+
+                pub fn $set(&mut self, value: $type) {
+                    self.0 = value;
                 }
             }
 
@@ -356,8 +391,8 @@ float_type! {
 }
 
 float_value! {
-    F32 F32Type is_f32 to_f32 f32
-    F64 F64Type is_f64 to_f64 f64
+    F32 F32Type is_f32 to_f32 set_f32 f32
+    F64 F64Type is_f64 to_f64 set_f64 f64
 }
 
 #[cfg(test)]

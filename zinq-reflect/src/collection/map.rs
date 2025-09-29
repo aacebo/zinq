@@ -173,6 +173,10 @@ impl Map {
         return self.data.len();
     }
 
+    pub fn data(&self) -> &std::collections::BTreeMap<crate::Value, crate::Value> {
+        return &self.data;
+    }
+
     pub fn has(&self, key: &crate::Value) -> bool {
         return self.data.contains_key(key);
     }
@@ -185,8 +189,12 @@ impl Map {
         return self.data.get_mut(key);
     }
 
-    pub fn set(&mut self, key: &crate::Value, value: &crate::Value) {
-        self.data.insert(key.clone(), value.clone());
+    pub fn set(&mut self, value: crate::Value) {
+        self.data = value.to_map().data().clone();
+    }
+
+    pub fn set_key_value(&mut self, key: crate::Value, value: crate::Value) {
+        self.data.insert(key, value);
     }
 }
 
@@ -207,6 +215,12 @@ impl std::ops::Index<&crate::Value> for Map {
 
     fn index(&self, index: &crate::Value) -> &Self::Output {
         return self.data.index(index);
+    }
+}
+
+impl std::ops::IndexMut<&crate::Value> for Map {
+    fn index_mut(&mut self, index: &crate::Value) -> &mut Self::Output {
+        return self.data.get_mut(index).unwrap();
     }
 }
 

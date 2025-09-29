@@ -78,6 +78,27 @@ impl Ref {
     pub fn get(&self) -> Box<crate::Value> {
         return self.0.clone();
     }
+
+    pub fn get_mut(&mut self) -> &mut crate::Value {
+        return &mut self.0;
+    }
+
+    pub fn set(&mut self, value: crate::Value) {
+        self.0 = value.to_ref().get();
+    }
+
+    pub fn set_ref(&mut self, value: Box<crate::Value>) {
+        self.0 = value;
+    }
+}
+
+impl crate::Value {
+    pub fn set_ref(&mut self, value: Box<crate::Value>) {
+        return match self {
+            Self::Ref(v) => v.set_ref(value),
+            _ => panic!("called 'set_ref' on '{}'", self.to_type()),
+        };
+    }
 }
 
 impl<T: Clone + crate::ToValue> From<&T> for Ref {

@@ -129,6 +129,27 @@ impl Slice {
         };
     }
 
+    pub fn set(&mut self, value: crate::Value) {
+        return match self {
+            Self::Sized(v) => v.set(value),
+            Self::UnSized(v) => v.set(value),
+        };
+    }
+
+    pub fn set_slice(&mut self, value: Vec<crate::Value>) {
+        return match self {
+            Self::Sized(v) => v.set_slice(value),
+            Self::UnSized(v) => v.set_slice(value),
+        };
+    }
+
+    pub fn set_index(&mut self, index: usize, value: crate::Value) {
+        return match self {
+            Self::Sized(v) => v.set_index(index, value),
+            Self::UnSized(v) => v.set_index(index, value),
+        };
+    }
+
     pub fn is_sized(&self) -> bool {
         return match self {
             Self::Sized(_) => true,
@@ -161,6 +182,15 @@ impl Slice {
         return match self {
             Self::Sized(v) => v.iter(),
             Self::UnSized(v) => v.iter(),
+        };
+    }
+}
+
+impl crate::Value {
+    pub fn set_slice(&mut self, value: Vec<crate::Value>) {
+        return match self {
+            Self::Slice(v) => v.set_slice(value),
+            _ => panic!("called 'set_slice' on '{}'", self.to_type()),
         };
     }
 }

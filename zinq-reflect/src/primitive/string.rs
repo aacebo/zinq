@@ -80,6 +80,23 @@ impl String {
     pub fn get(&self) -> std::string::String {
         return self.0.clone();
     }
+
+    pub fn set(&mut self, value: crate::Value) {
+        self.0 = value.to_string().get();
+    }
+
+    pub fn set_string(&mut self, value: std::string::String) {
+        self.0 = value;
+    }
+}
+
+impl crate::Value {
+    pub fn set_string(&mut self, value: std::string::String) {
+        return match self {
+            Self::String(v) => v.set_string(value),
+            _ => panic!("called 'set_string' on '{}'", self.to_type()),
+        };
+    }
 }
 
 impl From<std::string::String> for crate::Value {

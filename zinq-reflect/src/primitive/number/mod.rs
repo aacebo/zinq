@@ -111,6 +111,13 @@ impl Number {
         };
     }
 
+    pub fn set(&mut self, value: crate::Value) {
+        return match self {
+            Self::Float(v) => v.set(value),
+            Self::Int(v) => v.set(value),
+        };
+    }
+
     pub fn is_int(&self) -> bool {
         return match self {
             Self::Int(_) => true,

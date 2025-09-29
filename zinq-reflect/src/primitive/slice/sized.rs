@@ -102,6 +102,18 @@ impl SizedSlice {
     pub fn get(&self) -> Vec<crate::Value> {
         return self.value.clone();
     }
+
+    pub fn set(&mut self, value: crate::Value) {
+        self.value = value.to_slice().get();
+    }
+
+    pub fn set_slice(&mut self, value: Vec<crate::Value>) {
+        self.value = value;
+    }
+
+    pub fn set_index(&mut self, index: usize, value: crate::Value) {
+        self.value[index] = value;
+    }
 }
 
 impl<const N: usize> From<[crate::Value; N]> for SizedSlice {
@@ -116,11 +128,17 @@ impl<const N: usize> From<[crate::Value; N]> for SizedSlice {
 
 impl std::fmt::Display for SizedSlice {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for value in &self.value {
+        write!(f, "[")?;
+
+        for (i, value) in self.value.iter().enumerate() {
             write!(f, "{}", value)?;
+
+            if i < self.value.len() - 1 {
+                write!(f, ", ")?;
+            }
         }
 
-        return Ok(());
+        return write!(f, "]");
     }
 }
 

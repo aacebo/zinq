@@ -20,6 +20,7 @@ mod method;
 mod param;
 mod path;
 pub mod primitive;
+mod set;
 mod type_id;
 mod type_of;
 mod value;
@@ -49,6 +50,8 @@ pub use method::*;
 pub use param::*;
 pub use path::*;
 pub use primitive::*;
+#[allow(unused)]
+pub use set::*;
 pub use type_id::*;
 pub use type_of::*;
 pub use value::*;

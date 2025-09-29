@@ -68,6 +68,12 @@ impl std::ops::Index<&str> for MetaData {
     }
 }
 
+impl std::ops::IndexMut<&str> for MetaData {
+    fn index_mut(&mut self, index: &str) -> &mut Self::Output {
+        return self.get_mut(index).unwrap();
+    }
+}
+
 impl std::fmt::Display for MetaData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{{")?;
@@ -95,7 +101,7 @@ impl crate::ToValue for MetaData {
         let mut map = crate::Map::new(&crate::type_of!(BTreeMap<String, crate::Value>).to_map());
 
         for (key, value) in &self.0 {
-            map.set(&key.to_value(), value);
+            map.set_key_value(key.to_value(), value.clone());
         }
 
         return crate::Value::Map(map);

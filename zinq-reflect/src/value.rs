@@ -203,7 +203,7 @@ impl Value {
     pub fn to_string(&self) -> String {
         return match self {
             Self::String(v) => v.clone(),
-            Self::Ref(v) => (*v.get().clone()).to_string(),
+            Self::Ref(v) => v.as_ref().to_string(),
             _ => panic!("called 'to_string' on '{}'", self.to_type()),
         };
     }
@@ -221,6 +221,34 @@ impl Value {
             Self::Map(v) => v.clone(),
             Self::Ref(v) => v.get().clone().to_map(),
             _ => panic!("called 'to_map' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn set_key_value(&mut self, key: crate::Value, value: crate::Value) {
+        return match self {
+            Self::Map(v) => v.set_key_value(key, value),
+            Self::Struct(v) => v.set_key_value(&key.to_string(), value),
+            Self::Ref(v) => v.set_key_value(key, value),
+            _ => panic!("called 'set_key_value' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn set_index(&mut self, index: usize, value: crate::Value) {
+        return match self {
+            Self::Slice(v) => v.set_index(index, value),
+            _ => panic!("called 'set_index' on '{}'", self.to_type()),
+        };
+    }
+
+    pub fn set(&mut self, value: crate::Value) {
+        return match self {
+            Self::Bool(v) => v.set(value),
+            Self::Number(v) => v.set(value),
+            Self::String(v) => v.set(value),
+            Self::Slice(v) => v.set(value),
+            Self::Ref(v) => v.set(value),
+            Self::Map(v) => v.set(value),
+            _ => panic!("called 'set' on '{}'", self.to_type()),
         };
     }
 }
@@ -244,6 +272,12 @@ impl crate::ToType for Value {
             Self::Map(v) => v.to_type(),
             _ => panic!("called 'to_type' on null"),
         };
+    }
+}
+
+impl crate::ToValue for Value {
+    fn to_value(self) -> crate::Value {
+        return self;
     }
 }
 
@@ -311,6 +345,7 @@ impl IndexMut<&str> for Value {
     fn index_mut(&mut self, index: &str) -> &mut Self::Output {
         return match self {
             Self::Struct(v) => v.index_mut(index),
+            Self::Map(v) => v.index_mut(&index.to_value()),
             _ => panic!("called 'IndexMut<&str>::index' on '{}'", self.to_type()),
         };
     }
@@ -325,6 +360,20 @@ impl Index<&Self> for Value {
             Self::Map(v) => v.index(index),
             Self::Slice(v) => v.index(index.to_i32().get() as usize),
             _ => panic!("called 'Index<&Value>::index' on '{}'", self.to_type()),
+        };
+    }
+}
+
+impl IndexMut<&Self> for Value {
+    fn index_mut(&mut self, index: &Self) -> &mut Self::Output {
+        return match self {
+            Self::Struct(v) => v.index_mut(index.to_string().as_str()),
+            Self::Map(v) => v.index_mut(index),
+            Self::Slice(v) => v.index_mut(index.to_i32().get() as usize),
+            _ => panic!(
+                "called 'IndexMut<&Value>::index_mut' on '{}'",
+                self.to_type()
+            ),
         };
     }
 }

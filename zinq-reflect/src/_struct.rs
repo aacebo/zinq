@@ -116,6 +116,10 @@ impl Struct {
     pub fn get_mut(&mut self, name: &str) -> Option<&mut crate::Value> {
         return self.fields.get_mut(name);
     }
+
+    pub fn set_key_value(&mut self, name: &str, value: crate::Value) {
+        self.fields.insert(name.to_string(), value.clone());
+    }
 }
 
 impl crate::ToType for Struct {
