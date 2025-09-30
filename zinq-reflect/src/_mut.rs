@@ -46,7 +46,7 @@ impl std::fmt::Display for MutType {
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Mut(Box<crate::Value>);
+pub struct Mut(pub(crate) Box<crate::Value>);
 
 impl Mut {
     pub fn to_type(&self) -> crate::Type {
@@ -73,7 +73,7 @@ impl Mut {
 impl crate::Value {
     pub fn set_mut(&mut self, value: Box<crate::Value>) {
         return match self {
-            Self::Mut(v) => v.set_mut(value),
+            Self::Mut(v) => v.get().set_mut(value),
             Self::Ref(v) => v.get().set_mut(value),
             _ => panic!("called 'set_mut' on '{}'", self.to_type()),
         };

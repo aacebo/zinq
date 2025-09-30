@@ -68,7 +68,7 @@ where
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Ref(Box<crate::Value>);
+pub struct Ref(pub(crate) Box<crate::Value>);
 
 impl Ref {
     pub fn to_type(&self) -> crate::Type {
