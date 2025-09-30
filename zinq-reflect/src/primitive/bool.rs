@@ -57,6 +57,10 @@ impl crate::ToType for bool {
 pub struct Bool(bool);
 
 impl Bool {
+    pub fn to_type(&self) -> crate::Type {
+        return bool::type_of();
+    }
+
     pub fn is_true(&self) -> bool {
         return self.0 == true;
     }
