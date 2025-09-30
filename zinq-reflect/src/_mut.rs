@@ -44,6 +44,24 @@ impl std::fmt::Display for MutType {
     }
 }
 
+impl<T> crate::TypeOf for &mut T
+where
+    T: crate::TypeOf,
+{
+    fn type_of() -> crate::Type {
+        return crate::MutType::new(&T::type_of()).to_type();
+    }
+}
+
+impl<T> crate::ToType for &mut T
+where
+    T: crate::TypeOf,
+{
+    fn to_type(&self) -> crate::Type {
+        return crate::MutType::new(&T::type_of()).to_type();
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Mut(pub(crate) Box<crate::Value>);
@@ -77,6 +95,16 @@ impl crate::Value {
             Self::Ref(v) => v.get().set_mut(value),
             _ => panic!("called 'set_mut' on '{}'", self.to_type()),
         };
+    }
+}
+
+impl<T> crate::ToValue for &mut T
+where
+    T: Clone + crate::ToValue,
+{
+    fn to_value(self) -> crate::Value {
+        let value = self.clone();
+        return crate::Value::Mut(Mut(Box::new(value.to_value())));
     }
 }
 
@@ -135,5 +163,19 @@ impl Eq for Mut {}
 impl Ord for Mut {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         return self.0.cmp(&other.0);
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{TypeOf, type_of, value_of};
+
+    #[test]
+    pub fn basic() {
+        let value = value_of!(&mut 11);
+        let ty = type_of!(&mut i8);
+
+        assert!(value.is_mut());
+        assert!(ty.is_mut());
     }
 }
