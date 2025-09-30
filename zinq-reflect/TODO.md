@@ -1,5 +1,6 @@
 # To Do (Reflect)
 
+- add type/value casting system
 - add new `UnionType` and `Union`
 - add new `TypeAlias`
 - add `MetaData` to:
