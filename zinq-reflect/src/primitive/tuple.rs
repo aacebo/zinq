@@ -94,7 +94,7 @@ macro_rules! tuple_type {
 
         $(
             #[derive(Debug, Clone, PartialEq)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
             pub struct $type_name([Box<crate::Type>; $len]);
 
             impl $type_name {

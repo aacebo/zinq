@@ -281,7 +281,7 @@ macro_rules! float_value {
 
         $(
             #[derive(Debug, Copy, Clone, PartialEq, Default)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
             pub struct $name($type);
 
             impl $name {
