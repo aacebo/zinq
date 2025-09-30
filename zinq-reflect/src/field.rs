@@ -69,6 +69,18 @@ impl FieldName {
     }
 }
 
+impl AsRef<Self> for FieldName {
+    fn as_ref(&self) -> &Self {
+        return self;
+    }
+}
+
+impl AsMut<Self> for FieldName {
+    fn as_mut(&mut self) -> &mut Self {
+        return self;
+    }
+}
+
 impl From<&FieldName> for FieldName {
     fn from(value: &FieldName) -> Self {
         return value.clone();
