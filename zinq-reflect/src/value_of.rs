@@ -19,6 +19,11 @@ pub trait ToValue {
     fn to_value(self) -> crate::Value;
 }
 
+/// ## Object
+/// 
+/// implemented by types that
+/// can reflect their value/type and that
+/// of their individual fields
 pub trait Object: std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue {
     fn field(&self, name: &crate::FieldName) -> crate::Value;
 }
