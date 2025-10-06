@@ -74,6 +74,8 @@ pub fn should_reflect_field() {
     assert_eq!(field.meta().len(), 1);
     assert!(field.meta().has("hello"));
     assert_eq!(field.meta().get("hello").unwrap(), &"world".to_value());
+    assert!(user.clone().to_value().is_any());
+    assert!(user.clone().to_value().to_any().is::<models::User>());
 }
 
 #[test]
