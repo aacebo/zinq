@@ -1,8 +1,3 @@
-use std::{
-    collections::BTreeMap,
-    ops::{Index, IndexMut},
-};
-
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
@@ -77,89 +72,5 @@ impl std::fmt::Display for StructType {
         }
 
         return write!(f, "struct {}{}{}", &self.name, &self.generics, &self.fields);
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Struct {
-    ty: StructType,
-    fields: BTreeMap<String, crate::Value>,
-}
-
-impl Struct {
-    pub fn new(ty: &StructType) -> Self {
-        let mut fields = BTreeMap::new();
-
-        for field in ty.fields().iter() {
-            fields.insert(field.name().to_string(), crate::Value::Null);
-        }
-
-        return Self {
-            ty: ty.clone(),
-            fields,
-        };
-    }
-
-    pub fn to_type(&self) -> crate::Type {
-        return crate::Type::Struct(self.ty.clone());
-    }
-
-    pub fn iter(&self) -> std::collections::btree_map::Iter<'_, String, crate::Value> {
-        return self.fields.iter();
-    }
-
-    pub fn get(&self, name: &str) -> Option<&crate::Value> {
-        return self.fields.get(name);
-    }
-
-    pub fn get_mut(&mut self, name: &str) -> Option<&mut crate::Value> {
-        return self.fields.get_mut(name);
-    }
-
-    pub fn set_key_value(&mut self, name: &str, value: crate::Value) {
-        self.fields.insert(name.to_string(), value.clone());
-    }
-}
-
-impl crate::ToType for Struct {
-    fn to_type(&self) -> crate::Type {
-        return crate::Type::Struct(self.ty.clone());
-    }
-}
-
-impl crate::ToValue for Struct {
-    fn to_value(self) -> crate::Value {
-        return crate::Value::Struct(self.clone());
-    }
-}
-
-impl Index<&str> for Struct {
-    type Output = crate::Value;
-
-    fn index(&self, index: &str) -> &Self::Output {
-        return self.fields.index(index);
-    }
-}
-
-impl IndexMut<&str> for Struct {
-    fn index_mut(&mut self, index: &str) -> &mut Self::Output {
-        return self.fields.get_mut(index).unwrap();
-    }
-}
-
-impl std::fmt::Display for Struct {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{{")?;
-
-        for (key, value) in &self.fields {
-            write!(f, "\n\t{}: {}", key, value)?;
-        }
-
-        if self.fields.len() > 0 {
-            write!(f, "\n")?;
-        }
-
-        return write!(f, "}}");
     }
 }

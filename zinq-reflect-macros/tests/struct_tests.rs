@@ -87,7 +87,7 @@ pub fn should_reflect_enum() {
     assert!(
         kind.to_type().to_enum().variant("Admin").fields()[0]
             .ty()
-            .is_string()
+            .is_str()
     );
     assert!(
         kind.to_type()

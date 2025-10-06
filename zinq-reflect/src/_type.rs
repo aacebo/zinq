@@ -5,17 +5,16 @@ pub enum Type {
     Bool(crate::BoolType),
     Enum(crate::EnumType),
     Number(crate::NumberType),
-    String(crate::StringType),
+    Str(crate::StrType),
     Ref(crate::RefType),
     Slice(crate::SliceType),
+    Map(crate::MapType),
     Struct(crate::StructType),
     _Self(crate::SelfType),
     Tuple(crate::TupleType),
     Trait(crate::TraitType),
     Mut(crate::MutType),
     Mod(crate::ModType),
-    Seq(crate::SeqType),
-    Map(crate::MapType),
     Void,
 }
 
@@ -26,17 +25,16 @@ impl Type {
             Self::Bool(v) => v.id(),
             Self::Enum(v) => v.id(),
             Self::Number(v) => v.id(),
-            Self::String(v) => v.id(),
+            Self::Str(v) => v.id(),
             Self::Ref(v) => v.id(),
             Self::Slice(v) => v.id(),
+            Self::Map(v) => v.id(),
             Self::Struct(v) => v.id(),
             Self::_Self(v) => v.id(),
             Self::Tuple(v) => v.id(),
             Self::Trait(v) => v.id(),
             Self::Mut(v) => v.id(),
             Self::Mod(v) => v.id(),
-            Self::Seq(v) => v.id(),
-            Self::Map(v) => v.id(),
             Self::Void => crate::TypeId::from_str("void"),
         };
     }
@@ -49,31 +47,28 @@ impl Type {
             Self::Tuple(v) => v.len(),
             Self::Trait(v) => v.len(),
             Self::Mod(v) => v.len(),
-            Self::Seq(v) => v.len(),
             _ => panic!("called 'len' on '{}'", self.id()),
         };
     }
 
     pub fn path(&self) -> &crate::Path {
         return match self {
+            Self::Map(v) => v.path(),
             Self::Struct(v) => v.path(),
             Self::Enum(v) => v.path(),
             Self::Trait(v) => v.path(),
             Self::Mod(v) => v.path(),
-            Self::Seq(v) => v.path(),
-            Self::Map(v) => v.path(),
             _ => panic!("called 'path' on '{}'", self.id()),
         };
     }
 
     pub fn meta(&self) -> &crate::MetaData {
         return match self {
+            Self::Map(v) => v.meta(),
             Self::Struct(v) => v.meta(),
             Self::Enum(v) => v.meta(),
             Self::Trait(v) => v.meta(),
             Self::Mod(v) => v.meta(),
-            Self::Seq(v) => v.meta(),
-            Self::Map(v) => v.meta(),
             _ => panic!("called 'meta' on '{}'", self.id()),
         };
     }
@@ -187,9 +182,9 @@ impl Type {
         };
     }
 
-    pub fn is_string(&self) -> bool {
+    pub fn is_str(&self) -> bool {
         return match self {
-            Self::String(_) => true,
+            Self::Str(_) => true,
             _ => false,
         };
     }
@@ -239,13 +234,6 @@ impl Type {
     pub fn is_mod(&self) -> bool {
         return match self {
             Self::Mod(_) => true,
-            _ => false,
-        };
-    }
-
-    pub fn is_seq(&self) -> bool {
-        return match self {
-            Self::Seq(_) => true,
             _ => false,
         };
     }
@@ -376,17 +364,17 @@ impl Type {
         };
     }
 
-    pub fn to_string(&self) -> crate::StringType {
+    pub fn to_str(&self) -> crate::StrType {
         return match self {
-            Self::String(v) => v.clone(),
-            _ => panic!("called 'to_string' on '{}'", self.id()),
+            Self::Str(v) => v.clone(),
+            _ => panic!("called 'to_str' on '{}'", self.id()),
         };
     }
 
-    pub fn as_string(&self) -> &crate::StringType {
+    pub fn as_str(&self) -> &crate::StrType {
         return match self {
-            Self::String(v) => v,
-            _ => panic!("called 'as_string' on '{}'", self.id()),
+            Self::Str(v) => v,
+            _ => panic!("called 'as_str' on '{}'", self.id()),
         };
     }
 
@@ -460,20 +448,6 @@ impl Type {
         };
     }
 
-    pub fn to_seq(&self) -> crate::SeqType {
-        return match self {
-            Self::Seq(v) => v.clone(),
-            _ => panic!("called 'to_seq' on '{}'", self.id()),
-        };
-    }
-
-    pub fn as_seq(&self) -> &crate::SeqType {
-        return match self {
-            Self::Seq(v) => v,
-            _ => panic!("called 'as_seq' on '{}'", self.id()),
-        };
-    }
-
     pub fn to_map(&self) -> crate::MapType {
         return match self {
             Self::Map(v) => v.clone(),
@@ -493,7 +467,7 @@ impl Type {
             Self::Bool(v) => v.assignable_to(ty),
             Self::Enum(v) => v.assignable_to(ty),
             Self::Number(v) => v.assignable_to(ty),
-            Self::String(v) => v.assignable_to(ty),
+            Self::Str(v) => v.assignable_to(ty),
             Self::Ref(v) => v.assignable_to(ty),
             Self::Slice(v) => v.assignable_to(ty),
             Self::Struct(v) => v.assignable_to(ty),
@@ -502,7 +476,6 @@ impl Type {
             Self::Trait(v) => v.assignable_to(ty),
             Self::Mut(v) => v.assignable_to(ty),
             Self::Mod(v) => v.assignable_to(ty),
-            Self::Seq(v) => v.assignable_to(ty),
             Self::Map(v) => v.assignable_to(ty),
             _ => false,
         };
@@ -513,7 +486,7 @@ impl Type {
             Self::Bool(v) => v.convertable_to(ty),
             Self::Enum(v) => v.convertable_to(ty),
             Self::Number(v) => v.convertable_to(ty),
-            Self::String(v) => v.convertable_to(ty),
+            Self::Str(v) => v.convertable_to(ty),
             Self::Ref(v) => v.convertable_to(ty),
             Self::Slice(v) => v.convertable_to(ty),
             Self::Struct(v) => v.convertable_to(ty),
@@ -522,7 +495,6 @@ impl Type {
             Self::Trait(v) => v.convertable_to(ty),
             Self::Mut(v) => v.convertable_to(ty),
             Self::Mod(v) => v.convertable_to(ty),
-            Self::Seq(v) => v.convertable_to(ty),
             Self::Map(v) => v.convertable_to(ty),
             _ => false,
         };
@@ -536,7 +508,7 @@ impl std::fmt::Display for Type {
             Self::Bool(v) => write!(f, "{}", v),
             Self::Enum(v) => write!(f, "{}", v),
             Self::Number(v) => write!(f, "{}", v),
-            Self::String(v) => write!(f, "{}", v),
+            Self::Str(v) => write!(f, "{}", v),
             Self::Ref(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
@@ -545,7 +517,6 @@ impl std::fmt::Display for Type {
             Self::Trait(v) => write!(f, "{}", v),
             Self::Mut(v) => write!(f, "{}", v),
             Self::Mod(v) => write!(f, "{}", v),
-            Self::Seq(v) => write!(f, "{}", v),
             Self::Map(v) => write!(f, "{}", v),
             Self::Void => write!(f, "void"),
         };

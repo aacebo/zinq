@@ -28,7 +28,7 @@ mod test {
         let value = value_of!(1_i8);
 
         assert!(value.is_i8());
-        assert_eq!(value.to_i8().get(), 1);
+        assert_eq!(value.to_i8(), 1);
     }
 
     #[test]
@@ -36,8 +36,7 @@ mod test {
         let value = value_of!(&1_i8);
 
         assert!(value.is_ref());
-        assert!(value.is_ref_of(type_of!(i8)));
-        assert_eq!(value.to_ref().get().to_i8().get(), 1);
+        assert_eq!(value.to_ref().to_i8(), 1);
         assert_eq!(value.to_type().id(), "&i8");
     }
 }

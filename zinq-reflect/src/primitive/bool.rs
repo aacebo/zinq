@@ -1,5 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
 use crate::TypeOf;
 
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
@@ -36,6 +34,12 @@ impl crate::ToType for BoolType {
     }
 }
 
+impl PartialEq<crate::Type> for BoolType {
+    fn eq(&self, other: &crate::Type) -> bool {
+        return other.is_bool() && other.as_bool() == self;
+    }
+}
+
 impl crate::TypeOf for bool {
     fn type_of() -> crate::Type {
         return crate::Type::Bool(BoolType::default());
@@ -48,134 +52,49 @@ impl crate::ToType for bool {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize),
-    serde(transparent)
-)]
-pub struct Bool(bool);
-
-impl Bool {
-    pub fn to_type(&self) -> crate::Type {
-        return bool::type_of();
-    }
-
-    pub fn is_true(&self) -> bool {
-        return self.0 == true;
-    }
-
-    pub fn is_false(&self) -> bool {
-        return self.0 == false;
-    }
-
-    pub fn get(&self) -> bool {
-        return self.0;
-    }
-
-    pub fn set(&mut self, value: crate::Value) {
-        self.0 = value.to_bool().get();
-    }
-
-    pub fn set_bool(&mut self, value: bool) {
-        self.0 = value;
-    }
-}
-
-impl crate::Value {
-    pub fn set_bool(&mut self, value: bool) {
-        return match self {
-            Self::Bool(v) => v.set_bool(value),
-            _ => panic!("called 'set_bool' on '{}'", self.to_type()),
-        };
-    }
-}
-
-impl From<bool> for crate::Value {
+impl From<bool> for crate::Any {
     fn from(value: bool) -> Self {
-        return Self::Bool(Bool(value));
+        return Self::new(value);
     }
 }
 
-impl Into<bool> for crate::Value {
+impl Into<bool> for crate::Any {
     fn into(self) -> bool {
-        return self.to_bool().get();
-    }
-}
-
-impl From<bool> for Bool {
-    fn from(value: bool) -> Self {
-        return Self(value);
-    }
-}
-
-impl Into<bool> for Bool {
-    fn into(self) -> bool {
-        return self.0;
-    }
-}
-
-impl std::fmt::Display for Bool {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.as_ref());
-    }
-}
-
-impl crate::TypeOf for Bool {
-    fn type_of() -> crate::Type {
-        return bool::type_of();
-    }
-}
-
-impl crate::ToType for Bool {
-    fn to_type(&self) -> crate::Type {
-        return bool::type_of();
-    }
-}
-
-impl crate::ToValue for Bool {
-    fn to_value(self) -> crate::Value {
-        return crate::Value::Bool(self.clone());
+        return self.to_bool();
     }
 }
 
 impl crate::ToValue for bool {
     fn to_value(self) -> crate::Value {
-        return crate::Value::Bool(Bool(self.clone()));
+        return crate::Value::Bool(self);
     }
 }
 
-impl AsRef<bool> for Bool {
-    fn as_ref(&self) -> &bool {
-        return &self.0;
+impl crate::Value {
+    pub fn is_true(&self) -> bool {
+        return self.is_bool() && self.to_bool() == true;
+    }
+
+    pub fn is_false(&self) -> bool {
+        return self.is_bool() && self.to_bool() == false;
     }
 }
 
-impl AsMut<bool> for Bool {
-    fn as_mut(&mut self) -> &mut bool {
-        return &mut self.0;
+impl crate::Any {
+    pub fn is_bool(&self) -> bool {
+        return self.ty.is_bool();
     }
-}
 
-impl Deref for Bool {
-    type Target = bool;
-
-    fn deref(&self) -> &Self::Target {
-        return &self.0;
+    pub fn is_true(&self) -> bool {
+        return *self.to::<bool>() == true;
     }
-}
 
-impl DerefMut for Bool {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        return &mut self.0;
+    pub fn is_false(&self) -> bool {
+        return *self.to::<bool>() == false;
     }
-}
 
-impl Eq for Bool {}
-
-impl Ord for Bool {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        return self.0.cmp(&other.0);
+    pub fn to_bool(&self) -> bool {
+        return self.to::<bool>().clone();
     }
 }
 
@@ -189,7 +108,7 @@ mod test {
 
         assert!(value.is_bool());
         assert!(value.is_true());
-        assert!(value.to_bool().get());
+        assert!(value.to_bool());
     }
 
     #[test]
@@ -198,6 +117,6 @@ mod test {
 
         assert!(value.is_bool());
         assert!(value.is_false());
-        assert!(!value.to_bool().get());
+        assert!(!value.to_bool());
     }
 }

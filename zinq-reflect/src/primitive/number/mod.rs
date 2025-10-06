@@ -90,6 +90,15 @@ impl NumberType {
     }
 }
 
+impl PartialEq<crate::Type> for NumberType {
+    fn eq(&self, other: &crate::Type) -> bool {
+        return match other {
+            crate::Type::Number(v) => v == self,
+            _ => false,
+        };
+    }
+}
+
 impl std::fmt::Display for NumberType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
@@ -108,7 +117,7 @@ impl crate::ToType for NumberType {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Number {
     Int(Int),
@@ -120,13 +129,6 @@ impl Number {
         return match self {
             Self::Int(v) => v.to_type(),
             Self::Float(v) => v.to_type(),
-        };
-    }
-
-    pub fn set(&mut self, value: crate::Value) {
-        return match self {
-            Self::Float(v) => v.set(value),
-            Self::Int(v) => v.set(value),
         };
     }
 
@@ -146,68 +148,56 @@ impl Number {
 
     pub fn to_int(&self) -> Int {
         return match self {
-            Self::Int(v) => v.clone(),
-            _ => panic!("called 'to_int' on type '{}'", self.to_type().id()),
+            Self::Int(v) => *v,
+            v => panic!("called 'to_int' on '{}'", v.to_type()),
         };
     }
 
     pub fn as_int(&self) -> &Int {
         return match self {
             Self::Int(v) => v,
-            _ => panic!("called 'as_int' on type '{}'", self.to_type().id()),
+            v => panic!("called 'as_int' on '{}'", v.to_type()),
         };
     }
 
     pub fn to_float(&self) -> Float {
         return match self {
-            Self::Float(v) => v.clone(),
-            _ => panic!("called 'to_float' on type '{}'", self.to_type().id()),
+            Self::Float(v) => *v,
+            v => panic!("called 'to_float' on '{}'", v.to_type()),
         };
     }
 
     pub fn as_float(&self) -> &Float {
         return match self {
             Self::Float(v) => v,
-            _ => panic!("called 'as_float' on type '{}'", self.to_type().id()),
+            v => panic!("called 'as_float' on '{}'", v.to_type()),
         };
+    }
+
+    pub fn set_int(&mut self, value: Int) {
+        *self = Self::Int(value);
+    }
+
+    pub fn set_float(&mut self, value: Float) {
+        *self = Self::Float(value);
     }
 }
 
-impl Eq for Number {}
-
-impl Ord for Number {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        return match self {
-            Self::Float(_) => panic!("called 'Ord::cmp' on Float"),
-            Self::Int(v) => v.cmp(&other.to_int()),
-        };
-    }
-}
-
-impl PartialOrd for Number {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        return match self {
-            Self::Float(_) => None,
-            Self::Int(v) => v.partial_cmp(&other.to_int()),
-        };
-    }
-}
-
-impl crate::ToType for Number {
-    fn to_type(&self) -> crate::Type {
-        return match self {
-            Self::Int(v) => v.to_type(),
-            Self::Float(v) => v.to_type(),
-        };
+impl crate::Any {
+    pub fn is_number(&self) -> bool {
+        return self.is_int() || self.is_float();
     }
 }
 
 impl crate::ToValue for Number {
     fn to_value(self) -> crate::Value {
-        return match self {
-            Self::Int(v) => v.to_value(),
-            Self::Float(v) => v.to_value(),
-        };
+        return crate::Value::Number(self.clone());
+    }
+}
+
+impl PartialEq<crate::Value> for Number {
+    fn eq(&self, other: &crate::Value) -> bool {
+        return other.is_number() && other.as_number() == self;
     }
 }
 

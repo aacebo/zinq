@@ -1,7 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
-use crate::ToValue;
-
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(
     feature = "serde",
@@ -52,6 +48,15 @@ impl crate::ToType for RefType {
     }
 }
 
+impl PartialEq<crate::Type> for RefType {
+    fn eq(&self, other: &crate::Type) -> bool {
+        return match other {
+            crate::Type::Ref(v) => v == self,
+            _ => false,
+        };
+    }
+}
+
 impl<T> crate::TypeOf for &T
 where
     T: crate::TypeOf,
@@ -70,60 +75,24 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize),
-    serde(transparent)
-)]
-pub struct Ref(pub(crate) Box<crate::Value>);
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Ref {
+    pub(crate) ty: RefType,
+    pub(crate) value: Box<crate::Value>,
+}
 
 impl Ref {
     pub fn to_type(&self) -> crate::Type {
-        return RefType::new(&self.0.to_type()).to_type();
+        return self.ty.to_type();
     }
 
-    pub fn get(&self) -> Box<crate::Value> {
-        return self.0.clone();
+    pub fn ty(&self) -> &crate::Type {
+        return &self.ty.0;
     }
 
-    pub fn get_mut(&mut self) -> &mut crate::Value {
-        return &mut self.0;
-    }
-
-    pub fn set(&mut self, value: crate::Value) {
-        self.0 = value.to_ref().get();
-    }
-
-    pub fn set_ref(&mut self, value: Box<crate::Value>) {
-        self.0 = value;
-    }
-}
-
-impl crate::Value {
-    pub fn set_ref(&mut self, value: Box<crate::Value>) {
-        return match self {
-            Self::Ref(v) => v.set_ref(value),
-            _ => panic!("called 'set_ref' on '{}'", self.to_type()),
-        };
-    }
-}
-
-impl<T: Clone + crate::ToValue> From<&T> for Ref {
-    fn from(value: &T) -> Self {
-        return Self(Box::new(value.to_value()));
-    }
-}
-
-impl std::fmt::Display for Ref {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.as_ref());
-    }
-}
-
-impl crate::ToType for Ref {
-    fn to_type(&self) -> crate::Type {
-        return RefType::new(&self.0.to_type()).to_type();
+    pub fn value(&self) -> &crate::Value {
+        return &self.value;
     }
 }
 
@@ -133,47 +102,65 @@ impl crate::ToValue for Ref {
     }
 }
 
-impl<T> crate::ToValue for &T
-where
-    T: Clone + crate::ToValue,
-{
-    fn to_value(self) -> crate::Value {
-        let value = self.clone();
-        return crate::Value::Ref(Ref(Box::new(value.to_value())));
-    }
-}
-
 impl AsRef<crate::Value> for Ref {
     fn as_ref(&self) -> &crate::Value {
-        return &self.0;
+        return &self.value;
     }
 }
 
 impl AsMut<crate::Value> for Ref {
     fn as_mut(&mut self) -> &mut crate::Value {
-        return &mut self.0;
+        return &mut self.value;
     }
 }
 
-impl Deref for Ref {
+impl std::ops::Deref for Ref {
     type Target = crate::Value;
 
     fn deref(&self) -> &Self::Target {
-        return &self.0;
+        return &self.value;
     }
 }
 
-impl DerefMut for Ref {
+impl std::ops::DerefMut for Ref {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        return &mut self.0;
+        return &mut self.value;
     }
 }
 
-impl Eq for Ref {}
+impl std::fmt::Display for Ref {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "{}", &self.value);
+    }
+}
 
-impl Ord for Ref {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        return self.0.cmp(&other.0);
+impl PartialEq<crate::Value> for Ref {
+    fn eq(&self, other: &crate::Value) -> bool {
+        return other.is_ref() && other.to_ref() == *self;
+    }
+}
+
+impl<T> crate::ToValue for &T
+where
+    T: Clone + crate::ToValue + crate::TypeOf,
+{
+    fn to_value(self) -> crate::Value {
+        return crate::Value::Ref(Ref {
+            ty: RefType(Box::new(T::type_of())),
+            value: Box::new(self.clone().to_value()),
+        });
+    }
+}
+
+impl<T> From<&T> for crate::Value
+where
+    T: Clone + crate::ToValue + crate::ToType,
+{
+    fn from(value: &T) -> Self {
+        return Self::Ref(Ref {
+            ty: RefType(Box::new(value.to_type())),
+            value: Box::new(value.clone().to_value()),
+        });
     }
 }
 
@@ -186,9 +173,9 @@ mod test {
         let value = value_of!(&3_i32);
 
         assert!(value.is_ref());
-        assert!(value.is_ref_of(type_of!(i32)));
+        assert_eq!(value.to_ref().ty(), &type_of!(i32));
         assert_eq!(value.to_type().id(), "&i32");
-        assert_eq!(value.to_ref().get().to_i32().get(), 3);
+        assert_eq!(value.to_i32(), 3);
     }
 
     #[test]
@@ -196,8 +183,8 @@ mod test {
         let value = value_of!(&true);
 
         assert!(value.is_ref());
-        assert!(value.is_ref_of(type_of!(bool)));
+        assert_eq!(value.to_ref().ty(), &type_of!(bool));
         assert_eq!(value.to_type().id(), "&bool");
-        assert!(value.to_ref().get().to_bool().get());
+        assert!(value.to_bool());
     }
 }

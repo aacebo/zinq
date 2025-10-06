@@ -1,7 +1,5 @@
-use crate::TypeOf;
-
-macro_rules! int_type {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $type:ty)*) => {
+macro_rules! int {
+    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set_value:ident $coerce_value:ident $type:ty ,)*) => {
         #[derive(Debug, Copy, Clone, PartialEq)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum IntType {
@@ -23,6 +21,10 @@ macro_rules! int_type {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
+
+                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
+                }
             )*
         }
 
@@ -41,6 +43,10 @@ macro_rules! int_type {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
+
+                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
+                }
             )*
         }
 
@@ -52,12 +58,6 @@ macro_rules! int_type {
             pub fn id(&self) -> crate::TypeId {
                 return match self {
                     $(Self::$name(v) => v.id(),)*
-                };
-            }
-
-            pub fn len(&self) -> usize {
-                return match self {
-                    $(Self::$name(v) => v.len(),)*
                 };
             }
 
@@ -81,6 +81,10 @@ macro_rules! int_type {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
+
+                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
+                }
             )*
 
             pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -93,6 +97,16 @@ macro_rules! int_type {
                 return match self {
                     $(Self::$name(v) => v.convertable_to(ty),)*
                 };
+            }
+        }
+
+        ///
+        /// IntType: Implementations
+        ///
+
+        impl PartialEq<crate::Type> for IntType {
+            fn eq(&self, other: &crate::Type) -> bool {
+                return other.is_int() && other.as_number().as_int() == self;
             }
         }
 
@@ -110,6 +124,10 @@ macro_rules! int_type {
             }
         }
 
+        ///
+        /// Type: Definitions
+        ///
+
         $(
             #[derive(Debug, Copy, Clone, PartialEq, Default)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -118,10 +136,6 @@ macro_rules! int_type {
             impl $type_name {
                 pub fn id(&self) -> crate::TypeId {
                     return crate::TypeId::from_str(stringify!($type));
-                }
-
-                pub fn len(&self) -> usize {
-                    panic!("'Type::len()' called on non-array type '{}'", stringify!($name));
                 }
 
                 pub fn is_signed(&self) -> bool {
@@ -134,6 +148,10 @@ macro_rules! int_type {
 
                 pub fn convertable_to(&self, ty: crate::Type) -> bool {
                     return ty.is_int() && self.is_signed() == ty.is_signed();
+                }
+
+                pub fn coerce(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
                 }
             }
 
@@ -154,19 +172,61 @@ macro_rules! int_type {
                     return crate::Type::Number(crate::NumberType::Int(IntType::$name($type_name)));
                 }
             }
-        )*
-    };
-}
 
-macro_rules! int_value {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set:ident $type:ty)*) => {
-        #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
-        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-        pub enum Int {
-            $($name($name),)*
+            impl PartialEq<crate::Type> for $type_name {
+                fn eq(&self, other: &crate::Type) -> bool {
+                    return match other {
+                        crate::Type::Number(v) => v.$is_type() && (v.$to_type() == *self),
+                        _ => false,
+                    };
+                }
+            }
+        )*
+
+        ///
+        /// Value
+        ///
+
+        ///
+        /// Any: Implementations
+        ///
+
+        impl crate::Any {
+            pub fn is_int(&self) -> bool {
+                if $(self.$is_type() ||)* false {
+                    return true;
+                }
+
+                return false;
+            }
+
+            $(
+                pub fn $is_type(&self) -> bool {
+                    return self.is::<$type>();
+                }
+
+                pub fn $to_type(&self) -> $type {
+                    return self.to::<$type>().clone();
+                }
+
+                pub fn $set_value(&mut self, value: $type) {
+                    self.set(value);
+                }
+            )*
         }
 
+        ///
+        /// Value: Implementations
+        ///
+
         impl crate::Value {
+            pub fn is_int(&self) -> bool {
+                return match self {
+                    Self::Number(v) => v.is_int(),
+                    _ => false,
+                };
+            }
+
             $(
                 pub fn $is_type(&self) -> bool {
                     return match self {
@@ -175,21 +235,61 @@ macro_rules! int_value {
                     };
                 }
 
-                pub fn $to_type(&self) -> $name {
+                pub fn $to_type(&self) -> $type {
                     return match self {
                         Self::Number(v) => v.$to_type(),
+                        Self::Ref(v) => v.value().$to_type(),
+                        Self::Mut(v) => v.value().$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
-                    };
-                }
-
-                pub fn $set(&mut self, value: $type) {
-                    return match self {
-                        Self::Number(v) => v.$set(value),
-                        v => panic!("called '{}' on type '{}'", stringify!($set), v.to_type()),
                     };
                 }
             )*
         }
+
+        $(
+            impl crate::ToValue for $type {
+                fn to_value(self) -> crate::Value {
+                    return crate::Value::Number(crate::Number::Int(crate::Int::$name(self)));
+                }
+            }
+
+            impl From<$type> for crate::Value {
+                fn from(value: $type) -> Self {
+                    return Self::Number(crate::Number::Int(crate::Int::$name(value)));
+                }
+            }
+
+            impl Into<$type> for crate::Value {
+                fn into(self) -> $type {
+                    return match self {
+                        Self::Number(v) => v.to_int().$to_type(),
+                        v => panic!("called 'Into<{}>::into' on type '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsRef<$type> for crate::Value {
+                fn as_ref(&self) -> &$type {
+                    return match self {
+                        Self::Number(v) => AsRef::<$type>::as_ref(v),
+                        v => panic!("called 'AsRef<{}>::as_ref' on type '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsMut<$type> for crate::Value {
+                fn as_mut(&mut self) -> &mut $type {
+                    return match self {
+                        Self::Number(v) => AsMut::<$type>::as_mut(v),
+                        v => panic!("called 'AsMut<{}>::as_mut' on type '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+        )*
+
+        ///
+        /// Number: Implementations
+        ///
 
         impl crate::Number {
             $(
@@ -200,32 +300,69 @@ macro_rules! int_value {
                     };
                 }
 
-                pub fn $to_type(&self) -> $name {
+                pub fn $to_type(&self) -> $type {
                     return match self {
                         Self::Int(v) => v.$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
+            )*
+        }
 
-                pub fn $set(&mut self, value: $type) {
+        $(
+            impl From<$type> for crate::Number {
+                fn from(value: $type) -> Self {
+                    return Self::Int(Int::$name(value));
+                }
+            }
+
+            impl Into<$type> for crate::Number {
+                fn into(self) -> $type {
                     return match self {
-                        Self::Int(v) => v.$set(value),
-                        v => panic!("called '{}' on type '{}'", stringify!($set), v.to_type()),
+                        Self::Int(v) => v.$to_type(),
+                        v => panic!("called 'Into<{}>::into' on '{}'", stringify!($type), v.to_type()),
                     };
                 }
-            )*
+            }
+
+            impl AsRef<$type> for crate::Number {
+                fn as_ref(&self) -> &$type {
+                    return match self {
+                        Self::Int(v) => match v {
+                            Int::$name(v) => v,
+                            v => panic!("called 'AsRef<{}>::as_ref' on '{}'", stringify!($type), v.to_type()),
+                        },
+                        v => panic!("called 'AsRef<{}>::as_ref' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsMut<$type> for crate::Number {
+                fn as_mut(&mut self) -> &mut $type {
+                    return match self {
+                        Self::Int(v) => match v {
+                            Int::$name(v) => v,
+                            v => panic!("called 'AsMut<{}>::as_mut' on '{}'", stringify!($type), v.to_type()),
+                        },
+                        v => panic!("called 'AsMut<{}>::as_mut' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+        )*
+
+        ///
+        /// Int: Value
+        ///
+        #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+        pub enum Int {
+            $($name($type),)*
         }
 
         impl Int {
             pub fn to_type(&self) -> crate::Type {
                 return match self {
-                    $(Self::$name(v) => v.to_type(),)*
-                };
-            }
-
-            pub fn set(&mut self, value: crate::Value) {
-                return match self {
-                    $(Self::$name(v) => v.set(value),)*
+                    $(Self::$name(_) => crate::Type::Number(crate::NumberType::Int(IntType::$name($type_name))),)*
                 };
             }
 
@@ -237,192 +374,83 @@ macro_rules! int_value {
                     };
                 }
 
-                pub fn $to_type(&self) -> $name {
+                pub fn $to_type(&self) -> $type {
                     return match self {
-                        Self::$name(v) => v.clone(),
-                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
+                        Self::$name(v) => *v,
+                        _ => panic!("called '{}' on '{}'", stringify!($to_type), stringify!($type)),
                     };
                 }
 
-                pub fn $set(&mut self, value: $type) {
-                    return match self {
-                        Self::$name(v) => v.$set(value),
-                        v => panic!("called '{}' on type '{}'", stringify!($set), v.to_type()),
-                    };
+                pub fn $set_value(&mut self, value: $type) {
+                    *self = Self::$name(value);
                 }
             )*
         }
 
-        impl Eq for Int {}
-
-        impl Ord for Int {
-            fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-                return match self {
-                    $(Self::$name(v) => other.$to_type().cmp(v),)*
-                };
-            }
-        }
-
-        impl crate::ToType for Int {
-            fn to_type(&self) -> crate::Type {
-                return match self {
-                    $(Self::$name(v) => v.to_type(),)*
-                };
-            }
-        }
-
-        impl crate::ToValue for Int {
+        impl crate::ToValue for crate::Int {
             fn to_value(self) -> crate::Value {
-                return match self {
-                    $(Self::$name(v) => v.to_value(),)*
-                };
+                return crate::Value::Number(crate::Number::Int(self.clone()));
             }
         }
 
-        impl std::fmt::Display for Int {
+        $(
+            impl From<$type> for crate::Int {
+                fn from(value: $type) -> Self {
+                    return Self::$name(value);
+                }
+            }
+
+            impl Into<$type> for crate::Int {
+                fn into(self) -> $type {
+                    return self.$to_type();
+                }
+            }
+
+           impl AsRef<$type> for crate::Int {
+                fn as_ref(&self) -> &$type {
+                    return match self {
+                        Self::$name(v) => v,
+                        v => panic!("called 'AsRef<{}>::as_ref' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsMut<$type> for crate::Int {
+                fn as_mut(&mut self) -> &mut $type {
+                    return match self {
+                        Self::$name(v) => v,
+                        v => panic!("called 'AsMut<{}>::as_mut' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+        )*
+
+        impl PartialEq<crate::Value> for crate::Int {
+            fn eq(&self, other: &crate::Value) -> bool {
+                return other.is_int() && other.as_number().as_int() == self;
+            }
+        }
+
+        impl std::fmt::Display for crate::Int {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
                     $(Self::$name(v) => write!(f, "{}", v),)*
                 };
             }
         }
-
-        $(
-            #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-            pub struct $name($type);
-
-            impl $name {
-                pub fn to_type(&self) -> crate::Type {
-                    return <$type>::type_of();
-                }
-
-                pub fn get(&self) -> $type {
-                    return self.0;
-                }
-
-                pub fn set(&mut self, value: crate::Value) {
-                    self.0 = value.into();
-                }
-
-                pub fn $set(&mut self, value: $type) {
-                    self.0 = value;
-                }
-            }
-
-            impl Eq for crate::$name {}
-
-            impl Ord for crate::$name {
-                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-                    return self.0.cmp(&other.0);
-                }
-            }
-
-            impl From<$type> for crate::Value {
-                fn from(value: $type) -> Self {
-                    return Self::Number(crate::Number::Int(crate::Int::$name($name(value))));
-                }
-            }
-
-            impl Into<$type> for crate::Value {
-                fn into(self) -> $type {
-                    return self.$to_type().get();
-                }
-            }
-
-            impl From<$type> for $name {
-                fn from(value: $type) -> Self {
-                    return Self(value);
-                }
-            }
-
-            impl Into<$type> for $name {
-                fn into(self) -> $type {
-                    return self.0;
-                }
-            }
-
-            impl AsRef<$type> for $name {
-                fn as_ref(&self) -> &$type {
-                    return &self.0;
-                }
-            }
-
-            impl AsMut<$type> for $name {
-                fn as_mut(&mut self) -> &mut $type {
-                    return &mut self.0;
-                }
-            }
-
-            impl std::ops::Deref for $name {
-                type Target = $type;
-
-                fn deref(&self) -> &Self::Target {
-                    return &self.0;
-                }
-            }
-
-            impl std::ops::DerefMut for $name {
-                fn deref_mut(&mut self) -> &mut Self::Target {
-                    return &mut self.0;
-                }
-            }
-
-            impl std::fmt::Display for $name {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    return write!(f, "{}", self.as_ref());
-                }
-            }
-
-            impl crate::TypeOf for $name {
-                fn type_of() -> crate::Type {
-                    return <$type>::type_of();
-                }
-            }
-
-            impl crate::ToType for $name {
-                fn to_type(&self) -> crate::Type {
-                    return <$type>::type_of();
-                }
-            }
-
-            impl crate::ToValue for $name {
-                fn to_value(self) -> crate::Value {
-                    return crate::Value::Number(crate::Number::Int(Int::$name(self.clone())));
-                }
-            }
-
-            impl crate::ToValue for $type {
-                fn to_value(self) -> crate::Value {
-                    return crate::Value::Number(crate::Number::Int(Int::$name($name(self.clone()))));
-                }
-            }
-        )*
     };
 }
 
-int_type! {
-    I8 I8Type is_i8 to_i8 i8
-    I16 I16Type is_i16 to_i16 i16
-    I32 I32Type is_i32 to_i32 i32
-    I64 I64Type is_i64 to_i64 i64
+int! {
+    I8 I8Type is_i8 to_i8 set_i8 coerce_i8 i8,
+    I16 I16Type is_i16 to_i16 set_i16 coerce_i16 i16,
+    I32 I32Type is_i32 to_i32 set_i32 coerce_i32 i32,
+    I64 I64Type is_i64 to_i64 set_i64 coerce_i64 i64,
 
-    U8 U8Type is_u8 to_u8 u8
-    U16 U16Type is_u16 to_u16 u16
-    U32 U32Type is_u32 to_u32 u32
-    U64 U64Type is_u64 to_u64 u64
-}
-
-int_value! {
-    I8 I8Type is_i8 to_i8 set_i8 i8
-    I16 I16Type is_i16 to_i16 set_i16 i16
-    I32 I32Type is_i32 to_i32 set_i32 i32
-    I64 I64Type is_i64 to_i64 set_i64 i64
-
-    U8 U8Type is_u8 to_u8 set_u8 u8
-    U16 U16Type is_u16 to_u16 set_u16 u16
-    U32 U32Type is_u32 to_u32 set_u32 u32
-    U64 U64Type is_u64 to_u64 set_u64 u64
+    U8 U8Type is_u8 to_u8 set_u8 coerce_u8 u8,
+    U16 U16Type is_u16 to_u16 set_u16 coerce_u16 u16,
+    U32 U32Type is_u32 to_u32 set_u32 coerce_u32 u32,
+    U64 U64Type is_u64 to_u64 set_u64 coerce_u64 u64,
 }
 
 #[cfg(test)]
@@ -436,7 +464,7 @@ mod test {
         assert!(value.is_int());
         assert!(value.to_type().is_signed());
         assert!(value.is_i8());
-        assert_eq!(value.to_i8().get(), 125);
+        assert_eq!(value.to_i8(), 125);
     }
 
     #[test]
@@ -446,7 +474,7 @@ mod test {
         assert!(value.is_int());
         assert!(value.to_type().is_signed());
         assert!(value.is_i16());
-        assert_eq!(value.to_i16().get(), -15);
+        assert_eq!(value.to_i16(), -15);
     }
 
     #[test]
@@ -456,7 +484,7 @@ mod test {
         assert!(value.is_int());
         assert!(value.to_type().is_signed());
         assert!(value.is_i32());
-        assert_eq!(value.to_i32().get(), -15);
+        assert_eq!(value.to_i32(), -15);
     }
 
     #[test]
@@ -466,7 +494,7 @@ mod test {
         assert!(value.is_int());
         assert!(value.to_type().is_signed());
         assert!(value.is_i64());
-        assert_eq!(value.to_i64().get(), -15);
+        assert_eq!(value.to_i64(), -15);
     }
 
     #[test]
@@ -476,7 +504,7 @@ mod test {
         assert!(value.is_int());
         assert!(!value.to_type().is_signed());
         assert!(value.is_u8());
-        assert_eq!(value.to_u8().get(), 15);
+        assert_eq!(value.to_u8(), 15);
     }
 
     #[test]
@@ -486,7 +514,7 @@ mod test {
         assert!(value.is_int());
         assert!(!value.to_type().is_signed());
         assert!(value.is_u16());
-        assert_eq!(value.to_u16().get(), 15);
+        assert_eq!(value.to_u16(), 15);
     }
 
     #[test]
@@ -496,7 +524,7 @@ mod test {
         assert!(value.is_int());
         assert!(!value.to_type().is_signed());
         assert!(value.is_u32());
-        assert_eq!(value.to_u32().get(), 15);
+        assert_eq!(value.to_u32(), 15);
     }
 
     #[test]
@@ -506,6 +534,6 @@ mod test {
         assert!(value.is_int());
         assert!(!value.to_type().is_signed());
         assert!(value.is_u64());
-        assert_eq!(value.to_u64().get(), 15);
+        assert_eq!(value.to_u64(), 15);
     }
 }

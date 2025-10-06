@@ -1,6 +1,6 @@
 use crate::ToType;
 
-macro_rules! tuple_type {
+macro_rules! tuple {
     ($($name:ident $type_name:ident $to_type:ident $len:literal)*) => {
         #[derive(Debug, Clone, PartialEq)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -386,7 +386,7 @@ where
     }
 }
 
-tuple_type! {
+tuple! {
     T1 T1Type to_t1 1
     T2 T2Type to_t2 2
     T3 T3Type to_t3 3

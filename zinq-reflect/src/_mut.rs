@@ -66,59 +66,47 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize),
-    serde(transparent)
-)]
-pub struct Mut(pub(crate) Box<crate::Value>);
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Mut {
+    pub(crate) ty: crate::MutType,
+    pub(crate) value: Box<crate::Value>,
+}
 
 impl Mut {
     pub fn to_type(&self) -> crate::Type {
-        return MutType::new(&self.0.to_type()).to_type();
+        return self.ty.to_type();
     }
 
-    pub fn get(&self) -> Box<crate::Value> {
-        return self.0.clone();
+    pub fn ty(&self) -> &crate::Type {
+        return &self.ty.0;
     }
 
-    pub fn get_mut(&mut self) -> &mut crate::Value {
-        return &mut self.0;
-    }
-
-    pub fn set(&mut self, value: crate::Value) {
-        self.0 = value.to_ref().get();
-    }
-
-    pub fn set_mut(&mut self, value: Box<crate::Value>) {
-        self.0 = value;
-    }
-}
-
-impl crate::Value {
-    pub fn set_mut(&mut self, value: Box<crate::Value>) {
-        return match self {
-            Self::Mut(v) => v.get().set_mut(value),
-            Self::Ref(v) => v.get().set_mut(value),
-            _ => panic!("called 'set_mut' on '{}'", self.to_type()),
-        };
+    pub fn value(&self) -> &crate::Value {
+        return &self.value;
     }
 }
 
 impl<T> crate::ToValue for &mut T
 where
-    T: Clone + crate::ToValue,
+    T: Clone + crate::ToType + crate::ToValue,
 {
     fn to_value(self) -> crate::Value {
         let value = self.clone();
-        return crate::Value::Mut(Mut(Box::new(value.to_value())));
+
+        return crate::Value::Mut(Mut {
+            ty: MutType::new(&value.to_type()),
+            value: Box::new(value.to_value()),
+        });
     }
 }
 
-impl<T: Clone + crate::ToValue> From<&T> for Mut {
+impl<T: Clone + crate::ToType + crate::ToValue> From<&T> for Mut {
     fn from(value: &T) -> Self {
-        return Self(Box::new(value.clone().to_value()));
+        return Self {
+            ty: MutType::new(&value.to_type()),
+            value: Box::new(value.clone().to_value()),
+        };
     }
 }
 
@@ -130,7 +118,7 @@ impl std::fmt::Display for Mut {
 
 impl crate::ToType for Mut {
     fn to_type(&self) -> crate::Type {
-        return MutType::new(&self.0.to_type()).to_type();
+        return self.ty.to_type();
     }
 }
 
@@ -142,13 +130,13 @@ impl crate::ToValue for Mut {
 
 impl AsRef<crate::Value> for Mut {
     fn as_ref(&self) -> &crate::Value {
-        return &self.0;
+        return &self.value;
     }
 }
 
 impl AsMut<crate::Value> for Mut {
     fn as_mut(&mut self) -> &mut crate::Value {
-        return &mut self.0;
+        return &mut self.value;
     }
 }
 
@@ -156,21 +144,13 @@ impl std::ops::Deref for Mut {
     type Target = crate::Value;
 
     fn deref(&self) -> &Self::Target {
-        return &self.0;
+        return &self.value;
     }
 }
 
 impl std::ops::DerefMut for Mut {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        return &mut self.0;
-    }
-}
-
-impl Eq for Mut {}
-
-impl Ord for Mut {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        return self.0.cmp(&other.0);
+        return &mut self.value;
     }
 }
 

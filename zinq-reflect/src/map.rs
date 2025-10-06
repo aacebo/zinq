@@ -187,8 +187,8 @@ impl<K: crate::TypeOf, V: crate::TypeOf> crate::ToType for std::collections::BTr
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Map {
-    ty: MapType,
-    data: std::collections::BTreeMap<crate::Value, crate::Value>,
+    pub(crate) ty: MapType,
+    pub(crate) data: std::collections::BTreeMap<crate::Value, crate::Value>,
 }
 
 impl Map {
@@ -327,8 +327,8 @@ mod test {
         let ty = type_of!(HashMap<String, bool>);
 
         assert!(ty.is_map());
-        assert_eq!(ty.to_map().key(), &type_of!(String));
-        assert_eq!(ty.to_map().value(), &type_of!(bool));
+        assert_eq!(ty.as_map().key(), &type_of!(String));
+        assert_eq!(ty.as_map().value(), &type_of!(bool));
     }
 
     #[test]

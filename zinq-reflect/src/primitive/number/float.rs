@@ -1,7 +1,5 @@
-use crate::TypeOf;
-
-macro_rules! float_type {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $type:ty)*) => {
+macro_rules! float {
+    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set_value:ident $coerce_value:ident $type:ty)*) => {
         #[derive(Debug, Copy, Clone, PartialEq)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum FloatType {
@@ -23,6 +21,10 @@ macro_rules! float_type {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
+
+                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
+                }
             )*
         }
 
@@ -40,6 +42,10 @@ macro_rules! float_type {
                         Self::Float(v) => v.$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
+                }
+
+                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
                 }
             )*
         }
@@ -69,6 +75,10 @@ macro_rules! float_type {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
+
+                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
+                }
             )*
 
             pub fn assignable_to(&self, ty: crate::Type) -> bool {
@@ -81,6 +91,16 @@ macro_rules! float_type {
                 return match self {
                     $(Self::$name(v) => v.convertable_to(ty),)*
                 };
+            }
+        }
+
+        ///
+        /// FloatType: Implementations
+        ///
+
+        impl PartialEq<crate::Type> for FloatType {
+            fn eq(&self, other: &crate::Type) -> bool {
+                return other.is_float() && other.as_number().as_float() == self;
             }
         }
 
@@ -98,23 +118,9 @@ macro_rules! float_type {
             }
         }
 
-        impl From<std::any::TypeId> for FloatType {
-            fn from(value: std::any::TypeId) -> Self {
-                return Self::from(&value);
-            }
-        }
-
-        impl From<&std::any::TypeId> for FloatType {
-            fn from(value: &std::any::TypeId) -> Self {
-                if value == &std::any::TypeId::of::<f32>() {
-                    return Self::F32(F32Type::default());
-                } else if value == &std::any::TypeId::of::<f64>() {
-                    return Self::F64(F64Type::default());
-                }
-
-                panic!("invalid type");
-            }
-        }
+        ///
+        /// Type: Definitions
+        ///
 
         $(
             #[derive(Debug, Copy, Clone, PartialEq, Default)]
@@ -137,6 +143,10 @@ macro_rules! float_type {
                 pub fn convertable_to(&self, ty: crate::Type) -> bool {
                     return ty.is_float();
                 }
+
+                pub fn coerce(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
+                    return value.downcast_ref::<$type>();
+                }
             }
 
             impl std::fmt::Display for $type_name {
@@ -156,19 +166,61 @@ macro_rules! float_type {
                     return crate::Type::Number(crate::NumberType::Float(crate::FloatType::$name($type_name)));
                 }
             }
-        )*
-    };
-}
 
-macro_rules! float_value {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set:ident $type:ty)*) => {
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-        pub enum Float {
-            $($name($name),)*
+            impl PartialEq<crate::Type> for $type_name {
+                fn eq(&self, other: &crate::Type) -> bool {
+                    return match other {
+                        crate::Type::Number(v) => v.$is_type() && (v.$to_type() == *self),
+                        _ => false,
+                    };
+                }
+            }
+        )*
+
+        ///
+        /// Value
+        ///
+
+        ///
+        /// Any: Implementations
+        ///
+
+        impl crate::Any {
+            pub fn is_float(&self) -> bool {
+                if $(self.$is_type() ||)* false {
+                    return true;
+                }
+
+                return false;
+            }
+
+            $(
+                pub fn $is_type(&self) -> bool {
+                    return self.is::<$type>();
+                }
+
+                pub fn $to_type(&self) -> $type {
+                    return self.to::<$type>().clone();
+                }
+
+                pub fn $set_value(&mut self, value: $type) {
+                    self.set(value);
+                }
+            )*
         }
 
+        ///
+        /// Value: Implementations
+        ///
+
         impl crate::Value {
+            pub fn is_float(&self) -> bool {
+                return match self {
+                    Self::Number(v) => v.is_float(),
+                    _ => false,
+                };
+            }
+
             $(
                 pub fn $is_type(&self) -> bool {
                     return match self {
@@ -177,21 +229,61 @@ macro_rules! float_value {
                     };
                 }
 
-                pub fn $to_type(&self) -> $name {
+                pub fn $to_type(&self) -> $type {
                     return match self {
                         Self::Number(v) => v.$to_type(),
+                        Self::Ref(v) => v.value().$to_type(),
+                        Self::Mut(v) => v.value().$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
-                    };
-                }
-
-                pub fn $set(&mut self, value: $type) {
-                    return match self {
-                        Self::Number(v) => v.$set(value),
-                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
                     };
                 }
             )*
         }
+
+        $(
+            impl crate::ToValue for $type {
+                fn to_value(self) -> crate::Value {
+                    return crate::Value::Number(crate::Number::Float(crate::Float::$name(self)));
+                }
+            }
+
+            impl From<$type> for crate::Value {
+                fn from(value: $type) -> Self {
+                    return Self::Number(crate::Number::Float(crate::Float::$name(value)));
+                }
+            }
+
+            impl Into<$type> for crate::Value {
+                fn into(self) -> $type {
+                    return match self {
+                        Self::Number(v) => v.to_float().$to_type(),
+                        v => panic!("called 'Into<{}>::into' on type '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsRef<$type> for crate::Value {
+                fn as_ref(&self) -> &$type {
+                    return match self {
+                        Self::Number(v) => AsRef::<$type>::as_ref(v),
+                        v => panic!("called 'AsRef<{}>::as_ref' on type '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsMut<$type> for crate::Value {
+                fn as_mut(&mut self) -> &mut $type {
+                    return match self {
+                        Self::Number(v) => AsMut::<$type>::as_mut(v),
+                        v => panic!("called 'AsMut<{}>::as_mut' on type '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+        )*
+
+        ///
+        /// Number: Implementations
+        ///
 
         impl crate::Number {
             $(
@@ -202,32 +294,69 @@ macro_rules! float_value {
                     };
                 }
 
-                pub fn $to_type(&self) -> $name {
+                pub fn $to_type(&self) -> $type {
                     return match self {
                         Self::Float(v) => v.$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
                 }
+            )*
+        }
 
-                pub fn $set(&mut self, value: $type) {
+        $(
+            impl From<$type> for crate::Number {
+                fn from(value: $type) -> Self {
+                    return Self::Float(Float::$name(value));
+                }
+            }
+
+            impl Into<$type> for crate::Number {
+                fn into(self) -> $type {
                     return match self {
-                        Self::Float(v) => v.$set(value),
-                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
+                        Self::Float(v) => v.$to_type(),
+                        v => panic!("called 'Into<{}>::into' on '{}'", stringify!($type), v.to_type()),
                     };
                 }
-            )*
+            }
+
+            impl AsRef<$type> for crate::Number {
+                fn as_ref(&self) -> &$type {
+                    return match self {
+                        Self::Float(v) => match v {
+                            Float::$name(v) => v,
+                            v => panic!("called 'AsRef<{}>::as_ref' on '{}'", stringify!($type), v.to_type()),
+                        },
+                        v => panic!("called 'AsRef<{}>::as_ref' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsMut<$type> for crate::Number {
+                fn as_mut(&mut self) -> &mut $type {
+                    return match self {
+                        Self::Float(v) => match v {
+                            Float::$name(v) => v,
+                            v => panic!("called 'AsMut<{}>::as_mut' on '{}'", stringify!($type), v.to_type()),
+                        },
+                        v => panic!("called 'AsMut<{}>::as_mut' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+        )*
+
+        ///
+        /// Float: Value
+        ///
+        #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+        pub enum Float {
+            $($name($type),)*
         }
 
         impl Float {
             pub fn to_type(&self) -> crate::Type {
                 return match self {
-                    $(Self::$name(v) => v.to_type(),)*
-                };
-            }
-
-            pub fn set(&mut self, value: crate::Value) {
-                return match self {
-                    $(Self::$name(v) => v.set(value),)*
+                    $(Self::$name(_) => crate::Type::Number(crate::NumberType::Float(FloatType::$name($type_name))),)*
                 };
             }
 
@@ -239,160 +368,70 @@ macro_rules! float_value {
                     };
                 }
 
-                pub fn $to_type(&self) -> $name {
+                pub fn $to_type(&self) -> $type {
                     return match self {
-                        Self::$name(v) => v.clone(),
-                        v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
+                        Self::$name(v) => *v,
+                        _ => panic!("called '{}' on '{}'", stringify!($to_type), stringify!($type)),
                     };
                 }
 
-                pub fn $set(&mut self, value: $type) {
-                    return match self {
-                        Self::$name(v) => v.$set(value),
-                        _ => panic!("called '{}' on type '{}'", stringify!($set), stringify!($name)),
-                    };
+                pub fn $set_value(&mut self, value: $type) {
+                    *self = Self::$name(value);
                 }
             )*
         }
 
-        impl crate::ToType for Float {
-            fn to_type(&self) -> crate::Type {
-                return match self {
-                    $(Self::$name(v) => v.to_type(),)*
-                };
+        $(
+            impl From<$type> for crate::Float {
+                fn from(value: $type) -> Self {
+                    return Self::$name(value);
+                }
+            }
+
+            impl Into<$type> for crate::Float {
+                fn into(self) -> $type {
+                    return self.$to_type();
+                }
+            }
+
+           impl AsRef<$type> for crate::Float {
+                fn as_ref(&self) -> &$type {
+                    return match self {
+                        Self::$name(v) => v,
+                        v => panic!("called 'AsRef<{}>::as_ref' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+
+            impl AsMut<$type> for crate::Float {
+                fn as_mut(&mut self) -> &mut $type {
+                    return match self {
+                        Self::$name(v) => v,
+                        v => panic!("called 'AsMut<{}>::as_mut' on '{}'", stringify!($type), v.to_type()),
+                    };
+                }
+            }
+        )*
+
+        impl PartialEq<crate::Value> for crate::Float {
+            fn eq(&self, other: &crate::Value) -> bool {
+                return other.is_float() && other.as_number().as_float() == self;
             }
         }
 
-        impl crate::ToValue for Float {
-            fn to_value(self) -> crate::Value {
-                return match self {
-                    $(Self::$name(v) => v.to_value(),)*
-                };
-            }
-        }
-
-        impl std::fmt::Display for Float {
+        impl std::fmt::Display for crate::Float {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 return match self {
                     $(Self::$name(v) => write!(f, "{}", v),)*
                 };
             }
         }
-
-        $(
-            #[derive(Debug, Copy, Clone, PartialEq, Default)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-            pub struct $name($type);
-
-            impl $name {
-                pub fn to_type(&self) -> crate::Type {
-                    return <$type>::type_of();
-                }
-
-                pub fn get(&self) -> $type {
-                    return self.0;
-                }
-
-                pub fn set(&mut self, value: crate::Value) {
-                    self.0 = value.into();
-                }
-
-                pub fn $set(&mut self, value: $type) {
-                    self.0 = value;
-                }
-            }
-
-            impl From<$type> for crate::Value {
-                fn from(value: $type) -> Self {
-                    return Self::Number(crate::Number::Float(crate::Float::$name($name(value))));
-                }
-            }
-
-            impl Into<$type> for crate::Value {
-                fn into(self) -> $type {
-                    return self.$to_type().get();
-                }
-            }
-
-            impl From<$type> for $name {
-                fn from(value: $type) -> Self {
-                    return Self(value);
-                }
-            }
-
-            impl Into<$type> for $name {
-                fn into(self) -> $type {
-                    return self.0;
-                }
-            }
-
-            impl AsRef<$type> for $name {
-                fn as_ref(&self) -> &$type {
-                    return &self.0;
-                }
-            }
-
-            impl AsMut<$type> for $name {
-                fn as_mut(&mut self) -> &mut $type {
-                    return &mut self.0;
-                }
-            }
-
-            impl std::ops::Deref for $name {
-                type Target = $type;
-
-                fn deref(&self) -> &Self::Target {
-                    return &self.0;
-                }
-            }
-
-            impl std::ops::DerefMut for $name {
-                fn deref_mut(&mut self) -> &mut Self::Target {
-                    return &mut self.0;
-                }
-            }
-
-            impl std::fmt::Display for $name {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    return write!(f, "{}", self.as_ref());
-                }
-            }
-
-            impl crate::TypeOf for $name {
-                fn type_of() -> crate::Type {
-                    return <$type>::type_of();
-                }
-            }
-
-            impl crate::ToType for $name {
-                fn to_type(&self) -> crate::Type {
-                    return <$type>::type_of();
-                }
-            }
-
-            impl crate::ToValue for $name {
-                fn to_value(self) -> crate::Value {
-                    return crate::Value::Number(crate::Number::Float(Float::$name(self.clone())));
-                }
-            }
-
-            impl crate::ToValue for $type {
-                fn to_value(self) -> crate::Value {
-                    return crate::Value::Number(crate::Number::Float(Float::$name($name(self.clone()))));
-                }
-            }
-        )*
     };
 }
 
-float_type! {
-    F32 F32Type is_f32 to_f32 f32
-    F64 F64Type is_f64 to_f64 f64
-}
-
-float_value! {
-    F32 F32Type is_f32 to_f32 set_f32 f32
-    F64 F64Type is_f64 to_f64 set_f64 f64
+float! {
+    F32 F32Type is_f32 to_f32 set_f32 coerce_f32 f32
+    F64 F64Type is_f64 to_f64 set_f64 coerce_f64 f64
 }
 
 #[cfg(test)]
@@ -405,7 +444,7 @@ mod test {
 
         assert!(value.is_float());
         assert!(value.is_f32());
-        assert_eq!(value.to_f32().get(), 300.26);
+        assert_eq!(value.to_f32(), 300.26);
     }
 
     #[test]
@@ -414,6 +453,6 @@ mod test {
 
         assert!(value.is_float());
         assert!(value.is_f64());
-        assert_eq!(value.to_f64().get(), 350.26);
+        assert_eq!(value.to_f64(), 350.26);
     }
 }

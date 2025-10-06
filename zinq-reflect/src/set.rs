@@ -2,7 +2,7 @@
 macro_rules! set {
     ($target:expr => $(/$path:tt)* = $value:expr) => {{
         let out = $crate::get_mut!($target => $(/$path)*);
-        out.set($crate::value_of!($value));
+        *out = $crate::value_of!($value);
         out
     }};
 }

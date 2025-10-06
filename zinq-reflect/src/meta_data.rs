@@ -1,7 +1,5 @@
 use std::collections::BTreeMap;
 
-use crate::TypeOf;
-
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(
     feature = "serde",
@@ -92,18 +90,15 @@ impl std::fmt::Display for MetaData {
 
 impl crate::ToType for MetaData {
     fn to_type(&self) -> crate::Type {
-        return crate::type_of!(BTreeMap<String, crate::Value>);
+        return crate::StructType::new(&crate::Path::from("zinq::reflect"), "MetaData")
+            .visibility(crate::Visibility::Public(crate::Public::Full))
+            .build()
+            .to_type();
     }
 }
 
 impl crate::ToValue for MetaData {
     fn to_value(self) -> crate::Value {
-        let mut map = crate::Map::new(&crate::type_of!(BTreeMap<String, crate::Value>).to_map());
-
-        for (key, value) in &self.0 {
-            map.set_key_value(key.to_value(), value.clone());
-        }
-
-        return crate::Value::Map(map);
+        return crate::Any::new(self).to_value();
     }
 }
