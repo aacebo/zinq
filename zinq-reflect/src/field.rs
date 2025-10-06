@@ -39,7 +39,7 @@ impl std::fmt::Display for Field {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum FieldName {
     Key(String),
@@ -64,7 +64,14 @@ impl FieldName {
     pub fn as_str(&self) -> &str {
         return match self {
             Self::Key(v) => &v,
-            _ => panic!("called 'as_str' on 'Index'"),
+            _ => panic!("called 'as_str' on 'FieldName::Index'"),
+        };
+    }
+
+    pub fn as_index(&self) -> &usize {
+        return match self {
+            Self::Index(v) => v,
+            _ => panic!("called 'as_index' on 'FieldName::Key'"),
         };
     }
 }
@@ -108,6 +115,32 @@ impl From<&usize> for FieldName {
 impl From<usize> for FieldName {
     fn from(value: usize) -> Self {
         return Self::Index(value);
+    }
+}
+
+impl Eq for FieldName {}
+
+impl Ord for FieldName {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        return other.partial_cmp(self).unwrap();
+    }
+}
+
+impl PartialEq<str> for FieldName {
+    fn eq(&self, other: &str) -> bool {
+        return self.to_string() == other;
+    }
+}
+
+impl PartialEq<String> for FieldName {
+    fn eq(&self, other: &String) -> bool {
+        return self.to_string() == other.as_str();
+    }
+}
+
+impl PartialEq<usize> for FieldName {
+    fn eq(&self, other: &usize) -> bool {
+        return self.as_index() == other;
     }
 }
 

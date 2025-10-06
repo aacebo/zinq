@@ -19,6 +19,10 @@ pub trait ToValue {
     fn to_value(self) -> crate::Value;
 }
 
+pub trait Object: std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue {
+    fn field(&self, name: &crate::FieldName) -> crate::Value;
+}
+
 #[cfg(test)]
 mod test {
     use crate::*;

@@ -1,4 +1,4 @@
-use quote::quote;
+use quote::{format_ident, quote};
 
 use crate::{reflect_field, reflect_generics, reflect_meta, reflect_visibility};
 
@@ -14,6 +14,52 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
         vis: input.vis.clone(),
     });
 
+    let variants = data
+        .variants
+        .iter()
+        .map(|variant| {
+            let variant_ident = &variant.ident;
+            let variant_fields = match &variant.fields {
+                syn::Fields::Unit => vec![],
+                syn::Fields::Named(fields) => fields
+                    .named
+                    .iter()
+                    .map(|field| {
+                        let field_ident = &field.ident;
+                        quote!(#field_ident)
+                    })
+                    .collect::<Vec<_>>(),
+                syn::Fields::Unnamed(fields) => fields
+                    .unnamed
+                    .iter()
+                    .enumerate()
+                    .map(|(i, _)| {
+                        let field_ident = format_ident!("p{}", i);
+                        quote!(#field_ident)
+                    })
+                    .collect::<Vec<_>>(),
+            };
+
+            if variant_fields.is_empty() {
+                return quote! {
+                    Self::#variant_ident => ::zinq_reflect::Value::Null
+                };
+            }
+
+            quote! {
+                Self::#variant_ident(#(#variant_fields,)*) => {
+                    #(
+                        if (name == stringify!(#variant_fields)) {
+                            return ::zinq_reflect::ToValue::to_value(#variant_fields.clone());
+                        }
+                    )*
+
+                    ::zinq_reflect::Value::Null
+                }
+            }
+        })
+        .collect::<Vec<_>>();
+
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
             fn type_of() -> ::zinq_reflect::Type {
@@ -24,6 +70,20 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
         impl ::zinq_reflect::ToType for #name {
             fn to_type(&self) -> ::zinq_reflect::Type {
                 return #ty;
+            }
+        }
+
+        impl ::zinq_reflect::ToValue for #name {
+            fn to_value(self) -> ::zinq_reflect::Value {
+                return ::zinq_reflect::Any::new(self).to_value();
+            }
+        }
+
+        impl ::zinq_reflect::Object for #name {
+            fn field(&self, name: &::zinq_reflect::FieldName) -> ::zinq_reflect::Value {
+                return match self {
+                    #(#variants,)*
+                };
             }
         }
     };
@@ -32,6 +92,51 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
 pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
     let name = &item.ident;
     let ty = build(item);
+    let variants = item
+        .variants
+        .iter()
+        .map(|variant| {
+            let variant_ident = &variant.ident;
+            let variant_fields = match &variant.fields {
+                syn::Fields::Unit => vec![],
+                syn::Fields::Named(fields) => fields
+                    .named
+                    .iter()
+                    .map(|field| {
+                        let field_ident = &field.ident;
+                        quote!(#field_ident)
+                    })
+                    .collect::<Vec<_>>(),
+                syn::Fields::Unnamed(fields) => fields
+                    .unnamed
+                    .iter()
+                    .enumerate()
+                    .map(|(i, _)| {
+                        let field_ident = format_ident!("p{}", i);
+                        quote!(#field_ident)
+                    })
+                    .collect::<Vec<_>>(),
+            };
+
+            if variant_fields.is_empty() {
+                return quote! {
+                    Self::#variant_ident => ::zinq_reflect::Value::Null
+                };
+            }
+
+            quote! {
+                Self::#variant_ident(#(#variant_fields,)*) => {
+                    #(
+                        if (name == stringify!(#variant_fields)) {
+                            return ::zinq_reflect::ToValue::to_value(#variant_fields.clone());
+                        }
+                    )*
+
+                    ::zinq_reflect::Value::Null
+                }
+            }
+        })
+        .collect::<Vec<_>>();
 
     return quote! {
         impl ::zinq_reflect::TypeOf for #name {
@@ -43,6 +148,20 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
         impl ::zinq_reflect::ToType for #name {
             fn to_type(&self) -> ::zinq_reflect::Type {
                 return #ty;
+            }
+        }
+
+        impl ::zinq_reflect::ToValue for #name {
+            fn to_value(self) -> ::zinq_reflect::Value {
+                return ::zinq_reflect::Any::new(self).to_value();
+            }
+        }
+
+        impl ::zinq_reflect::Object for #name {
+            fn field(&self, name: &::zinq_reflect::FieldName) -> ::zinq_reflect::Value {
+                return match self {
+                    #(#variants,)*
+                };
             }
         }
     };

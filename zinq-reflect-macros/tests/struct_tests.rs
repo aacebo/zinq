@@ -8,7 +8,7 @@ mod models {
     use zinq_reflect::{ToType, TypeOf};
     use zinq_reflect_macros::*;
 
-    #[derive(Reflect)]
+    #[derive(Debug, Clone, Reflect)]
     pub enum Kind {
         #[reflect(lowercase)]
         Admin(String),
@@ -26,7 +26,7 @@ mod models {
         }
     }
 
-    #[derive(Reflect)]
+    #[derive(Debug, Clone, Reflect)]
     #[reflect(name = "alex")]
     pub struct User {
         #[reflect(hello = "world")]
@@ -35,7 +35,7 @@ mod models {
         pub password: String,
     }
 
-    #[derive(Reflect)]
+    #[derive(Debug, Clone, Reflect)]
     pub struct Position(pub f64, pub f64);
 }
 

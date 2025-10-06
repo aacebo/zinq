@@ -178,38 +178,6 @@ macro_rules! float {
         )*
 
         ///
-        /// Value
-        ///
-
-        ///
-        /// Any: Implementations
-        ///
-
-        impl crate::Any {
-            pub fn is_float(&self) -> bool {
-                if $(self.$is_type() ||)* false {
-                    return true;
-                }
-
-                return false;
-            }
-
-            $(
-                pub fn $is_type(&self) -> bool {
-                    return self.is::<$type>();
-                }
-
-                pub fn $to_type(&self) -> $type {
-                    return self.to::<$type>().clone();
-                }
-
-                pub fn $set_value(&mut self, value: $type) {
-                    self.set(value);
-                }
-            )*
-        }
-
-        ///
         /// Value: Implementations
         ///
 

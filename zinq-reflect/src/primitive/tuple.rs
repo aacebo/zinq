@@ -178,11 +178,35 @@ where
 
 impl<A, B> crate::ToType for (A, B)
 where
-    A: crate::TypeOf,
-    B: crate::TypeOf,
+    A: Clone + crate::ToType + crate::ToValue + 'static,
+    B: Clone + crate::ToType + crate::ToValue + 'static,
 {
     fn to_type(&self) -> crate::Type {
-        return T2Type::new([Box::new(A::type_of()), Box::new(B::type_of())]).to_type();
+        return T2Type::new([Box::new(self.0.to_type()), Box::new(self.1.to_type())]).to_type();
+    }
+}
+
+impl<A, B> crate::ToValue for (A, B)
+where
+    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
+    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
+{
+    fn to_value(self) -> crate::Value {
+        return crate::Any::new(self).to_value();
+    }
+}
+
+impl<A, B> crate::Object for (A, B)
+where
+    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
+    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
+{
+    fn field(&self, name: &crate::FieldName) -> crate::Value {
+        return match name.to_string().as_str() {
+            "0" => self.0.clone().to_value(),
+            "1" => self.1.clone().to_value(),
+            v => panic!("field '{}' not found on type '{}'", v, self.to_type()),
+        };
     }
 }
 

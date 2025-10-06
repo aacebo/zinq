@@ -183,12 +183,6 @@ impl Number {
     }
 }
 
-impl crate::Any {
-    pub fn is_number(&self) -> bool {
-        return self.is_int() || self.is_float();
-    }
-}
-
 impl crate::ToValue for Number {
     fn to_value(self) -> crate::Value {
         return crate::Value::Number(self.clone());

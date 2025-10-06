@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(
     feature = "serde",
@@ -75,6 +77,15 @@ where
     }
 }
 
+impl<T> crate::ToType for Arc<T>
+where
+    T: Clone + crate::ToType,
+{
+    fn to_type(&self) -> crate::Type {
+        return crate::RefType::new(&self.as_ref().to_type()).to_type();
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Ref {
@@ -142,12 +153,24 @@ impl PartialEq<crate::Value> for Ref {
 
 impl<T> crate::ToValue for &T
 where
-    T: Clone + crate::ToValue + crate::TypeOf,
+    T: Clone + crate::ToValue + crate::ToType,
 {
     fn to_value(self) -> crate::Value {
         return crate::Value::Ref(Ref {
-            ty: RefType(Box::new(T::type_of())),
+            ty: RefType(Box::new(self.clone().to_type())),
             value: Box::new(self.clone().to_value()),
+        });
+    }
+}
+
+impl<T> crate::ToValue for Arc<T>
+where
+    T: Clone + crate::ToValue + crate::ToType,
+{
+    fn to_value(self) -> crate::Value {
+        return crate::Value::Ref(Ref {
+            ty: RefType(Box::new(self.as_ref().to_type())),
+            value: Box::new(self.as_ref().clone().to_value()),
         });
     }
 }

@@ -52,15 +52,9 @@ impl crate::ToType for bool {
     }
 }
 
-impl From<bool> for crate::Any {
+impl From<bool> for crate::Value {
     fn from(value: bool) -> Self {
-        return Self::new(value);
-    }
-}
-
-impl Into<bool> for crate::Any {
-    fn into(self) -> bool {
-        return self.to_bool();
+        return Self::Bool(value);
     }
 }
 
@@ -77,24 +71,6 @@ impl crate::Value {
 
     pub fn is_false(&self) -> bool {
         return self.is_bool() && self.to_bool() == false;
-    }
-}
-
-impl crate::Any {
-    pub fn is_bool(&self) -> bool {
-        return self.ty.is_bool();
-    }
-
-    pub fn is_true(&self) -> bool {
-        return *self.to::<bool>() == true;
-    }
-
-    pub fn is_false(&self) -> bool {
-        return *self.to::<bool>() == false;
-    }
-
-    pub fn to_bool(&self) -> bool {
-        return self.to::<bool>().clone();
     }
 }
 

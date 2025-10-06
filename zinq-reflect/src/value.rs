@@ -256,6 +256,15 @@ impl crate::ToValue for Value {
     }
 }
 
+impl crate::Object for Value {
+    fn field(&self, name: &crate::FieldName) -> crate::Value {
+        return match self {
+            Self::Any(v) => v.field(name),
+            v => panic!("called 'zinq::reflect::Object::field' on '{}'", v.to_type()),
+        };
+    }
+}
+
 impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
         return match self {

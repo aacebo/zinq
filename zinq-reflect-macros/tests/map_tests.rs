@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use zinq_reflect::{ToType, TypeOf, type_of, value_of};
 use zinq_reflect_macros::*;
 
-#[derive(Reflect)]
+#[derive(Debug, Clone, Reflect)]
 pub struct Tester(HashMap<u8, i8>);
 
 #[test]

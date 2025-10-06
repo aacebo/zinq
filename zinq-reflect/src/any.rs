@@ -1,13 +1,49 @@
 use std::sync::Arc;
 
+impl dyn crate::Object {
+    pub fn downcast_ref<T: std::any::Any>(&self) -> Option<&T> {
+        let value: &dyn std::any::Any = self;
+        return value.downcast_ref::<T>();
+    }
+
+    pub fn downcast_mut<T: std::any::Any>(&mut self) -> Option<&mut T> {
+        let value: &mut dyn std::any::Any = self;
+        return value.downcast_mut::<T>();
+    }
+
+    pub fn is<T: std::any::Any>(&self) -> bool {
+        let value: &dyn std::any::Any = self;
+        return value.is::<T>();
+    }
+}
+
+#[cfg(feature = "serde")]
+impl serde::Serialize for dyn crate::Object {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+
+        let ty = self.to_type().to_struct();
+        let mut ser = serializer.serialize_map(Some(ty.len()))?;
+
+        for field in ty.fields().iter() {
+            ser.serialize_entry(&field.name().to_string(), &self.field(field.name()))?;
+        }
+
+        return ser.end();
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Any {
     pub(crate) ty: crate::Type,
-    pub(crate) value: Arc<dyn std::any::Any>,
+    pub(crate) value: Arc<dyn crate::Object>,
 }
 
 impl Any {
-    pub fn new<T: std::any::Any + crate::ToType>(value: T) -> Self {
+    pub fn new<T: crate::Object>(value: T) -> Self {
         return Self {
             ty: value.to_type(),
             value: Arc::new(value),
@@ -18,24 +54,24 @@ impl Any {
         return &self.ty;
     }
 
-    pub fn get(&self) -> &dyn std::any::Any {
-        return &self.value;
+    pub fn get(&self) -> &dyn crate::Object {
+        return self.value.as_ref();
     }
 
-    pub fn get_mut(&mut self) -> &mut dyn std::any::Any {
-        return &mut self.value;
+    pub fn get_mut(&mut self) -> &mut dyn crate::Object {
+        return Arc::get_mut(&mut self.value).unwrap();
     }
 
-    pub fn set<T: std::any::Any>(&mut self, value: T) {
+    pub fn set<T: crate::Object>(&mut self, value: T) {
         self.value = Arc::new(value);
     }
 
-    pub fn is<T: std::any::Any>(&self) -> bool {
-        return self.value.is::<T>();
+    pub fn is<T: crate::Object>(&self) -> bool {
+        return self.as_ref().is::<T>();
     }
 
-    pub fn to<T: std::any::Any + crate::TypeOf>(&self) -> &T {
-        if let Some(v) = self.value.downcast_ref::<T>() {
+    pub fn to<T: crate::Object + crate::TypeOf>(&self) -> &T {
+        if let Some(v) = self.as_ref().downcast_ref::<T>() {
             return v;
         }
 
@@ -68,29 +104,29 @@ impl crate::ToValue for Any {
     }
 }
 
-impl AsRef<dyn std::any::Any> for Any {
-    fn as_ref(&self) -> &dyn std::any::Any {
-        return &self.value;
+impl AsRef<dyn crate::Object> for Any {
+    fn as_ref(&self) -> &dyn crate::Object {
+        return self.get();
     }
 }
 
-impl AsMut<dyn std::any::Any> for Any {
-    fn as_mut(&mut self) -> &mut dyn std::any::Any {
-        return &mut self.value;
+impl AsMut<dyn crate::Object> for Any {
+    fn as_mut(&mut self) -> &mut dyn crate::Object {
+        return self.get_mut();
     }
 }
 
 impl std::ops::Deref for Any {
-    type Target = dyn std::any::Any;
+    type Target = dyn crate::Object;
 
     fn deref(&self) -> &Self::Target {
-        return &self.value;
+        return self.get();
     }
 }
 
 impl std::ops::DerefMut for Any {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        return &mut self.value;
+        return self.get_mut();
     }
 }
 
@@ -122,8 +158,16 @@ impl serde::Serialize for Any {
     where
         S: serde::Serializer,
     {
-        if self.ty.is_bool() {
-            return serializer.serialize_bool(*self.value.downcast_ref::<bool>().unwrap());
+        if self.ty.is_struct() {
+            use serde::ser::SerializeMap;
+
+            let mut ser = serializer.serialize_map(Some(self.ty.as_struct().len()))?;
+
+            for field in self.ty.to_struct().fields().iter() {
+                ser.serialize_entry(&field.name().to_string(), self.value.as_ref())?;
+            }
+
+            return ser.end();
         }
 
         return serializer.serialize_str("null");
@@ -137,5 +181,11 @@ impl<'de> serde::Deserialize<'de> for Any {
         D: serde::Deserializer<'de>,
     {
         unimplemented!()
+    }
+}
+
+impl<T: Clone + crate::Object> crate::Object for Arc<T> {
+    fn field(&self, name: &crate::FieldName) -> crate::Value {
+        return self.as_ref().field(name);
     }
 }
