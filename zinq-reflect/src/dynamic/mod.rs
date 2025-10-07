@@ -1,5 +1,13 @@
 use std::sync::Arc;
 
+mod r#dyn;
+mod object;
+mod sequence;
+
+pub use r#dyn::*;
+pub use object::*;
+pub use sequence::*;
+
 #[derive(Debug, Clone)]
 pub enum Dynamic {
     Dyn(Arc<dyn crate::Dyn>),
