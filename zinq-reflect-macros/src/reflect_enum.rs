@@ -75,7 +75,7 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
 
         impl ::zinq_reflect::ToValue for #name {
             fn to_value(self) -> ::zinq_reflect::Value {
-                return ::zinq_reflect::Any::new(self).to_value();
+                return ::zinq_reflect::Dynamic::from_object(self).to_value();
             }
         }
 
@@ -153,7 +153,7 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
         impl ::zinq_reflect::ToValue for #name {
             fn to_value(self) -> ::zinq_reflect::Value {
-                return ::zinq_reflect::Any::new(self).to_value();
+                return ::zinq_reflect::Dynamic::from_object(self).to_value();
             }
         }
 

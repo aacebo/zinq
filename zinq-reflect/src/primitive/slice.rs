@@ -26,6 +26,10 @@ impl SliceType {
         };
     }
 
+    pub fn elem(&self) -> &crate::Type {
+        return &self.ty;
+    }
+
     pub fn capacity(&self) -> Option<usize> {
         return self.capacity;
     }

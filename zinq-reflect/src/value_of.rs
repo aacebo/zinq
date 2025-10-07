@@ -19,13 +19,18 @@ pub trait ToValue {
     fn to_value(self) -> crate::Value;
 }
 
-/// ## Object
-/// 
+/// ## AsValue
+///
 /// implemented by types that
-/// can reflect their value/type and that
-/// of their individual fields
-pub trait Object: std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue {
-    fn field(&self, name: &crate::FieldName) -> crate::Value;
+/// can reflect their value
+pub trait AsValue {
+    fn as_value(&self) -> Box<crate::Value>;
+}
+
+impl<T: Clone + ToValue> AsValue for T {
+    fn as_value(&self) -> Box<crate::Value> {
+        return Box::new(self.clone().to_value());
+    }
 }
 
 #[cfg(test)]

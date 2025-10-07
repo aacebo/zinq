@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use crate::{ToType, ToValue};
 
 #[derive(Debug, Clone)]
@@ -10,7 +12,7 @@ pub enum Value {
     Map(crate::Map),
     Mut(crate::Mut),
     Ref(crate::Ref),
-    Any(crate::Any),
+    Dynamic(crate::Dynamic),
     Null,
 }
 
@@ -24,7 +26,7 @@ impl Value {
             Self::Map(v) => v.to_type(),
             Self::Mut(v) => v.to_type(),
             Self::Ref(v) => v.to_type(),
-            Self::Any(v) => v.to_type(),
+            Self::Dynamic(v) => v.to_type(),
             Self::Null => panic!("called 'to_type' on '<null>'"),
         };
     }
@@ -36,6 +38,15 @@ impl Value {
             Self::Str(v) => v.len(),
             Self::Mut(v) => v.len(),
             Self::Ref(v) => v.len(),
+            v => panic!("called 'len' on '{}'", v.to_type()),
+        };
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<'_, Self> {
+        return match self {
+            Self::Slice(v) => v.iter(),
+            Self::Mut(v) => v.iter(),
+            Self::Ref(v) => v.iter(),
             v => panic!("called 'len' on '{}'", v.to_type()),
         };
     }
@@ -89,9 +100,9 @@ impl Value {
         };
     }
 
-    pub fn is_any(&self) -> bool {
+    pub fn is_dynamic(&self) -> bool {
         return match self {
-            Self::Any(_) => true,
+            Self::Dynamic(_) => true,
             _ => false,
         };
     }
@@ -139,12 +150,12 @@ impl Value {
         };
     }
 
-    pub fn as_any(&self) -> &crate::Any {
+    pub fn as_dynamic(&self) -> &crate::Dynamic {
         return match self {
-            Self::Any(v) => v,
-            Self::Ref(v) => v.as_any(),
-            Self::Mut(v) => v.as_any(),
-            v => panic!("called 'as_any' on '{}'", v.to_type()),
+            Self::Dynamic(v) => v,
+            Self::Ref(v) => v.as_dynamic(),
+            Self::Mut(v) => v.as_dynamic(),
+            v => panic!("called 'as_dynamic' on '{}'", v.to_type()),
         };
     }
 
@@ -209,12 +220,12 @@ impl Value {
         };
     }
 
-    pub fn to_any(&self) -> crate::Any {
+    pub fn to_dynamic(&self) -> crate::Dynamic {
         return match self {
-            Self::Any(v) => v.clone(),
-            Self::Ref(v) => v.to_any(),
-            Self::Mut(v) => v.to_any(),
-            v => panic!("called 'to_any' on '{}'", v.to_type()),
+            Self::Dynamic(v) => v.clone(),
+            Self::Ref(v) => v.to_dynamic(),
+            Self::Mut(v) => v.to_dynamic(),
+            v => panic!("called 'to_dynamic' on '{}'", v.to_type()),
         };
     }
 
@@ -225,6 +236,12 @@ impl Value {
             Self::Mut(v) => v.to_map(),
             v => panic!("called 'to_map' on '{}'", v.to_type()),
         };
+    }
+}
+
+impl AsRef<Value> for Value {
+    fn as_ref(&self) -> &Value {
+        return self;
     }
 }
 
@@ -244,7 +261,7 @@ impl crate::ToType for Value {
             Self::Map(v) => v.to_type(),
             Self::Mut(v) => v.to_type(),
             Self::Ref(v) => v.to_type(),
-            Self::Any(v) => v.to_type(),
+            Self::Dynamic(v) => v.to_type(),
             Self::Null => panic!("called 'ToType::to_type' on '<null>'"),
         };
     }
@@ -259,8 +276,24 @@ impl crate::ToValue for Value {
 impl crate::Object for Value {
     fn field(&self, name: &crate::FieldName) -> crate::Value {
         return match self {
-            Self::Any(v) => v.field(name),
+            Self::Dynamic(v) => v.field(name),
             v => panic!("called 'zinq::reflect::Object::field' on '{}'", v.to_type()),
+        };
+    }
+}
+
+impl crate::Sequence for Value {
+    fn len(&self) -> usize {
+        return match self {
+            Self::Dynamic(v) => v.len(),
+            v => panic!("called 'zinq::reflect::Sequence::len' on '{}'", v.to_type()),
+        };
+    }
+
+    fn index(&self, i: usize) -> &crate::Value {
+        return match self {
+            Self::Dynamic(v) => v.index(i),
+            v => panic!("called 'zinq::reflect::Sequence::len' on '{}'", v.to_type()),
         };
     }
 }
@@ -360,7 +393,7 @@ impl std::fmt::Display for Value {
             Self::Map(v) => write!(f, "{}", v),
             Self::Mut(v) => write!(f, "{}", v),
             Self::Ref(v) => write!(f, "{}", v),
-            Self::Any(v) => write!(f, "{}", v),
+            Self::Dynamic(v) => write!(f, "{}", v),
             Self::Null => write!(f, "<null>"),
         };
     }

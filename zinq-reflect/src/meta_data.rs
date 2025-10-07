@@ -99,7 +99,7 @@ impl crate::ToType for MetaData {
 
 impl crate::ToValue for MetaData {
     fn to_value(self) -> crate::Value {
-        return crate::Any::new(self).to_value();
+        return crate::Dynamic::from_object(self).to_value();
     }
 }
 
