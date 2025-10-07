@@ -1,5 +1,23 @@
 #[macro_export]
 macro_rules! value_of {
+    [&mut $value:expr] => {
+        $crate::AsValueMut::as_value(&mut $value)
+    };
+    [&mut $value:ident] => {
+        $crate::AsValueMut::as_value(&mut $value)
+    };
+    [&mut $value:literal] => {
+        $crate::AsValueMut::as_value(&mut $value)
+    };
+    [&$value:expr] => {
+        $crate::ToValue::to_value(&$value)
+    };
+    [&$value:ident] => {
+        $crate::ToValue::to_value(&$value)
+    };
+    [&$value:literal] => {
+        $crate::ToValue::to_value(&$value)
+    };
     [$value:expr] => {
         $crate::ToValue::to_value($value)
     };
@@ -9,6 +27,9 @@ macro_rules! value_of {
     [$value:literal] => {
         $crate::ToValue::to_value($value)
     };
+    ($($anything:tt)*) => {
+        $crate::value_of!($($anything)*)
+    };
 }
 
 /// ## ToValue
@@ -17,6 +38,22 @@ macro_rules! value_of {
 /// can reflect their value
 pub trait ToValue {
     fn to_value(self) -> crate::Value;
+}
+
+/// ## AsValue
+///
+/// implemented by types that
+/// can reflect their value
+pub trait AsValue {
+    fn as_value(&self) -> crate::Value;
+}
+
+/// ## AsValueMut
+///
+/// implemented by types that
+/// can reflect their value
+pub trait AsValueMut {
+    fn as_value(&mut self) -> crate::Value;
 }
 
 #[cfg(test)]

@@ -112,7 +112,11 @@ impl crate::ToType for MapType {
     }
 }
 
-impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::HashMap<K, V> {
+impl<K, V> crate::TypeOf for std::collections::HashMap<K, V>
+where
+    K: crate::TypeOf,
+    V: crate::TypeOf,
+{
     fn type_of() -> crate::Type {
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
@@ -130,7 +134,11 @@ impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::Has
     }
 }
 
-impl<K: crate::TypeOf, V: crate::TypeOf> crate::ToType for std::collections::HashMap<K, V> {
+impl<K, V> crate::ToType for std::collections::HashMap<K, V>
+where
+    K: crate::TypeOf,
+    V: crate::TypeOf,
+{
     fn to_type(&self) -> crate::Type {
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
@@ -148,7 +156,11 @@ impl<K: crate::TypeOf, V: crate::TypeOf> crate::ToType for std::collections::Has
     }
 }
 
-impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::BTreeMap<K, V> {
+impl<K, V> crate::TypeOf for std::collections::BTreeMap<K, V>
+where
+    K: crate::TypeOf,
+    V: crate::TypeOf,
+{
     fn type_of() -> crate::Type {
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
@@ -166,7 +178,11 @@ impl<K: crate::TypeOf, V: crate::TypeOf> crate::TypeOf for std::collections::BTr
     }
 }
 
-impl<K: crate::TypeOf, V: crate::TypeOf> crate::ToType for std::collections::BTreeMap<K, V> {
+impl<K, V> crate::ToType for std::collections::BTreeMap<K, V>
+where
+    K: crate::TypeOf,
+    V: crate::TypeOf,
+{
     fn to_type(&self) -> crate::Type {
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
@@ -256,6 +272,12 @@ impl crate::ToValue for Map {
     }
 }
 
+impl crate::AsValue for Map {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Map(self.clone());
+    }
+}
+
 impl std::ops::Index<&crate::Value> for Map {
     type Output = crate::Value;
 
@@ -286,8 +308,10 @@ impl std::fmt::Display for Map {
     }
 }
 
-impl<K: crate::TypeOf + crate::ToValue, V: crate::TypeOf + crate::ToValue> crate::ToValue
-    for std::collections::HashMap<K, V>
+impl<K, V> crate::ToValue for std::collections::HashMap<K, V>
+where
+    K: crate::TypeOf + crate::ToValue,
+    V: crate::TypeOf + crate::ToValue,
 {
     fn to_value(self) -> crate::Value {
         let ty = self.to_type();
@@ -301,8 +325,27 @@ impl<K: crate::TypeOf + crate::ToValue, V: crate::TypeOf + crate::ToValue> crate
     }
 }
 
-impl<K: crate::TypeOf + crate::ToValue, V: crate::TypeOf + crate::ToValue> crate::ToValue
-    for std::collections::BTreeMap<K, V>
+impl<K, V> crate::AsValue for std::collections::HashMap<K, V>
+where
+    K: crate::TypeOf + crate::AsValue,
+    V: crate::TypeOf + crate::AsValue,
+{
+    fn as_value(&self) -> crate::Value {
+        let ty = self.to_type();
+        let mut value = Map::new(ty.as_map());
+
+        for (k, v) in self {
+            value.set_key_value(k.as_value(), v.as_value());
+        }
+
+        return value.as_value();
+    }
+}
+
+impl<K, V> crate::ToValue for std::collections::BTreeMap<K, V>
+where
+    K: crate::TypeOf + crate::ToValue,
+    V: crate::TypeOf + crate::ToValue,
 {
     fn to_value(self) -> crate::Value {
         let ty = self.to_type();
@@ -313,6 +356,23 @@ impl<K: crate::TypeOf + crate::ToValue, V: crate::TypeOf + crate::ToValue> crate
         }
 
         return value.to_value();
+    }
+}
+
+impl<K, V> crate::AsValue for std::collections::BTreeMap<K, V>
+where
+    K: crate::TypeOf + crate::AsValue,
+    V: crate::TypeOf + crate::AsValue,
+{
+    fn as_value(&self) -> crate::Value {
+        let ty = self.to_type();
+        let mut value = Map::new(ty.as_map());
+
+        for (k, v) in self {
+            value.set_key_value(k.as_value(), v.as_value());
+        }
+
+        return value.as_value();
     }
 }
 

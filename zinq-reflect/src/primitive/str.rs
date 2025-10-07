@@ -124,8 +124,20 @@ impl crate::ToValue for std::string::String {
     }
 }
 
+impl crate::AsValue for std::string::String {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Str(Str(self.clone()));
+    }
+}
+
 impl crate::ToValue for &str {
     fn to_value(self) -> crate::Value {
+        return crate::Value::Str(Str(self.to_string()));
+    }
+}
+
+impl crate::AsValue for &str {
+    fn as_value(&self) -> crate::Value {
         return crate::Value::Str(Str(self.to_string()));
     }
 }

@@ -189,6 +189,12 @@ impl crate::ToValue for Number {
     }
 }
 
+impl crate::AsValue for Number {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Number(self.clone());
+    }
+}
+
 impl PartialEq<crate::Value> for Number {
     fn eq(&self, other: &crate::Value) -> bool {
         return other.is_number() && other.as_number() == self;

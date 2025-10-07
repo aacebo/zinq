@@ -58,11 +58,17 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::
             }
         }
 
+        impl ::zinq_reflect::AsValue for #name {
+            fn as_value(&self) -> ::zinq_reflect::Value {
+                return ::zinq_reflect::Dynamic::from_object(self.clone()).as_value();
+            }
+        }
+
         impl ::zinq_reflect::Object for #name {
             fn field(&self, name: &::zinq_reflect::FieldName) -> ::zinq_reflect::Value {
                 #(
                     if name == stringify!(#fields) {
-                        return ::zinq_reflect::ToValue::to_value(self.#fields.clone());
+                        return ::zinq_reflect::value_of!(self.#fields.clone());
                     }
                 )*
 
@@ -119,11 +125,17 @@ pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
             }
         }
 
+        impl ::zinq_reflect::AsValue for #name {
+            fn as_value(&self) -> ::zinq_reflect::Value {
+                return ::zinq_reflect::Dynamic::from_object(self.clone()).as_value();
+            }
+        }
+
         impl ::zinq_reflect::Object for #name {
             fn field(&self, name: &::zinq_reflect::FieldName) -> ::zinq_reflect::Value {
                 #(
                     if name == stringify!(#fields) {
-                        return ::zinq_reflect::ToValue::to_value(self.#fields.clone());
+                        return ::zinq_reflect::value_of!(self.#fields.clone());
                     }
                 )*
 

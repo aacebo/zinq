@@ -103,6 +103,12 @@ impl crate::ToValue for MetaData {
     }
 }
 
+impl crate::AsValue for MetaData {
+    fn as_value(&self) -> crate::Value {
+        return crate::Dynamic::from_object(self.clone()).as_value();
+    }
+}
+
 impl crate::Object for MetaData {
     fn field(&self, name: &crate::FieldName) -> crate::Value {
         return self.get(name.as_str()).unwrap().clone();

@@ -64,6 +64,12 @@ impl crate::ToValue for bool {
     }
 }
 
+impl crate::AsValue for bool {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Bool(*self);
+    }
+}
+
 impl crate::Value {
     pub fn is_true(&self) -> bool {
         return self.is_bool() && self.to_bool() == true;

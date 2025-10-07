@@ -101,6 +101,20 @@ where
     }
 }
 
+impl<T> crate::AsValueMut for T
+where
+    T: Clone + crate::ToType + crate::ToValue + crate::AsValue,
+{
+    fn as_value(&mut self) -> crate::Value {
+        let value = self.clone();
+
+        return crate::Value::Mut(Mut {
+            ty: MutType::new(&value.to_type()),
+            value: Box::new(value.as_value()),
+        });
+    }
+}
+
 impl<T: Clone + crate::ToType + crate::ToValue> From<&T> for Mut {
     fn from(value: &T) -> Self {
         return Self {
@@ -124,6 +138,12 @@ impl crate::ToType for Mut {
 
 impl crate::ToValue for Mut {
     fn to_value(self) -> crate::Value {
+        return crate::Value::Mut(self.clone());
+    }
+}
+
+impl crate::AsValue for Mut {
+    fn as_value(&self) -> crate::Value {
         return crate::Value::Mut(self.clone());
     }
 }

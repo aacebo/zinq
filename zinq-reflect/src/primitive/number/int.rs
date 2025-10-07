@@ -1,5 +1,5 @@
 macro_rules! int {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set_value:ident $coerce_value:ident $type:ty ,)*) => {
+    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set_value:ident $type:ty ,)*) => {
         #[derive(Debug, Copy, Clone, PartialEq)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum IntType {
@@ -21,10 +21,6 @@ macro_rules! int {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
-
-                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
-                }
             )*
         }
 
@@ -42,10 +38,6 @@ macro_rules! int {
                         Self::Int(v) => v.$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
-                }
-
-                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
                 }
             )*
         }
@@ -80,10 +72,6 @@ macro_rules! int {
                         Self::$name(v) => v.clone(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
-                }
-
-                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
                 }
             )*
 
@@ -148,10 +136,6 @@ macro_rules! int {
 
                 pub fn convertable_to(&self, ty: crate::Type) -> bool {
                     return ty.is_int() && self.is_signed() == ty.is_signed();
-                }
-
-                pub fn coerce(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
                 }
             }
 
@@ -218,6 +202,12 @@ macro_rules! int {
             impl crate::ToValue for $type {
                 fn to_value(self) -> crate::Value {
                     return crate::Value::Number(crate::Number::Int(crate::Int::$name(self)));
+                }
+            }
+
+            impl crate::AsValue for $type {
+                fn as_value(&self) -> crate::Value {
+                    return crate::Value::Number(crate::Number::Int(crate::Int::$name(*self)));
                 }
             }
 
@@ -361,6 +351,12 @@ macro_rules! int {
             }
         }
 
+        impl crate::AsValue for crate::Int {
+            fn as_value(&self) -> crate::Value {
+                return crate::Value::Number(crate::Number::Int(*self));
+            }
+        }
+
         $(
             impl From<$type> for crate::Int {
                 fn from(value: $type) -> Self {
@@ -410,15 +406,15 @@ macro_rules! int {
 }
 
 int! {
-    I8 I8Type is_i8 to_i8 set_i8 coerce_i8 i8,
-    I16 I16Type is_i16 to_i16 set_i16 coerce_i16 i16,
-    I32 I32Type is_i32 to_i32 set_i32 coerce_i32 i32,
-    I64 I64Type is_i64 to_i64 set_i64 coerce_i64 i64,
+    I8 I8Type is_i8 to_i8 set_i8 i8,
+    I16 I16Type is_i16 to_i16 set_i16 i16,
+    I32 I32Type is_i32 to_i32 set_i32 i32,
+    I64 I64Type is_i64 to_i64 set_i64 i64,
 
-    U8 U8Type is_u8 to_u8 set_u8 coerce_u8 u8,
-    U16 U16Type is_u16 to_u16 set_u16 coerce_u16 u16,
-    U32 U32Type is_u32 to_u32 set_u32 coerce_u32 u32,
-    U64 U64Type is_u64 to_u64 set_u64 coerce_u64 u64,
+    U8 U8Type is_u8 to_u8 set_u8 u8,
+    U16 U16Type is_u16 to_u16 set_u16 u16,
+    U32 U32Type is_u32 to_u32 set_u32 u32,
+    U64 U64Type is_u64 to_u64 set_u64 u64,
 }
 
 #[cfg(test)]

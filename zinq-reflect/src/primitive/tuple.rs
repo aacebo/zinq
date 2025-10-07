@@ -188,18 +188,28 @@ where
 
 impl<A, B> crate::ToValue for (A, B)
 where
-    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
-    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
+    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
+    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
 {
     fn to_value(self) -> crate::Value {
         return crate::Dynamic::from_object(self).to_value();
     }
 }
 
+impl<A, B> crate::AsValue for (A, B)
+where
+    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
+    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
+{
+    fn as_value(&self) -> crate::Value {
+        return crate::Dynamic::from_object(self.clone()).as_value();
+    }
+}
+
 impl<A, B> crate::Object for (A, B)
 where
-    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
-    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + 'static,
+    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
+    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
 {
     fn field(&self, name: &crate::FieldName) -> crate::Value {
         return match name.to_string().as_str() {

@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SliceType {
-    ty: Box<crate::Type>,
-    capacity: Option<usize>,
+    pub(crate) ty: Box<crate::Type>,
+    pub(crate) capacity: Option<usize>,
 }
 
 impl SliceType {
@@ -87,20 +87,6 @@ where
     }
 }
 
-impl<T> crate::TypeOf for Vec<T>
-where
-    T: crate::TypeOf,
-{
-    fn type_of() -> crate::Type {
-        let ty = T::type_of();
-
-        return crate::Type::Slice(SliceType {
-            ty: Box::new(ty),
-            capacity: None,
-        });
-    }
-}
-
 impl<const N: usize, T> crate::ToType for [T; N]
 where
     T: crate::TypeOf,
@@ -116,20 +102,6 @@ where
 }
 
 impl<T> crate::ToType for [T]
-where
-    T: crate::TypeOf,
-{
-    fn to_type(&self) -> crate::Type {
-        let ty = T::type_of();
-
-        return crate::Type::Slice(SliceType {
-            ty: Box::new(ty),
-            capacity: None,
-        });
-    }
-}
-
-impl<T> crate::ToType for Vec<T>
 where
     T: crate::TypeOf,
 {
@@ -210,6 +182,12 @@ impl crate::ToValue for Slice {
     }
 }
 
+impl crate::AsValue for Slice {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Slice(self.clone());
+    }
+}
+
 impl<T> crate::ToValue for &[T]
 where
     T: Clone + crate::TypeOf + crate::ToValue,
@@ -221,6 +199,21 @@ where
                 capacity: None,
             },
             value: self.iter().map(|v| v.clone().to_value()).collect(),
+        });
+    }
+}
+
+impl<T> crate::AsValue for &[T]
+where
+    T: Clone + crate::TypeOf + crate::AsValue,
+{
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Slice(Slice {
+            ty: SliceType {
+                ty: Box::new(T::type_of()),
+                capacity: None,
+            },
+            value: self.iter().map(|v| v.clone().as_value()).collect(),
         });
     }
 }
@@ -240,17 +233,17 @@ where
     }
 }
 
-impl<T> crate::ToValue for Vec<T>
+impl<const N: usize, T> crate::AsValue for [T; N]
 where
-    T: Clone + crate::TypeOf + crate::ToValue,
+    T: Clone + crate::TypeOf + crate::AsValue,
 {
-    fn to_value(self) -> crate::Value {
+    fn as_value(&self) -> crate::Value {
         return crate::Value::Slice(Slice {
             ty: SliceType {
                 ty: Box::new(T::type_of()),
-                capacity: None,
+                capacity: Some(N),
             },
-            value: self.iter().map(|v| v.clone().to_value()).collect(),
+            value: self.iter().map(|v| v.clone().as_value()).collect(),
         });
     }
 }

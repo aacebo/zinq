@@ -1,5 +1,5 @@
 macro_rules! float {
-    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set_value:ident $coerce_value:ident $type:ty)*) => {
+    ($($name:ident $type_name:ident $is_type:ident $to_type:ident $set_value:ident $type:ty)*) => {
         #[derive(Debug, Copy, Clone, PartialEq)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum FloatType {
@@ -21,10 +21,6 @@ macro_rules! float {
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v),
                     };
                 }
-
-                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
-                }
             )*
         }
 
@@ -42,10 +38,6 @@ macro_rules! float {
                         Self::Float(v) => v.$to_type(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
-                }
-
-                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
                 }
             )*
         }
@@ -74,10 +66,6 @@ macro_rules! float {
                         Self::$name(v) => v.clone(),
                         v => panic!("called '{}' on type '{}'", stringify!($to_type), v.to_type()),
                     };
-                }
-
-                pub fn $coerce_value(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
                 }
             )*
 
@@ -142,10 +130,6 @@ macro_rules! float {
 
                 pub fn convertable_to(&self, ty: crate::Type) -> bool {
                     return ty.is_float();
-                }
-
-                pub fn coerce(&self, value: &'static dyn std::any::Any) -> Option<&$type> {
-                    return value.downcast_ref::<$type>();
                 }
             }
 
@@ -212,6 +196,12 @@ macro_rules! float {
             impl crate::ToValue for $type {
                 fn to_value(self) -> crate::Value {
                     return crate::Value::Number(crate::Number::Float(crate::Float::$name(self)));
+                }
+            }
+
+            impl crate::AsValue for $type {
+                fn as_value(&self) -> crate::Value {
+                    return crate::Value::Number(crate::Number::Float(crate::Float::$name(*self)));
                 }
             }
 
@@ -349,6 +339,18 @@ macro_rules! float {
             )*
         }
 
+        impl crate::ToValue for crate::Float {
+            fn to_value(self) -> crate::Value {
+                return crate::Value::Number(crate::Number::Float(self.clone()));
+            }
+        }
+
+        impl crate::AsValue for crate::Float {
+            fn as_value(&self) -> crate::Value {
+                return crate::Value::Number(crate::Number::Float(*self));
+            }
+        }
+
         $(
             impl From<$type> for crate::Float {
                 fn from(value: $type) -> Self {
@@ -398,8 +400,8 @@ macro_rules! float {
 }
 
 float! {
-    F32 F32Type is_f32 to_f32 set_f32 coerce_f32 f32
-    F64 F64Type is_f64 to_f64 set_f64 coerce_f64 f64
+    F32 F32Type is_f32 to_f32 set_f32 f32
+    F64 F64Type is_f64 to_f64 set_f64 f64
 }
 
 #[cfg(test)]

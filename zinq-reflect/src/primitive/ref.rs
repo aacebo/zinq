@@ -113,6 +113,12 @@ impl crate::ToValue for Ref {
     }
 }
 
+impl crate::AsValue for Ref {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Ref(self.clone());
+    }
+}
+
 impl AsRef<crate::Value> for Ref {
     fn as_ref(&self) -> &crate::Value {
         return &self.value;
@@ -163,6 +169,21 @@ where
     }
 }
 
+impl<T> crate::AsValue for &T
+where
+    T: Clone + crate::AsValue + crate::ToType,
+{
+    #[allow(suspicious_double_ref_op)]
+    fn as_value(&self) -> crate::Value {
+        let value = self.clone().clone();
+
+        return crate::Value::Ref(Ref {
+            ty: RefType(Box::new(value.to_type())),
+            value: Box::new(value.as_value()),
+        });
+    }
+}
+
 impl<T> crate::ToValue for Arc<T>
 where
     T: Clone + crate::ToValue + crate::ToType,
@@ -171,6 +192,18 @@ where
         return crate::Value::Ref(Ref {
             ty: RefType(Box::new(self.as_ref().to_type())),
             value: Box::new(self.as_ref().clone().to_value()),
+        });
+    }
+}
+
+impl<T> crate::AsValue for Arc<T>
+where
+    T: Clone + crate::AsValue + crate::ToType,
+{
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Ref(Ref {
+            ty: RefType(Box::new(self.as_ref().to_type())),
+            value: Box::new(self.as_ref().clone().as_value()),
         });
     }
 }

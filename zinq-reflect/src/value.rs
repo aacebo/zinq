@@ -273,6 +273,12 @@ impl crate::ToValue for Value {
     }
 }
 
+impl crate::AsValue for Value {
+    fn as_value(&self) -> crate::Value {
+        return self.clone();
+    }
+}
+
 impl crate::Object for Value {
     fn field(&self, name: &crate::FieldName) -> crate::Value {
         return match self {
@@ -290,9 +296,9 @@ impl crate::Sequence for Value {
         };
     }
 
-    fn index(&self, i: usize) -> &crate::Value {
+    fn index(&self, i: usize) -> crate::Value {
         return match self {
-            Self::Dynamic(v) => v.index(i),
+            Self::Dynamic(v) => v.index(i).clone(),
             v => panic!("called 'zinq::reflect::Sequence::len' on '{}'", v.to_type()),
         };
     }

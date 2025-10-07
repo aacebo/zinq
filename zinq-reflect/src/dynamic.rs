@@ -107,6 +107,12 @@ impl crate::ToValue for Dynamic {
     }
 }
 
+impl crate::AsValue for Dynamic {
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Dynamic(self.clone());
+    }
+}
+
 impl AsRef<dyn crate::Object> for Dynamic {
     fn as_ref(&self) -> &dyn crate::Object {
         return match self {
@@ -162,7 +168,7 @@ impl std::ops::Index<usize> for Dynamic {
 
     fn index(&self, index: usize) -> &Self::Output {
         return match self {
-            Self::Sequence(v) => v.index(index),
+            Self::Sequence(v) => v.index_ref(index),
             v => panic!("called 'std::ops::Index<usize>' on {}", v.to_type()),
         };
     }

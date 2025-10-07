@@ -48,13 +48,13 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
 
             if variant_fields.len() == 1 {
                 return quote! {
-                    Self::#variant_ident(v) => ::zinq_reflect::ToValue::to_value(v)
+                    Self::#variant_ident(v) => ::zinq_reflect::value_of!(v)
                 };
             }
 
             quote! {
                 Self::#variant_ident(#(#variant_fields,)*) => {
-                    ::zinq_reflect::ToValue::to_value((#(#variant_fields,)*))
+                    ::zinq_reflect::value_of!((#(#variant_fields,)*))
                 }
             }
         })
@@ -75,6 +75,14 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
 
         impl ::zinq_reflect::ToValue for #name {
             fn to_value(self) -> ::zinq_reflect::Value {
+                return match self {
+                    #(#variants,)*
+                };
+            }
+        }
+
+        impl ::zinq_reflect::AsValue for #name {
+            fn as_value(&self) -> ::zinq_reflect::Value {
                 return match self {
                     #(#variants,)*
                 };
@@ -120,13 +128,13 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
             if variant_fields.len() == 1 {
                 return quote! {
-                    Self::#variant_ident(v) => ::zinq_reflect::ToValue::to_value(v)
+                    Self::#variant_ident(v) => ::zinq_reflect::value_of!(v)
                 };
             }
 
             quote! {
                 Self::#variant_ident(#(#variant_fields,)*) => {
-                    ::zinq_reflect::ToValue::to_value((#(#variant_fields,)*))
+                    ::zinq_reflect::value_of!((#(#variant_fields,)*))
                 }
             }
         })
@@ -147,6 +155,14 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
         impl ::zinq_reflect::ToValue for #name {
             fn to_value(self) -> ::zinq_reflect::Value {
+                return match self {
+                    #(#variants,)*
+                };
+            }
+        }
+
+        impl ::zinq_reflect::AsValue for #name {
+            fn as_value(&self) -> ::zinq_reflect::Value {
                 return match self {
                     #(#variants,)*
                 };

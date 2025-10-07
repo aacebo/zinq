@@ -1,13 +1,20 @@
 use std::sync::Arc;
 
+use crate::TypeOf;
+
 /// ## Sequence
 ///
 /// implemented by types that
 /// can reflect their value/type and that
 /// of their individual index's in a sequence
-pub trait Sequence: std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue {
+pub trait Sequence:
+    std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue
+{
     fn len(&self) -> usize;
-    fn index(&self, i: usize) -> &crate::Value;
+    fn index(&self, i: usize) -> crate::Value;
+    fn index_ref(&self, _: usize) -> &crate::Value {
+        unimplemented!()
+    }
 }
 
 impl dyn Sequence {
@@ -39,7 +46,7 @@ impl serde::Serialize for dyn Sequence {
         let mut ser = serializer.serialize_seq(ty.capacity())?;
 
         for i in 0..self.len() {
-            ser.serialize_element(self.index(i))?;
+            ser.serialize_element(&self.index(i))?;
         }
 
         return ser.end();
@@ -63,7 +70,71 @@ impl<T: Clone + Sequence> Sequence for Arc<T> {
         return self.as_ref().len();
     }
 
-    fn index(&self, i: usize) -> &crate::Value {
+    fn index(&self, i: usize) -> crate::Value {
         return self.as_ref().index(i);
+    }
+}
+
+impl<T> crate::TypeOf for Vec<T> {
+    fn type_of() -> crate::Type {
+        return crate::StructType::new(&crate::Path::from("std::vec"), "Vec")
+            .visibility(crate::Visibility::Public(crate::Public::Full))
+            .generics(&crate::Generics::from([crate::TypeParam::new("T")
+                .build()
+                .to_generic()]))
+            .build()
+            .to_type();
+    }
+}
+
+impl<T> crate::ToType for Vec<T> {
+    fn to_type(&self) -> crate::Type {
+        return Vec::<T>::type_of();
+    }
+}
+
+impl<T> crate::ToValue for Vec<T>
+where
+    T: Clone + crate::TypeOf + crate::AsValue,
+{
+    fn to_value(self) -> crate::Value {
+        return crate::Value::Slice(crate::Slice {
+            ty: crate::SliceType {
+                ty: Box::new(T::type_of()),
+                capacity: None,
+            },
+            value: self.iter().map(|v| v.as_value()).collect::<Vec<_>>(),
+        });
+    }
+}
+
+impl<T> crate::AsValue for Vec<T>
+where
+    T: Clone + crate::TypeOf + crate::AsValue,
+{
+    fn as_value(&self) -> crate::Value {
+        return crate::Value::Slice(crate::Slice {
+            ty: crate::SliceType {
+                ty: Box::new(T::type_of()),
+                capacity: None,
+            },
+            value: self.iter().map(|v| v.as_value()).collect::<Vec<_>>(),
+        });
+    }
+}
+
+impl<T> crate::Sequence for Vec<T>
+where
+    T: Clone + std::fmt::Debug + crate::TypeOf + crate::AsValue + 'static,
+{
+    fn len(&self) -> usize {
+        return self.len();
+    }
+
+    fn index(&self, i: usize) -> crate::Value {
+        return match self.get(i) {
+            None => crate::Value::Null,
+            Some(v) => v.as_value().index(i),
+        };
     }
 }
