@@ -81,6 +81,8 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
             }
         }
 
+        impl ::zinq_reflect::Dyn for #name { }
+
         impl ::zinq_reflect::AsValue for #name {
             fn as_value(&self) -> ::zinq_reflect::Value {
                 return match self {
@@ -160,6 +162,8 @@ pub fn attr(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                 };
             }
         }
+
+        impl ::zinq_reflect::Dyn for #name { }
 
         impl ::zinq_reflect::AsValue for #name {
             fn as_value(&self) -> ::zinq_reflect::Value {

@@ -7,9 +7,7 @@ use crate::TypeOf;
 /// implemented by types that
 /// can reflect their value/type and that
 /// of their individual index's in a sequence
-pub trait Sequence:
-    std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue
-{
+pub trait Sequence: crate::Dyn {
     fn len(&self) -> usize;
     fn index(&self, i: usize) -> crate::Value;
     fn index_ref(&self, _: usize) -> &crate::Value {

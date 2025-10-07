@@ -279,6 +279,8 @@ impl crate::AsValue for Value {
     }
 }
 
+impl crate::Dyn for Value {}
+
 impl crate::Object for Value {
     fn field(&self, name: &crate::FieldName) -> crate::Value {
         return match self {
@@ -299,7 +301,10 @@ impl crate::Sequence for Value {
     fn index(&self, i: usize) -> crate::Value {
         return match self {
             Self::Dynamic(v) => v.index(i).clone(),
-            v => panic!("called 'zinq::reflect::Sequence::len' on '{}'", v.to_type()),
+            v => panic!(
+                "called 'zinq::reflect::Sequence::index' on '{}'",
+                v.to_type()
+            ),
         };
     }
 }

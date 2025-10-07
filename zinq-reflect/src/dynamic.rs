@@ -2,11 +2,16 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub enum Dynamic {
+    Dyn(Arc<dyn crate::Dyn>),
     Object(Arc<dyn crate::Object>),
     Sequence(Arc<dyn crate::Sequence>),
 }
 
 impl Dynamic {
+    pub fn from_dyn<T: crate::Dyn>(value: T) -> Self {
+        return Self::Dyn(Arc::new(value));
+    }
+
     pub fn from_object<T: crate::Object>(value: T) -> Self {
         return Self::Object(Arc::new(value));
     }
@@ -17,6 +22,7 @@ impl Dynamic {
 
     pub fn to_type(&self) -> crate::Type {
         return match self {
+            Self::Dyn(v) => v.to_type(),
             Self::Object(v) => v.to_type(),
             Self::Sequence(v) => v.to_type(),
         };
@@ -43,36 +49,45 @@ impl Dynamic {
         };
     }
 
+    pub fn as_dyn(&self) -> &dyn crate::Dyn {
+        return match self {
+            Self::Dyn(v) => v.as_ref(),
+            Self::Object(v) => v.as_ref(),
+            Self::Sequence(v) => v.as_ref(),
+        };
+    }
+
     pub fn as_object(&self) -> &dyn crate::Object {
         return match self {
             Self::Object(v) => v.as_ref(),
-            Self::Sequence(v) => panic!("called 'as_object' on '{}'", v.to_type()),
+            v => panic!("called 'as_object' on '{}'", v.to_type()),
         };
     }
 
     pub fn as_object_mut(&mut self) -> &mut dyn crate::Object {
         return match self {
             Self::Object(v) => Arc::get_mut(v).unwrap(),
-            Self::Sequence(v) => panic!("called 'as_object_mut' on '{}'", v.to_type()),
+            v => panic!("called 'as_object_mut' on '{}'", v.to_type()),
         };
     }
 
     pub fn as_sequence(&self) -> &dyn crate::Sequence {
         return match self {
             Self::Sequence(v) => v.as_ref(),
-            Self::Object(v) => panic!("called 'as_sequence' on '{}'", v.to_type()),
+            v => panic!("called 'as_sequence' on '{}'", v.to_type()),
         };
     }
 
     pub fn as_sequence_mut(&mut self) -> &mut dyn crate::Sequence {
         return match self {
             Self::Sequence(v) => Arc::get_mut(v).unwrap(),
-            Self::Object(v) => panic!("called 'as_sequence_mut' on '{}'", v.to_type()),
+            v => panic!("called 'as_sequence_mut' on '{}'", v.to_type()),
         };
     }
 
     pub fn is<T: crate::Object>(&self) -> bool {
         return match self {
+            Self::Dyn(v) => v.is::<T>(),
             Self::Object(v) => v.is::<T>(),
             Self::Sequence(v) => v.is::<T>(),
         };
@@ -80,6 +95,7 @@ impl Dynamic {
 
     pub fn to<T: crate::Object>(&self) -> &T {
         return match self {
+            Self::Dyn(v) => v.downcast_ref::<T>().unwrap(),
             Self::Object(v) => v.downcast_ref::<T>().unwrap(),
             Self::Sequence(v) => v.downcast_ref::<T>().unwrap(),
         };
@@ -95,6 +111,7 @@ impl crate::TypeOf for Dynamic {
 impl crate::ToType for Dynamic {
     fn to_type(&self) -> crate::Type {
         return match self {
+            Self::Dyn(v) => v.to_type(),
             Self::Object(v) => v.to_type(),
             Self::Sequence(v) => v.to_type(),
         };
@@ -117,7 +134,7 @@ impl AsRef<dyn crate::Object> for Dynamic {
     fn as_ref(&self) -> &dyn crate::Object {
         return match self {
             Self::Object(v) => v.as_ref(),
-            Self::Sequence(v) => panic!("called 'AsRef<dyn Object>::as_ref' on '{}'", v.to_type()),
+            v => panic!("called 'AsRef<dyn Object>::as_ref' on '{}'", v.to_type()),
         };
     }
 }
@@ -126,7 +143,7 @@ impl AsMut<dyn crate::Object> for Dynamic {
     fn as_mut(&mut self) -> &mut dyn crate::Object {
         return match self {
             Self::Object(v) => Arc::get_mut(v).unwrap(),
-            Self::Sequence(v) => panic!("called 'AsMut<dyn Object>::as_mut' on '{}'", v.to_type()),
+            v => panic!("called 'AsMut<dyn Object>::as_mut' on '{}'", v.to_type()),
         };
     }
 }
@@ -135,7 +152,7 @@ impl AsRef<dyn crate::Sequence> for Dynamic {
     fn as_ref(&self) -> &dyn crate::Sequence {
         return match self {
             Self::Sequence(v) => v.as_ref(),
-            Self::Object(v) => panic!("called 'AsRef<dyn Sequence>::as_ref' on '{}'", v.to_type()),
+            v => panic!("called 'AsRef<dyn Sequence>::as_ref' on '{}'", v.to_type()),
         };
     }
 }
@@ -144,7 +161,7 @@ impl AsMut<dyn crate::Sequence> for Dynamic {
     fn as_mut(&mut self) -> &mut dyn crate::Sequence {
         return match self {
             Self::Sequence(v) => Arc::get_mut(v).unwrap(),
-            Self::Object(v) => panic!("called 'AsMut<dyn Sequence>::as_mut' on '{}'", v.to_type()),
+            v => panic!("called 'AsMut<dyn Sequence>::as_mut' on '{}'", v.to_type()),
         };
     }
 }
@@ -177,6 +194,7 @@ impl std::ops::Index<usize> for Dynamic {
 impl std::fmt::Display for Dynamic {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return match self {
+            Self::Dyn(v) => write!(f, "{}", v.as_ref()),
             Self::Object(v) => write!(f, "{}", v.as_ref()),
             Self::Sequence(v) => write!(f, "{}", v.as_ref()),
         };
@@ -190,6 +208,7 @@ impl serde::Serialize for Dynamic {
         S: serde::Serializer,
     {
         return match self {
+            Self::Dyn(v) => v.serialize(serializer),
             Self::Object(v) => v.serialize(serializer),
             Self::Sequence(v) => v.serialize(serializer),
         };

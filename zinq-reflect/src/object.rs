@@ -5,9 +5,7 @@ use std::sync::Arc;
 /// implemented by types that
 /// can reflect their value/type and that
 /// of their individual fields
-pub trait Object:
-    std::any::Any + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue
-{
+pub trait Object: crate::Dyn {
     fn field(&self, name: &crate::FieldName) -> crate::Value;
 }
 

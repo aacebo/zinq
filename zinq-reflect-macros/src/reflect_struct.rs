@@ -64,6 +64,8 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataStruct) -> proc_macro2::
             }
         }
 
+        impl ::zinq_reflect::Dyn for #name { }
+
         impl ::zinq_reflect::Object for #name {
             fn field(&self, name: &::zinq_reflect::FieldName) -> ::zinq_reflect::Value {
                 #(
@@ -130,6 +132,8 @@ pub fn attr(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
                 return ::zinq_reflect::Dynamic::from_object(self.clone()).as_value();
             }
         }
+
+        impl ::zinq_reflect::Dyn for #name { }
 
         impl ::zinq_reflect::Object for #name {
             fn field(&self, name: &::zinq_reflect::FieldName) -> ::zinq_reflect::Value {

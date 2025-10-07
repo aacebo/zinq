@@ -206,6 +206,13 @@ where
     }
 }
 
+impl<A, B> crate::Dyn for (A, B)
+where
+    A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
+    B: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
+{
+}
+
 impl<A, B> crate::Object for (A, B)
 where
     A: Clone + std::fmt::Debug + crate::ToType + crate::ToValue + crate::AsValue + 'static,
