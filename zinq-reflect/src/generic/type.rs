@@ -7,8 +7,8 @@ pub struct TypeParam {
 }
 
 impl TypeParam {
-    pub fn new(name: &str) -> crate::build::TypeParamBuilder {
-        return crate::build::TypeParamBuilder::new(name);
+    pub fn new() -> crate::TypeParamBuilder {
+        return crate::TypeParamBuilder::new();
     }
 
     pub fn to_generic(&self) -> crate::Generic {
@@ -52,5 +52,49 @@ impl std::fmt::Display for TypeParam {
         }
 
         return Ok(());
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct TypeParamBuilder(crate::TypeParam);
+
+impl TypeParamBuilder {
+    pub fn new() -> Self {
+        return Self(crate::TypeParam {
+            name: String::from(""),
+            default: None,
+            bounds: vec![],
+        });
+    }
+
+    pub fn with_name(&self, name: &str) -> Self {
+        let mut next = self.clone();
+        next.0.name = name.to_string();
+        return next;
+    }
+
+    pub fn with_default(&self, default: &crate::Type) -> Self {
+        let mut next = self.clone();
+        next.0.default = Some(default.clone());
+        return next;
+    }
+
+    pub fn with_bounds(&self, bounds: &[crate::Bound]) -> Self {
+        let mut next = self.clone();
+        next.0.bounds.append(&mut bounds.to_vec());
+        return next;
+    }
+
+    pub fn with_bound(&self, bound: &crate::Bound) -> Self {
+        let mut next = self.clone();
+        next.0.bounds.push(bound.clone());
+        return next;
+    }
+
+    pub fn build(&self) -> crate::TypeParam {
+        return self.0.clone();
     }
 }

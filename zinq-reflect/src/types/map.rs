@@ -80,8 +80,8 @@ where
             .with_name("HashMap")
             .with_visibility(crate::Visibility::Public(crate::Public::Full))
             .with_generics(&crate::Generics::from([
-                crate::TypeParam::new("K").build().to_generic(),
-                crate::TypeParam::new("V").build().to_generic(),
+                crate::TypeParam::new().with_name("K").build().to_generic(),
+                crate::TypeParam::new().with_name("V").build().to_generic(),
             ]))
             .build()
             .to_type();
@@ -104,8 +104,8 @@ where
             .with_name("HashMap")
             .with_visibility(crate::Visibility::Public(crate::Public::Full))
             .with_generics(&crate::Generics::from([
-                crate::TypeParam::new("K").build().to_generic(),
-                crate::TypeParam::new("V").build().to_generic(),
+                crate::TypeParam::new().with_name("K").build().to_generic(),
+                crate::TypeParam::new().with_name("V").build().to_generic(),
             ]))
             .build()
             .to_type();
@@ -128,8 +128,8 @@ where
             .with_name("BTreeMap")
             .with_visibility(crate::Visibility::Public(crate::Public::Full))
             .with_generics(&crate::Generics::from([
-                crate::TypeParam::new("K").build().to_generic(),
-                crate::TypeParam::new("V").build().to_generic(),
+                crate::TypeParam::new().with_name("K").build().to_generic(),
+                crate::TypeParam::new().with_name("V").build().to_generic(),
             ]))
             .build()
             .to_type();
@@ -152,8 +152,8 @@ where
             .with_name("BTreeMap")
             .with_visibility(crate::Visibility::Public(crate::Public::Full))
             .with_generics(&crate::Generics::from([
-                crate::TypeParam::new("K").build().to_generic(),
-                crate::TypeParam::new("V").build().to_generic(),
+                crate::TypeParam::new().with_name("K").build().to_generic(),
+                crate::TypeParam::new().with_name("V").build().to_generic(),
             ]))
             .build()
             .to_type();
