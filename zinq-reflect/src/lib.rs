@@ -1,10 +1,10 @@
-pub mod bound;
+mod bound;
 mod r#box;
-pub mod build;
-pub mod dynamic;
+mod build;
+mod dynamic;
 mod field;
-pub mod fields;
-pub mod generic;
+mod fields;
+mod generic;
 mod get;
 mod r#impl;
 mod item;
