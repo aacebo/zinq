@@ -1,10 +1,10 @@
-mod _const;
-mod _lifetime;
-mod _type;
+mod r#const;
+mod lifetime;
+mod r#type;
 
-pub use _const::*;
-pub use _lifetime::*;
-pub use _type::*;
+pub use r#const::*;
+pub use lifetime::*;
+pub use r#type::*;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

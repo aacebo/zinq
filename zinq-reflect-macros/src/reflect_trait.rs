@@ -49,7 +49,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                     .map(|arg| match arg {
                         syn::FnArg::Receiver(recv) => {
                             let mut param_ty = quote! {
-                                ::zinq_reflect::SelfType.to_type()
+                                ::zinq_reflect::ThisType.to_type()
                             };
 
                             if let Some(_) = &recv.mutability {

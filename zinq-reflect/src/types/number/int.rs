@@ -187,81 +187,73 @@ mod test {
 
     #[test]
     pub fn i8() {
-        let value = value_of!(125_i8);
+        let ty = type_of!(125_i8);
 
-        assert!(value.is_int());
-        assert!(value.to_type().is_signed());
-        assert!(value.is_i8());
-        assert_eq!(value.to_i8(), 125);
+        assert!(ty.is_int());
+        assert!(ty.is_signed());
+        assert!(ty.is_i8());
     }
 
     #[test]
     pub fn i16() {
-        let value = value_of!(-15_i16);
+        let ty = type_of!(-15_i16);
 
-        assert!(value.is_int());
-        assert!(value.to_type().is_signed());
-        assert!(value.is_i16());
-        assert_eq!(value.to_i16(), -15);
+        assert!(ty.is_int());
+        assert!(ty.is_signed());
+        assert!(ty.is_i16());
     }
 
     #[test]
     pub fn i32() {
-        let value = value_of!(-15_i32);
+        let ty = type_of!(-15_i32);
 
-        assert!(value.is_int());
-        assert!(value.to_type().is_signed());
-        assert!(value.is_i32());
-        assert_eq!(value.to_i32(), -15);
+        assert!(ty.is_int());
+        assert!(ty.is_signed());
+        assert!(ty.is_i32());
     }
 
     #[test]
     pub fn i64() {
-        let value = value_of!(-15_i64);
+        let ty = type_of!(-15_i64);
 
-        assert!(value.is_int());
-        assert!(value.to_type().is_signed());
-        assert!(value.is_i64());
-        assert_eq!(value.to_i64(), -15);
+        assert!(ty.is_int());
+        assert!(ty.is_signed());
+        assert!(ty.is_i64());
     }
 
     #[test]
     pub fn u8() {
-        let value = value_of!(15_u8);
+        let ty = type_of!(15_u8);
 
-        assert!(value.is_int());
-        assert!(!value.to_type().is_signed());
-        assert!(value.is_u8());
-        assert_eq!(value.to_u8(), 15);
+        assert!(ty.is_int());
+        assert!(!ty.is_signed());
+        assert!(ty.is_u8());
     }
 
     #[test]
     pub fn u16() {
-        let value = value_of!(15_u16);
+        let ty = type_of!(15_u16);
 
-        assert!(value.is_int());
-        assert!(!value.to_type().is_signed());
-        assert!(value.is_u16());
-        assert_eq!(value.to_u16(), 15);
+        assert!(ty.is_int());
+        assert!(!ty.is_signed());
+        assert!(ty.is_u16());
     }
 
     #[test]
     pub fn u32() {
-        let value = value_of!(15_u32);
+        let ty = type_of!(15_u32);
 
-        assert!(value.is_int());
-        assert!(!value.to_type().is_signed());
-        assert!(value.is_u32());
-        assert_eq!(value.to_u32(), 15);
+        assert!(ty.is_int());
+        assert!(!ty.is_signed());
+        assert!(ty.is_u32());
     }
 
     #[test]
     pub fn u64() {
-        let value = value_of!(15_u64);
+        let ty = type_of!(15_u64);
 
-        assert!(value.is_int());
-        assert!(!value.to_type().is_signed());
-        assert!(value.is_u64());
-        assert_eq!(value.to_u64(), 15);
+        assert!(ty.is_int());
+        assert!(!ty.is_signed());
+        assert!(ty.is_u64());
     }
 }

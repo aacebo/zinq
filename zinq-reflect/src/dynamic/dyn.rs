@@ -43,5 +43,4 @@ impl std::fmt::Display for dyn Dyn {
 }
 
 impl<T: Clone + Dyn> Dyn for Arc<T> {}
-
 impl<T> Dyn for Vec<T> where T: Clone + std::fmt::Debug + crate::TypeOf + crate::AsValue + 'static {}

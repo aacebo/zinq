@@ -10,7 +10,7 @@ pub enum Type {
     Slice(crate::SliceType),
     Map(crate::MapType),
     Struct(crate::StructType),
-    _Self(crate::SelfType),
+    This(crate::ThisType),
     Tuple(crate::TupleType),
     Trait(crate::TraitType),
     Mut(crate::MutType),
@@ -30,7 +30,7 @@ impl Type {
             Self::Slice(v) => v.id(),
             Self::Map(v) => v.id(),
             Self::Struct(v) => v.id(),
-            Self::_Self(v) => v.id(),
+            Self::This(v) => v.id(),
             Self::Tuple(v) => v.id(),
             Self::Trait(v) => v.id(),
             Self::Mut(v) => v.id(),
@@ -191,7 +191,7 @@ impl Type {
 
     pub fn is_self(&self) -> bool {
         return match self {
-            Self::_Self(_) => true,
+            Self::This(_) => true,
             _ => false,
         };
     }
@@ -378,16 +378,16 @@ impl Type {
         };
     }
 
-    pub fn to_self(&self) -> crate::SelfType {
+    pub fn to_self(&self) -> crate::ThisType {
         return match self {
-            Self::_Self(v) => v.clone(),
+            Self::This(v) => v.clone(),
             _ => panic!("called 'to_self' on '{}'", self.id()),
         };
     }
 
-    pub fn as_self(&self) -> &crate::SelfType {
+    pub fn as_self(&self) -> &crate::ThisType {
         return match self {
-            Self::_Self(v) => v,
+            Self::This(v) => v,
             _ => panic!("called 'as_self' on '{}'", self.id()),
         };
     }
@@ -471,7 +471,7 @@ impl Type {
             Self::Ref(v) => v.assignable_to(ty),
             Self::Slice(v) => v.assignable_to(ty),
             Self::Struct(v) => v.assignable_to(ty),
-            Self::_Self(v) => v.assignable_to(ty),
+            Self::This(v) => v.assignable_to(ty),
             Self::Tuple(v) => v.assignable_to(ty),
             Self::Trait(v) => v.assignable_to(ty),
             Self::Mut(v) => v.assignable_to(ty),
@@ -490,7 +490,7 @@ impl Type {
             Self::Ref(v) => v.convertable_to(ty),
             Self::Slice(v) => v.convertable_to(ty),
             Self::Struct(v) => v.convertable_to(ty),
-            Self::_Self(v) => v.convertable_to(ty),
+            Self::This(v) => v.convertable_to(ty),
             Self::Tuple(v) => v.convertable_to(ty),
             Self::Trait(v) => v.convertable_to(ty),
             Self::Mut(v) => v.convertable_to(ty),
@@ -512,7 +512,7 @@ impl std::fmt::Display for Type {
             Self::Ref(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
-            Self::_Self(v) => write!(f, "{}", v),
+            Self::This(v) => write!(f, "{}", v),
             Self::Tuple(v) => write!(f, "{}", v),
             Self::Trait(v) => write!(f, "{}", v),
             Self::Mut(v) => write!(f, "{}", v),

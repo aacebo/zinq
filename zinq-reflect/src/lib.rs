@@ -14,7 +14,7 @@ mod method;
 mod param;
 mod path;
 mod set;
-mod ty;
+mod r#type;
 mod type_id;
 mod type_of;
 mod value;
@@ -39,7 +39,7 @@ pub use param::*;
 pub use path::*;
 #[allow(unused)]
 pub use set::*;
-pub use ty::*;
+pub use r#type::*;
 pub use type_id::*;
 pub use type_of::*;
 pub use value::*;
