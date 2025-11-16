@@ -177,11 +177,13 @@ pub fn build(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
     };
 
     return quote! {
-        ::zinq_reflect::StructType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
-            .visibility(#vis)
-            .meta(&#meta)
-            .generics(&#generics)
-            .fields(
+        ::zinq_reflect::StructType::new()
+            .with_path(&(::zinq_reflect::Path::from(module_path!())))
+            .with_name(stringify!(#name))
+            .with_visibility(#vis)
+            .with_meta(&#meta)
+            .with_generics(&#generics)
+            .with_fields(
                 ::zinq_reflect::Fields::new()
                     .with_layout(#layout)
                     .with_fields(&[#(#fields,)*])

@@ -75,9 +75,11 @@ where
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
         let value = V::type_of();
-        let ty = crate::StructType::new(&path, "HashMap")
-            .visibility(crate::Visibility::Public(crate::Public::Full))
-            .generics(&crate::Generics::from([
+        let ty = crate::StructType::new()
+            .with_path(&path)
+            .with_name("HashMap")
+            .with_visibility(crate::Visibility::Public(crate::Public::Full))
+            .with_generics(&crate::Generics::from([
                 crate::TypeParam::new("K").build().to_generic(),
                 crate::TypeParam::new("V").build().to_generic(),
             ]))
@@ -97,9 +99,11 @@ where
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
         let value = V::type_of();
-        let ty = crate::StructType::new(&path, "HashMap")
-            .visibility(crate::Visibility::Public(crate::Public::Full))
-            .generics(&crate::Generics::from([
+        let ty = crate::StructType::new()
+            .with_path(&path)
+            .with_name("HashMap")
+            .with_visibility(crate::Visibility::Public(crate::Public::Full))
+            .with_generics(&crate::Generics::from([
                 crate::TypeParam::new("K").build().to_generic(),
                 crate::TypeParam::new("V").build().to_generic(),
             ]))
@@ -119,9 +123,11 @@ where
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
         let value = V::type_of();
-        let ty = crate::StructType::new(&path, "BTreeMap")
-            .visibility(crate::Visibility::Public(crate::Public::Full))
-            .generics(&crate::Generics::from([
+        let ty = crate::StructType::new()
+            .with_path(&path)
+            .with_name("BTreeMap")
+            .with_visibility(crate::Visibility::Public(crate::Public::Full))
+            .with_generics(&crate::Generics::from([
                 crate::TypeParam::new("K").build().to_generic(),
                 crate::TypeParam::new("V").build().to_generic(),
             ]))
@@ -141,9 +147,11 @@ where
         let path = crate::Path::from("std::collections");
         let key = K::type_of();
         let value = V::type_of();
-        let ty = crate::StructType::new(&path, "BTreeMap")
-            .visibility(crate::Visibility::Public(crate::Public::Full))
-            .generics(&crate::Generics::from([
+        let ty = crate::StructType::new()
+            .with_path(&path)
+            .with_name("BTreeMap")
+            .with_visibility(crate::Visibility::Public(crate::Public::Full))
+            .with_generics(&crate::Generics::from([
                 crate::TypeParam::new("K").build().to_generic(),
                 crate::TypeParam::new("V").build().to_generic(),
             ]))

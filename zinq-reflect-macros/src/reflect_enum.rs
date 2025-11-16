@@ -189,7 +189,9 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
 
             match &variant.fields {
                 syn::Fields::Unit => quote! {
-                    ::zinq_reflect::Variant::new(stringify!(#variant_name)).build()
+                    ::zinq_reflect::Variant::new()
+                        .with_name(stringify!(#variant_name))
+                        .build()
                 },
                 syn::Fields::Named(named_fields) => {
                     let fields = named_fields
@@ -200,9 +202,10 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                         .collect::<Vec<_>>();
 
                     quote! {
-                        ::zinq_reflect::Variant::new(stringify!(#variant_name))
-                            .meta(&#variant_meta)
-                            .fields(
+                        ::zinq_reflect::Variant::new()
+                            .with_name(stringify!(#variant_name))
+                            .with_meta(&#variant_meta)
+                            .with_fields(
                                 ::zinq_reflect::Fields::new()
                                     .with_layout(::zinq_reflect::Layout::Key)
                                     .with_fields(&[#(#fields,)*])
@@ -221,9 +224,10 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                         .collect::<Vec<_>>();
 
                     quote! {
-                        ::zinq_reflect::Variant::new(stringify!(#variant_name))
-                            .meta(&#variant_meta)
-                            .fields(
+                        ::zinq_reflect::Variant::new()
+                            .with_name(stringify!(#variant_name))
+                            .with_meta(&#variant_meta)
+                            .with_fields(
                                 ::zinq_reflect::Fields::new()
                                     .with_layout(::zinq_reflect::Layout::Index)
                                     .with_fields(&[#(#fields,)*])
