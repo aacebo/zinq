@@ -1,7 +1,6 @@
 mod _mod;
 mod _mut;
 mod _self;
-pub mod build;
 pub mod dynamic;
 mod r#enum;
 mod r#impl;

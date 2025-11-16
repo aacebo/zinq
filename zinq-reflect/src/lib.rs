@@ -1,5 +1,6 @@
 pub mod bound;
 mod r#box;
+pub mod build;
 mod field;
 pub mod fields;
 pub mod generic;
