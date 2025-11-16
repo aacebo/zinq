@@ -1,6 +1,7 @@
 pub mod bound;
 mod r#box;
 pub mod build;
+pub mod dynamic;
 mod field;
 pub mod fields;
 pub mod generic;
@@ -23,6 +24,7 @@ mod visibility;
 
 pub use bound::*;
 pub use r#box::*;
+pub use dynamic::*;
 pub use field::*;
 pub use fields::*;
 pub use generic::*;

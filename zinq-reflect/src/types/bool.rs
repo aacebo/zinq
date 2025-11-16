@@ -51,35 +51,6 @@ impl crate::ToType for bool {
         return Self::type_of();
     }
 }
-
-impl From<bool> for crate::Value {
-    fn from(value: bool) -> Self {
-        return Self::Bool(value);
-    }
-}
-
-impl crate::ToValue for bool {
-    fn to_value(self) -> crate::Value {
-        return crate::Value::Bool(self);
-    }
-}
-
-impl crate::AsValue for bool {
-    fn as_value(&self) -> crate::Value {
-        return crate::Value::Bool(*self);
-    }
-}
-
-impl crate::Value {
-    pub fn is_true(&self) -> bool {
-        return self.is_bool() && self.to_bool() == true;
-    }
-
-    pub fn is_false(&self) -> bool {
-        return self.is_bool() && self.to_bool() == false;
-    }
-}
-
 #[cfg(test)]
 mod test {
     use crate::*;
