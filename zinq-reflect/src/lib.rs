@@ -44,5 +44,8 @@ pub use visibility::*;
 pub mod types;
 pub use types::*;
 
+pub mod values;
+pub use values::*;
+
 #[cfg(feature = "macros")]
 pub use zinq_reflect_macros::*;
