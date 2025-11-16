@@ -8,8 +8,8 @@ pub struct ModType {
 }
 
 impl ModType {
-    pub fn new(path: &crate::Path) -> crate::build::ModTypeBuilder {
-        return crate::build::ModTypeBuilder::new(path);
+    pub fn new() -> crate::ModTypeBuilder {
+        return crate::ModTypeBuilder::new();
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -86,5 +86,50 @@ impl std::fmt::Display for ModType {
         }
 
         return write!(f, "}}");
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct ModTypeBuilder(crate::ModType);
+
+impl ModTypeBuilder {
+    pub fn new() -> Self {
+        return Self(crate::ModType {
+            path: crate::Path::new(),
+            meta: crate::MetaData::new(),
+            vis: crate::Visibility::Private,
+            items: vec![],
+        });
+    }
+
+    pub fn with_path(&self, path: &crate::Path) -> Self {
+        let mut next = self.clone();
+        next.0.path = path.clone();
+        return next;
+    }
+
+    pub fn with_meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
+    pub fn with_visibility(&self, vis: crate::Visibility) -> Self {
+        let mut next = self.clone();
+        next.0.vis = vis;
+        return next;
+    }
+
+    pub fn with_items(&self, items: &[crate::Item]) -> Self {
+        let mut next = self.clone();
+        next.0.items.append(&mut items.to_vec());
+        return next;
+    }
+
+    pub fn build(&self) -> crate::ModType {
+        return self.0.clone();
     }
 }
