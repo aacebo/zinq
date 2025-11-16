@@ -10,8 +10,8 @@ pub struct EnumType {
 }
 
 impl EnumType {
-    pub fn new(path: &crate::Path, name: &str) -> crate::build::EnumTypeBuilder {
-        return crate::build::EnumTypeBuilder::new(path, name);
+    pub fn new() -> EnumTypeBuilder {
+        return EnumTypeBuilder::new();
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -94,5 +94,70 @@ impl std::fmt::Display for EnumType {
         }
 
         return write!(f, "}}");
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct EnumTypeBuilder(crate::EnumType);
+
+impl EnumTypeBuilder {
+    pub fn new() -> Self {
+        return Self(crate::EnumType {
+            path: crate::Path::new(),
+            meta: crate::MetaData::new(),
+            vis: crate::Visibility::Private,
+            name: String::new(),
+            generics: crate::Generics::new(),
+            variants: vec![],
+        });
+    }
+
+    pub fn with_path(&self, path: &crate::Path) -> Self {
+        let mut next = self.clone();
+        next.0.path = path.clone();
+        return next;
+    }
+
+    pub fn with_name(&self, name: &str) -> Self {
+        let mut next = self.clone();
+        next.0.name = name.to_string();
+        return next;
+    }
+
+    pub fn with_meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
+    pub fn with_visibility(&self, vis: crate::Visibility) -> Self {
+        let mut next = self.clone();
+        next.0.vis = vis;
+        return next;
+    }
+
+    pub fn with_generics(&self, generics: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.generics = generics.clone();
+        return next;
+    }
+
+    pub fn with_variants(&self, variants: &[crate::Variant]) -> Self {
+        let mut next = self.clone();
+        next.0.variants.append(&mut variants.to_vec());
+        return next;
+    }
+
+    pub fn with_variant(&self, variant: &crate::Variant) -> Self {
+        let mut next = self.clone();
+        next.0.variants.push(variant.clone());
+        return next;
+    }
+
+    pub fn build(&self) -> crate::EnumType {
+        return self.0.clone();
     }
 }

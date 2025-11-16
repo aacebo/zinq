@@ -3,6 +3,10 @@
 pub struct Path(Vec<String>);
 
 impl Path {
+    pub fn new() -> Self {
+        return Self(vec![]);
+    }
+
     pub fn len(&self) -> usize {
         return self.0.len();
     }

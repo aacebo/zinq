@@ -238,11 +238,13 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
         .collect::<Vec<_>>();
 
     return quote! {
-        ::zinq_reflect::EnumType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
-            .meta(&#meta)
-            .generics(&#generics)
-            .visibility(#vis)
-            .variants(&[#(#variants,)*])
+        ::zinq_reflect::EnumType::new()
+            .with_path(&(::zinq_reflect::Path::from(module_path!())))
+            .with_name(stringify!(#name))
+            .with_meta(&#meta)
+            .with_generics(&#generics)
+            .with_visibility(#vis)
+            .with_variants(&[#(#variants,)*])
             .build()
             .to_type()
     };

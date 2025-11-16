@@ -1,5 +1,3 @@
-mod r#enum;
-mod field;
 mod fields;
 mod r#impl;
 mod method;
@@ -9,8 +7,6 @@ mod r#trait;
 mod type_param;
 mod variant;
 
-pub use r#enum::*;
-pub use field::*;
 pub use fields::*;
 pub use r#impl::*;
 pub use method::*;
