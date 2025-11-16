@@ -10,8 +10,8 @@ pub struct TraitType {
 }
 
 impl TraitType {
-    pub fn new(path: &crate::Path, name: &str) -> crate::build::TraitTypeBuilder {
-        return crate::build::TraitTypeBuilder::new(path, name);
+    pub fn new() -> crate::TraitTypeBuilder {
+        return crate::TraitTypeBuilder::new();
     }
 
     pub fn to_type(&self) -> crate::Type {
@@ -140,5 +140,70 @@ impl std::fmt::Display for TraitType {
         }
 
         return write!(f, "}}");
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct TraitTypeBuilder(crate::TraitType);
+
+impl TraitTypeBuilder {
+    pub fn new() -> Self {
+        return Self(crate::TraitType {
+            path: crate::Path::new(),
+            meta: crate::MetaData::new(),
+            vis: crate::Visibility::Private,
+            name: String::from(""),
+            generics: crate::Generics::new(),
+            methods: vec![],
+        });
+    }
+
+    pub fn with_path(&self, path: &crate::Path) -> Self {
+        let mut next = self.clone();
+        next.0.path = path.clone();
+        return next;
+    }
+
+    pub fn with_name(&self, name: &str) -> Self {
+        let mut next = self.clone();
+        next.0.name = name.to_string();
+        return next;
+    }
+
+    pub fn with_meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
+    pub fn with_visibility(&self, vis: crate::Visibility) -> Self {
+        let mut next = self.clone();
+        next.0.vis = vis;
+        return next;
+    }
+
+    pub fn with_generics(&self, generics: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.generics = generics.clone();
+        return next;
+    }
+
+    pub fn with_methods(&self, methods: &[crate::Method]) -> Self {
+        let mut next = self.clone();
+        next.0.methods.append(&mut methods.to_vec());
+        return next;
+    }
+
+    pub fn with_method(&self, method: &crate::Method) -> Self {
+        let mut next = self.clone();
+        next.0.methods.push(method.clone());
+        return next;
+    }
+
+    pub fn build(&self) -> crate::TraitType {
+        return self.0.clone();
     }
 }
