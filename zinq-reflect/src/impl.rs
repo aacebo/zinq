@@ -10,8 +10,8 @@ pub struct Impl {
 }
 
 impl Impl {
-    pub fn new(path: &crate::Path, self_ty: &crate::Type) -> crate::build::ImplBuilder {
-        return crate::build::ImplBuilder::new(path, self_ty);
+    pub fn new() -> crate::ImplBuilder {
+        return crate::ImplBuilder::new();
     }
 
     pub fn to_item(&self) -> crate::Item {
@@ -87,5 +87,70 @@ impl std::fmt::Display for Impl {
         }
 
         return write!(f, "}}");
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct ImplBuilder(crate::Impl);
+
+impl ImplBuilder {
+    pub fn new() -> Self {
+        return Self(crate::Impl {
+            path: crate::Path::new(),
+            meta: crate::MetaData::new(),
+            of_trait: None,
+            self_ty: crate::Type::Any,
+            generics: crate::Generics::new(),
+            methods: vec![],
+        });
+    }
+
+    pub fn with_path(&self, path: &crate::Path) -> Self {
+        let mut next = self.clone();
+        next.0.path = path.clone();
+        return next;
+    }
+
+    pub fn with_type(&self, ty: &crate::Type) -> Self {
+        let mut next = self.clone();
+        next.0.self_ty = ty.clone();
+        return next;
+    }
+
+    pub fn with_meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
+    pub fn with_of(&self, _trait: &crate::Path) -> Self {
+        let mut next = self.clone();
+        next.0.of_trait = Some(_trait.clone());
+        return next;
+    }
+
+    pub fn with_generics(&self, generics: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.generics = generics.clone();
+        return next;
+    }
+
+    pub fn with_methods(&self, methods: &[crate::Method]) -> Self {
+        let mut next = self.clone();
+        next.0.methods.append(&mut methods.to_vec());
+        return next;
+    }
+
+    pub fn with_method(&self, method: &crate::Method) -> Self {
+        let mut next = self.clone();
+        next.0.methods.push(method.clone());
+        return next;
+    }
+
+    pub fn build(&self) -> crate::Impl {
+        return self.0.clone();
     }
 }

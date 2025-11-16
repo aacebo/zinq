@@ -6,7 +6,7 @@ impl VariantBuilder {
         return Self(crate::Variant {
             meta: crate::MetaData::new(),
             name: name.to_string(),
-            fields: super::FieldsBuilder::new().build(),
+            fields: crate::FieldsBuilder::new().build(),
         });
     }
 

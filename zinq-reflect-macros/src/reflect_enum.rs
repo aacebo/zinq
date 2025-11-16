@@ -204,8 +204,8 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                             .meta(&#variant_meta)
                             .fields(
                                 ::zinq_reflect::Fields::new()
-                                    .layout(::zinq_reflect::Layout::Key)
-                                    .fields(&[#(#fields,)*])
+                                    .with_layout(::zinq_reflect::Layout::Key)
+                                    .with_fields(&[#(#fields,)*])
                                     .build()
                                     .as_ref()
                             )
@@ -225,8 +225,8 @@ pub fn build(item: &syn::ItemEnum) -> proc_macro2::TokenStream {
                             .meta(&#variant_meta)
                             .fields(
                                 ::zinq_reflect::Fields::new()
-                                    .layout(::zinq_reflect::Layout::Index)
-                                    .fields(&[#(#fields,)*])
+                                    .with_layout(::zinq_reflect::Layout::Index)
+                                    .with_fields(&[#(#fields,)*])
                                     .build()
                                     .as_ref()
                             )

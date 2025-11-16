@@ -9,7 +9,7 @@ impl StructTypeBuilder {
             vis: crate::Visibility::Private,
             name: name.to_string(),
             generics: crate::Generics::new(),
-            fields: super::FieldsBuilder::new().build(),
+            fields: crate::FieldsBuilder::new().build(),
         });
     }
 

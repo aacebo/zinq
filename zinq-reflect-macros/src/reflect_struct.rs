@@ -183,8 +183,8 @@ pub fn build(item: &syn::ItemStruct) -> proc_macro2::TokenStream {
             .generics(&#generics)
             .fields(
                 ::zinq_reflect::Fields::new()
-                    .layout(#layout)
-                    .fields(&[#(#fields,)*])
+                    .with_layout(#layout)
+                    .with_fields(&[#(#fields,)*])
                     .build()
                     .as_ref()
             )

@@ -13,16 +13,20 @@ pub fn build(item: &syn::ItemImpl) -> proc_macro2::TokenStream {
 
     return match &impl_trait {
         None => quote! {
-            ::zinq_reflect::Impl::new(&(::zinq_reflect::Path::from(module_path!())), &(::zinq_reflect::type_of!(#impl_for)))
-                .meta(&#impl_meta)
-                .generics(&#impl_generics)
+            ::zinq_reflect::Impl::new()
+                .with_path(&(::zinq_reflect::Path::from(module_path!())))
+                .with_type(&(::zinq_reflect::type_of!(#impl_for)))
+                .with_meta(&#impl_meta)
+                .with_generics(&#impl_generics)
                 .build()
         },
         Some(of) => quote! {
-            ::zinq_reflect::Impl::new(&(::zinq_reflect::Path::from(module_path!())), &(::zinq_reflect::type_of!(#impl_for)))
-                .meta(&#impl_meta)
-                .generics(&#impl_generics)
-                .of(&(::zinq_reflect::Path::from(stringify!(#of))))
+            ::zinq_reflect::Impl::new()
+                .with_path(&(::zinq_reflect::Path::from(module_path!())))
+                .with_type(&(::zinq_reflect::type_of!(#impl_for)))
+                .with_meta(&#impl_meta)
+                .with_generics(&#impl_generics)
+                .with_of(&(::zinq_reflect::Path::from(stringify!(#of))))
                 .build()
         },
     };
