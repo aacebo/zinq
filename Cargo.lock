@@ -75,6 +75,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "zinq-error"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "zinq-error-macros",
+]
+
+[[package]]
+name = "zinq-error-macros"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "zinq-error",
+ "zinq-reflect",
+]
+
+[[package]]
 name = "zinq-query"
 version = "0.0.0"
 dependencies = [
