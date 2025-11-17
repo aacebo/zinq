@@ -1,46 +1,132 @@
-mod error;
-mod error_group;
-
-pub use error::*;
-pub use error_group::*;
-
 #[cfg(feature = "macros")]
 pub use zinq_error_macros::*;
 
 pub trait ToError {
-    fn to_error(&self) -> ZinqError;
+    fn to_error(&self) -> Error;
 }
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum ZinqError {
-    Error(Error),
-    Group(ErrorGroup),
+pub struct Error {
+    name: Option<String>,
+    code: Option<u16>,
+    message: Option<String>,
+    children: Vec<Self>,
 }
 
-impl ZinqError {
-    pub fn len(&self) -> usize {
-        return match self {
-            Self::Error(v) => v.len(),
-            Self::Group(v) => v.len(),
+impl Error {
+    pub fn new() -> ErrorBuilder {
+        return ErrorBuilder::new();
+    }
+
+    pub fn name(&self) -> Option<&str> {
+        return match &self.name {
+            None => None,
+            Some(v) => Some(&v),
         };
     }
-}
 
-impl std::fmt::Display for ZinqError {
+    pub fn code(&self) -> Option<u16> {
+        return self.code;
+    }
+
+    pub fn message(&self) -> Option<&str> {
+        return match &self.message {
+            None => None,
+            Some(v) => Some(&v),
+        };
+    }
+
+    pub fn children(&self) -> &[Self] {
+        return &self.children;
+    }
+}
+impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return match self {
-            Self::Error(v) => write!(f, "{}", v),
-            Self::Group(v) => write!(f, "{}", v),
-        };
+        if let Some(message) = &self.message {
+            write!(f, "{}", message)?;
+        }
+
+        if self.children.is_empty() {
+            return Ok(());
+        }
+
+        write!(f, " [")?;
+
+        for (i, error) in self.children.iter().enumerate() {
+            write!(f, "\n\t{}", error)?;
+
+            if i < self.children.len() - 1 {
+                write!(f, ",")?;
+            }
+        }
+
+        return write!(f, "]");
     }
 }
 
-impl std::error::Error for ZinqError {
+impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        return match self {
-            Self::Error(v) => v.source(),
-            Self::Group(v) => v.source(),
-        };
+        if self.children.len() > 0 {
+            let source = self.children.first().unwrap();
+            return Some(source);
+        }
+
+        return None;
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct ErrorBuilder(Error);
+
+impl ErrorBuilder {
+    pub fn new() -> Self {
+        return Self(Error {
+            name: None,
+            code: None,
+            message: None,
+            children: vec![],
+        });
+    }
+
+    pub fn with_name(&self, name: &str) -> Self {
+        let mut next = self.clone();
+        next.0.name = Some(name.to_string());
+        return next;
+    }
+
+    pub fn with_code(&self, code: u16) -> Self {
+        let mut next = self.clone();
+        next.0.code = Some(code);
+        return next;
+    }
+
+    pub fn with_message(&self, message: &str) -> Self {
+        let mut next = self.clone();
+        next.0.message = Some(message.to_string());
+        return next;
+    }
+
+    pub fn with_child(&self, child: Error) -> Self {
+        let mut next = self.clone();
+        next.0.children.push(child);
+        return next;
+    }
+
+    pub fn with_children(&self, children: &[Error]) -> Self {
+        let mut next = self.clone();
+
+        for child in children {
+            next.0.children.push(child.clone());
+        }
+
+        return next;
+    }
+
+    pub fn build(&self) -> Error {
+        return self.0.clone();
     }
 }

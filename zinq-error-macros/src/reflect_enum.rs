@@ -79,7 +79,16 @@ pub fn derive(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
 
         impl std::error::Error for #name {
             fn source(&self) -> Option<&(dyn ::std::error::Error + 'static)> {
-                return Some(self);
+                return None;
+            }
+        }
+
+        impl ::zinq_error::ToError for #name {
+            fn to_error(&self) -> ::zinq_error::Error {
+                return ::zinq_error::Error::new()
+                    .with_name(stringify!(#name))
+                    .with_message(&self.to_string())
+                    .build();
             }
         }
     };
