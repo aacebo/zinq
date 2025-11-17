@@ -49,7 +49,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                     .map(|arg| match arg {
                         syn::FnArg::Receiver(recv) => {
                             let mut param_ty = quote! {
-                                ::zinq_reflect::SelfType.to_type()
+                                ::zinq_reflect::ThisType.to_type()
                             };
 
                             if let Some(_) = &recv.mutability {
@@ -94,12 +94,13 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                     .collect::<Vec<_>>();
 
                 return Some(quote! {
-                    ::zinq_reflect::Method::new(stringify!(#fn_name))
-                        .meta(&#fn_meta)
-                        .is_async(#fn_is_async)
-                        .visibility(::zinq_reflect::Visibility::Public(::zinq_reflect::Public::Full))
-                        .params(&[#(#fn_params,)*])
-                        .return_type(&#fn_return_type)
+                    ::zinq_reflect::Method::new()
+                        .with_name(stringify!(#fn_name))
+                        .with_meta(&#fn_meta)
+                        .with_is_async(#fn_is_async)
+                        .with_visibility(::zinq_reflect::Visibility::Public(::zinq_reflect::Public::Full))
+                        .with_params(&[#(#fn_params,)*])
+                        .with_return_type(&#fn_return_type)
                         .build()
                 });
             }
@@ -109,11 +110,13 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
         .collect::<Vec<_>>();
 
     return quote! {
-        ::zinq_reflect::TraitType::new(&(::zinq_reflect::Path::from(module_path!())), stringify!(#name))
-            .meta(&#meta.merge(&#inner_meta))
-            .generics(&#generics)
-            .visibility(#vis)
-            .methods(&[#(#methods,)*])
+        ::zinq_reflect::TraitType::new()
+            .with_path(&(::zinq_reflect::Path::from(module_path!())))
+            .with_name(stringify!(#name))
+            .with_meta(&#meta.merge(&#inner_meta))
+            .with_generics(&#generics)
+            .with_visibility(#vis)
+            .with_methods(&[#(#methods,)*])
             .build()
             .to_type()
     };

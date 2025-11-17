@@ -90,8 +90,10 @@ impl std::fmt::Display for MetaData {
 
 impl crate::ToType for MetaData {
     fn to_type(&self) -> crate::Type {
-        return crate::StructType::new(&crate::Path::from("zinq::reflect"), "MetaData")
-            .visibility(crate::Visibility::Public(crate::Public::Full))
+        return crate::StructType::new()
+            .with_path(&crate::Path::from("zinq::reflect"))
+            .with_name("MetaData")
+            .with_visibility(crate::Visibility::Public(crate::Public::Full))
             .build()
             .to_type();
     }

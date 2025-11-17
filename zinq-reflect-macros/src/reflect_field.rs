@@ -15,12 +15,11 @@ pub fn build(field: &syn::Field, index: usize, is_named: bool) -> proc_macro2::T
     let field_meta = reflect_meta::build(&field.attrs);
 
     return quote! {
-        ::zinq_reflect::Field::new(
-            &#field_name,
-            &(::zinq_reflect::type_of!(#field_type)),
-        )
-        .visibility(#field_vis)
-        .meta(&#field_meta)
-        .build()
+        ::zinq_reflect::Field::new()
+            .with_name(&#field_name)
+            .with_type(&(::zinq_reflect::type_of!(#field_type)))
+            .with_visibility(#field_vis)
+            .with_meta(&#field_meta)
+            .build()
     };
 }

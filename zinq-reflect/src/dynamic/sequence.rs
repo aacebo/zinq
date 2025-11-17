@@ -75,9 +75,12 @@ impl<T: Clone + Sequence> Sequence for Arc<T> {
 
 impl<T> crate::TypeOf for Vec<T> {
     fn type_of() -> crate::Type {
-        return crate::StructType::new(&crate::Path::from("std::vec"), "Vec")
-            .visibility(crate::Visibility::Public(crate::Public::Full))
-            .generics(&crate::Generics::from([crate::TypeParam::new("T")
+        return crate::StructType::new()
+            .with_path(&crate::Path::from("std::vec"))
+            .with_name("Vec")
+            .with_visibility(crate::Visibility::Public(crate::Public::Full))
+            .with_generics(&crate::Generics::from([crate::TypeParam::new()
+                .with_name("T")
                 .build()
                 .to_generic()]))
             .build()

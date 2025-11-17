@@ -8,8 +8,8 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn new(name: &FieldName, ty: &crate::Type) -> crate::build::FieldBuilder {
-        return crate::build::FieldBuilder::new(name, ty);
+    pub fn new() -> crate::FieldBuilder {
+        return crate::FieldBuilder::new();
     }
 
     pub fn meta(&self) -> &crate::MetaData {
@@ -150,5 +150,50 @@ impl std::fmt::Display for FieldName {
             Self::Key(v) => write!(f, "{}", v),
             Self::Index(v) => write!(f, "{}", v),
         };
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct FieldBuilder(crate::Field);
+
+impl FieldBuilder {
+    pub fn new() -> Self {
+        return Self(crate::Field {
+            meta: crate::MetaData::new(),
+            vis: crate::Visibility::Private,
+            name: crate::FieldName::from(""),
+            ty: Box::new(crate::Type::Any),
+        });
+    }
+
+    pub fn with_name(&self, name: &crate::FieldName) -> Self {
+        let mut next = self.clone();
+        next.0.name = name.clone();
+        return next;
+    }
+
+    pub fn with_type(&self, ty: &crate::Type) -> Self {
+        let mut next = self.clone();
+        next.0.ty = Box::new(ty.clone());
+        return next;
+    }
+
+    pub fn with_meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
+    pub fn with_visibility(&self, vis: crate::Visibility) -> Self {
+        let mut next = self.clone();
+        next.0.vis = vis;
+        return next;
+    }
+
+    pub fn build(&self) -> crate::Field {
+        return self.0.clone();
     }
 }

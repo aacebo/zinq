@@ -1,28 +1,19 @@
-mod _enum;
-mod _impl;
-mod _mod;
-mod _mut;
-mod _self;
-mod _struct;
-mod _trait;
-mod _type;
-pub mod bound;
+mod bound;
 mod r#box;
-pub mod build;
-pub mod dynamic;
+mod dynamic;
 mod field;
-pub mod fields;
-pub mod generic;
+mod fields;
+mod generic;
 mod get;
+mod r#impl;
 mod item;
 mod layout;
-mod map;
 mod meta_data;
 mod method;
 mod param;
 mod path;
-pub mod primitive;
 mod set;
+mod r#type;
 mod type_id;
 mod type_of;
 mod value;
@@ -30,14 +21,6 @@ mod value_of;
 mod variant;
 mod visibility;
 
-pub use _enum::*;
-pub use _impl::*;
-pub use _mod::*;
-pub use _mut::*;
-pub use _self::*;
-pub use _struct::*;
-pub use _trait::*;
-pub use _type::*;
 pub use bound::*;
 pub use r#box::*;
 pub use dynamic::*;
@@ -46,22 +29,28 @@ pub use fields::*;
 pub use generic::*;
 #[allow(unused)]
 pub use get::*;
+pub use r#impl::*;
 pub use item::*;
 pub use layout::*;
-pub use map::*;
 pub use meta_data::*;
 pub use method::*;
 pub use param::*;
 pub use path::*;
-pub use primitive::*;
 #[allow(unused)]
 pub use set::*;
+pub use r#type::*;
 pub use type_id::*;
 pub use type_of::*;
 pub use value::*;
 pub use value_of::*;
 pub use variant::*;
 pub use visibility::*;
+
+pub mod types;
+pub use types::*;
+
+pub mod values;
+pub use values::*;
 
 #[cfg(feature = "macros")]
 pub use zinq_reflect_macros::*;

@@ -49,13 +49,16 @@ pub fn build_type(param: &syn::TypeParam) -> proc_macro2::TokenStream {
     }
 
     let tokens = quote! {
-        ::zinq_reflect::TypeParam::new(stringify!(#name))
-            .bounds(&[#(#bounds.to_bound(),)*])
+        ::zinq_reflect::TypeParam::new()
+            .with_name(stringify!(#name))
+            .with_bounds(&[#(#bounds.to_bound(),)*])
     };
 
     return match &param.default {
         None => quote!(#tokens.build()),
-        Some(default) => quote!(#tokens.default(&(::zinq_reflect::type_of!(#default))).build()),
+        Some(default) => {
+            quote!(#tokens.with_default(&(::zinq_reflect::type_of!(#default))).build())
+        }
     };
 }
 

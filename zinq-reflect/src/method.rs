@@ -13,8 +13,8 @@ pub struct Method {
 }
 
 impl Method {
-    pub fn new(name: &str) -> crate::build::MethodBuilder {
-        return crate::build::MethodBuilder::new(name);
+    pub fn new() -> crate::MethodBuilder {
+        return crate::MethodBuilder::new();
     }
 
     pub fn meta(&self) -> &crate::MetaData {
@@ -85,5 +85,77 @@ impl std::fmt::Display for Method {
         }
 
         return write!(f, ";");
+    }
+}
+
+///
+/// Builder
+///
+#[derive(Debug, Clone)]
+pub struct MethodBuilder(crate::Method);
+
+impl MethodBuilder {
+    pub fn new() -> Self {
+        return Self(crate::Method {
+            meta: crate::MetaData::new(),
+            is_async: false,
+            vis: crate::Visibility::Private,
+            name: String::from(""),
+            generics: crate::Generics::new(),
+            params: vec![],
+            return_type: Box::new(crate::Type::Void),
+        });
+    }
+
+    pub fn with_name(&self, name: &str) -> Self {
+        let mut next = self.clone();
+        next.0.name = name.to_string();
+        return next;
+    }
+
+    pub fn with_meta(&self, meta: &crate::MetaData) -> Self {
+        let mut next = self.clone();
+        next.0.meta = meta.clone();
+        return next;
+    }
+
+    pub fn with_is_async(&self, is_async: bool) -> Self {
+        let mut next = self.clone();
+        next.0.is_async = is_async;
+        return next;
+    }
+
+    pub fn with_visibility(&self, vis: crate::Visibility) -> Self {
+        let mut next = self.clone();
+        next.0.vis = vis;
+        return next;
+    }
+
+    pub fn with_generics(&self, generics: &crate::Generics) -> Self {
+        let mut next = self.clone();
+        next.0.generics = generics.clone();
+        return next;
+    }
+
+    pub fn with_params(&self, params: &[crate::Param]) -> Self {
+        let mut next = self.clone();
+        next.0.params.append(&mut params.to_vec());
+        return next;
+    }
+
+    pub fn with_param(&self, param: &crate::Param) -> Self {
+        let mut next = self.clone();
+        next.0.params.push(param.clone());
+        return next;
+    }
+
+    pub fn with_return_type(&self, ty: &crate::Type) -> Self {
+        let mut next = self.clone();
+        next.0.return_type = Box::new(ty.clone());
+        return next;
+    }
+
+    pub fn build(&self) -> crate::Method {
+        return self.0.clone();
     }
 }

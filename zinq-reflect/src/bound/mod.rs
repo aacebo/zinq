@@ -1,8 +1,8 @@
-mod _lifetime;
-mod _trait;
+mod lifetime;
+mod r#trait;
 
-pub use _lifetime::*;
-pub use _trait::*;
+pub use lifetime::*;
+pub use r#trait::*;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
