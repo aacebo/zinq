@@ -10,8 +10,10 @@ mod item;
 mod layout;
 mod meta_data;
 mod method;
+mod option;
 mod param;
 mod path;
+mod result;
 mod set;
 mod r#type;
 mod type_id;
@@ -34,8 +36,12 @@ pub use item::*;
 pub use layout::*;
 pub use meta_data::*;
 pub use method::*;
+#[allow(unused)]
+pub use option::*;
 pub use param::*;
 pub use path::*;
+#[allow(unused)]
+pub use result::*;
 #[allow(unused)]
 pub use set::*;
 pub use r#type::*;

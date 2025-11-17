@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use zinq_reflect::{Reflect, ToType, ToValue, TypeOf, value_of};
+use zinq_reflect::{ToType, ToValue, TypeOf, value_of};
 use zinq_reflect_macros::*;
 
 #[reflect(version = 2)]

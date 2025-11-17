@@ -19,4 +19,4 @@ proc-macro2 = { workspace = true }
 
 [dev-dependencies]
 zinq-reflect = { workspace = true, features = ["macros"] }
-zinq-error = { workspace = true, features = ["macros"] }
+zinq-error = { workspace = true }

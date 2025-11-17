@@ -1,3 +1,5 @@
+use zinq_reflect::{Reflect, TypeOf};
+
 #[cfg(feature = "macros")]
 pub use zinq_error_macros::*;
 
@@ -5,7 +7,7 @@ pub trait ToError {
     fn to_error(&self) -> Error;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Reflect)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Error {
     name: Option<String>,
@@ -110,17 +112,17 @@ impl ErrorBuilder {
         return next;
     }
 
-    pub fn with_child(&self, child: Error) -> Self {
+    pub fn with_child(&self, error: Error) -> Self {
         let mut next = self.clone();
-        next.0.children.push(child);
+        next.0.children.push(error);
         return next;
     }
 
-    pub fn with_children(&self, children: &[Error]) -> Self {
+    pub fn with_children(&self, errors: &[Error]) -> Self {
         let mut next = self.clone();
 
-        for child in children {
-            next.0.children.push(child.clone());
+        for error in errors {
+            next.0.children.push(error.clone());
         }
 
         return next;

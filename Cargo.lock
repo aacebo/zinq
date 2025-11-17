@@ -81,6 +81,7 @@ version = "0.0.0"
 dependencies = [
  "serde",
  "zinq-error-macros",
+ "zinq-reflect",
 ]
 
 [[package]]
