@@ -1,4 +1,6 @@
-use zinq_reflect::{Reflect, TypeOf};
+use std::collections::HashMap;
+
+use zinq_reflect::{Reflect, ToValue, TypeOf, Value};
 
 #[cfg(feature = "macros")]
 pub use zinq_error_macros::*;
@@ -14,6 +16,7 @@ pub struct Error {
     name: Option<String>,
     code: Option<u16>,
     message: Option<String>,
+    attributes: HashMap<String, Value>,
     children: Vec<Self>,
 }
 
@@ -104,6 +107,7 @@ impl ErrorBuilder {
             name: None,
             code: None,
             message: None,
+            attributes: HashMap::new(),
             children: vec![],
         });
     }
@@ -129,6 +133,12 @@ impl ErrorBuilder {
     pub fn with_message(&self, message: &str) -> Self {
         let mut next = self.clone();
         next.0.message = Some(message.to_string());
+        return next;
+    }
+
+    pub fn with_attribute<T: ToValue>(&self, key: &str, value: T) -> Self {
+        let mut next = self.clone();
+        next.0.attributes.insert(key.to_string(), value.to_value());
         return next;
     }
 

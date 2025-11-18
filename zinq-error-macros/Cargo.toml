@@ -13,6 +13,7 @@ repository.workspace = true
 proc-macro = true
 
 [dependencies]
+zinq-temple = { workspace = true }
 syn = { workspace = true, features = ["full", "parsing"] }
 quote = { workspace = true }
 proc-macro2 = { workspace = true }

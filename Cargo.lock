@@ -3,12 +3,6 @@
 version = 4
 
 [[package]]
-name = "bytes"
-version = "1.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.101"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -69,10 +63,7 @@ version = "0.0.0"
 dependencies = [
  "serde",
  "zinq-error",
- "zinq-query",
  "zinq-reflect",
- "zinq-schema",
- "zinq-validate",
 ]
 
 [[package]]
@@ -93,22 +84,8 @@ dependencies = [
  "syn",
  "zinq-error",
  "zinq-reflect",
+ "zinq-temple",
 ]
-
-[[package]]
-name = "zinq-query"
-version = "0.0.0"
-dependencies = [
- "bytes",
- "serde",
- "zinq-query-macros",
- "zinq-reflect",
- "zinq-schema",
-]
-
-[[package]]
-name = "zinq-query-macros"
-version = "0.0.0"
 
 [[package]]
 name = "zinq-reflect"
@@ -129,25 +106,5 @@ dependencies = [
 ]
 
 [[package]]
-name = "zinq-schema"
-version = "0.0.0"
-dependencies = [
- "serde",
- "zinq-schema-macros",
-]
-
-[[package]]
-name = "zinq-schema-macros"
-version = "0.0.0"
-
-[[package]]
-name = "zinq-validate"
-version = "0.0.0"
-dependencies = [
- "zinq-schema",
- "zinq-validate-macros",
-]
-
-[[package]]
-name = "zinq-validate-macros"
+name = "zinq-temple"
 version = "0.0.0"

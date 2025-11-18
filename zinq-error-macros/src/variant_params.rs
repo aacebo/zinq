@@ -1,8 +1,8 @@
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct VariantParams {
-    pub name: Option<String>,
+    pub name: Option<syn::LitStr>,
     pub code: Option<u16>,
-    pub message: Option<String>,
+    pub message: Option<syn::LitStr>,
 }
 
 impl syn::parse::Parse for VariantParams {
@@ -11,7 +11,7 @@ impl syn::parse::Parse for VariantParams {
             return Ok(Self {
                 name: None,
                 code: None,
-                message: Some(literal.value()),
+                message: Some(literal),
             });
         }
 
@@ -27,7 +27,7 @@ impl syn::parse::Parse for VariantParams {
             match key.to_string().as_str() {
                 "name" => {
                     let value: syn::LitStr = input.parse()?;
-                    params.name = Some(value.value());
+                    params.name = Some(value);
                 }
                 "code" => {
                     let value: syn::LitInt = input.parse()?;
@@ -35,7 +35,7 @@ impl syn::parse::Parse for VariantParams {
                 }
                 "message" => {
                     let value: syn::LitStr = input.parse()?;
-                    params.message = Some(value.value());
+                    params.message = Some(value);
                 }
                 _ => {
                     return Err(syn::parse::Error::new(
