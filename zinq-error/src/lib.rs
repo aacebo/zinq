@@ -10,6 +10,7 @@ pub trait ToError {
 #[derive(Debug, Clone, Reflect)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Error {
+    path: String,
     name: Option<String>,
     code: Option<u16>,
     message: Option<String>,
@@ -19,6 +20,10 @@ pub struct Error {
 impl Error {
     pub fn new() -> ErrorBuilder {
         return ErrorBuilder::new();
+    }
+
+    pub fn path(&self) -> &str {
+        return &self.path;
     }
 
     pub fn name(&self) -> Option<&str> {
@@ -45,6 +50,14 @@ impl Error {
 }
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(name) = &self.name {
+            write!(f, "{}", name)?;
+
+            if self.message.is_some() {
+                write!(f, ": ")?;
+            }
+        }
+
         if let Some(message) = &self.message {
             write!(f, "{}", message)?;
         }
@@ -87,11 +100,18 @@ pub struct ErrorBuilder(Error);
 impl ErrorBuilder {
     pub fn new() -> Self {
         return Self(Error {
+            path: String::new(),
             name: None,
             code: None,
             message: None,
             children: vec![],
         });
+    }
+
+    pub fn with_path(&self, path: &str) -> Self {
+        let mut next = self.clone();
+        next.0.path = path.to_string();
+        return next;
     }
 
     pub fn with_name(&self, name: &str) -> Self {

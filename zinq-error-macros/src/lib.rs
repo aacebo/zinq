@@ -1,7 +1,5 @@
-mod enum_params;
 mod variant_params;
 
-pub(crate) use enum_params::*;
 pub(crate) use variant_params::*;
 
 use proc_macro::TokenStream;
@@ -20,27 +18,6 @@ pub fn derive_error(tokens: TokenStream) -> TokenStream {
 
 fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenStream {
     let name = &input.ident;
-    let attribute = input
-        .attrs
-        .iter()
-        .find(|attribute| attribute.path().is_ident("error"));
-
-    let params = match attribute {
-        None => None,
-        Some(attr) => match attr.parse_args::<crate::EnumParams>() {
-            Err(err) => return err.to_compile_error(),
-            Ok(v) => Some(v),
-        },
-    };
-
-    let error_name = match &params {
-        None => quote!(stringify!(#name)),
-        Some(p) => match &p.name {
-            None => quote!(stringify!(#name)),
-            Some(v) => quote!(&#v),
-        },
-    };
-
     let variants_to_error = data
         .variants
         .iter()
@@ -97,20 +74,24 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
             };
 
             let variant_error_message = match &variant_params {
-                None => quote!(&self.to_string()),
+                None => quote!(None),
                 Some(p) => match &p.message {
-                    None => quote!(&format!("{}", #variant_error_name)),
-                    Some(v) => quote!(&format!("{}: {}", #variant_error_name, #v)),
+                    None => quote!(None),
+                    Some(v) => quote!(Some(#v)),
                 },
             };
 
             let variant_error = quote! {
                 let mut builder = ::zinq_error::Error::new()
-                    .with_name(#error_name)
-                    .with_message(#variant_error_message);
+                    .with_path(&String::from(module_path!()))
+                    .with_name(#variant_error_name);
 
                 if let Some(code) = #variant_error_code {
                     builder = builder.with_code(code);
+                }
+
+                if let Some(message) = #variant_error_message {
+                    builder = builder.with_message(message);
                 }
 
                 builder.build()

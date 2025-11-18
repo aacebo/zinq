@@ -44,6 +44,12 @@ impl syn::parse::Parse for VariantParams {
                     ));
                 }
             };
+
+            if !input.peek(syn::Token![,]) {
+                break;
+            }
+
+            input.parse::<syn::Token![,]>()?;
         }
 
         return Ok(params);
