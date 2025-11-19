@@ -1,54 +1,47 @@
-use parse_format::{ParseMode, Parser, Piece, Position};
+use parse_format::{Argument, ParseMode, Parser, Piece};
+use strfmt::strfmt;
 
-#[derive(Debug)]
-pub enum Part<'a> {
-    Literal(&'a str),
-    Arg {
-        // one of `{}`, `{0}`, `{name}`
-        position: Position<'a>,
-        // you can dig into this for precision, width, etc.
-        format: parse_format::FormatSpec<'a>,
-    },
+#[derive(Debug, Clone)]
+pub struct Template<'a> {
+    pub parts: Vec<Piece<'a>>,
+    pub arguments: Vec<Argument<'a>>,
 }
 
-pub fn parse(fmt: &str) -> Result<Vec<Part<'_>>, syn::Error> {
-    // style: None        -> no special style (see rustc source if you care)
-    // snippet: None      -> we just pass the raw string
-    // append_newline: false
-    // mode: ParseMode::Format -> "normal" format string, like format_args!
-    let mut parser = Parser::new(fmt, None, None, false, ParseMode::Format);
-    let mut pieces = Vec::new();
+impl<'a> Template<'a> {
+    pub fn parse(fmt: &str) -> Result<Template<'_>, syn::Error> {
+        let mut parser = Parser::new(fmt, None, None, false, ParseMode::Format);
+        let mut template = Template {
+            parts: vec![],
+            arguments: vec![],
+        };
 
-    while let Some(piece) = parser.next() {
-        match piece {
-            Piece::String(s) => {
-                pieces.push(Part::Literal(s));
-            }
-            Piece::NextArgument(arg) => {
-                pieces.push(Part::Arg {
-                    position: arg.position,
-                    format: arg.format,
-                });
+        while let Some(piece) = parser.next() {
+            template.parts.push(piece.clone());
 
-                // match arg.position {
-                //     Position::ArgumentNamed(name) => {
-
-                //     },
-                //     Position::ArgumentIs(index) => {
-
-                //     },
-                //     Position::ArgumentImplicitlyIs(index) => {
-
-                //     },
-                // };
+            if let Piece::NextArgument(arg) = &piece {
+                template.arguments.push(arg.clone());
             }
         }
+
+        if let Some(err) = parser.errors.first() {
+            let error = syn::Error::new(proc_macro2::Span::call_site(), err.to_string());
+            return Err(error);
+        }
+
+        return Ok(template);
     }
 
-    if let Some(err) = parser.errors.first() {
-        let error = syn::Error::new(proc_macro2::Span::call_site(), err.to_string());
-        return Err(error);
-    }
+    // pub fn render(&self) -> Result<String, formatx::Error> {
+    //     return Ok(strfmt!(&self.to_string())?);
+    // }
+}
 
-    return Ok(pieces);
+impl<'a> std::fmt::Display for Template<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for part in self.parts.iter() {
+            write!(f, "{}", part)?;
+        }
+
+        return Ok(());
+    }
 }

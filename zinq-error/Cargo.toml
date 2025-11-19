@@ -11,9 +11,8 @@ repository.workspace = true
 
 [features]
 macros = ["dep:zinq-error-macros"]
-serde = ["dep:serde", "serde/derive", "zinq-reflect/serde"]
+serde = ["dep:serde", "serde/derive"]
 
 [dependencies]
-zinq-reflect = { workspace = true, features = ["macros"] }
 zinq-error-macros = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }

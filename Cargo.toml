@@ -24,3 +24,4 @@ syn = { version = "2" }
 quote = { version = "1" }
 proc-macro2 = { version = "1" }
 parse-format = { version = "0.1" }
+strfmt = { version = "0.2" }

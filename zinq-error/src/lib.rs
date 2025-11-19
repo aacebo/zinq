@@ -1,22 +1,21 @@
-use std::collections::HashMap;
+mod attribute;
+mod to_error;
 
-use zinq_reflect::{Reflect, ToValue, TypeOf, Value};
+pub use attribute::*;
+pub use to_error::*;
+
+use std::sync::Arc;
 
 #[cfg(feature = "macros")]
 pub use zinq_error_macros::*;
 
-pub trait ToError {
-    fn to_error(&self) -> Error;
-}
-
-#[derive(Debug, Clone, Reflect)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Clone)]
 pub struct Error {
     path: String,
     name: Option<String>,
     code: Option<u16>,
     message: Option<String>,
-    attributes: HashMap<String, Value>,
+    attributes: Vec<Attribute>,
     children: Vec<Self>,
 }
 
@@ -107,7 +106,7 @@ impl ErrorBuilder {
             name: None,
             code: None,
             message: None,
-            attributes: HashMap::new(),
+            attributes: vec![],
             children: vec![],
         });
     }
@@ -136,9 +135,25 @@ impl ErrorBuilder {
         return next;
     }
 
-    pub fn with_attribute<T: ToValue>(&self, key: &str, value: T) -> Self {
+    pub fn with_attribute<T: Value + 'static>(&self, value: T) -> Self {
         let mut next = self.clone();
-        next.0.attributes.insert(key.to_string(), value.to_value());
+
+        next.0.attributes.push(Attribute {
+            name: None,
+            value: Arc::new(value),
+        });
+
+        return next;
+    }
+
+    pub fn with_attribute_as<T: Value + 'static>(&self, name: &str, value: T) -> Self {
+        let mut next = self.clone();
+
+        next.0.attributes.push(Attribute {
+            name: Some(name.to_string()),
+            value: Arc::new(value),
+        });
+
         return next;
     }
 

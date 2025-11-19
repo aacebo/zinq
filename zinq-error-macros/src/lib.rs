@@ -5,6 +5,9 @@ pub(crate) use params::*;
 
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
+use strfmt::Format;
+
+use crate::template::Template;
 
 #[proc_macro_derive(Error, attributes(error))]
 pub fn derive_error(tokens: TokenStream) -> TokenStream {
@@ -83,29 +86,39 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
             };
 
             let variant_error_template_result = match &variant_params {
-                None => template::parse(""),
+                None => Template::parse(""),
                 Some(p) => match &p.message {
-                    None => template::parse(""),
-                    Some(v) => template::parse(&v),
+                    None => Template::parse(""),
+                    Some(v) => Template::parse(&v),
                 },
             };
 
-            let _ = match variant_error_template_result {
+            let template = match variant_error_template_result {
                 Err(err) => return err.to_compile_error(),
                 Ok(res) => res,
             };
 
+            // // template.
+            // if let Ok(value) = template.to_string().format(vars) {
+
+            // }
+
+            let attributes = template.arguments.iter().map(|arg| {
+                quote! {}
+            });
+
             let variant_error = quote! {
                 let mut builder = ::zinq_error::Error::new()
                     .with_path(&String::from(module_path!()))
-                    .with_name(#variant_error_name);
+                    .with_name(#variant_error_name)
+                    .with_attribute_as("name", &#variant_error_name);
 
                 if let Some(code) = #variant_error_code {
-                    builder = builder.with_code(code);
+                    builder = builder.with_code(code).with_attribute_as("code", code);
                 }
 
                 if let Some(message) = #variant_error_message {
-                    builder = builder.with_message(message);
+                    builder = builder.with_message(message).with_attribute_as("message", message);
                 }
 
                 builder.build()
@@ -136,7 +149,6 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
         .iter()
         .map(|variant| {
             let variant_ident = &variant.ident;
-
             let variant_fields = match &variant.fields {
                 syn::Fields::Unit => vec![],
                 syn::Fields::Named(fields) => fields
@@ -178,6 +190,47 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
         })
         .collect::<Vec<_>>();
 
+    let variant_attributes = data
+        .variants
+        .iter()
+        .map(|variant| {
+            let variant_ident = &variant.ident;
+            let variant_attr = &variant
+                .attrs
+                .iter()
+                .find(|attribute| attribute.path().is_ident("error"));
+
+            let variant_params = match variant_attr {
+                None => None,
+                Some(attr) => match attr.parse_args::<crate::Params>() {
+                    Err(err) => return err.to_compile_error(),
+                    Ok(v) => Some(v),
+                },
+            };
+
+            let variant_error_template_result = match &variant_params {
+                None => Template::parse(""),
+                Some(p) => match &p.message {
+                    None => Template::parse(""),
+                    Some(v) => Template::parse(&v),
+                },
+            };
+
+            let template = match variant_error_template_result {
+                Err(err) => return err.to_compile_error(),
+                Ok(res) => res,
+            };
+
+            let attributes = template.arguments.iter().map(|arg| {
+                quote! {}
+            });
+
+            quote! {
+                #(#attributes)*
+            }
+        })
+        .collect::<Vec<_>>();
+
     return quote! {
         impl std::fmt::Display for #name {
             fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
@@ -200,5 +253,7 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
                 };
             }
         }
+
+        #(#variant_attributes)*
     };
 }

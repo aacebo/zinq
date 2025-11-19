@@ -17,6 +17,7 @@ syn = { workspace = true, features = ["full", "parsing"] }
 quote = { workspace = true }
 proc-macro2 = { workspace = true }
 parse-format = { workspace = true }
+strfmt = { workspace = true }
 
 [dev-dependencies]
 zinq-reflect = { workspace = true, features = ["macros"] }
