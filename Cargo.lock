@@ -3,6 +3,15 @@
 version = 4
 
 [[package]]
+name = "parse-format"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "196ee31dbb1c61f6c74683bc9fa1668e0849aeea930d592c13c157320fb321e0"
+dependencies = [
+ "unicode-ident",
+]
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.101"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -79,12 +88,12 @@ dependencies = [
 name = "zinq-error-macros"
 version = "0.0.0"
 dependencies = [
+ "parse-format",
  "proc-macro2",
  "quote",
  "syn",
  "zinq-error",
  "zinq-reflect",
- "zinq-temple",
 ]
 
 [[package]]
@@ -103,11 +112,4 @@ dependencies = [
  "quote",
  "syn",
  "zinq-reflect",
-]
-
-[[package]]
-name = "zinq-temple"
-version = "0.0.0"
-dependencies = [
- "syn",
 ]

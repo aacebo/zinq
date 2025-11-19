@@ -1,6 +1,7 @@
-mod variant_params;
+mod params;
+mod template;
 
-pub(crate) use variant_params::*;
+pub(crate) use params::*;
 
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -30,7 +31,7 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
 
             let variant_params = match variant_attr {
                 None => None,
-                Some(attr) => match attr.parse_args::<crate::VariantParams>() {
+                Some(attr) => match attr.parse_args::<crate::Params>() {
                     Err(err) => return err.to_compile_error(),
                     Ok(v) => Some(v),
                 },
@@ -79,6 +80,19 @@ fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::TokenS
                     None => quote!(None),
                     Some(v) => quote!(Some(#v)),
                 },
+            };
+
+            let variant_error_template_result = match &variant_params {
+                None => template::parse(""),
+                Some(p) => match &p.message {
+                    None => template::parse(""),
+                    Some(v) => template::parse(&v),
+                },
+            };
+
+            let _ = match variant_error_template_result {
+                Err(err) => return err.to_compile_error(),
+                Ok(res) => res,
             };
 
             let variant_error = quote! {

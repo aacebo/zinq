@@ -18,10 +18,9 @@ zinq-reflect = { path = "./zinq-reflect", version = "0.0.0" }
 zinq-reflect-macros = { path = "./zinq-reflect-macros", version = "0.0.0" }
 zinq-error = { path = "./zinq-error", version = "0.0.0" }
 zinq-error-macros = { path = "./zinq-error-macros", version = "0.0.0" }
-zinq-temple = { path = "./zinq-temple", version = "0.0.0" }
 
-bytes = { version = "1" }
 serde = { version = "1" }
 syn = { version = "2" }
 quote = { version = "1" }
 proc-macro2 = { version = "1" }
+parse-format = { version = "0.1" }
