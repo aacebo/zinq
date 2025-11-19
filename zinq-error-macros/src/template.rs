@@ -1,5 +1,4 @@
 use parse_format::{Argument, ParseMode, Parser, Piece};
-use strfmt::strfmt;
 
 #[derive(Debug, Clone)]
 pub struct Template<'a> {
@@ -30,10 +29,6 @@ impl<'a> Template<'a> {
 
         return Ok(template);
     }
-
-    // pub fn render(&self) -> Result<String, formatx::Error> {
-    //     return Ok(strfmt!(&self.to_string())?);
-    // }
 }
 
 impl<'a> std::fmt::Display for Template<'a> {
