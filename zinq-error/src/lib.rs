@@ -135,6 +135,12 @@ impl ErrorBuilder {
         return next;
     }
 
+    pub fn with_message_string(&self, message: String) -> Self {
+        let mut next = self.clone();
+        next.0.message = Some(message);
+        return next;
+    }
+
     pub fn with_attribute<T: Value + 'static>(&self, value: T) -> Self {
         let mut next = self.clone();
 

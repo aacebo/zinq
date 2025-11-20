@@ -6,6 +6,7 @@ pub fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
         .variants
         .iter()
         .map(|variant| {
+            let span = proc_macro2::Span::mixed_site();
             let variant_ident = &variant.ident;
             let variant_attr = &variant
                 .attrs
@@ -20,25 +21,41 @@ pub fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
                 },
             };
 
-            let variant_fields = match &variant.fields {
-                syn::Fields::Unit => vec![],
-                syn::Fields::Named(fields) => fields
-                    .named
-                    .iter()
-                    .map(|field| {
-                        let field_ident = &field.ident;
-                        quote!(#field_ident)
-                    })
-                    .collect::<Vec<_>>(),
-                syn::Fields::Unnamed(fields) => fields
-                    .unnamed
-                    .iter()
-                    .enumerate()
-                    .map(|(i, _)| {
-                        let field_ident = format_ident!("p{}", i);
-                        quote!(#field_ident)
-                    })
-                    .collect::<Vec<_>>(),
+            let (is_empty, variant_fields_inner, variant_fields_outer) = match &variant.fields {
+                syn::Fields::Unit => (true, quote!(), quote!()),
+                syn::Fields::Named(fields) => {
+                    let inner = fields
+                        .named
+                        .iter()
+                        .map(|field| {
+                            let field_ident = &field.ident;
+                            quote!(#field_ident)
+                        })
+                        .collect::<Vec<_>>();
+
+                    (
+                        inner.is_empty(),
+                        quote!(#(#inner = #inner, )*),
+                        quote!({ #(#inner, )* }),
+                    )
+                }
+                syn::Fields::Unnamed(fields) => {
+                    let inner = fields
+                        .unnamed
+                        .iter()
+                        .enumerate()
+                        .map(|(i, _)| {
+                            let field_ident = format_ident!("p{}", i);
+                            quote!(#field_ident)
+                        })
+                        .collect::<Vec<_>>();
+
+                    (
+                        inner.is_empty(),
+                        quote!(#(#inner, )*),
+                        quote!((#(#inner, )*)),
+                    )
+                }
             };
 
             let variant_error_name = match &variant_params {
@@ -58,10 +75,18 @@ pub fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
             };
 
             let variant_error_message = match &variant_params {
-                None => quote!(None),
+                None => quote!(Option::<String>::None),
                 Some(p) => match &p.message {
-                    None => quote!(None),
-                    Some(v) => quote!(Some(#v)),
+                    None => quote!(Option::<String>::None),
+                    Some(v) => {
+                        let literal = syn::LitStr::new(v, span);
+
+                        if is_empty {
+                            quote!(Some(format!(#literal)));
+                        }
+
+                        quote!(Some(format!(#literal, #variant_fields_inner)))
+                    }
                 },
             };
 
@@ -72,30 +97,19 @@ pub fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
                     .with_attribute_as("name", &#variant_error_name);
 
                 if let Some(code) = #variant_error_code {
-                    builder = builder.with_code(code).with_attribute_as("code", code);
+                    builder = builder.with_code(code)
+                        .with_attribute_as("code", code);
                 }
 
                 if let Some(message) = #variant_error_message {
-                    builder = builder.with_message(message).with_attribute_as("message", message);
+                    builder = builder.with_message_string(message.clone());
                 }
 
                 builder.build()
             };
 
-            if variant_fields.is_empty() {
-                return quote!(Self::#variant_ident => {
-                    #variant_error
-                });
-            }
-
-            if variant_fields.len() == 1 {
-                return quote!(Self::#variant_ident(v) => {
-                    #variant_error
-                });
-            }
-
             quote! {
-                Self::#variant_ident(#(#variant_fields,)*) => {
+                Self::#variant_ident #variant_fields_outer => {
                     #variant_error
                 }
             }
