@@ -93,12 +93,10 @@ pub fn render(input: &syn::DeriveInput, data: &syn::DataEnum) -> proc_macro2::To
             let variant_error = quote! {
                 let mut builder = ::zinq_error::Error::new()
                     .with_path(&String::from(module_path!()))
-                    .with_name(#variant_error_name)
-                    .with_attribute_as("name", &#variant_error_name);
+                    .with_name(#variant_error_name);
 
                 if let Some(code) = #variant_error_code {
-                    builder = builder.with_code(code)
-                        .with_attribute_as("code", code);
+                    builder = builder.with_code(code);
                 }
 
                 if let Some(message) = #variant_error_message {

@@ -1,21 +1,17 @@
-mod attribute;
 mod to_error;
 
-pub use attribute::*;
 pub use to_error::*;
-
-use std::sync::Arc;
 
 #[cfg(feature = "macros")]
 pub use zinq_error_macros::*;
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Error {
     path: String,
     name: Option<String>,
     code: Option<u16>,
     message: Option<String>,
-    attributes: Vec<Attribute>,
     children: Vec<Self>,
 }
 
@@ -106,7 +102,6 @@ impl ErrorBuilder {
             name: None,
             code: None,
             message: None,
-            attributes: vec![],
             children: vec![],
         });
     }
@@ -138,28 +133,6 @@ impl ErrorBuilder {
     pub fn with_message_string(&self, message: String) -> Self {
         let mut next = self.clone();
         next.0.message = Some(message);
-        return next;
-    }
-
-    pub fn with_attribute<T: Value + 'static>(&self, value: T) -> Self {
-        let mut next = self.clone();
-
-        next.0.attributes.push(Attribute {
-            name: None,
-            value: Arc::new(value),
-        });
-
-        return next;
-    }
-
-    pub fn with_attribute_as<T: Value + 'static>(&self, name: &str, value: T) -> Self {
-        let mut next = self.clone();
-
-        next.0.attributes.push(Attribute {
-            name: Some(name.to_string()),
-            value: Arc::new(value),
-        });
-
         return next;
     }
 
