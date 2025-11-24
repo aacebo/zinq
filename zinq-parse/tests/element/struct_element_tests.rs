@@ -49,22 +49,22 @@ pub fn should_debug_value() {
 
     assert!(element.select(&mut context));
 
-    match element.render(&mut context) {
+    let tokens = match element.render(&mut context) {
         Err(err) => panic!("{}", err),
-        Ok(tokens) => {
-            debug_assert_eq!(
-                tokens.to_string(),
-                quote! {
-                    #item
+        Ok(tokens) => tokens,
+    };
 
-                    impl Hello {
-                        pub fn print_debug_custom(&self) {
-                            println!("{:#?}", self);
-                        }
-                    }
+    debug_assert_eq!(
+        tokens.to_string(),
+        quote! {
+            #item
+
+            impl Hello {
+                pub fn print_debug_custom(&self) {
+                    println!("{:#?}", self);
                 }
-                .to_string()
-            )
+            }
         }
-    }
+        .to_string()
+    );
 }
