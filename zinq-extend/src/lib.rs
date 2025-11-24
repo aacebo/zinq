@@ -12,7 +12,7 @@ use quote::quote;
 use type_entry::*;
 
 thread_local! {
-    pub(crate) static EXTENDABLE_REGISTRY: RefCell<HashMap<String, TypeEntry>> =
+    pub(crate) static REGISTRY: RefCell<HashMap<String, TypeEntry>> =
         RefCell::new(HashMap::new());
 }
 
