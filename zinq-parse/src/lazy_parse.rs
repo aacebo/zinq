@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use quote::ToTokens;
 use syn::parse::Parse;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct LazyParse<T: Parse + ToTokens> {
     raw: String,
     __phantom__: PhantomData<T>,
