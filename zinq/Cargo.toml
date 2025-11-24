@@ -14,10 +14,12 @@ macros = ["zinq-reflect/macros", "zinq-error/macros"]
 reflect = ["dep:zinq-reflect"]
 error = ["dep:zinq-error"]
 extend = ["dep:zinq-extend"]
+parse = ["dep:zinq-parse"]
 serde = ["dep:serde", "serde/derive", "zinq-reflect/serde", "zinq-error/serde"]
 
 [dependencies]
 zinq-reflect = { workspace = true, optional = true }
 zinq-extend = { workspace = true, optional = true }
 zinq-error = { workspace = true, optional = true }
+zinq-parse = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }

@@ -15,3 +15,9 @@ pub mod reflect {
 pub mod error {
     pub use zinq_error::*;
 }
+
+#[cfg(feature = "parse")]
+#[cfg_attr(feature = "parse", macro_use)]
+pub mod parse {
+    pub use zinq_parse::*;
+}

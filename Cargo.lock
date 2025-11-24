@@ -64,6 +64,7 @@ dependencies = [
  "serde",
  "zinq-error",
  "zinq-extend",
+ "zinq-parse",
  "zinq-reflect",
 ]
 
@@ -87,6 +88,15 @@ dependencies = [
 
 [[package]]
 name = "zinq-extend"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "zinq-parse"
 version = "0.0.0"
 dependencies = [
  "proc-macro2",
