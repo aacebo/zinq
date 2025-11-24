@@ -3,8 +3,8 @@ use quote::quote;
 
 use crate::{REGISTRY, TypeEntry};
 
-pub fn extend(input_tokens: TokenStream, item: &mut syn::ItemStruct) -> TokenStream {
-    let input = syn::parse_macro_input!(input_tokens as crate::Input);
+pub fn extend(tokens: TokenStream, item: &mut syn::ItemStruct) -> TokenStream {
+    let input = syn::parse_macro_input!(tokens as crate::Input);
 
     for name in input.0.iter() {
         let fields_to_add =

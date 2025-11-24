@@ -1,7 +1,7 @@
 mod input;
 mod lazy_parse;
-mod r#struct;
 mod type_entry;
+mod types;
 
 use std::{cell::RefCell, collections::HashMap};
 
@@ -10,6 +10,7 @@ use lazy_parse::*;
 use proc_macro::TokenStream;
 use quote::quote;
 use type_entry::*;
+use types::*;
 
 thread_local! {
     pub(crate) static REGISTRY: RefCell<HashMap<String, TypeEntry>> =
