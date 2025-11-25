@@ -10,7 +10,7 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["zinq-reflect/macros", "zinq-error/macros"]
+macros = ["zinq-reflect/macros", "zinq-error/macros", "zinq-parse/macros"]
 reflect = ["dep:zinq-reflect"]
 error = ["dep:zinq-error"]
 extend = ["dep:zinq-extend"]

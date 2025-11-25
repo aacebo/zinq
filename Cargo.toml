@@ -17,6 +17,7 @@ repository = "https://www.github.com/aacebo/zinq"
 zinq-reflect = { path = "./zinq-reflect", version = "0.0.0" }
 zinq-reflect-macros = { path = "./zinq-reflect-macros", version = "0.0.0" }
 zinq-parse = { path = "./zinq-parse", version = "*" }
+zinq-parse-macros = { path = "./zinq-parse-macros", version = "*" }
 zinq-extend = { path = "./zinq-extend", version = "0.0.0" }
 zinq-error = { path = "./zinq-error", version = "0.0.0" }
 zinq-error-macros = { path = "./zinq-error-macros", version = "0.0.0" }

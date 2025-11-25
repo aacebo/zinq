@@ -27,6 +27,7 @@
 - [zinq-parse]
     - `TypeRegistry` for building shared macro type state
     - `#[import]` macro at root to recursively build `TypeRegistry`
+    - `#[derive(Element), context(MyContext)]` macros for auto defining render elements for macros
 - [zinq-builder]
     - `#[derive(Build)]` for auto generation of builder struct
 - [`??`]
