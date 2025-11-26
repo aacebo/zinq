@@ -31,10 +31,6 @@ pub fn struct_element(
             type Context = #context_type;
             type Output = proc_macro2::TokenStream;
 
-            fn select(&self, context: &mut Self::Context) -> bool {
-                return true;
-            }
-
             fn render(&self, context: &mut Self::Context) -> Result<Self::Output, ::zinq_parse::Error> {
                 Ok(::quote::quote! {
 

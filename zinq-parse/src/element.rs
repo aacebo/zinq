@@ -18,13 +18,6 @@ pub trait Element {
     type Output: quote::ToTokens;
 
     ///
-    /// ## select
-    /// called before `render`, returns true if this
-    /// element can render the given context
-    ///
-    fn select(&self, context: &mut Self::Context) -> bool;
-
-    ///
     /// ## render
     /// called with a context and returns a token stream
     ///
