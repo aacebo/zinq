@@ -1,4 +1,5 @@
 mod context;
+pub mod contexts;
 mod element;
 mod error;
 mod lazy_parse;

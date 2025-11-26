@@ -5,20 +5,20 @@
 ///
 pub trait Context {
     ///
-    /// the rust type to be parsed
-    ///
-    type Target: quote::ToTokens;
-
-    ///
     /// the attribute macro input to be parsed
     ///
     type Input: syn::parse::Parse;
 
     ///
+    /// the rust type to be parsed
+    ///
+    type Target: syn::parse::Parse + quote::ToTokens;
+
+    ///
     /// ## args
     /// parse and return the context args
     ///
-    fn input(&self) -> Result<Self::Input, crate::Error>;
+    fn input(&self) -> Option<&Self::Input>;
 
     ///
     /// ## target

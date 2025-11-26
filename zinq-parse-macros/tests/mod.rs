@@ -1,7 +1,7 @@
-use zinq_parse_macros::{zinq_attribute, zinq_derive};
+use zinq_parse_macros::zinq_derive;
 
-#[zinq_derive(Output=TokenStream)]
+#[zinq_derive]
 pub struct DeriveElement;
 
-#[zinq_attribute]
-pub struct AttributeElement;
+#[test]
+pub fn should_render_element() {}
