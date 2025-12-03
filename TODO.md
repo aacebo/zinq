@@ -1,7 +1,7 @@
 # To Do
 
-- [zinq-reflect](./zinq-reflect/TODO.md)
-- [zinq-error]
+- [reflectx](./reflectx/TODO.md)
+- [errorx]
     - hook into `std::backtrace::Backtrace`
     - add `#[backtrace]` macro
     - error message templates
@@ -11,7 +11,7 @@
         - `std::io::Error`
         - `std::syn::Error`
         - etc...
-- [zinq-extend]
+- [extendx]
     - struct extend struct fields/methods
         - downcast methods from child to parent type
         `to_${parent}(&self) -> ${Parent}`
@@ -24,7 +24,7 @@
         - ie `impl From<&[T]> for Vec<T>`
     - `#[proxy(${field})]` to add all the methods from the wrapped
     type to your type and proxy their calls to the inner field
-- [zinq-parse]
+- [macrox]
     - `TypeRegistry` for building shared macro type state
     - `#[import]` macro at root to recursively build `TypeRegistry`
     - `#[derive(Element), context(MyContext)]` macros for auto defining render elements for macros

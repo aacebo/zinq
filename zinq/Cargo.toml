@@ -10,16 +10,16 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["zinq-reflect/macros", "zinq-error/macros"]
-reflect = ["dep:zinq-reflect"]
-error = ["dep:zinq-error"]
-extend = ["dep:zinq-extend"]
-parse = ["dep:zinq-parse"]
-serde = ["dep:serde", "serde/derive", "zinq-reflect/serde", "zinq-error/serde"]
+macros = ["reflectx/macros", "errorx/macros"]
+reflect = ["dep:reflectx"]
+error = ["dep:errorx"]
+extend = ["dep:extendx"]
+parse = ["dep:macrox"]
+serde = ["dep:serde", "serde/derive", "reflectx/serde", "errorx/serde"]
 
 [dependencies]
-zinq-reflect = { workspace = true, optional = true }
-zinq-extend = { workspace = true, optional = true }
-zinq-error = { workspace = true, optional = true }
-zinq-parse = { workspace = true, optional = true }
+reflectx = { workspace = true, optional = true }
+extendx = { workspace = true, optional = true }
+errorx = { workspace = true, optional = true }
+macrox = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }

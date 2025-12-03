@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
-members = [ "zinq", "zinq-*"]
-default-members = ["zinq", "zinq-*"]
+members = ["zinq", "errorx", "errorx-macros", "extendx", "macrox", "reflectx", "reflectx-macros"]
+default-members = ["zinq", "errorx", "errorx-macros", "extendx", "macrox", "reflectx", "reflectx-macros"]
 
 [workspace.package]
 version = "0.0.0"
@@ -14,12 +14,12 @@ homepage = "https://www.github.com/aacebo/zinq"
 repository = "https://www.github.com/aacebo/zinq"
 
 [workspace.dependencies]
-zinq-reflect = { path = "./zinq-reflect", version = "0.0.0" }
-zinq-reflect-macros = { path = "./zinq-reflect-macros", version = "0.0.0" }
-zinq-parse = { path = "./zinq-parse", version = "*" }
-zinq-extend = { path = "./zinq-extend", version = "0.0.0" }
-zinq-error = { path = "./zinq-error", version = "0.0.0" }
-zinq-error-macros = { path = "./zinq-error-macros", version = "0.0.0" }
+reflectx = { path = "./reflectx", version = "0.0.0" }
+reflectx-macros = { path = "./reflectx-macros", version = "0.0.0" }
+macrox = { path = "./macrox", version = "*" }
+extendx = { path = "./extendx", version = "0.0.0" }
+errorx = { path = "./errorx", version = "0.0.0" }
+errorx-macros = { path = "./errorx-macros", version = "0.0.0" }
 
 serde = { version = "1" }
 syn = { version = "2" }
