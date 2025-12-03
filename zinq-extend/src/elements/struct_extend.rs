@@ -1,7 +1,5 @@
 use quote::quote;
-use zinq_parse::{Element, Error, StructContext};
-
-use crate::REGISTRY;
+use zinq_parse::{Element, Error, StructContext, registry};
 
 #[derive(Debug, Clone)]
 pub struct StructExtend;
@@ -15,9 +13,7 @@ impl Element for StructExtend {
         let target = context.target_mut();
 
         for name in input.0.iter() {
-            let fields_to_add = match REGISTRY
-                .with_borrow(|registry| registry.get(&name.to_string()).cloned())
-            {
+            let fields_to_add = match registry::get(&name.to_string()) {
                 None => {
                     let message = format!("type '{}' not found", &name);
                     return Err(Error::new(&message).with_span(name.span()));
@@ -57,12 +53,10 @@ impl Element for StructExtend {
             };
         }
 
-        REGISTRY.with_borrow_mut(|registry| {
-            registry.insert(
-                target.ident.to_string(),
-                crate::TypeEntry::from(syn::Item::Struct(target.clone())),
-            );
-        });
+        registry::put(
+            target.ident.to_string(),
+            registry::TypeEntry::from(syn::Item::Struct(target.clone())),
+        );
 
         return Ok(quote!(#target));
     }

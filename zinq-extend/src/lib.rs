@@ -1,21 +1,10 @@
 mod elements;
 mod input;
-mod lazy_parse;
-mod type_entry;
-
-use std::{cell::RefCell, collections::HashMap};
 
 use elements::*;
 use input::*;
-use lazy_parse::*;
 use proc_macro::TokenStream;
-use type_entry::*;
 use zinq_parse::Element;
-
-thread_local! {
-    pub(crate) static REGISTRY: RefCell<HashMap<String, TypeEntry>> =
-        RefCell::new(HashMap::new());
-}
 
 #[proc_macro_attribute]
 pub fn extend(input_tokens: TokenStream, item_tokens: TokenStream) -> TokenStream {
