@@ -5,8 +5,8 @@ use crate::{Context, EnumContext, StructContext};
 
 ///
 /// ## Element
-/// a basic modularization of token rendering
-/// for proc macros
+/// a component that can parse/render
+/// rust syntax
 ///
 pub trait Element {
     ///
@@ -30,8 +30,29 @@ pub trait Element {
     }
 
     ///
+    /// ## render_enum
+    /// render tokens for some enum
+    ///
+    fn render_enum(&self, _context: &mut EnumContext) -> Result<TokenStream, crate::Error> {
+        unimplemented!()
+    }
+
+    ///
+    /// ## render_struct
+    /// render tokens for some struct
+    ///
+    fn render_struct(&self, _context: &mut StructContext) -> Result<TokenStream, crate::Error> {
+        unimplemented!()
+    }
+
+    ///
     /// ## render
     /// called with a context and returns a token stream
     ///
-    fn render(&self, context: &mut Context) -> Result<TokenStream, crate::Error>;
+    fn render(&self, context: &mut Context) -> Result<TokenStream, crate::Error> {
+        return match context {
+            Context::Enum(v) => self.render_enum(v),
+            Context::Struct(v) => self.render_struct(v),
+        };
+    }
 }

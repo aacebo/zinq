@@ -1,6 +1,6 @@
 use syn::punctuated::Punctuated;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Input(pub Punctuated<syn::Ident, syn::Token![,]>);
 
 impl syn::parse::Parse for Input {

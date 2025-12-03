@@ -20,7 +20,14 @@ impl Context {
         };
     }
 
-    pub fn item(&self) -> syn::Item {
+    pub fn input_required<T: Parse>(&self) -> T {
+        return match self {
+            Self::Enum(v) => v.input_required(),
+            Self::Struct(v) => v.input_required(),
+        };
+    }
+
+    pub fn target(&self) -> syn::Item {
         return match self {
             Self::Enum(v) => syn::Item::Enum(v.target.clone()),
             Self::Struct(v) => syn::Item::Struct(v.target.clone()),

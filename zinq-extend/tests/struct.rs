@@ -19,9 +19,13 @@ struct C {
 
 #[test]
 pub fn should_extend() {
-    let _c = C {
+    let c = C {
         a: String::new(),
         b: 1,
         c: true,
     };
+
+    debug_assert_eq!(c.a, "");
+    debug_assert_eq!(c.b, 1);
+    debug_assert_eq!(c.c, true);
 }

@@ -15,6 +15,13 @@ impl EnumContext {
         };
     }
 
+    pub fn input_required<T: Parse>(&self) -> T {
+        return match &self.input {
+            None => panic!("input token stream is missing, but it is required"),
+            Some(tokens) => syn::parse::<T>(tokens.clone().into()).unwrap(),
+        };
+    }
+
     pub fn target(&self) -> &syn::ItemEnum {
         return &self.target;
     }
