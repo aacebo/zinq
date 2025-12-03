@@ -1,4 +1,7 @@
-use crate::Context;
+use proc_macro2::TokenStream;
+use syn::spanned::Spanned;
+
+use crate::{Context, EnumContext, StructContext};
 
 ///
 /// ## Element
@@ -7,19 +10,28 @@ use crate::Context;
 ///
 pub trait Element {
     ///
-    /// the context type to be passed
-    /// into the element for rendering
+    /// ## parse
+    /// build the context or return None
+    /// to ignore this element
     ///
-    type Context: Context;
+    fn parse(
+        &self,
+        input: Option<TokenStream>,
+        tokens: TokenStream,
+    ) -> Result<Context, crate::Error> {
+        let item = syn::parse::<syn::Item>(tokens.into()).unwrap();
+        let context = match item {
+            syn::Item::Struct(target) => Context::Struct(StructContext { input, target }),
+            syn::Item::Enum(target) => Context::Enum(EnumContext { input, target }),
+            v => return Err(crate::Error::new("error while parsing element").with_span(v.span())),
+        };
 
-    ///
-    /// the token output type
-    ///
-    type Output: quote::ToTokens;
+        return Ok(context);
+    }
 
     ///
     /// ## render
     /// called with a context and returns a token stream
     ///
-    fn render(&self, context: &mut Self::Context) -> Result<Self::Output, crate::Error>;
+    fn render(&self, context: &mut Context) -> Result<TokenStream, crate::Error>;
 }

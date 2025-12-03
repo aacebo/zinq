@@ -1,29 +1,25 @@
+use proc_macro2::TokenStream;
 use syn::parse::Parse;
 
-use crate::Context;
-
 #[derive(Debug, Clone)]
-pub struct EnumContext<Input: Parse> {
-    input: Option<Input>,
-    target: syn::ItemEnum,
+pub struct EnumContext {
+    pub(crate) input: Option<TokenStream>,
+    pub(crate) target: syn::ItemEnum,
 }
 
-impl<Input: Parse> Context for EnumContext<Input> {
-    type Input = Input;
-    type Target = syn::ItemEnum;
-
-    fn input(&self) -> Option<&Self::Input> {
+impl EnumContext {
+    pub fn input<T: Parse>(&self) -> Option<T> {
         return match &self.input {
             None => None,
-            Some(input) => Some(input),
+            Some(tokens) => Some(syn::parse::<T>(tokens.clone().into()).unwrap()),
         };
     }
 
-    fn target(&self) -> &Self::Target {
+    pub fn target(&self) -> &syn::ItemEnum {
         return &self.target;
     }
 
-    fn target_mut(&mut self) -> &mut Self::Target {
+    pub fn target_mut(&mut self) -> &mut syn::ItemEnum {
         return &mut self.target;
     }
 }

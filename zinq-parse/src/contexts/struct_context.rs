@@ -1,29 +1,25 @@
+use proc_macro2::TokenStream;
 use syn::parse::Parse;
 
-use crate::Context;
-
 #[derive(Debug, Clone)]
-pub struct StructContext<Input: Parse> {
-    input: Option<Input>,
-    target: syn::ItemStruct,
+pub struct StructContext {
+    pub(crate) input: Option<TokenStream>,
+    pub(crate) target: syn::ItemStruct,
 }
 
-impl<Input: Parse> Context for StructContext<Input> {
-    type Input = Input;
-    type Target = syn::ItemStruct;
-
-    fn input(&self) -> Option<&Self::Input> {
+impl StructContext {
+    pub fn input<T: Parse>(&self) -> Option<T> {
         return match &self.input {
             None => None,
-            Some(input) => Some(input),
+            Some(tokens) => Some(syn::parse::<T>(tokens.clone().into()).unwrap()),
         };
     }
 
-    fn target(&self) -> &Self::Target {
+    pub fn target(&self) -> &syn::ItemStruct {
         return &self.target;
     }
 
-    fn target_mut(&mut self) -> &mut Self::Target {
+    pub fn target_mut(&mut self) -> &mut syn::ItemStruct {
         return &mut self.target;
     }
 }

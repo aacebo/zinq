@@ -1,5 +1,8 @@
 use std::sync::Arc;
 
+use proc_macro2::TokenStream;
+use quote::quote;
+
 #[derive(Debug, Clone)]
 pub struct Error {
     message: String,
@@ -34,6 +37,14 @@ impl Error {
         let mut next = self.clone();
         next.inner = Some(Arc::new(value));
         return next;
+    }
+
+    pub fn to_compile_error(&self) -> TokenStream {
+        let message = &self.message;
+
+        return quote! {
+            compile_error(#message)
+        };
     }
 }
 
