@@ -9,7 +9,6 @@ use zinq_parse::Element;
 #[proc_macro_attribute]
 pub fn extend(input_tokens: TokenStream, item_tokens: TokenStream) -> TokenStream {
     let element = StructExtend;
-
     let mut context = match element.parse(Some(input_tokens.into()), item_tokens.into()) {
         Err(err) => return err.to_compile_error().into(),
         Ok(v) => v,

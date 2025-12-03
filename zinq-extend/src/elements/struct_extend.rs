@@ -11,6 +11,8 @@ impl Element for StructExtend {
     ) -> Result<proc_macro2::TokenStream, Error> {
         let input = context.input_required::<crate::Input>();
         let target = context.target_mut();
+        let ident = &target.ident;
+        let mut methods = proc_macro2::TokenStream::new();
 
         for name in input.0.iter() {
             let fields_to_add = match registry::get(&name.to_string()) {
@@ -30,6 +32,16 @@ impl Element for StructExtend {
                 syn::Fields::Named(named_fields) => match &mut target.fields {
                     syn::Fields::Named(fields) => {
                         fields.named.extend(named_fields.named.clone());
+                        methods.extend(named_fields.named.iter().map(|field| {
+                            let field_ident = field.ident.clone().unwrap();
+                            let field_ty = &field.ty;
+
+                            quote! {
+                                pub fn #field_ident(&self) -> &#field_ty {
+                                    return &self.#field_ident;
+                                }
+                            }
+                        }));
                     }
                     _ => {
                         return Err(Error::new(
@@ -58,6 +70,12 @@ impl Element for StructExtend {
             registry::TypeEntry::from(syn::Item::Struct(target.clone())),
         );
 
-        return Ok(quote!(#target));
+        return Ok(quote! {
+            #target
+
+            impl #ident {
+                #methods
+            }
+        });
     }
 }
