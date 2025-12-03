@@ -1,6 +1,6 @@
 [package]
 name = "zinq"
-description = "a relational schema framework."
+description = "a comprehensive collection of packages designed to streamline rust development."
 readme = "README.md"
 version.workspace = true
 edition.workspace = true

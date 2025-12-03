@@ -3,8 +3,8 @@ mod input;
 
 use elements::*;
 use input::*;
-use proc_macro::TokenStream;
 use macrox::Element;
+use proc_macro::TokenStream;
 
 #[proc_macro_attribute]
 pub fn extend(input_tokens: TokenStream, item_tokens: TokenStream) -> TokenStream {

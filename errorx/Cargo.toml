@@ -13,6 +13,12 @@ repository.workspace = true
 macros = ["dep:errorx-macros"]
 serde = ["dep:serde", "serde/derive"]
 
+[lints.rust]
+named_arguments_used_positionally = "allow"
+
 [dependencies]
 errorx-macros = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+errorx-macros = { workspace = true }

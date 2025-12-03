@@ -1,5 +1,5 @@
-use quote::quote;
 use macrox::{Element, Error, StructContext, registry};
+use quote::quote;
 
 #[derive(Debug, Clone)]
 pub struct StructExtend;

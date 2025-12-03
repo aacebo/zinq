@@ -12,13 +12,7 @@ repository.workspace = true
 [lib]
 proc-macro = true
 
-[lints.rust]
-named_arguments_used_positionally = "allow"
-
 [dependencies]
 syn = { workspace = true, features = ["full", "parsing"] }
 quote = { workspace = true }
 proc-macro2 = { workspace = true }
-
-[dev-dependencies]
-errorx = { workspace = true }

@@ -16,3 +16,6 @@ serde = ["dep:serde", "serde/derive"]
 [dependencies]
 reflectx-macros = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+reflectx-macros = { workspace = true }

@@ -28,7 +28,8 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
     let vis = reflect_visibility::build(&item.vis);
     let inner_meta = reflect_meta::build(&item.attrs);
     let generics = reflect_generics::build(&item.generics);
-    let methods = item.items
+    let methods = item
+        .items
         .iter()
         .filter_map(|item| {
             if let syn::TraitItem::Fn(func) = item {
@@ -44,7 +45,9 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                     syn::ReturnType::Type(_, ty) => quote!(::reflectx::type_of!(#ty)),
                 };
 
-                let fn_params = func.sig.inputs
+                let fn_params = func
+                    .sig
+                    .inputs
                     .iter()
                     .map(|arg| match arg {
                         syn::FnArg::Receiver(recv) => {
@@ -66,7 +69,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                                     &#param_ty,
                                 )
                             }
-                        },
+                        }
                         syn::FnArg::Typed(typed) => match typed.pat.as_ref() {
                             syn::Pat::Ident(ident) => {
                                 let arg_name = &ident.ident;
@@ -74,11 +77,13 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                                 let mut param_ty = quote!(::reflectx::type_of!(#arg_ty));
 
                                 if let Some(_) = &ident.mutability {
-                                    param_ty = quote!(::reflectx::MutType::new(&#param_ty).to_type());
+                                    param_ty =
+                                        quote!(::reflectx::MutType::new(&#param_ty).to_type());
                                 }
 
                                 if let syn::Type::Ptr(_) = typed.ty.as_ref() {
-                                    param_ty = quote!(::reflectx::RefType::new(&#param_ty).to_type());
+                                    param_ty =
+                                        quote!(::reflectx::RefType::new(&#param_ty).to_type());
                                 }
 
                                 quote! {
@@ -87,7 +92,7 @@ pub fn build(meta: proc_macro2::TokenStream, item: &syn::ItemTrait) -> proc_macr
                                         &#param_ty,
                                     )
                                 }
-                            },
+                            }
                             _ => quote!(),
                         },
                     })
