@@ -1,15 +1,14 @@
-mod elements;
-mod input;
+mod render;
 
-use elements::*;
-use input::*;
 use macrox::Element;
 use proc_macro::TokenStream;
 
-#[proc_macro_attribute]
-pub fn extend(input_tokens: TokenStream, item_tokens: TokenStream) -> TokenStream {
-    let element = StructExtend;
-    let mut context = match element.parse(Some(input_tokens.into()), item_tokens.into()) {
+macrox::import!();
+
+#[proc_macro_derive(Extend, attributes(proxy))]
+pub fn extend(tokens: TokenStream) -> TokenStream {
+    let element = render::StructDerive;
+    let mut context = match element.parse_derive(tokens.into()) {
         Err(err) => return err.to_compile_error().into(),
         Ok(v) => v,
     };

@@ -43,7 +43,7 @@ impl Error {
         let message = &self.message;
 
         return quote! {
-            compile_error(#message)
+            compile_error!(#message)
         };
     }
 }

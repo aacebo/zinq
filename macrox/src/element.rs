@@ -30,6 +30,48 @@ pub trait Element {
     }
 
     ///
+    /// ## parse
+    /// build the context or return None
+    /// to ignore this element
+    ///
+    fn parse_derive(&self, tokens: TokenStream) -> Result<Context, crate::Error> {
+        let input = syn::parse::<syn::DeriveInput>(tokens.into()).unwrap();
+        let context: Context = match input.data {
+            syn::Data::Struct(target) => Context::Struct(StructContext {
+                input: None,
+                target: syn::ItemStruct {
+                    attrs: input.attrs.clone(),
+                    fields: target.fields.clone(),
+                    generics: input.generics.clone(),
+                    ident: input.ident.clone(),
+                    semi_token: target.semi_token.clone(),
+                    struct_token: target.struct_token.clone(),
+                    vis: input.vis.clone(),
+                },
+            }),
+            syn::Data::Enum(target) => Context::Enum(EnumContext {
+                input: None,
+                target: syn::ItemEnum {
+                    attrs: input.attrs.clone(),
+                    variants: target.variants.clone(),
+                    generics: input.generics.clone(),
+                    ident: input.ident.clone(),
+                    brace_token: target.brace_token.clone(),
+                    enum_token: target.enum_token.clone(),
+                    vis: input.vis.clone(),
+                },
+            }),
+            _ => {
+                return Err(
+                    crate::Error::new("error while parsing element").with_span(input.span())
+                );
+            }
+        };
+
+        return Ok(context);
+    }
+
+    ///
     /// ## render_enum
     /// render tokens for some enum
     ///

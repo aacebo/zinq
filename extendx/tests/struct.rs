@@ -1,31 +1,30 @@
-use extendx::extend;
+use extendx::Extend;
 
-#[extend]
+#[derive(Default, Extend)]
 #[allow(unused)]
 struct A {
     pub a: String,
 }
 
-#[extend(A)]
+#[derive(Default, Extend)]
 #[allow(unused)]
 struct B {
+    #[proxy]
+    inner_a: A,
     pub b: usize,
 }
 
-#[extend(B)]
+#[derive(Default, Extend)]
 struct C {
+    #[proxy]
+    inner_b: B,
     pub c: bool,
 }
 
 #[test]
 pub fn should_extend() {
-    let c = C {
-        a: String::new(),
-        b: 1,
-        c: true,
-    };
+    let c = C::default();
 
-    debug_assert_eq!(c.a, "");
-    debug_assert_eq!(c.b, 1);
-    debug_assert_eq!(c.c, true);
+    debug_assert_eq!(c.b(), &0);
+    debug_assert_eq!(c.c, false);
 }
