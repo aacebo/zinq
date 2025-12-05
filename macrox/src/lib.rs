@@ -4,6 +4,7 @@ mod error;
 mod ext;
 mod lazy_parse;
 pub mod registry;
+pub mod state;
 mod syntax;
 
 pub use contexts::*;

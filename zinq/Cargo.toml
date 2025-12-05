@@ -10,14 +10,16 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["reflectx/macros", "errorx/macros"]
-reflect = ["dep:reflectx"]
-error = ["dep:errorx"]
-extend = ["dep:extendx"]
-parse = ["dep:macrox"]
-serde = ["dep:serde", "serde/derive", "reflectx/serde", "errorx/serde"]
+macros = ["configx/macros", "reflectx/macros", "errorx/macros"]
+configx = ["dep:configx"]
+reflectx = ["dep:reflectx"]
+errorx = ["dep:errorx"]
+extendx = ["dep:extendx"]
+macrox = ["dep:macrox"]
+serde = ["dep:serde", "serde/derive", "reflectx/serde", "errorx/serde", "configx/serde"]
 
 [dependencies]
+configx = { workspace = true, optional = true }
 reflectx = { workspace = true, optional = true }
 extendx = { workspace = true, optional = true }
 errorx = { workspace = true, optional = true }
