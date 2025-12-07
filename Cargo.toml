@@ -24,6 +24,7 @@ errorx-macros = { path = "./errorx-macros", version = "0.0.1" }
 
 serde = { version = "1" }
 serde_yml = { version = "0.0.6" }
+serde_json = { version = "1" }
 syn = { version = "2" }
 quote = { version = "1" }
 proc-macro2 = { version = "1" }

@@ -1,9 +1,10 @@
 mod key;
-mod meta;
 mod path;
+pub mod types;
+
+use std::sync::Arc;
 
 pub use key::*;
-pub use meta::*;
 pub use path::*;
 
 #[cfg(feature = "macros")]
@@ -16,53 +17,71 @@ pub use configx_macros::*;
 ///
 pub trait Config {
     ///
-    /// ## name
-    /// the configs name
+    /// ## get
+    /// get the raw value of a given path
     ///
-    fn name(&self) -> &str;
+    fn get(&self, path: &Path) -> Option<&str>;
+
+    ///
+    /// ## section
+    /// get a section at a given path
+    ///
+    fn section(&self, path: &Path) -> Option<Arc<dyn Section>>;
 
     ///
     /// ## children
     /// the child config slice
     ///
-    fn iter(&self) -> std::vec::IntoIter<(Key, Box<dyn Config>)>;
+    fn children(&self) -> Vec<Arc<dyn Section>>;
+}
 
+///
+/// ## Section
+/// a config that is a child section to some parent
+/// configuration and may also have sub configs
+///
+pub trait Section: Config {
+    ///
+    /// ## path
+    /// the absolute path from the root
+    /// config to this section
+    ///
+    fn path(&self) -> Path;
+
+    ///
+    /// ## key
+    /// the key this section occupies in its parent.
+    ///
+    fn key(&self) -> Key;
+}
+
+///
+/// ## Value
+/// a config that can access its value
+///
+pub trait GetAs: Config {
     ///
     /// ## get
-    /// get a child config by its key
+    /// get a value at some path
     ///
-    fn get(&self, key: &Key) -> Option<Box<dyn Config>>;
+    fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T>;
 
     ///
-    /// ## get_or_panic
-    /// get a child config by its key
-    /// panic if not found
+    /// ## get_required
+    /// get a value at some path, or panic
     ///
-    fn get_or_panic(&self, key: &Key) -> Box<dyn Config> {
-        match self.get(key) {
-            None => panic!("[error] => '{}' not found in ", key),
+    fn get_as_required<T: serde::de::DeserializeOwned>(&self, path: &Path) -> T {
+        match self.get_as(path) {
+            None => panic!("[error] => value not found for '{}'", path,),
             Some(v) => v,
         }
     }
 }
 
-impl<T> Config for T
-where
-    T: IntoIterator + Clone,
-    T::Item: Sized + Config + std::any::Any,
-{
-    fn name(&self) -> &str {
-        return std::any::type_name::<T>();
-    }
-
-    fn iter(&self) -> std::vec::IntoIter<(Key, Box<dyn Config>)> {
-        return vec![].into_iter();
-    }
-
-    fn get(&self, key: &Key) -> Option<Box<dyn Config>> {
-        match key {
-            Key::Index(i) => Some(Box::new(self.clone().into_iter().nth(*i)?)),
-            _ => None,
-        }
+#[cfg(feature = "yml")]
+impl GetAs for dyn Config {
+    fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T> {
+        serde_yml::from_str(self.get(path)?)
+            .expect(&format!("could not deserialize config path '{}'", path))
     }
 }

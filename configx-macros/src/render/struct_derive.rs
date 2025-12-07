@@ -11,35 +11,32 @@ impl Element for StructDerive {
     ) -> Result<proc_macro2::TokenStream, Error> {
         let target = context.target();
         let ident = &target.ident;
-        let fields = target
+        let fields_get = target
             .fields
             .iter()
             .map(|field| {
                 let field_ident = &field.ident;
 
                 quote! {
-                    stringify!(#field_ident) => Some(Box::new(self.#field_ident))
+                    stringify!(#field_ident) => Some(&self.#field_ident)
                 }
             })
             .collect::<Vec<_>>();
 
         Ok(quote! {
             impl ::configx::Config for #ident {
-                fn name(&self) -> &str {
-                    return stringify!(#ident);
+                fn get(&self, path: &::configx::Path) -> Option<&str> {
+                    match path.to_string().as_str() {
+                        #(#fields_get, )*
+                    }
                 }
 
-                fn iter(&self) -> std::vec::IntoIter<(::configx::Key, Box<dyn ::configx::Config>)> {
-                    return vec![].into_iter();
+                fn section(&self, path: &::configx::Path) -> Option<::std::sync::Arc<dyn ::configx::Section>> {
+                    todo!()
                 }
 
-                fn get(&self, key: &::configx::Key) -> Option<Box<dyn ::configx::Config>> {
-                    return match key {
-                        ::configx::Key::String(v) => match v.as_str() {
-                            #(#fields, )*
-                        },
-                        _ => None,
-                    };
+                fn children(&self) -> Vec<::std::sync::Arc<dyn ::configx::Section>> {
+                    vec![]
                 }
             }
         })

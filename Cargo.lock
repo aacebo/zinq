@@ -97,6 +97,8 @@ version = "0.0.1"
 dependencies = [
  "configx-macros",
  "serde",
+ "serde_json",
+ "serde_yml",
 ]
 
 [[package]]
@@ -343,7 +345,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde",
- "serde_yml",
  "syn",
 ]
 
