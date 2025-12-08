@@ -6,13 +6,16 @@ pub enum Key {
 
 impl From<&str> for Key {
     fn from(value: &str) -> Self {
-        return Self::String(value.to_string());
+        return Self::from(value.to_string());
     }
 }
 
 impl From<String> for Key {
     fn from(value: String) -> Self {
-        return Self::String(value);
+        match value.parse::<usize>() {
+            Err(_) => Self::String(value),
+            Ok(v) => Self::Index(v),
+        }
     }
 }
 
@@ -37,10 +40,10 @@ impl std::fmt::Display for Key {
     }
 }
 
-impl PartialEq<str> for Key {
-    fn eq(&self, other: &str) -> bool {
+impl PartialEq<&str> for Key {
+    fn eq(&self, other: &&str) -> bool {
         return match self {
-            Self::String(v) => v == other,
+            Self::String(v) => v == *other,
             _ => false,
         };
     }

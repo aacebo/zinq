@@ -1,12 +1,8 @@
+mod item;
 mod key;
 mod path;
-mod get;
-mod section;
-pub mod types;
 
-use std::sync::Arc;
-
-pub use section::*;
+// pub use item::*;
 pub use key::*;
 pub use path::*;
 
@@ -22,28 +18,26 @@ pub trait Config {
     ///
     /// ## value
     /// the configs raw serialized value
-    /// 
-    fn value(&self) -> String;
-
     ///
-    /// ## get
-    /// get the raw value of a given path
-    ///
-    fn get(&self, path: &Path) -> Option<String>;
+    fn value<'a>(&self, key: &Key) -> Option<&'a dyn Section>;
 
     ///
     /// ## section
     /// get a section at a given path
     ///
-    fn section<'a>(&self, _path: &Path) -> Option<&'a dyn Section> {
-        None
+    #[allow(unused_variables)]
+    fn get<'a>(&self, path: &Path) -> Option<&'a dyn Section> {
+        match path.first() {
+            None => None,
+            Some(key) => self.value(key),
+        }
     }
 
     ///
     /// ## children
     /// the child config slice
     ///
-    fn children(&self) -> Vec<Arc<dyn Section>> {
+    fn children<'a>(&self) -> Vec<&'a dyn Section> {
         vec![]
     }
 }
@@ -72,6 +66,7 @@ pub trait Section: Config {
 /// ## Value
 /// a config that can access its value
 ///
+#[cfg(feature = "serde")]
 pub trait GetAs: Config {
     ///
     /// ## get_as
@@ -91,18 +86,27 @@ pub trait GetAs: Config {
     }
 }
 
-impl std::ops::Index<&str> for dyn Config {
-    type Output = dyn Section;
-    
-    fn index(&self, index: &str) -> &Self::Output {
-        let path = Path::from(index);
-        self.section(&path).unwrap()
-    }
-}
+// #[cfg(feature = "yml")]
+// impl GetAs for dyn Config {
+//     fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T> {
+//         serde_yml::from_str(&self.get(path)?).unwrap_or(None)
+//     }
+// }
 
-#[cfg(feature = "yml")]
-impl GetAs for dyn Config {
-    fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T> {
-        serde_yml::from_str(&self.get(path)?).unwrap_or(None)
-    }
-}
+// impl std::ops::Index<&str> for dyn Config {
+//     type Output = dyn Section;
+
+//     fn index(&self, index: &str) -> &Self::Output {
+//         let path = Path::from(index);
+//         self.get(&path).unwrap()
+//     }
+// }
+
+// impl std::ops::Index<usize> for dyn Config {
+//     type Output = dyn Section;
+
+//     fn index(&self, index: usize) -> &Self::Output {
+//         let path = Path::from(format!("{}", index));
+//         self.get(&path).unwrap()
+//     }
+// }
