@@ -1,9 +1,12 @@
 mod key;
 mod path;
+mod get;
+mod section;
 pub mod types;
 
 use std::sync::Arc;
 
+pub use section::*;
 pub use key::*;
 pub use path::*;
 
@@ -17,22 +20,32 @@ pub use configx_macros::*;
 ///
 pub trait Config {
     ///
+    /// ## value
+    /// the configs raw serialized value
+    /// 
+    fn value(&self) -> String;
+
+    ///
     /// ## get
     /// get the raw value of a given path
     ///
-    fn get(&self, path: &Path) -> Option<&str>;
+    fn get(&self, path: &Path) -> Option<String>;
 
     ///
     /// ## section
     /// get a section at a given path
     ///
-    fn section(&self, path: &Path) -> Option<Arc<dyn Section>>;
+    fn section<'a>(&self, _path: &Path) -> Option<&'a dyn Section> {
+        None
+    }
 
     ///
     /// ## children
     /// the child config slice
     ///
-    fn children(&self) -> Vec<Arc<dyn Section>>;
+    fn children(&self) -> Vec<Arc<dyn Section>> {
+        vec![]
+    }
 }
 
 ///
@@ -61,13 +74,13 @@ pub trait Section: Config {
 ///
 pub trait GetAs: Config {
     ///
-    /// ## get
+    /// ## get_as
     /// get a value at some path
     ///
     fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T>;
 
     ///
-    /// ## get_required
+    /// ## get_as_required
     /// get a value at some path, or panic
     ///
     fn get_as_required<T: serde::de::DeserializeOwned>(&self, path: &Path) -> T {
@@ -78,10 +91,18 @@ pub trait GetAs: Config {
     }
 }
 
+impl std::ops::Index<&str> for dyn Config {
+    type Output = dyn Section;
+    
+    fn index(&self, index: &str) -> &Self::Output {
+        let path = Path::from(index);
+        self.section(&path).unwrap()
+    }
+}
+
 #[cfg(feature = "yml")]
 impl GetAs for dyn Config {
     fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T> {
-        serde_yml::from_str(self.get(path)?)
-            .expect(&format!("could not deserialize config path '{}'", path))
+        serde_yml::from_str(&self.get(path)?).unwrap_or(None)
     }
 }

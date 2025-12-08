@@ -18,21 +18,26 @@ impl Element for StructDerive {
                 let field_ident = &field.ident;
 
                 quote! {
-                    stringify!(#field_ident) => Some(&self.#field_ident)
+                    stringify!(#field_ident) => Some(format!("{:#?}", self.#field_ident))
                 }
             })
             .collect::<Vec<_>>();
 
         Ok(quote! {
             impl ::configx::Config for #ident {
-                fn get(&self, path: &::configx::Path) -> Option<&str> {
+                fn value(&self) -> String {
+                    unimplemented!()
+                }
+
+                fn get(&self, path: &::configx::Path) -> Option<String> {
                     match path.to_string().as_str() {
                         #(#fields_get, )*
+                        _ => None,
                     }
                 }
 
-                fn section(&self, path: &::configx::Path) -> Option<::std::sync::Arc<dyn ::configx::Section>> {
-                    todo!()
+                fn section<'a>(&self, path: &::configx::Path) -> Option<&'a dyn ::configx::Section> {
+                    unimplemented!()
                 }
 
                 fn children(&self) -> Vec<::std::sync::Arc<dyn ::configx::Section>> {

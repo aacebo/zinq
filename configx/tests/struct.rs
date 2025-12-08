@@ -7,7 +7,7 @@ pub struct ClientConfig {
     pub api: ApiConfig,
 }
 
-#[derive(Config)]
+#[derive(Config, Debug)]
 pub struct ApiConfig {
     pub url: String,
     pub port: Option<usize>,

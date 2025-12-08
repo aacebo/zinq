@@ -1,11 +1,13 @@
+use std::collections::VecDeque;
+
 use crate::Key;
 
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct Path(Vec<Key>);
+pub struct Path(VecDeque<Key>);
 
 impl Path {
     pub fn new() -> Self {
-        return Self(vec![]);
+        return Self(VecDeque::new());
     }
 
     pub fn depth(&self) -> usize {
@@ -13,22 +15,26 @@ impl Path {
     }
 
     pub fn key(&self) -> Option<&Key> {
-        return self.0.last();
+        return self.0.back();
     }
 
-    pub fn add(&self, segment: Key) -> Self {
+    pub fn push(&self, segment: Key) -> Self {
         let mut next = self.clone();
-        next.0.push(segment);
+        next.0.push_back(segment);
         return next;
+    }
+
+    pub fn pop(&mut self) -> Option<Key> {
+        return self.0.pop_front();
     }
 }
 
 impl From<&str> for Path {
     fn from(value: &str) -> Self {
-        let mut segments = vec![];
+        let mut segments = VecDeque::new();
 
         for part in value.split("/") {
-            segments.push(Key::from(part));
+            segments.push_back(Key::from(part));
         }
 
         Self(segments)
@@ -37,10 +43,10 @@ impl From<&str> for Path {
 
 impl From<String> for Path {
     fn from(value: String) -> Self {
-        let mut segments = vec![];
+        let mut segments = VecDeque::new();
 
         for part in value.split("/") {
-            segments.push(Key::from(part));
+            segments.push_back(Key::from(part));
         }
 
         Self(segments)
