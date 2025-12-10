@@ -1,10 +1,10 @@
 [workspace]
 resolver = "3"
-members = ["zinq", "configx", "configx-macros", "errorx", "errorx-macros", "extendx", "macrox", "reflectx", "reflectx-macros"]
-default-members = ["zinq", "configx", "configx-macros", "errorx", "errorx-macros", "extendx", "macrox", "reflectx", "reflectx-macros"]
+members = ["zinq", "zinq-*"]
+default-members = ["zinq", "zinq-*"]
 
 [workspace.package]
-version = "0.0.1"
+version = "0.0.0"
 edition = "2024"
 license = "MIT"
 readme = "README.md"
@@ -13,18 +13,5 @@ homepage = "https://www.github.com/aacebo/zinq"
 repository = "https://www.github.com/aacebo/zinq"
 
 [workspace.dependencies]
-configx = { path = "./configx", version = "0.0.1" }
-configx-macros = { path = "./configx-macros", version = "0.0.1" }
-reflectx = { path = "./reflectx", version = "0.0.1" }
-reflectx-macros = { path = "./reflectx-macros", version = "0.0.1" }
-macrox = { path = "./macrox", version = "0.0.1" }
-extendx = { path = "./extendx", version = "0.0.1" }
-errorx = { path = "./errorx", version = "0.0.1" }
-errorx-macros = { path = "./errorx-macros", version = "0.0.1" }
-
-serde = { version = "1" }
-serde_yml = { version = "0.0.6" }
-serde_json = { version = "1" }
-syn = { version = "2" }
-quote = { version = "1" }
-proc-macro2 = { version = "1" }
+zinq = { path = "./zinq", version = "0.0.0" }
+zinq-rust = { path = "./zinq-rust", version = "0.0.0" }

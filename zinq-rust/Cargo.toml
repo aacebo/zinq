@@ -1,6 +1,6 @@
 [package]
-name = "zinq"
-description = "a generic ast/parser/tokenizer framework"
+name = "zinq-rust"
+description = "rust ast/parser/tokenizer implementations"
 readme = "README.md"
 version.workspace = true
 edition.workspace = true
