@@ -1,8 +1,14 @@
+mod error;
+mod get;
 mod item;
 mod key;
 mod path;
 
-// pub use item::*;
+use std::ops::Index;
+
+pub use error::*;
+pub use get::*;
+pub use item::*;
 pub use key::*;
 pub use path::*;
 
@@ -16,97 +22,112 @@ pub use configx_macros::*;
 ///
 pub trait Config {
     ///
-    /// ## value
-    /// the configs raw serialized value
+    /// ## item
+    /// get a config item by its key
     ///
-    fn value<'a>(&self, key: &Key) -> Option<&'a dyn Section>;
-
-    ///
-    /// ## section
-    /// get a section at a given path
-    ///
-    #[allow(unused_variables)]
-    fn get<'a>(&self, path: &Path) -> Option<&'a dyn Section> {
-        match path.first() {
-            None => None,
-            Some(key) => self.value(key),
-        }
-    }
+    fn item(&self, key: &Key) -> Option<Item>;
 
     ///
     /// ## children
     /// the child config slice
     ///
-    fn children<'a>(&self) -> Vec<&'a dyn Section> {
+    fn children(&self) -> Vec<Item> {
         vec![]
     }
 }
 
-///
-/// ## Section
-/// a config that is a child section to some parent
-/// configuration and may also have sub configs
-///
-pub trait Section: Config {
-    ///
-    /// ## path
-    /// the absolute path from the root
-    /// config to this section
-    ///
-    fn path(&self) -> Path;
-
-    ///
-    /// ## key
-    /// the key this section occupies in its parent.
-    ///
-    fn key(&self) -> Key;
-}
-
-///
-/// ## Value
-/// a config that can access its value
-///
-#[cfg(feature = "serde")]
-pub trait GetAs: Config {
-    ///
-    /// ## get_as
-    /// get a value at some path
-    ///
-    fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T>;
-
-    ///
-    /// ## get_as_required
-    /// get a value at some path, or panic
-    ///
-    fn get_as_required<T: serde::de::DeserializeOwned>(&self, path: &Path) -> T {
-        match self.get_as(path) {
-            None => panic!("[error] => value not found for '{}'", path,),
+impl GetByPath for dyn Config {
+    fn get<T>(&self, path: &Path) -> Option<T>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        let key = match path.first() {
+            None => return None,
             Some(v) => v,
-        }
+        };
+
+        let item = self.item(key)?;
+        item.get(path.clone().pop())
     }
 }
 
-// #[cfg(feature = "yml")]
-// impl GetAs for dyn Config {
-//     fn get_as<T: serde::de::DeserializeOwned>(&self, path: &Path) -> Option<T> {
-//         serde_yml::from_str(&self.get(path)?).unwrap_or(None)
-//     }
-// }
+impl<T> GetByPath for T
+where
+    T: Config + Clone + 'static,
+{
+    fn get<V>(&self, path: &Path) -> Option<V>
+    where
+        V: serde::de::DeserializeOwned,
+    {
+        let key = path.last()?;
+        let mut item = Item::Section(Section::new(Key::from(""), self.clone()));
 
-// impl std::ops::Index<&str> for dyn Config {
-//     type Output = dyn Section;
+        for i in 0..path.len() - 1 {
+            item = item.item(path.index(i))?;
+        }
 
-//     fn index(&self, index: &str) -> &Self::Output {
-//         let path = Path::from(index);
-//         self.get(&path).unwrap()
-//     }
-// }
+        if let Some(Item::Value(v)) = item.item(key) {
+            return Some(v.get().expect("expected error free deserialization"));
+        }
 
-// impl std::ops::Index<usize> for dyn Config {
-//     type Output = dyn Section;
+        None
+    }
+}
 
-//     fn index(&self, index: usize) -> &Self::Output {
-//         let path = Path::from(format!("{}", index));
-//         self.get(&path).unwrap()
-//     }
-// }
+#[cfg(test)]
+mod test {
+    use crate::{Config, GetByPath, Item, Key, Section, Value, path};
+
+    #[derive(Default, Clone)]
+    struct AppConfig {
+        name: String,
+        api: ApiConfig,
+    }
+
+    impl Config for AppConfig {
+        fn item(&self, key: &Key) -> Option<Item> {
+            let item = match key.to_string().as_str() {
+                "name" => Item::Value(Value::new(key.clone(), self.name.clone())),
+                "api" => Item::Section(Section::new(key.clone(), self.api.clone())),
+                _ => return None,
+            };
+
+            Some(item)
+        }
+    }
+
+    #[derive(Default, Clone)]
+    struct ApiConfig {
+        host: String,
+        port: usize,
+    }
+
+    impl Config for ApiConfig {
+        fn item(&self, key: &Key) -> Option<Item> {
+            let item = match key.to_string().as_str() {
+                "host" => Item::Value(Value::new(key.clone(), self.host.clone())),
+                "port" => Item::Value(Value::new(key.clone(), self.port)),
+                _ => return None,
+            };
+
+            Some(item)
+        }
+    }
+
+    #[test]
+    pub fn should_get_section() {
+        let app = AppConfig {
+            name: String::from("test"),
+            api: ApiConfig {
+                host: String::from("google"),
+                port: 3000,
+            },
+        };
+
+        debug_assert_eq!(app.get(&path!(/api/host)), Some(app.api.host.clone()));
+        debug_assert_eq!(
+            app.get::<String>(&path!(/api/host)).unwrap_or_default(),
+            app.api.host.as_str()
+        );
+    }
+}

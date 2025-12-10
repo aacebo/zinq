@@ -10,14 +10,14 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
+default = []
 macros = ["dep:configx-macros"]
-serde = ["dep:serde", "serde/derive"]
-yml = ["serde", "dep:serde_yml"]
-json = ["serde", "dep:serde_json"]
+yml = ["dep:serde_yml"]
+json = ["dep:serde_json"]
 
 [dependencies]
 configx-macros = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
+serde = { workspace = true, features = ["derive"] }
 serde_yml = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 

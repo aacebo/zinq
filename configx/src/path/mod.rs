@@ -1,11 +1,17 @@
+mod iter;
+
+pub use iter::*;
+
+use std::collections::VecDeque;
+
 use crate::Key;
 
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct Path(Vec<Key>);
+pub struct Path(VecDeque<Key>);
 
 impl Path {
     pub fn new() -> Self {
-        return Self(vec![]);
+        return Self(VecDeque::new());
     }
 
     pub fn len(&self) -> usize {
@@ -13,37 +19,44 @@ impl Path {
     }
 
     pub fn first(&self) -> Option<&Key> {
-        return self.0.first();
+        return self.0.front();
     }
 
     pub fn last(&self) -> Option<&Key> {
-        return self.0.last();
+        return self.0.back();
     }
 
     pub fn push(&mut self, key: Key) -> &mut Self {
-        self.0.push(key);
+        self.0.push_back(key);
         return self;
     }
 
-    pub fn pop(&mut self) -> Option<Key> {
-        return self.0.pop();
+    pub fn pop(&mut self) -> &mut Self {
+        self.0.pop_front();
+        return self;
     }
 
-    pub fn iter(&self) -> std::slice::Iter<'_, Key> {
-        return self.0.iter();
+    pub fn iter(&self) -> Iter<'_> {
+        return Iter::from(self);
+    }
+
+    pub fn split(&self, index: usize) -> (Self, Self) {
+        let mut left: VecDeque<Key> = self.0.clone();
+        let right = left.split_off(index);
+        (Path::from(left), Path::from(right))
     }
 }
 
 impl From<&str> for Path {
     fn from(value: &str) -> Self {
-        let mut keys = vec![];
+        let mut keys = VecDeque::new();
 
         for part in value.split("/") {
             if part.is_empty() {
                 continue;
             }
 
-            keys.push(Key::from(part));
+            keys.push_back(Key::from(part));
         }
 
         Self(keys)
@@ -52,14 +65,14 @@ impl From<&str> for Path {
 
 impl From<String> for Path {
     fn from(value: String) -> Self {
-        let mut keys = vec![];
+        let mut keys = VecDeque::new();
 
         for part in value.split("/") {
             if part.is_empty() {
                 continue;
             }
 
-            keys.push(Key::from(part));
+            keys.push_back(Key::from(part));
         }
 
         Self(keys)
@@ -68,6 +81,12 @@ impl From<String> for Path {
 
 impl From<Vec<Key>> for Path {
     fn from(value: Vec<Key>) -> Self {
+        Self(VecDeque::from(value))
+    }
+}
+
+impl From<VecDeque<Key>> for Path {
+    fn from(value: VecDeque<Key>) -> Self {
         Self(value)
     }
 }
@@ -125,6 +144,6 @@ mod test {
         debug_assert_eq!(path[0], "a");
         debug_assert_eq!(path[1], 0);
         debug_assert_eq!(path[2], "test");
-        debug_assert_eq!(path, "/a/0/test");
+        debug_assert_eq!(path, "/a/0/test", "{}", path);
     }
 }

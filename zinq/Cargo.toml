@@ -10,13 +10,13 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["configx/macros", "reflectx/macros", "errorx/macros"]
+macros = ["reflectx/macros", "errorx/macros"]
 configx = ["dep:configx"]
 reflectx = ["dep:reflectx"]
 errorx = ["dep:errorx"]
 extendx = ["dep:extendx"]
 macrox = ["dep:macrox"]
-serde = ["dep:serde", "serde/derive", "reflectx/serde", "errorx/serde", "configx/serde"]
+serde = ["dep:serde", "serde/derive", "reflectx/serde", "errorx/serde"]
 
 [dependencies]
 configx = { workspace = true, optional = true }

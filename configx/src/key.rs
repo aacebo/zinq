@@ -40,6 +40,8 @@ impl std::fmt::Display for Key {
     }
 }
 
+impl Eq for Key {}
+
 impl PartialEq<&str> for Key {
     fn eq(&self, other: &&str) -> bool {
         return match self {
@@ -54,6 +56,17 @@ impl PartialEq<usize> for Key {
         return match self {
             Self::Index(v) => v == other,
             _ => false,
+        };
+    }
+}
+
+impl std::ops::Deref for Key {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        return match self {
+            Self::String(v) => &v,
+            _ => panic!("expected string value"),
         };
     }
 }
