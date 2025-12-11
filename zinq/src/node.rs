@@ -1,3 +1,1 @@
-pub trait Node {
-    
-}
+pub trait Node {}
