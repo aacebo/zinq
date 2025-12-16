@@ -8,6 +8,8 @@ pub use list::*;
 pub use not_found::*;
 pub use text::*;
 
+pub type Result<T> = std::result::Result<T, Error>;
+
 pub trait AsError {
     fn as_error(&self) -> &dyn std::error::Error;
 }
