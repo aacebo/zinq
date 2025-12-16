@@ -4,8 +4,3 @@ a family of tools that facilitate schema based use cases, including querying, va
 
 - [zinq](./zinq/README.md)
 - [reflectx](./reflectx/README.md)
-- [reflectx-macros](./reflectx-macros/README.md)
-- [errorx](./errorx/README.md)
-- [errorx-macros](./errorx-macros/README.md)
-- [macrox](./macrox/README.md)
-- [extendx](./extendx/README.md)
