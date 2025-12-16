@@ -1,50 +1,16 @@
 # To Do
 
-- [reflectx](./reflectx/TODO.md)
-- [errorx]
-    - hook into `std::backtrace::Backtrace`
-    - add `#[backtrace]` macro
-    - error message templates
-    - implement `From` for common error types:
-        - `HttpError`
-        - `std::fmt::Error`
-        - `std::io::Error`
-        - `std::syn::Error`
-        - etc...
-- [extendx]
-    - struct extend struct fields/methods
-        - downcast methods from child to parent type
-        `to_${parent}(&self) -> ${Parent}`
-        - from methods for parent from child type
-        `impl From<Child> for Parent`
-    - enum extend enum variants/methods
-    - if all enum variants have a method/field, auto
-    generate forward methods using `match`
-    - extension traits for external types
-        - ie `impl From<&[T]> for Vec<T>`
-    - `#[proxy(${field})]` to add all the methods from the wrapped
-    type to your type and proxy their calls to the inner field
-- [macrox]
-    - `TypeRegistry` for building shared macro type state
-    - `#[import]` macro at root to recursively build `TypeRegistry`
-    - `#[derive(Element), context(MyContext)]` macros for auto defining render elements for macros
-- [zinq-builder]
-    - `#[derive(Build)]` for auto generation of builder struct
-- [`??`]
-    -  deconstruct named fields to tuple
-    ```rust
-    #[derive(Tuple)]
-    struct MyStruct {
-        a: usize,
-        b: usize,
-        c: usize,
-    }
+The Zinq projects task list...for now.
 
-    let value = MyStruct {
-        a: 1,
-        b: 2,
-        c: 3,
-    }
+## Error
 
-    let (a, b, c) = &value.as_tuple();
-    ```
+- Add error derive macro
+- Add code to error type
+- Add common http error types
+
+## Context
+
+- Add context derive macro
+- Add context get by path
+- Add context sections
+
