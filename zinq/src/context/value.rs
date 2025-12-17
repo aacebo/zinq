@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::error::{DynError, Error, Result};
+use crate::error::{Error, Result, ToError};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Value(String);
@@ -11,12 +11,12 @@ impl Value {
         T::Err: std::error::Error + 'static,
     {
         match T::from_str(&self.0) {
-            Err(err) => Err(DynError::new(err).into()),
+            Err(err) => Err(err.to_error()),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn get_required<T: FromStr>(&self) -> T
+    pub fn require<T: FromStr>(&self) -> T
     where
         T::Err: std::error::Error + 'static,
     {

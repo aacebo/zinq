@@ -9,6 +9,10 @@ pub mod reflect {
 #[cfg(feature = "macros")]
 extern crate zinq_macros;
 
+#[cfg(feature = "cancel")]
+#[cfg_attr(feature = "cancel", macro_use)]
+pub mod cancel;
+
 #[cfg(feature = "context")]
 #[cfg_attr(feature = "context", macro_use)]
 pub mod context;
