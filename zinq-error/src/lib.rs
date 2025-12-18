@@ -1,9 +1,11 @@
 mod any;
+mod bad_request;
 mod list;
 mod not_found;
 mod text;
 
 pub use any::*;
+pub use bad_request::*;
 pub use list::*;
 pub use not_found::*;
 pub use text::*;
@@ -35,6 +37,7 @@ pub enum Error {
     Text(TextError),
     List(ListError),
     NotFound(NotFoundError),
+    BadRequest(BadRequestError),
     Other(AnyError),
 }
 
@@ -44,6 +47,7 @@ impl std::fmt::Display for Error {
             Self::Text(err) => write!(f, "{}", err),
             Self::List(err) => write!(f, "{}", err),
             Self::NotFound(err) => write!(f, "{}", err),
+            Self::BadRequest(err) => write!(f, "{}", err),
             Self::Other(err) => write!(f, "{}", err),
         }
     }
@@ -55,6 +59,7 @@ impl std::error::Error for Error {
             Self::Text(err) => err.source(),
             Self::List(err) => err.source(),
             Self::NotFound(err) => err.source(),
+            Self::BadRequest(err) => err.source(),
             Self::Other(err) => err.source(),
         }
     }
