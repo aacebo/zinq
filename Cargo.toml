@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
-members = ["zinq", "zinq-macros", "reflectx", "reflectx-macros"]
-default-members = ["zinq", "zinq-macros", "reflectx", "reflectx-macros"]
+members = ["zinq"]
+default-members = ["zinq"]
 
 [workspace.package]
 version = "0.0.1"
@@ -13,13 +13,4 @@ homepage = "https://www.github.com/aacebo/zinq"
 repository = "https://www.github.com/aacebo/zinq"
 
 [workspace.dependencies]
-zinq-macros = { path = "./zinq-macros", version = "0.0.1" }
-reflectx = { path = "./reflectx", version = "0.0.1" }
-reflectx-macros = { path = "./reflectx-macros", version = "0.0.1" }
-
-serde = { version = "1" }
-serde_yml = { version = "0.0.6" }
-serde_json = { version = "1" }
-syn = { version = "2" }
-quote = { version = "1" }
-proc-macro2 = { version = "1" }
+zinq = { path = "./zinq", version = "0.0.1" }

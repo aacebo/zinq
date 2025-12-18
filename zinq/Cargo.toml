@@ -1,6 +1,6 @@
 [package]
 name = "zinq"
-description = "a comprehensive collection of packages designed to streamline rust development."
+description = ""
 readme = "README.md"
 version.workspace = true
 edition.workspace = true
@@ -10,15 +10,5 @@ homepage.workspace = true
 repository.workspace = true
 
 [features]
-macros = ["dep:zinq-macros", "reflectx/macros"]
-context = ["error", "path", "cancel"]
-cancel = []
-error = []
-path = []
-reflect = ["dep:reflectx"]
-serde = ["dep:serde", "serde/derive", "reflectx/serde"]
 
 [dependencies]
-zinq-macros = { workspace = true, optional = true }
-reflectx = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
