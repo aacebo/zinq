@@ -1,5 +1,5 @@
 [package]
-name = "zinq"
+name = "zinq-error"
 readme = "README.md"
 version.workspace = true
 edition.workspace = true
@@ -8,10 +8,4 @@ documentation.workspace = true
 homepage.workspace = true
 repository.workspace = true
 
-[features]
-parse = ["dep:zinq-parse"]
-
 [dependencies]
-zinq-error = { workspace = true }
-zinq-token = { workspace = true }
-zinq-parse = { workspace = true, optional = true }

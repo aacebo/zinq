@@ -93,7 +93,7 @@ impl std::ops::IndexMut<usize> for ListError {
 
 #[cfg(test)]
 mod test {
-    use crate::error::{ListError, TextError};
+    use crate::{ListError, TextError};
 
     #[test]
     pub fn should_create_error_list() {

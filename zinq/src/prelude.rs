@@ -1,1 +1,1 @@
-pub use crate::error::{Error, Result};
+pub use zinq_error::{Error, Result};

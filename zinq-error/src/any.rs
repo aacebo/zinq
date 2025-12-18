@@ -39,7 +39,7 @@ impl std::ops::Deref for AnyError {
 
 #[cfg(test)]
 mod test {
-    use crate::error::ToError;
+    use crate::ToError;
 
     #[derive(Debug)]
     struct CustomError(String);
