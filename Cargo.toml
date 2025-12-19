@@ -14,6 +14,7 @@ repository = "https://www.github.com/aacebo/zinq"
 
 [workspace.dependencies]
 zinq = { path = "./zinq", version = "0.0.1" }
+zinq-ast = { path = "./zinq-ast", version = "0.0.1" }
 zinq-error = { path = "./zinq-error", version = "0.0.1" }
 zinq-token = { path = "./zinq-token", version = "0.0.1" }
 zinq-parse = { path = "./zinq-parse", version = "0.0.1" }

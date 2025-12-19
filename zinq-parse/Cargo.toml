@@ -10,4 +10,3 @@ repository.workspace = true
 
 [dependencies]
 zinq-error = { workspace = true }
-zinq-token = { workspace = true }

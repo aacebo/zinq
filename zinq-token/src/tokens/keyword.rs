@@ -88,6 +88,7 @@ define_keywords! {
     "match"     pub struct Match,
     "where"     pub struct Where,
     "continue"  pub struct Continue,
+    "trait"     pub struct Trait,
     "if"        pub struct If,
     "else"      pub struct Else,
     "for"       pub struct For,
