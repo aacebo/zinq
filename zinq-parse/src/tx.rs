@@ -1,4 +1,9 @@
-use crate::Commit;
+use std::ops::Index;
+
+use crate::{
+    Commit,
+    delta::{self, Delta},
+};
 
 ///
 /// ## Tx
@@ -57,6 +62,41 @@ where
     #[inline]
     pub fn commits(&self) -> &[Commit<T>] {
         &self.commits
+    }
+}
+
+impl<T> Tx<T>
+where
+    T: std::fmt::Debug,
+    T: delta::Delta,
+    T: Clone,
+    T: Eq,
+{
+    ///
+    /// ## delta
+    /// get the delta of the first and last commit
+    ///
+    #[inline]
+    pub fn delta(&self) -> delta::Commit<T::Output> {
+        let first = self
+            .commits
+            .first()
+            .expect("expected at least one commit in transaction");
+        let last = self.commits.last().unwrap();
+
+        Commit::<T>::delta(first, last)
+    }
+
+    ///
+    /// ## delta_slice
+    /// get the delta of a sub slice by giving the indices
+    /// of the upper and lower bounded commits
+    ///
+    #[inline]
+    pub fn delta_slice(&self, start: usize, end: usize) -> delta::Commit<T::Output> {
+        let first = self.commits.index(start);
+        let last = self.commits.index(end);
+        Commit::<T>::delta(first, last)
     }
 }
 
