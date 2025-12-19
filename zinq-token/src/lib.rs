@@ -1,34 +1,45 @@
-mod cursor;
-mod location;
-pub mod source;
-mod span;
-mod span_error;
-mod stream;
-pub mod tokens;
+#![allow(unused)]
 
-pub use cursor::*;
-pub use location::*;
-pub use span::*;
-pub use span_error::*;
-pub use stream::*;
+mod group;
+mod ident;
+mod keyword;
+mod literal;
+mod punct;
+
+pub use group::*;
+pub use ident::*;
+pub use keyword::*;
+pub use literal::*;
+pub use punct::*;
+
 use zinq_error::Result;
+use zinq_parse::{Parse, Peek};
 
-pub trait Token: Sized {
-    ///
-    /// ## peek
-    /// check if the next token is this token type
-    ///
-    fn peek(cursor: Cursor) -> bool;
+#[derive(Debug, Clone)]
+pub enum Token {
+    Keyword(Keyword),
+}
 
-    ///
-    /// ## parse
-    /// parse this token type using a provided stream of tokens
-    ///
-    fn parse(cursor: Cursor) -> Result<Self>;
+impl Peek for Token {
+    #[inline]
+    fn peek<P: zinq_parse::Parser>(parser: &P) -> bool {
+        Keyword::peek(parser)
+    }
+}
 
-    ///
-    /// ## span
-    /// get the span of the token
-    ///
-    fn span(&self) -> &Span;
+impl Parse for Token {
+    #[inline]
+    fn parse<P: zinq_parse::Parser>(parser: &mut P) -> Result<Self> {
+        match Keyword::parse(parser) {
+            Err(err) => Err(err),
+            Ok(v) => Ok(v.into()),
+        }
+    }
+
+    #[inline]
+    fn span(&self) -> &zinq_parse::Span {
+        match self {
+            Self::Keyword(v) => v.span(),
+        }
+    }
 }

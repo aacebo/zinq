@@ -1,15 +1,17 @@
 use crate::Span;
 
 ///
-/// ## Cursor
-/// a mutable span
+/// ## ByteParser
+/// the default implementation of a
+/// `Parser` that can iterate/parse some
+/// `Bytes`
 ///
 #[derive(Debug, Default, Clone)]
-pub struct Cursor {
+pub struct ByteParser {
     span: Span,
 }
 
-impl Cursor {
+impl ByteParser {
     #[inline]
     pub fn new() -> Self {
         Self {
@@ -37,21 +39,14 @@ impl Cursor {
     }
 }
 
-impl From<Span> for Cursor {
+impl From<Span> for ByteParser {
     #[inline]
-    fn from(span: Span) -> Self {
-        Self { span }
+    fn from(value: Span) -> Self {
+        Self { span: value }
     }
 }
 
-impl std::fmt::Display for Cursor {
-    #[inline]
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
-    }
-}
-
-impl std::ops::Deref for Cursor {
+impl std::ops::Deref for ByteParser {
     type Target = Span;
 
     #[inline]

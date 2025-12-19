@@ -2,7 +2,10 @@ use std::ops::Index;
 
 use zinq_error::{AnyError, Error, Result, TextError};
 
-use crate::{Bytes, FileMetaData, Location, ParseError};
+use crate::{
+    Bytes, FileMetaData, Location, ParseError,
+    delta::{self, Delta},
+};
 
 ///
 /// ## Span
@@ -128,5 +131,14 @@ impl std::fmt::Display for Span {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let value = String::from_utf8(self.bytes().to_vec()).expect("utf8 source reading failed");
         write!(f, "{}", &value)
+    }
+}
+
+impl std::ops::Sub for Span {
+    type Output = delta::Span;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::delta(&self, &rhs)
     }
 }

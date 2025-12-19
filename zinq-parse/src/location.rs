@@ -1,3 +1,5 @@
+use crate::delta::{self, Delta};
+
 ///
 /// ## Location
 /// a 0 indexed coordinate in a set of bytes
@@ -46,5 +48,14 @@ impl PartialOrd for Location {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl std::ops::Sub for Location {
+    type Output = delta::Location;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::delta(&self, &rhs)
     }
 }
