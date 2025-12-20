@@ -25,7 +25,7 @@ macro_rules! define_keywords {
             fn parse<P: zinq_parse::Parser>(parser: &mut P) -> zinq_error::Result<Self> {
                 $(
                     if parser.peek_as::<$name>() {
-                        if let Some(v) = parser.parse::<$name>()?.value() {
+                        if let Some(v) = parser.parse_as::<$name>()?.value() {
                             return Ok(v.value().clone().into());
                         }
                     }

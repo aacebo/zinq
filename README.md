@@ -4,6 +4,8 @@
 
 The goal of the Zinq project is to create a new programming language with all the best parts about Rust and Go. These two fantastic languages are opposite ends of the spectrum of syntax/features, so Zinq is intended to be a more moderate middleground.
 
+The secondary goal is for this language to be modular enough for large layers (tokens, ast, runtime, compiler) can be replaced/reused.
+
 ## Why
 
 Over the past 5 years I have predominately used [Rust](https://rust-lang.org/) and [Go](https://go.dev/) to build projects. I love these new languages for several reasons but have always felt there was a space between the two that needs to be filled.

@@ -1,7 +1,6 @@
 mod byte_parser;
 mod bytes;
 mod commit;
-mod cursor;
 pub mod delta;
 mod error;
 mod file_meta_data;
@@ -12,7 +11,6 @@ mod tx;
 pub use byte_parser::*;
 pub use bytes::*;
 pub use commit::*;
-pub use cursor::*;
 pub use error::*;
 pub use file_meta_data::*;
 pub use location::*;
@@ -44,7 +42,7 @@ pub trait Parse: Sized + Peek + std::fmt::Debug + Clone {
 /// traverse/parse a sequence of data
 ///
 pub trait Parser {
-    type Item;
+    type Item: Parse + std::fmt::Debug + Clone;
 
     ///
     /// ## error
@@ -91,34 +89,40 @@ pub trait Parser {
 
     ///
     /// ## parse
+    /// parse an item
+    ///
+    fn parse(&mut self) -> Result<Tx<Self::Item>>;
+
+    ///
+    /// ## parse_as
     /// parse a type
     ///
-    fn parse<T: Parse>(&mut self) -> Result<Tx<T>>;
+    fn parse_as<T: Parse>(&mut self) -> Result<Tx<T>>;
 
     ///
     /// ## shift_left
     /// shift the current span left by one.
     ///
-    fn shift_left(&mut self) -> Tx<Span>;
+    fn shift_left(&mut self) -> Tx<Self::Item>;
 
     ///
     /// ## shift_right
     /// shift the current span right by one.
     ///
-    fn shift_right(&mut self) -> Tx<Span>;
+    fn shift_right(&mut self) -> Tx<Self::Item>;
 
     ///
     /// ## next
     /// advance the end of the span by 1
     ///
-    fn next(&mut self) -> Tx<Span>;
+    fn next(&mut self) -> Tx<Self::Item>;
 
     ///
     /// ## next_if
     /// advance the end of the span by 1
     /// conditionally
     ///
-    fn next_if<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Span>;
+    fn next_if<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Self::Item>;
 
     ///
     /// ## next_while
@@ -126,5 +130,5 @@ pub trait Parser {
     /// conditionally until predicate returns
     /// false
     ///
-    fn next_while<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Span>;
+    fn next_while<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Self::Item>;
 }
