@@ -35,7 +35,6 @@ impl<T: Delta> Delta for crate::Commit<T>
 where
     T: std::fmt::Debug,
     T: Clone,
-    T: Eq,
 {
     type Output = super::Commit<T::Output>;
 

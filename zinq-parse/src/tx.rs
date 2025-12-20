@@ -1,22 +1,27 @@
-use std::ops::Index;
+use std::{
+    ops::Index,
+    sync::atomic::{AtomicU64, Ordering},
+};
 
 use crate::{
     Commit,
     delta::{self, Delta},
 };
 
+static ID: AtomicU64 = AtomicU64::new(1);
+
 ///
 /// ## Tx
 /// tracks the incremental changes being
 /// made by a parser for a unit of work
 ///
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq)]
 pub struct Tx<T>
 where
     T: std::fmt::Debug,
     T: Clone,
-    T: Eq,
 {
+    id: u64,
     commits: Vec<Commit<T>>,
 }
 
@@ -24,7 +29,6 @@ impl<T> Tx<T>
 where
     T: std::fmt::Debug,
     T: Clone,
-    T: Eq,
 {
     ///
     /// ## new
@@ -32,7 +36,28 @@ where
     ///
     #[inline]
     pub fn new() -> Self {
-        Self { commits: vec![] }
+        Self {
+            id: ID.fetch_add(1, Ordering::Relaxed),
+            commits: vec![],
+        }
+    }
+
+    ///
+    /// ## id
+    /// the transaction id
+    ///
+    #[inline]
+    pub fn id(&self) -> &u64 {
+        &self.id
+    }
+
+    ///
+    /// ## empty
+    /// check if the transaction is empty
+    ///
+    #[inline]
+    pub fn empty(&self) -> bool {
+        self.commits.is_empty()
     }
 
     ///
@@ -70,7 +95,6 @@ where
     T: std::fmt::Debug,
     T: delta::Delta,
     T: Clone,
-    T: Eq,
 {
     ///
     /// ## delta
@@ -104,11 +128,11 @@ impl<T> From<T> for Tx<T>
 where
     T: std::fmt::Debug,
     T: Clone,
-    T: Eq,
 {
     #[inline]
     fn from(value: T) -> Self {
         Self {
+            id: ID.fetch_add(1, Ordering::Relaxed),
             commits: vec![value.into()],
         }
     }
@@ -119,16 +143,25 @@ where
     T: std::fmt::Debug,
     T: std::fmt::Display,
     T: Clone,
-    T: Eq,
 {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Tx ({}):\n", self.commits.len())?;
+        write!(f, "Tx #{} ({}):\n", self.id, self.commits.len())?;
 
         for commit in &self.commits {
             write!(f, "{}", commit)?;
         }
 
         Ok(())
+    }
+}
+
+impl<T> PartialEq for Tx<T>
+where
+    T: std::fmt::Debug,
+    T: Clone,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.id() == other.id()
     }
 }

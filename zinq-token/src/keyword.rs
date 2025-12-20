@@ -11,7 +11,7 @@ macro_rules! define_keywords {
             #[inline]
             fn peek<P: zinq_parse::Parser>(parser: &P) -> bool {
                 $(
-                    if parser.peek::<$name>() {
+                    if parser.peek_as::<$name>() {
                         return true;
                     }
                 )*
@@ -24,8 +24,10 @@ macro_rules! define_keywords {
             #[inline]
             fn parse<P: zinq_parse::Parser>(parser: &mut P) -> zinq_error::Result<Self> {
                 $(
-                    if parser.peek::<$name>() {
-                        return Ok(parser.parse::<$name>()?.into());
+                    if parser.peek_as::<$name>() {
+                        if let Some(v) = parser.parse::<$name>()?.value() {
+                            return Ok(v.value().clone().into());
+                        }
                     }
                 )*
 

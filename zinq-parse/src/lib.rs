@@ -33,7 +33,7 @@ pub trait Peek {
 /// ## Parse
 /// implementers can be parsed by `Parser`
 ///
-pub trait Parse: Sized + Peek {
+pub trait Parse: Sized + Peek + std::fmt::Debug + Clone {
     fn parse<P: Parser>(parser: &mut P) -> Result<Self>;
     fn span(&self) -> &Span;
 }
@@ -66,47 +66,59 @@ pub trait Parser {
     fn fork(&self) -> Self;
 
     ///
+    /// ## peek
+    /// peek at the next byte
+    ///
+    fn peek(&self) -> &Self::Item;
+
+    ///
     /// ## peek_as
     /// peek to see if a type can be parsed
     ///
     fn peek_as<T: Peek>(&self) -> bool;
 
-    // ///
-    // /// ## peek_n
-    // /// peek n indices ahead of the current position
-    // ///
-    // fn peek_n(&self, n: usize) ->
+    ///
+    /// ## peek_n
+    /// peek n indices ahead of the current position
+    ///
+    fn peek_n(&self, n: usize) -> &[Self::Item];
+
+    ///
+    /// ## peek_n
+    /// peek n indices ahead of the current position
+    ///
+    fn peek_at(&self, index: usize) -> &Self::Item;
 
     ///
     /// ## parse
     /// parse a type
     ///
-    fn parse<T: Parse>(&mut self) -> Result<T>;
+    fn parse<T: Parse>(&mut self) -> Result<Tx<T>>;
 
     ///
     /// ## shift_left
     /// shift the current span left by one.
     ///
-    fn shift_left(&mut self);
+    fn shift_left(&mut self) -> Tx<Span>;
 
     ///
     /// ## shift_right
     /// shift the current span right by one.
     ///
-    fn shift_right(&mut self);
+    fn shift_right(&mut self) -> Tx<Span>;
 
     ///
     /// ## next
     /// advance the end of the span by 1
     ///
-    fn next(&mut self);
+    fn next(&mut self) -> Tx<Span>;
 
     ///
     /// ## next_if
     /// advance the end of the span by 1
     /// conditionally
     ///
-    fn next_if<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> bool;
+    fn next_if<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Span>;
 
     ///
     /// ## next_while
@@ -114,5 +126,5 @@ pub trait Parser {
     /// conditionally until predicate returns
     /// false
     ///
-    fn next_while<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> usize;
+    fn next_while<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Span>;
 }
