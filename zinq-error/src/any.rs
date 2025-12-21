@@ -3,29 +3,57 @@ use std::sync::Arc;
 use super::Error;
 
 #[derive(Debug, Clone)]
-pub struct AnyError(Arc<dyn std::error::Error>);
+pub struct AnyError {
+    code: Option<u32>,
+    inner: Arc<dyn std::error::Error>,
+}
 
 impl AnyError {
     pub fn new<T: std::error::Error + 'static>(error: T) -> Self {
-        Self(Arc::new(error))
+        Self {
+            code: None,
+            inner: Arc::new(error),
+        }
+    }
+
+    pub fn with_code(mut self, code: u32) -> Self {
+        self.code = Some(code);
+        self
+    }
+
+    pub fn code(&self) -> Option<u32> {
+        self.code
+    }
+}
+
+impl From<Error> for AnyError {
+    fn from(value: Error) -> Self {
+        Self {
+            code: value.code(),
+            inner: Arc::new(value),
+        }
     }
 }
 
 impl Into<Error> for AnyError {
     fn into(self) -> Error {
-        Error::Other(self)
+        Error::Any(self)
     }
 }
 
 impl std::fmt::Display for AnyError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0.as_ref())
+        if let Some(code) = self.code() {
+            write!(f, "[{}] => ", code)?;
+        }
+
+        write!(f, "{}", &self.inner)
     }
 }
 
 impl std::error::Error for AnyError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        Some(self.0.as_ref())
+        Some(&self.inner)
     }
 }
 
@@ -33,7 +61,7 @@ impl std::ops::Deref for AnyError {
     type Target = dyn std::error::Error;
 
     fn deref(&self) -> &Self::Target {
-        self.0.as_ref()
+        &self.inner
     }
 }
 

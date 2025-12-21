@@ -135,14 +135,18 @@ impl Span {
 
     #[inline]
     pub fn error(&self, message: &str) -> Error {
-        AnyError::new(ParseError::new(self.clone(), TextError::from(message))).into()
+        AnyError::new(ParseError::new(
+            self.clone(),
+            TextError::from(message).into(),
+        ))
+        .into()
     }
 }
 
 impl std::fmt::Display for Span {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let value = String::from_utf8(self.bytes().to_vec()).expect("utf8 source reading failed");
+        let value = str::from_utf8(self.bytes()).expect("utf8 source reading failed");
         write!(f, "{}", &value)
     }
 }

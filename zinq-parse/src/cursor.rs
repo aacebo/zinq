@@ -23,6 +23,20 @@ impl Cursor {
     }
 
     ///
+    /// ## begin
+    /// move the cursors `start` and `end` bounds
+    /// to the start
+    ///
+    #[inline]
+    pub fn begin(mut self) -> Self {
+        let mut span = self.span.clone();
+        span.start_mut().seek(0, self.span.bytes());
+        span.end_mut().seek(0, self.span.bytes());
+        self.span = span;
+        self
+    }
+
+    ///
     /// ## peek
     /// peek at the next byte
     ///
@@ -37,7 +51,7 @@ impl Cursor {
     ///
     #[inline]
     pub fn peek_n(&self, n: usize) -> &[u8] {
-        let (items, _) = self.span().bytes().split_at(n);
+        let (_, items) = self.span().src().split_at(self.span().end().index() + n);
         items
     }
 
@@ -47,16 +61,16 @@ impl Cursor {
     ///
     #[inline]
     pub fn peek_at(&self, index: usize) -> Option<&u8> {
-        self.span().bytes().get(index)
+        self.span().src().get(index)
     }
 
     ///
-    /// ## backward
+    /// ## shift_back
     /// move both the `start` and `end` bounds
     /// backwards 1
     ///
     #[inline]
-    pub fn backward(&mut self) -> &Span {
+    pub fn shift_back(&mut self) -> &Span {
         let mut span = self.span.clone();
         span.start_mut().back(self.span.src());
         span.end_mut().back(self.span.src());
@@ -65,12 +79,12 @@ impl Cursor {
     }
 
     ///
-    /// ## forward
+    /// ## shift_next
     /// move both the `start` and `end` bounds
     /// forward 1
     ///
     #[inline]
-    pub fn forward(&mut self) -> &Span {
+    pub fn shift_next(&mut self) -> &Span {
         let mut span = self.span.clone();
         span.start_mut().next(self.span.src());
         span.end_mut().next(self.span.src());
@@ -180,7 +194,7 @@ impl Cursor {
     pub fn error(&self, message: &str) -> Error {
         AnyError::new(ParseError::new(
             self.span().clone(),
-            TextError::from(message),
+            TextError::from(message).into(),
         ))
         .into()
     }
@@ -193,10 +207,46 @@ impl From<Span> for Cursor {
     }
 }
 
-// #[cfg(test)]
-// mod test {
-//     #[test]
-//     fn should_create_cursor() {
-//         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-//     }
-// }
+impl std::fmt::Display for Cursor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", &self.span)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{Bytes, Cursor, Span};
+
+    #[test]
+    fn should_peek() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let span = Span::from_bytes(&bytes).expect("expected span");
+        let mut cursor = Cursor::from(span).begin();
+
+        debug_assert_eq!(cursor.span().bytes(), b"h");
+        debug_assert_eq!(cursor.next(), Some(&b'i'));
+        debug_assert_eq!(cursor.span().bytes(), b"hi");
+
+        debug_assert_eq!(cursor.peek(), Some(&b'\n'));
+        debug_assert_eq!(cursor.span().bytes(), b"hi");
+        debug_assert_eq!(cursor.peek_at(8), Some(&b'a'));
+        debug_assert_eq!(cursor.span().bytes(), b"hi");
+    }
+
+    #[test]
+    fn should_shift() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let span = Span::from_bytes(&bytes).expect("expected span");
+        let mut cursor = Cursor::from(span).begin();
+
+        debug_assert_eq!(cursor.span().bytes(), b"h");
+        debug_assert_eq!(cursor.next(), Some(&b'i'));
+        debug_assert_eq!(cursor.span().bytes(), b"hi");
+
+        debug_assert_eq!(cursor.shift_next().bytes(), b"i\n");
+        debug_assert_eq!(cursor.span().bytes(), b"i\n");
+
+        debug_assert_eq!(cursor.shift_back().bytes(), b"hi");
+        debug_assert_eq!(cursor.span().bytes(), b"hi");
+    }
+}

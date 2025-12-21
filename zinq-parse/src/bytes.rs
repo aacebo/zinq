@@ -84,7 +84,7 @@ impl std::ops::Deref for Bytes {
 impl std::fmt::Display for Bytes {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let value = String::from_utf8(self.0.to_vec())
+        let value = str::from_utf8(&self.0)
             .expect("error while attempting to convert Bytes to utf8 String");
         write!(f, "{}", &value)
     }

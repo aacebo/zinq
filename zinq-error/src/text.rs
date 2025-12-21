@@ -1,17 +1,21 @@
 use super::Error;
 
-#[derive(Debug, Clone)]
-pub struct TextError(pub(crate) String);
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TextError {
+    value: String,
+}
 
 impl From<String> for TextError {
     fn from(value: String) -> Self {
-        Self(value)
+        Self { value }
     }
 }
 
 impl From<&str> for TextError {
     fn from(value: &str) -> Self {
-        Self(value.to_string())
+        Self {
+            value: value.to_string(),
+        }
     }
 }
 
@@ -23,7 +27,7 @@ impl Into<Error> for TextError {
 
 impl std::fmt::Display for TextError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.0)
+        write!(f, "{}", &self.value)
     }
 }
 
@@ -37,6 +41,6 @@ impl std::ops::Deref for TextError {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.value
     }
 }

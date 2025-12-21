@@ -1,4 +1,4 @@
-use zinq_error::{AnyError, BadRequestError, Error, NotFoundError, Result};
+use zinq_error::{AnyError, Error, Result};
 
 use crate::Bytes;
 
@@ -20,11 +20,11 @@ impl FileMetaData {
         let p = std::path::Path::new(self.path.as_ref());
 
         if !p.exists() {
-            return Err(NotFoundError::from(format!("file '{}' not found", self.path)).into());
+            return Err(Error::not_found(&format!("file '{}' not found", self.path)));
         }
 
         if !p.is_file() {
-            return Err(BadRequestError::from("must be a file").into());
+            return Err(Error::bad_request("must be a file"));
         }
 
         let bytes = match std::fs::read(self.path.as_ref()) {
@@ -44,11 +44,11 @@ impl TryFrom<&str> for FileMetaData {
         let p = std::path::Path::new(path);
 
         if !p.exists() {
-            return Err(NotFoundError::from(format!("file '{}' not found", path)).into());
+            return Err(Error::not_found(&format!("file '{}' not found", path)));
         }
 
         if !p.is_file() {
-            return Err(BadRequestError::from("must be a file").into());
+            return Err(Error::bad_request("must be a file"));
         }
 
         Ok(Self {

@@ -116,7 +116,12 @@ impl Location {
             return false;
         }
 
-        let mut column = self.column - 1;
+        let mut column = self.column;
+
+        if column > 0 {
+            column -= 1;
+        }
+
         let mut line = self.line;
 
         if bytes.index(self.index) == &b'\n' {
