@@ -61,23 +61,23 @@ impl Span {
 
 impl Span {
     #[inline]
-    pub fn start(&self) -> Location {
-        self.start
+    pub fn start(&self) -> &Location {
+        &self.start
     }
 
     #[inline]
-    pub fn end(&self) -> Location {
-        self.end
+    pub fn end(&self) -> &Location {
+        &self.end
     }
 
     #[inline]
-    pub fn first(&self) -> u8 {
-        *self.bytes.index(self.start.index)
+    pub fn first(&self) -> &u8 {
+        self.bytes.index(self.start.index)
     }
 
     #[inline]
-    pub fn last(&self) -> u8 {
-        *self.bytes.index(self.end.index)
+    pub fn last(&self) -> &u8 {
+        self.bytes.index(self.end.index)
     }
 
     #[inline]

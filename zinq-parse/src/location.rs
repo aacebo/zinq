@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use crate::delta::{self, Delta};
 
 ///
@@ -25,6 +27,53 @@ impl Location {
     #[inline]
     pub fn column(&self) -> usize {
         self.column
+    }
+
+    #[inline]
+    pub fn next(&mut self, bytes: &[u8]) -> bool {
+        if self.index + 1 > bytes.len() - 1 {
+            return false;
+        }
+
+        self.index += 1;
+        self.column += 1;
+
+        if bytes.index(self.index) == &b'\n' {
+            self.line += 1;
+            self.column = 0;
+        }
+
+        true
+    }
+
+    #[inline]
+    pub fn back(&mut self, bytes: &[u8]) -> bool {
+        if self.index == 0 {
+            return false;
+        }
+
+        let mut column = self.column - 1;
+        let mut line = self.line;
+
+        if bytes.index(self.index) == &b'\n' {
+            let mut count = 0;
+
+            for i in (0..self.index).rev() {
+                if bytes.index(i) == &b'\n' {
+                    break;
+                }
+
+                count += 1;
+            }
+
+            line -= 1;
+            column = count;
+        }
+
+        self.index -= 1;
+        self.column = column;
+        self.line = line;
+        true
     }
 }
 

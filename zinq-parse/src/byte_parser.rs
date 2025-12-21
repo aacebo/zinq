@@ -30,7 +30,7 @@ impl ByteParser {
         next.span.end.index += 1;
         next.span.end.column += 1;
 
-        if next.span.last() == b'\n' {
+        if *next.span.last() == b'\n' {
             next.span.end.line += 1;
             next.span.end.column = 0;
         }

@@ -1,6 +1,7 @@
 mod byte_parser;
 mod bytes;
 mod commit;
+mod cursor;
 pub mod delta;
 mod error;
 mod file_meta_data;
@@ -11,6 +12,7 @@ mod tx;
 pub use byte_parser::*;
 pub use bytes::*;
 pub use commit::*;
+pub use cursor::*;
 pub use error::*;
 pub use file_meta_data::*;
 pub use location::*;
@@ -45,90 +47,82 @@ pub trait Parser {
     type Item: Parse + std::fmt::Debug + Clone;
 
     ///
-    /// ## error
-    /// create an error with a given message
-    /// at the current parser location
+    /// ## cursor
     ///
-    fn error(&self, message: &str) -> Error;
+    fn cursor(&self) -> &Cursor;
 
     ///
     /// ## span
     /// get the current span
     ///
-    fn span(&self) -> &Span;
-
-    ///
-    /// ## fork
-    /// fork the parser
-    ///
-    fn fork(&self) -> Self;
+    fn span(&self) -> &Span {
+        self.cursor().span()
+    }
 
     ///
     /// ## peek
     /// peek at the next byte
     ///
-    fn peek(&self) -> &Self::Item;
+    fn peek(&self) -> Option<&u8> {
+        self.peek_n(1).first()
+    }
+
+    ///
+    /// ## peek_n
+    /// peek n indices ahead of the current position
+    ///
+    fn peek_n(&self, n: usize) -> &[u8] {
+        let (items, _) = self.span().bytes().split_at(n);
+        items
+    }
+
+    ///
+    /// ## peek_at
+    /// peek at an item by its index
+    ///
+    fn peek_at(&self, index: usize) -> Option<&u8> {
+        self.span().bytes().get(index)
+    }
 
     ///
     /// ## peek_as
-    /// peek to see if a type can be parsed
+    /// parse a type
     ///
-    fn peek_as<T: Peek>(&self) -> bool;
+    fn peek_as<T: Peek>(&self) -> bool
+    where
+        Self: Sized,
+    {
+        T::peek(self)
+    }
 
     ///
-    /// ## peek_n
-    /// peek n indices ahead of the current position
+    /// ## error
+    /// create an error with a given message
+    /// at the current parser location
     ///
-    fn peek_n(&self, n: usize) -> &[Self::Item];
-
-    ///
-    /// ## peek_n
-    /// peek n indices ahead of the current position
-    ///
-    fn peek_at(&self, index: usize) -> &Self::Item;
+    fn error(&self, message: &str) -> Error {
+        self.cursor().error(message)
+    }
 
     ///
     /// ## parse
     /// parse an item
     ///
-    fn parse(&mut self) -> Result<Tx<Self::Item>>;
+    fn parse(&mut self) -> Result<Tx<Self::Item>>
+    where
+        Self: Sized,
+    {
+        Ok(Tx::from(Self::Item::parse(self)?))
+    }
 
     ///
     /// ## parse_as
     /// parse a type
     ///
-    fn parse_as<T: Parse>(&mut self) -> Result<Tx<T>>;
-
-    ///
-    /// ## shift_left
-    /// shift the current span left by one.
-    ///
-    fn shift_left(&mut self) -> Tx<Self::Item>;
-
-    ///
-    /// ## shift_right
-    /// shift the current span right by one.
-    ///
-    fn shift_right(&mut self) -> Tx<Self::Item>;
-
-    ///
-    /// ## next
-    /// advance the end of the span by 1
-    ///
-    fn next(&mut self) -> Tx<Self::Item>;
-
-    ///
-    /// ## next_if
-    /// advance the end of the span by 1
-    /// conditionally
-    ///
-    fn next_if<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Self::Item>;
-
-    ///
-    /// ## next_while
-    /// advance the end of the span
-    /// conditionally until predicate returns
-    /// false
-    ///
-    fn next_while<P: FnOnce(&Self::Item) -> bool>(&mut self, predicate: P) -> Tx<Self::Item>;
+    fn parse_as<T: Parse>(&mut self) -> Result<Tx<T>>
+    where
+        Self: Sized,
+    {
+        Ok(Tx::from(T::parse(self)?))
+    }
 }
