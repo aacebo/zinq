@@ -14,10 +14,10 @@ use crate::{
 ///
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct Span {
-    pub(crate) start: Location,
-    pub(crate) end: Location,
-    pub(crate) file: Option<FileMetaData>,
-    pub(crate) bytes: Bytes,
+    start: Location,
+    end: Location,
+    file: Option<FileMetaData>,
+    bytes: Bytes,
 }
 
 impl Span {
@@ -66,18 +66,28 @@ impl Span {
     }
 
     #[inline]
+    pub fn start_mut(&mut self) -> &mut Location {
+        &mut self.start
+    }
+
+    #[inline]
     pub fn end(&self) -> &Location {
         &self.end
     }
 
     #[inline]
+    pub fn end_mut(&mut self) -> &mut Location {
+        &mut self.end
+    }
+
+    #[inline]
     pub fn first(&self) -> &u8 {
-        self.bytes.index(self.start.index)
+        self.bytes.index(self.start.index())
     }
 
     #[inline]
     pub fn last(&self) -> &u8 {
-        self.bytes.index(self.end.index)
+        self.bytes.index(self.end.index())
     }
 
     #[inline]
@@ -103,6 +113,11 @@ impl Span {
     #[inline]
     pub fn bytes(&self) -> &[u8] {
         &self.bytes[self.start.index()..self.end.index()]
+    }
+
+    #[inline]
+    pub fn src(&self) -> &[u8] {
+        &self.bytes
     }
 
     #[inline]

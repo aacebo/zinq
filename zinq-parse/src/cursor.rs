@@ -22,12 +22,41 @@ impl Cursor {
     }
 
     ///
+    /// ## peek
+    /// peek at the next byte
+    ///
+    pub fn peek(&self) -> Option<&u8> {
+        self.peek_n(1).first()
+    }
+
+    ///
+    /// ## peek_n
+    /// peek n indices ahead of the current position
+    ///
+    pub fn peek_n(&self, n: usize) -> &[u8] {
+        let (items, _) = self.span().bytes().split_at(n);
+        items
+    }
+
+    ///
+    /// ## peek_at
+    /// peek at an item by its index
+    ///
+    pub fn peek_at(&self, index: usize) -> Option<&u8> {
+        self.span().bytes().get(index)
+    }
+
+    ///
     /// ## backward
     /// move both the `start` and `end` bounds
     /// backwards 1
     ///
     pub fn backward(&mut self) -> &Span {
-        todo!()
+        let mut span = self.span.clone();
+        span.start_mut().back(self.span.src());
+        span.end_mut().back(self.span.src());
+        self.span = span;
+        &self.span
     }
 
     ///
@@ -36,6 +65,10 @@ impl Cursor {
     /// forward 1
     ///
     pub fn forward(&mut self) -> &Span {
+        let mut span = self.span.clone();
+        span.start_mut().next(self.span.src());
+        span.end_mut().next(self.span.src());
+        self.span = span;
         &self.span
     }
 
@@ -48,7 +81,9 @@ impl Cursor {
             return None;
         }
 
-        self.span.start.back(&self.span.bytes);
+        let mut span = self.span.clone();
+        span.start_mut().back(self.span.src());
+        self.span = span;
         Some(self.span.first())
     }
 
@@ -61,7 +96,9 @@ impl Cursor {
             return None;
         }
 
-        self.span.end.next(&self.span.bytes);
+        let mut span = self.span.clone();
+        span.end_mut().next(self.span.src());
+        self.span = span;
         Some(self.span.last())
     }
 

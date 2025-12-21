@@ -3,6 +3,8 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+use zinq_error::Result;
+
 use crate::{
     Commit,
     delta::{self, Delta},
@@ -70,6 +72,16 @@ where
     }
 
     ///
+    /// ## commits
+    /// an ordered slice of the commits that
+    /// make up this trace
+    ///
+    #[inline]
+    pub fn commits(&self) -> &[Commit<T>] {
+        &self.commits
+    }
+
+    ///
     /// ## next
     /// set the current `Span` and
     /// add a delta to the trace
@@ -80,13 +92,32 @@ where
     }
 
     ///
-    /// ## commits
-    /// an ordered slice of the commits that
-    /// make up this trace
+    /// ## revert
+    /// revert back to the state of the commit
+    /// before our current commit
     ///
     #[inline]
-    pub fn commits(&self) -> &[Commit<T>] {
-        &self.commits
+    pub fn revert(&mut self) -> Option<Commit<T>> {
+        self.commits.pop()
+    }
+
+    ///
+    /// ## run
+    /// runs your handler and, if successful, adds a new commit
+    /// to the transaction
+    ///
+    #[inline]
+    pub fn run<Handler: FnOnce() -> Result<T>>(&mut self, handler: Handler) -> Result<&Commit<T>> {
+        match handler() {
+            Err(err) => Err(err),
+            Ok(v) => {
+                self.commits.push(Commit::from(v));
+                Ok(self
+                    .commits
+                    .last()
+                    .expect("expected at least one commit to be in transaction"))
+            }
+        }
     }
 }
 
@@ -161,6 +192,7 @@ where
     T: std::fmt::Debug,
     T: Clone,
 {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.id() == other.id()
     }

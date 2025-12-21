@@ -8,27 +8,87 @@ use crate::delta::{self, Delta};
 ///
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Location {
-    pub(crate) index: usize,
-    pub(crate) line: usize,
-    pub(crate) column: usize,
+    index: usize,
+    line: usize,
+    column: usize,
 }
 
 impl Location {
+    ///
+    /// ## new
+    /// calculate a new location at a given `index`
+    /// of some `bytes`
+    ///
+    #[inline]
+    pub fn new(index: usize, bytes: &[u8]) -> Self {
+        let mut location = Self::default();
+        location.seek(index, bytes);
+        return location;
+    }
+
+    ///
+    /// ## index
+    /// the raw index
+    ///
     #[inline]
     pub fn index(&self) -> usize {
         self.index
     }
 
+    ///
+    /// ## line
+    /// the line index
+    ///
     #[inline]
     pub fn line(&self) -> usize {
         self.line
     }
 
+    ///
+    /// ## column
+    /// the column index
+    ///
     #[inline]
     pub fn column(&self) -> usize {
         self.column
     }
 
+    ///
+    /// ## seek
+    /// change the location to the given `index` and
+    /// recalculate the `line` and `column`
+    ///
+    #[inline]
+    pub fn seek(&mut self, index: usize, bytes: &[u8]) -> bool {
+        let mut i = 0;
+        let mut line = 0;
+        let mut column = 0;
+
+        while i < index {
+            i += 1;
+            column += 1;
+
+            let byte = match bytes.get(i) {
+                None => return false,
+                Some(v) => v,
+            };
+
+            if byte == &b'\n' {
+                line += 1;
+                column = 0;
+            }
+        }
+
+        self.index = i;
+        self.line = line;
+        self.column = column;
+        true
+    }
+
+    ///
+    /// ## next
+    /// move the location forward by 1
+    ///
     #[inline]
     pub fn next(&mut self, bytes: &[u8]) -> bool {
         if self.index + 1 > bytes.len() - 1 {
@@ -46,6 +106,10 @@ impl Location {
         true
     }
 
+    ///
+    /// ## back
+    /// move the location backward by 1
+    ///
     #[inline]
     pub fn back(&mut self, bytes: &[u8]) -> bool {
         if self.index == 0 {

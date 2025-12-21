@@ -48,46 +48,41 @@ pub trait Parser {
 
     ///
     /// ## cursor
+    /// borrow the parsers `Cursor`
     ///
     fn cursor(&self) -> &Cursor;
+
+    ///
+    /// ## cursor_mut
+    /// borrow the parsers `Cursor` as mutable,
+    /// allowing you to manually manipulate its bounds
+    ///
+    fn cursor_mut(&mut self) -> &mut Cursor;
 
     ///
     /// ## span
     /// get the current span
     ///
+    #[inline]
     fn span(&self) -> &Span {
         self.cursor().span()
     }
 
     ///
-    /// ## peek
-    /// peek at the next byte
+    /// ## error
+    /// create an error with a given message
+    /// at the current parser location
     ///
-    fn peek(&self) -> Option<&u8> {
-        self.peek_n(1).first()
-    }
-
-    ///
-    /// ## peek_n
-    /// peek n indices ahead of the current position
-    ///
-    fn peek_n(&self, n: usize) -> &[u8] {
-        let (items, _) = self.span().bytes().split_at(n);
-        items
-    }
-
-    ///
-    /// ## peek_at
-    /// peek at an item by its index
-    ///
-    fn peek_at(&self, index: usize) -> Option<&u8> {
-        self.span().bytes().get(index)
+    #[inline]
+    fn error(&self, message: &str) -> Error {
+        self.cursor().error(message)
     }
 
     ///
     /// ## peek_as
     /// parse a type
     ///
+    #[inline]
     fn peek_as<T: Peek>(&self) -> bool
     where
         Self: Sized,
@@ -96,18 +91,10 @@ pub trait Parser {
     }
 
     ///
-    /// ## error
-    /// create an error with a given message
-    /// at the current parser location
-    ///
-    fn error(&self, message: &str) -> Error {
-        self.cursor().error(message)
-    }
-
-    ///
     /// ## parse
     /// parse an item
     ///
+    #[inline]
     fn parse(&mut self) -> Result<Tx<Self::Item>>
     where
         Self: Sized,
@@ -119,6 +106,7 @@ pub trait Parser {
     /// ## parse_as
     /// parse a type
     ///
+    #[inline]
     fn parse_as<T: Parse>(&mut self) -> Result<Tx<T>>
     where
         Self: Sized,

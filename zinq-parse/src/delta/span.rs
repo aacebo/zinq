@@ -51,8 +51,8 @@ impl super::Delta for crate::Span {
 
     #[inline]
     fn delta(start: &Self, end: &Self) -> Self::Output {
-        let start_diff = end.start - start.start;
-        let end_diff = end.end - start.end;
+        let start_diff = *end.start() - *start.start();
+        let end_diff = *end.end() - *start.end();
 
         Self::Output {
             start: start_diff,

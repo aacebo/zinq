@@ -1,4 +1,4 @@
-use std::{ops::Index, rc::Rc};
+use std::rc::Rc;
 
 use crate::Location;
 
@@ -33,23 +33,7 @@ impl Bytes {
 
     #[inline]
     pub fn location(&self, index: usize) -> Location {
-        let mut line = 0;
-        let mut column = 0;
-
-        for i in 0..index + 1 {
-            column += 1;
-
-            if *self.0.index(i) == b'\n' {
-                line += 1;
-                column = 0;
-            }
-        }
-
-        Location {
-            index,
-            line,
-            column,
-        }
+        Location::new(index, &self.0)
     }
 }
 

@@ -10,7 +10,7 @@ pub trait Delta {
     type Output;
 
     ///
-    /// ## between
+    /// ## delta
     /// calculate the delta between two commits
     ///
     fn delta(start: &Self, end: &Self) -> Self::Output;

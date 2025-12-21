@@ -23,20 +23,6 @@ impl ByteParser {
     pub fn span(&self) -> &Span {
         &self.span
     }
-
-    #[inline]
-    pub fn next(self) -> Self {
-        let mut next = self.clone();
-        next.span.end.index += 1;
-        next.span.end.column += 1;
-
-        if *next.span.last() == b'\n' {
-            next.span.end.line += 1;
-            next.span.end.column = 0;
-        }
-
-        next
-    }
 }
 
 impl From<Span> for ByteParser {
