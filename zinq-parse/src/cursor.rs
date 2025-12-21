@@ -192,3 +192,11 @@ impl From<Span> for Cursor {
         Self { span }
     }
 }
+
+// #[cfg(test)]
+// mod test {
+//     #[test]
+//     fn should_create_cursor() {
+//         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+//     }
+// }

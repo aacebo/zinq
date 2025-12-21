@@ -102,17 +102,17 @@ impl Span {
 
     #[inline]
     pub fn eof(&self) -> bool {
-        self.end.index() == self.bytes.len()
+        self.end.index() == self.bytes.len() - 1
     }
 
     #[inline]
     pub fn len(&self) -> usize {
-        self.end.index() - self.start.index()
+        (self.end.index() + 1) - self.start.index()
     }
 
     #[inline]
     pub fn bytes(&self) -> &[u8] {
-        &self.bytes[self.start.index()..self.end.index()]
+        &self.bytes[self.start.index()..self.end.index() + 1]
     }
 
     #[inline]
@@ -121,7 +121,10 @@ impl Span {
     }
 
     #[inline]
-    pub fn slice(&self, start: Location, end: Location) -> Self {
+    pub fn slice(&self, from: usize, to: usize) -> Self {
+        let start = Location::new(from, &self.bytes);
+        let end = Location::new(to, &self.bytes);
+
         Self {
             start,
             end,
@@ -162,5 +165,53 @@ impl PartialEq<&[u8]> for Span {
 impl<const N: usize> PartialEq<&[u8; N]> for Span {
     fn eq(&self, other: &&[u8; N]) -> bool {
         self.bytes() == *other
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{Bytes, Span};
+
+    #[test]
+    fn should_create_span() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let span = Span::from_bytes(&bytes).expect("expected span");
+
+        debug_assert_eq!(span.bytes(), bytes.as_ref());
+        debug_assert!(span.eof());
+        debug_assert_eq!(span.len(), bytes.len());
+    }
+
+    #[test]
+    fn should_create_sub_span() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let span = Span::from_bytes(&bytes)
+            .expect("expected span")
+            .slice(7, 10);
+
+        debug_assert_eq!(span.bytes(), b"name");
+        debug_assert!(!span.eof());
+        debug_assert_eq!(span.len(), 4);
+    }
+
+    #[test]
+    fn should_create_delta() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let span = Span::from_bytes(&bytes).expect("expected span");
+        let a = span.slice(3, 4);
+        let b = span.slice(4, 7);
+
+        debug_assert_eq!(a.bytes(), b"my");
+        debug_assert_eq!(b.bytes(), b"y\n\nn");
+
+        let delta = b - a;
+
+        debug_assert_eq!(delta.start().steps(), 1);
+        debug_assert_eq!(delta.start().lines(), 0);
+        debug_assert_eq!(delta.start().columns(), 1);
+
+        debug_assert_eq!(delta.end().steps(), 3);
+        debug_assert_eq!(delta.end().lines(), 2);
+        debug_assert_eq!(delta.end().columns(), -1);
     }
 }
