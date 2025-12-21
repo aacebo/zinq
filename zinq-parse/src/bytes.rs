@@ -104,7 +104,7 @@ mod test {
     }
 
     #[test]
-    fn should_create_location() {
+    fn should_create_locations() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
         let mut location = bytes.at(3);
 
