@@ -66,14 +66,14 @@ macro_rules! define_keywords {
             impl zinq_parse::Peek for $name {
                 #[inline]
                 fn peek<P: zinq_parse::Parser>(parser: &P) -> bool {
-                    parser.span().matches($token.as_bytes())
+                    parser.span() == &$token.as_bytes()
                 }
             }
 
             impl zinq_parse::Parse for $name {
                 #[inline]
                 fn parse<P: zinq_parse::Parser>(parser: &mut P) -> zinq_error::Result<Self> {
-                    if !parser.span().matches($token.as_bytes()) {
+                    if !(parser.span() == &$token.as_bytes()) {
                         return Err(parser.error(&format!("expected '{}'", $token)));
                     }
 

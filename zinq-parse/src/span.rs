@@ -121,11 +121,6 @@ impl Span {
     }
 
     #[inline]
-    pub fn matches(&self, bytes: &[u8]) -> bool {
-        self.bytes() == bytes
-    }
-
-    #[inline]
     pub fn slice(&self, start: Location, end: Location) -> Self {
         Self {
             start,
@@ -155,5 +150,17 @@ impl std::ops::Sub for Span {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self::delta(&self, &rhs)
+    }
+}
+
+impl PartialEq<&[u8]> for Span {
+    fn eq(&self, other: &&[u8]) -> bool {
+        self.bytes() == *other
+    }
+}
+
+impl<const N: usize> PartialEq<&[u8; N]> for Span {
+    fn eq(&self, other: &&[u8; N]) -> bool {
+        self.bytes() == *other
     }
 }

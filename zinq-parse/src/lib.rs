@@ -1,4 +1,3 @@
-mod byte_parser;
 mod bytes;
 mod commit;
 mod cursor;
@@ -9,7 +8,6 @@ mod location;
 mod span;
 mod tx;
 
-pub use byte_parser::*;
 pub use bytes::*;
 pub use commit::*;
 pub use cursor::*;

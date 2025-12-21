@@ -87,6 +87,7 @@ where
     T: std::fmt::Debug,
     T: Clone,
 {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.id() == other.id()
     }

@@ -147,6 +147,31 @@ impl Cursor {
     }
 
     ///
+    /// ## skip
+    /// move the end of the span forward by 1
+    /// without returning the value
+    ///
+    #[inline]
+    pub fn skip(&mut self) -> &mut Self {
+        self.next();
+        self
+    }
+
+    ///
+    /// ## skip_n
+    /// skip `n` bytes by moving the `end` of the span
+    /// forward by `n`
+    ///
+    #[inline]
+    pub fn skip_n(&mut self, n: usize) -> &mut Self {
+        for _ in 0..n {
+            self.skip();
+        }
+
+        self
+    }
+
+    ///
     /// ## error
     /// create an error with a given message
     /// at the current parser location
