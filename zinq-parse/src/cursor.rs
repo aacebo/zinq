@@ -17,6 +17,7 @@ impl Cursor {
     /// ## span
     /// get the current span
     ///
+    #[inline]
     pub fn span(&self) -> &Span {
         &self.span
     }
@@ -25,6 +26,7 @@ impl Cursor {
     /// ## peek
     /// peek at the next byte
     ///
+    #[inline]
     pub fn peek(&self) -> Option<&u8> {
         self.peek_n(1).first()
     }
@@ -33,6 +35,7 @@ impl Cursor {
     /// ## peek_n
     /// peek n indices ahead of the current position
     ///
+    #[inline]
     pub fn peek_n(&self, n: usize) -> &[u8] {
         let (items, _) = self.span().bytes().split_at(n);
         items
@@ -42,6 +45,7 @@ impl Cursor {
     /// ## peek_at
     /// peek at an item by its index
     ///
+    #[inline]
     pub fn peek_at(&self, index: usize) -> Option<&u8> {
         self.span().bytes().get(index)
     }
@@ -51,6 +55,7 @@ impl Cursor {
     /// move both the `start` and `end` bounds
     /// backwards 1
     ///
+    #[inline]
     pub fn backward(&mut self) -> &Span {
         let mut span = self.span.clone();
         span.start_mut().back(self.span.src());
@@ -64,6 +69,7 @@ impl Cursor {
     /// move both the `start` and `end` bounds
     /// forward 1
     ///
+    #[inline]
     pub fn forward(&mut self) -> &Span {
         let mut span = self.span.clone();
         span.start_mut().next(self.span.src());
@@ -76,6 +82,7 @@ impl Cursor {
     /// ## back
     /// decrement the `start` of the span by 1
     ///
+    #[inline]
     pub fn back(&mut self) -> Option<&u8> {
         if self.span.sof() {
             return None;
@@ -91,6 +98,7 @@ impl Cursor {
     /// ## next
     /// advance the `end` of the span by 1
     ///
+    #[inline]
     pub fn next(&mut self) -> Option<&u8> {
         if self.span.eof() {
             return None;
@@ -107,6 +115,7 @@ impl Cursor {
     /// advance the end of the span by 1
     /// conditionally
     ///
+    #[inline]
     pub fn next_if<P: FnOnce(&u8, &Span) -> bool>(&mut self, predicate: P) -> Option<&u8> {
         if predicate(self.span().last(), self.span()) {
             return self.next();
@@ -121,6 +130,7 @@ impl Cursor {
     /// conditionally until predicate returns
     /// false
     ///
+    #[inline]
     pub fn next_while<P: Fn(&&u8, &&Span) -> bool>(&mut self, predicate: P) -> Option<&Span> {
         let mut fork = self.clone();
 
@@ -141,6 +151,7 @@ impl Cursor {
     /// create an error with a given message
     /// at the current parser location
     ///
+    #[inline]
     pub fn error(&self, message: &str) -> Error {
         AnyError::new(ParseError::new(
             self.span().clone(),
@@ -151,6 +162,7 @@ impl Cursor {
 }
 
 impl From<Span> for Cursor {
+    #[inline]
     fn from(span: Span) -> Self {
         Self { span }
     }
