@@ -23,16 +23,16 @@ impl Bytes {
 
     #[inline]
     pub fn first(&self) -> Location {
-        self.location(0)
+        self.at(0)
     }
 
     #[inline]
     pub fn last(&self) -> Location {
-        self.location(self.len() - 1)
+        self.at(self.len() - 1)
     }
 
     #[inline]
-    pub fn location(&self, index: usize) -> Location {
+    pub fn at(&self, index: usize) -> Location {
         Location::new(index, &self.0)
     }
 }
@@ -48,6 +48,13 @@ impl From<&[u8]> for Bytes {
     #[inline]
     fn from(value: &[u8]) -> Self {
         Self(Rc::from(value))
+    }
+}
+
+impl<const N: usize> From<&[u8; N]> for Bytes {
+    #[inline]
+    fn from(value: &[u8; N]) -> Self {
+        Self(Rc::from(value.as_ref()))
     }
 }
 
@@ -80,5 +87,37 @@ impl std::fmt::Display for Bytes {
         let value = String::from_utf8(self.0.to_vec())
             .expect("error while attempting to convert Bytes to utf8 String");
         write!(f, "{}", &value)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{Bytes, Location};
+
+    #[test]
+    fn should_create_bytes() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+
+        debug_assert_eq!(bytes.len(), 23);
+        debug_assert_eq!(bytes.first(), Location::new(0, &bytes));
+        debug_assert_eq!(bytes.last(), Location::new(bytes.len() - 1, &bytes));
+    }
+
+    #[test]
+    fn should_create_location() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let mut location = bytes.at(3);
+
+        debug_assert_eq!(location.index(), 3);
+        debug_assert_eq!(location.line(), 1);
+        debug_assert_eq!(location.column(), 0);
+        debug_assert_eq!(bytes[location.index()], b'm');
+
+        location = bytes.at(15);
+
+        debug_assert_eq!(location.index(), 15);
+        debug_assert_eq!(location.line(), 6);
+        debug_assert_eq!(location.column(), 1);
+        debug_assert_eq!(bytes[location.index()], b's');
     }
 }

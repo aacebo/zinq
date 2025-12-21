@@ -65,13 +65,13 @@ impl Location {
         let mut column = 0;
 
         while i < index {
-            i += 1;
-            column += 1;
-
             let byte = match bytes.get(i) {
                 None => return false,
                 Some(v) => v,
             };
+
+            i += 1;
+            column += 1;
 
             if byte == &b'\n' {
                 line += 1;
