@@ -4,9 +4,7 @@ use zinq_parse::{Cursor, Parse, Parser, Tx};
 use crate::{Keyword, Token};
 
 #[derive(Debug, Clone)]
-pub struct TokenParser {
-    cursor: Cursor,
-}
+pub struct TokenParser;
 
 impl TokenParser {
     ///
@@ -23,7 +21,7 @@ impl TokenParser {
     /// ## keyword
     /// `parse` a `Keyword` token
     ///
-    pub fn keyword(&mut self, cursor: &mut Cursor) -> Result<Tx<Keyword>> {
+    pub fn keyword(&mut self, cursor: &mut Cursor) -> Result<Keyword> {
         self.parse_as::<Keyword>(cursor)
     }
 }

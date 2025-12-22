@@ -61,11 +61,14 @@ pub trait Parser: Sized {
     /// parse an item
     ///
     #[inline]
-    fn parse(&mut self, cursor: &mut Cursor) -> Result<Tx<Self::Item>>
+    fn parse(&mut self, cursor: &mut Cursor) -> Result<Self::Item>
     where
         Self: Sized,
     {
-        Ok(Tx::from(Self::Item::parse(cursor, self)?))
+        let mut fork = cursor.clone();
+        let value = Self::Item::parse(cursor, self)?;
+        cursor.merge(fork.commit());
+        Ok(value)
     }
 
     ///
@@ -73,10 +76,13 @@ pub trait Parser: Sized {
     /// parse a type
     ///
     #[inline]
-    fn parse_as<T: Parse<Self>>(&mut self, cursor: &mut Cursor) -> Result<Tx<T>>
+    fn parse_as<T: Parse<Self>>(&mut self, cursor: &mut Cursor) -> Result<T>
     where
         Self: Sized,
     {
-        Ok(Tx::from(T::parse(cursor, self)?))
+        let mut fork = cursor.clone();
+        let value = T::parse(&mut fork, self)?;
+        cursor.merge(fork.commit());
+        Ok(value)
     }
 }
