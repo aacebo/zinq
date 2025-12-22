@@ -19,6 +19,9 @@ use zinq_parse::{Cursor, Parse, Peek, Span};
 
 #[derive(Debug, Clone)]
 pub enum Token {
+    Group(Group),
+    Punct(Punct),
+    Literal(Literal),
     Keyword(Keyword),
     Ident(Ident),
 }
@@ -26,14 +29,14 @@ pub enum Token {
 impl Peek<TokenParser> for Token {
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        Keyword::peek(cursor, parser)
+        true
     }
 }
 
 impl Parse<TokenParser> for Token {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
-        match Keyword::parse(cursor, parser) {
+        match Ident::parse(cursor, parser) {
             Err(err) => Err(err),
             Ok(v) => Ok(v.into()),
         }
@@ -42,6 +45,9 @@ impl Parse<TokenParser> for Token {
     #[inline]
     fn span(&self) -> &Span {
         match self {
+            Self::Group(v) => v.span(),
+            Self::Punct(v) => v.span(),
+            Self::Literal(v) => v.span(),
             Self::Keyword(v) => v.span(),
             Self::Ident(v) => v.span(),
         }

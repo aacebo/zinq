@@ -3,12 +3,20 @@ use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
 use crate::{Keyword, Token, TokenParser};
 
+///
+/// ## Ident
+/// an identifier
+/// ## Examples
+/// - foo
+/// - my_var
+/// - MyType
+///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Ident {
     span: Span,
 }
 
-impl From<Ident> for crate::Token {
+impl From<Ident> for Token {
     #[inline]
     fn from(value: Ident) -> Self {
         Self::Ident(value)
