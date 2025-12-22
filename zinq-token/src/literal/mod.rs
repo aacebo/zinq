@@ -1,3 +1,9 @@
+mod byte;
+mod string;
+
+pub use byte::*;
+pub use string::*;
+
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
@@ -6,28 +12,20 @@ use crate::{Keyword, Token, TokenParser};
 ///
 /// ## Literal
 /// a literal value
-/// ### Examples
-/// - 123
-/// - true/false
-/// - "test"
-/// - 'h'
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Literal {
-    span: Span,
-}
-
-impl From<Literal> for Token {
-    #[inline]
-    fn from(value: Literal) -> Self {
-        Self::Literal(value)
-    }
+pub enum Literal {
+    Byte(LByte),
+    String(LString),
 }
 
 impl std::fmt::Display for Literal {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        match self {
+            Self::Byte(v) => write!(f, "{}", v),
+            Self::String(v) => write!(f, "{}", v),
+        }
     }
 }
 
@@ -46,6 +44,16 @@ impl Parse<TokenParser> for Literal {
 
     #[inline]
     fn span(&self) -> &Span {
-        &self.span
+        match self {
+            Self::Byte(v) => v.span(),
+            Self::String(v) => v.span(),
+        }
+    }
+}
+
+impl From<Literal> for Token {
+    #[inline]
+    fn from(value: Literal) -> Self {
+        Self::Literal(value)
     }
 }

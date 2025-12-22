@@ -1,4 +1,4 @@
-use zinq_error::Error;
+use zinq_error::{Builder, Error};
 
 use crate::{ParseError, Span, Tx};
 
@@ -177,8 +177,8 @@ impl Cursor {
     /// at the current parser location
     ///
     #[inline]
-    pub fn error(&self, message: &str) -> Error {
-        Error::from(ParseError::from_str(self.span().clone(), message)).build()
+    pub fn error(&self, message: &str) -> Builder {
+        Error::from(ParseError::from_str(self.span().clone(), message))
     }
 
     ///
