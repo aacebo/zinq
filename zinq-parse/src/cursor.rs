@@ -1,4 +1,4 @@
-use zinq_error::{AnyError, Error, TextError};
+use zinq_error::Error;
 
 use crate::{ParseError, Span};
 
@@ -192,11 +192,7 @@ impl Cursor {
     ///
     #[inline]
     pub fn error(&self, message: &str) -> Error {
-        AnyError::new(ParseError::new(
-            self.span().clone(),
-            TextError::from(message).into(),
-        ))
-        .into()
+        Error::from(ParseError::from_str(self.span().clone(), message)).build()
     }
 }
 

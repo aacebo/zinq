@@ -2,7 +2,7 @@ use zinq_error::Error;
 
 use crate::Span;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParseError {
     span: Span,
     inner: Error,
@@ -10,18 +10,21 @@ pub struct ParseError {
 
 impl ParseError {
     #[inline]
-    pub fn new(span: Span, inner: Error) -> Self {
+    pub fn from_error(span: Span, inner: Error) -> Self {
         Self { span, inner }
+    }
+
+    #[inline]
+    pub fn from_str(span: Span, message: &str) -> Self {
+        Self {
+            span,
+            inner: Error::from_str(message).build(),
+        }
     }
 
     #[inline]
     pub fn span(&self) -> &Span {
         &self.span
-    }
-
-    #[inline]
-    pub fn code(&self) -> Option<u32> {
-        self.inner.code()
     }
 
     #[inline]
@@ -41,5 +44,14 @@ impl std::error::Error for ParseError {
     #[inline]
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         Some(&self.inner)
+    }
+}
+
+impl std::ops::Deref for ParseError {
+    type Target = Error;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.inner
     }
 }

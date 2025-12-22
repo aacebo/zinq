@@ -1,6 +1,6 @@
 use std::ops::Index;
 
-use zinq_error::{AnyError, Error, Result, TextError};
+use zinq_error::{Error, Result};
 
 use crate::{
     Bytes, FileMetaData, Location, ParseError,
@@ -135,11 +135,7 @@ impl Span {
 
     #[inline]
     pub fn error(&self, message: &str) -> Error {
-        AnyError::new(ParseError::new(
-            self.clone(),
-            TextError::from(message).into(),
-        ))
-        .into()
+        Error::from(ParseError::from_str(self.clone(), message)).build()
     }
 }
 
