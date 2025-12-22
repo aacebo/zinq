@@ -134,7 +134,7 @@ impl Cursor {
     pub fn next_while<P: Fn(&&u8, &&Span) -> bool>(&mut self, predicate: P) -> &Span {
         let mut fork = self.clone();
 
-        for byte in self.span().bytes().iter() {
+        while let Some(byte) = fork.peek() {
             if !predicate(&byte, &fork.span()) {
                 break;
             }
@@ -256,5 +256,23 @@ mod test {
 
         debug_assert_eq!(cursor.shift_back().bytes(), b"hi");
         debug_assert_eq!(cursor.span().bytes(), b"hi");
+    }
+
+    #[test]
+    fn should_merge() {
+        let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
+        let span = Span::from_bytes(&bytes).expect("expected span");
+        let mut cursor = span.cursor();
+        let mut fork = cursor.clone();
+        let prev = fork.next_while(|b, _| b != &&b'n');
+
+        debug_assert_eq!(prev.bytes(), b"hi\nmy\n\n");
+        debug_assert_eq!(cursor.span().bytes(), b"h");
+        debug_assert_eq!(fork.span().bytes(), b"hi\nmy\n\n");
+
+        cursor.merge(&fork.commit());
+
+        debug_assert_eq!(cursor.span().bytes(), b"\n");
+        debug_assert_eq!(fork.span().bytes(), b"\n");
     }
 }
