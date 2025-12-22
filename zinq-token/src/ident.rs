@@ -25,14 +25,22 @@ impl std::fmt::Display for Ident {
 impl Peek<TokenParser> for Ident {
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        true
+        if let Some(b) = cursor.peek() {
+            return b.is_ascii_alphabetic();
+        }
+
+        false
     }
 }
 
 impl Parse<TokenParser> for Ident {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
-        todo!()
+        while let Some(b) = cursor.peek() {}
+
+        Ok(Self {
+            span: Span::default(),
+        })
     }
 
     #[inline]

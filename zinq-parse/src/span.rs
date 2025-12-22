@@ -3,7 +3,7 @@ use std::ops::Index;
 use zinq_error::{Error, Result};
 
 use crate::{
-    Bytes, FileMetaData, Location, ParseError,
+    Bytes, Cursor, FileMetaData, Location, ParseError,
     delta::{self, Delta},
 };
 
@@ -131,6 +131,13 @@ impl Span {
             file: self.file.clone(),
             bytes: self.bytes.clone(),
         }
+    }
+
+    #[inline]
+    pub fn cursor(&self) -> Cursor {
+        let mut span = self.clone();
+        span.end = span.start;
+        Cursor::from(span)
     }
 
     #[inline]

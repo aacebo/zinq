@@ -1,15 +1,15 @@
 use zinq_error::Error;
 
-use crate::{ParseError, Span};
+use crate::{ParseError, Span, Tx};
 
 ///
 /// ## Cursor
 /// a mutable `Span` that provides
 /// ways to move the `start` and `end`
 /// bounds
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Cursor {
-    span: Span,
+    changes: Tx<Span>,
 }
 
 impl Cursor {
@@ -19,21 +19,7 @@ impl Cursor {
     ///
     #[inline]
     pub fn span(&self) -> &Span {
-        &self.span
-    }
-
-    ///
-    /// ## begin
-    /// move the cursors `start` and `end` bounds
-    /// to the start
-    ///
-    #[inline]
-    pub fn begin(mut self) -> Self {
-        let mut span = self.span.clone();
-        span.start_mut().seek(0, self.span.bytes());
-        span.end_mut().seek(0, self.span.bytes());
-        self.span = span;
-        self
+        self.changes.last()
     }
 
     ///
@@ -71,11 +57,11 @@ impl Cursor {
     ///
     #[inline]
     pub fn shift_back(&mut self) -> &Span {
-        let mut span = self.span.clone();
-        span.start_mut().back(self.span.src());
-        span.end_mut().back(self.span.src());
-        self.span = span;
-        &self.span
+        let mut span = self.span().clone();
+        span.start_mut().back(self.span().src());
+        span.end_mut().back(self.span().src());
+        self.changes.next(span);
+        self.span()
     }
 
     ///
@@ -85,11 +71,11 @@ impl Cursor {
     ///
     #[inline]
     pub fn shift_next(&mut self) -> &Span {
-        let mut span = self.span.clone();
-        span.start_mut().next(self.span.src());
-        span.end_mut().next(self.span.src());
-        self.span = span;
-        &self.span
+        let mut span = self.span().clone();
+        span.start_mut().next(self.span().src());
+        span.end_mut().next(self.span().src());
+        self.changes.next(span);
+        self.span()
     }
 
     ///
@@ -98,14 +84,14 @@ impl Cursor {
     ///
     #[inline]
     pub fn back(&mut self) -> Option<&u8> {
-        if self.span.sof() {
+        if self.span().sof() {
             return None;
         }
 
-        let mut span = self.span.clone();
-        span.start_mut().back(self.span.src());
-        self.span = span;
-        Some(self.span.first())
+        let mut span = self.span().clone();
+        span.start_mut().back(self.span().src());
+        self.changes.next(span);
+        Some(self.span().first())
     }
 
     ///
@@ -114,14 +100,14 @@ impl Cursor {
     ///
     #[inline]
     pub fn next(&mut self) -> Option<&u8> {
-        if self.span.eof() {
+        if self.span().eof() {
             return None;
         }
 
-        let mut span = self.span.clone();
-        span.end_mut().next(self.span.src());
-        self.span = span;
-        Some(self.span.last())
+        let mut span = self.span().clone();
+        span.end_mut().next(self.span().src());
+        self.changes.next(span);
+        Some(self.span().last())
     }
 
     ///
@@ -194,30 +180,56 @@ impl Cursor {
     pub fn error(&self, message: &str) -> Error {
         Error::from(ParseError::from_str(self.span().clone(), message)).build()
     }
+
+    ///
+    /// ## commit
+    /// commit the staged changes to the transaction
+    ///
+    #[inline]
+    pub fn commit(&mut self) -> &mut Self {
+        let mut span = self.span().clone();
+        span.start_mut()
+            .seek(self.span().end().index(), self.span().bytes());
+        self.changes.next(span);
+        self
+    }
+
+    ///
+    /// ## merge
+    /// merge a forked `Cursor`
+    ///
+    #[inline]
+    pub fn merge(&mut self, other: &Self) -> &mut Self {
+        self.changes.next(other.span().clone());
+        self
+    }
 }
 
 impl From<Span> for Cursor {
     #[inline]
     fn from(span: Span) -> Self {
-        Self { span }
+        Self {
+            changes: Tx::<Span>::new(span.clone()),
+        }
     }
 }
 
 impl std::fmt::Display for Cursor {
+    #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{Bytes, Cursor, Span};
+    use crate::{Bytes, Span};
 
     #[test]
     fn should_peek() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
         let span = Span::from_bytes(&bytes).expect("expected span");
-        let mut cursor = Cursor::from(span).begin();
+        let mut cursor = span.cursor();
 
         debug_assert_eq!(cursor.span().bytes(), b"h");
         debug_assert_eq!(cursor.next(), Some(&b'i'));
@@ -233,7 +245,7 @@ mod test {
     fn should_shift() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
         let span = Span::from_bytes(&bytes).expect("expected span");
-        let mut cursor = Cursor::from(span).begin();
+        let mut cursor = span.cursor();
 
         debug_assert_eq!(cursor.span().bytes(), b"h");
         debug_assert_eq!(cursor.next(), Some(&b'i'));

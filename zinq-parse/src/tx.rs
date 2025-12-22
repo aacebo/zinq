@@ -17,7 +17,7 @@ static ID: AtomicU64 = AtomicU64::new(1);
 /// tracks the incremental changes being
 /// made by a parser for a unit of work
 ///
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Default, Clone, Eq)]
 pub struct Tx<T>
 where
     T: std::fmt::Debug,
@@ -37,10 +37,10 @@ where
     /// create a new empty transaction
     ///
     #[inline]
-    pub fn new() -> Self {
+    pub fn new(value: T) -> Self {
         Self {
             id: ID.fetch_add(1, Ordering::Relaxed),
-            commits: vec![],
+            commits: vec![value.into()],
         }
     }
 
@@ -59,16 +59,29 @@ where
     ///
     #[inline]
     pub fn empty(&self) -> bool {
-        self.commits.is_empty()
+        self.commits.len() < 2
+    }
+
+    /// ## first
+    /// get the first commit value
+    #[inline]
+    pub fn first(&self) -> &T {
+        self.commits
+            .first()
+            .expect("expected at least 1 commit in transaction")
+            .value()
     }
 
     ///
-    /// ## value
-    /// the most recent commit
+    /// ## last
+    /// the last commit value
     ///
     #[inline]
-    pub fn value(&self) -> Option<&Commit<T>> {
-        self.commits.last()
+    pub fn last(&self) -> &T {
+        self.commits
+            .last()
+            .expect("expected at least 1 commit in transaction")
+            .value()
     }
 
     ///
@@ -99,6 +112,26 @@ where
     #[inline]
     pub fn revert(&mut self) -> Option<Commit<T>> {
         self.commits.pop()
+    }
+
+    ///
+    /// ## squash
+    /// create a new commit to reduce the transactions commit count to
+    /// 2 (start -> end) when possible
+    ///
+    #[inline]
+    pub fn squash(self) -> Self {
+        if self.commits.len() > 2 {
+            return self;
+        }
+
+        let first = self.commits.first().unwrap().clone();
+        let last = self.commits.last().unwrap().clone();
+
+        Self {
+            id: self.id,
+            commits: vec![first, last],
+        }
     }
 
     ///

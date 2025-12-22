@@ -25,9 +25,7 @@ macro_rules! define_keywords {
             fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
                 $(
                     if parser.peek_as::<$name>(cursor) {
-                        if let Some(v) = parser.parse_as::<$name>(cursor)?.value() {
-                            return Ok(v.value().clone().into());
-                        }
+                        return Ok(parser.parse_as::<$name>(cursor)?.last().clone().into());
                     }
                 )*
 
