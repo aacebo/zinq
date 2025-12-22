@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Parser, Peek};
 
 macro_rules! define_keywords {
     ($($token:literal pub struct $name:ident),*) => {
@@ -7,11 +7,11 @@ macro_rules! define_keywords {
             $($name($name),)*
         }
 
-        impl zinq_parse::Peek for Keyword {
+        impl zinq_parse::Peek<$crate::TokenParser> for Keyword {
             #[inline]
-            fn peek<P: zinq_parse::Parser>(parser: &P) -> bool {
+            fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> bool {
                 $(
-                    if parser.peek_as::<$name>() {
+                    if parser.peek_as::<$name>(cursor) {
                         return true;
                     }
                 )*
@@ -20,18 +20,18 @@ macro_rules! define_keywords {
             }
         }
 
-        impl zinq_parse::Parse for Keyword {
+        impl zinq_parse::Parse<$crate::TokenParser> for Keyword {
             #[inline]
-            fn parse<P: zinq_parse::Parser>(parser: &mut P) -> zinq_error::Result<Self> {
+            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
                 $(
-                    if parser.peek_as::<$name>() {
-                        if let Some(v) = parser.parse_as::<$name>()?.value() {
+                    if parser.peek_as::<$name>(cursor) {
+                        if let Some(v) = parser.parse_as::<$name>(cursor)?.value() {
                             return Ok(v.value().clone().into());
                         }
                     }
                 )*
 
-                Err(parser.error(&format!("unknown tokens '{}'", parser.span())))
+                Err(cursor.error(&format!("unknown tokens '{}'", cursor.span())))
             }
 
             #[inline]
@@ -56,29 +56,22 @@ macro_rules! define_keywords {
                 span: zinq_parse::Span,
             }
 
-            impl $name {
+            impl zinq_parse::Peek<$crate::TokenParser> for $name {
                 #[inline]
-                pub fn span(&self) -> &zinq_parse::Span {
-                    &self.span
+                fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> bool {
+                    cursor.span() == &$token.as_bytes()
                 }
             }
 
-            impl zinq_parse::Peek for $name {
+            impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
-                fn peek<P: zinq_parse::Parser>(parser: &P) -> bool {
-                    parser.span() == &$token.as_bytes()
-                }
-            }
-
-            impl zinq_parse::Parse for $name {
-                #[inline]
-                fn parse<P: zinq_parse::Parser>(parser: &mut P) -> zinq_error::Result<Self> {
-                    if !(parser.span() == &$token.as_bytes()) {
-                        return Err(parser.error(&format!("expected '{}'", $token)));
+                fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+                    if !(cursor.span() == &$token.as_bytes()) {
+                        return Err(cursor.error(&format!("expected '{}'", $token)));
                     }
 
                     Ok(Self {
-                        span: parser.span().clone(),
+                        span: cursor.span().clone(),
                     })
                 }
 

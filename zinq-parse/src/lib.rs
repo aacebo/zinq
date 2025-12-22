@@ -17,22 +17,22 @@ pub use location::*;
 pub use span::*;
 pub use tx::*;
 
-use zinq_error::{Error, Result};
+use zinq_error::Result;
 
 ///
 /// ## Peek
 /// implementers can be peeked by `Parser`
 ///
-pub trait Peek {
-    fn peek<P: Parser>(parser: &P) -> bool;
+pub trait Peek<P: Parser> {
+    fn peek(cursor: &Cursor, parser: &P) -> bool;
 }
 
 ///
 /// ## Parse
 /// implementers can be parsed by `Parser`
 ///
-pub trait Parse: Sized + Peek + std::fmt::Debug + Clone {
-    fn parse<P: Parser>(parser: &mut P) -> Result<Self>;
+pub trait Parse<P: Parser>: Sized + Peek<P> + std::fmt::Debug + Clone {
+    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self>;
     fn span(&self) -> &Span;
 }
 
@@ -41,51 +41,19 @@ pub trait Parse: Sized + Peek + std::fmt::Debug + Clone {
 /// a convenient way to conditionally
 /// traverse/parse a sequence of data
 ///
-pub trait Parser {
-    type Item: Parse + std::fmt::Debug + Clone;
-
-    ///
-    /// ## cursor
-    /// borrow the parsers `Cursor`
-    ///
-    fn cursor(&self) -> &Cursor;
-
-    ///
-    /// ## cursor_mut
-    /// borrow the parsers `Cursor` as mutable,
-    /// allowing you to manually manipulate its bounds
-    ///
-    fn cursor_mut(&mut self) -> &mut Cursor;
-
-    ///
-    /// ## span
-    /// get the current span
-    ///
-    #[inline]
-    fn span(&self) -> &Span {
-        self.cursor().span()
-    }
-
-    ///
-    /// ## error
-    /// create an error with a given message
-    /// at the current parser location
-    ///
-    #[inline]
-    fn error(&self, message: &str) -> Error {
-        self.cursor().error(message)
-    }
+pub trait Parser: Sized {
+    type Item: Parse<Self> + std::fmt::Debug + Clone;
 
     ///
     /// ## peek_as
     /// parse a type
     ///
     #[inline]
-    fn peek_as<T: Peek>(&self) -> bool
+    fn peek_as<T: Peek<Self>>(&self, cursor: &Cursor) -> bool
     where
         Self: Sized,
     {
-        T::peek(self)
+        T::peek(cursor, self)
     }
 
     ///
@@ -93,11 +61,11 @@ pub trait Parser {
     /// parse an item
     ///
     #[inline]
-    fn parse(&mut self) -> Result<Tx<Self::Item>>
+    fn parse(&mut self, cursor: &mut Cursor) -> Result<Tx<Self::Item>>
     where
         Self: Sized,
     {
-        Ok(Tx::from(Self::Item::parse(self)?))
+        Ok(Tx::from(Self::Item::parse(cursor, self)?))
     }
 
     ///
@@ -105,10 +73,10 @@ pub trait Parser {
     /// parse a type
     ///
     #[inline]
-    fn parse_as<T: Parse>(&mut self) -> Result<Tx<T>>
+    fn parse_as<T: Parse<Self>>(&mut self, cursor: &mut Cursor) -> Result<Tx<T>>
     where
         Self: Sized,
     {
-        Ok(Tx::from(T::parse(self)?))
+        Ok(Tx::from(T::parse(cursor, self)?))
     }
 }

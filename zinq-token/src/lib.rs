@@ -15,31 +15,31 @@ pub use parser::*;
 pub use punct::*;
 
 use zinq_error::Result;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Cursor, Parse, Peek, Span};
 
 #[derive(Debug, Clone)]
 pub enum Token {
     Keyword(Keyword),
 }
 
-impl Peek for Token {
+impl Peek<TokenParser> for Token {
     #[inline]
-    fn peek<P: zinq_parse::Parser>(parser: &P) -> bool {
-        Keyword::peek(parser)
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
+        Keyword::peek(cursor, parser)
     }
 }
 
-impl Parse for Token {
+impl Parse<TokenParser> for Token {
     #[inline]
-    fn parse<P: zinq_parse::Parser>(parser: &mut P) -> Result<Self> {
-        match Keyword::parse(parser) {
+    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
+        match Keyword::parse(cursor, parser) {
             Err(err) => Err(err),
             Ok(v) => Ok(v.into()),
         }
     }
 
     #[inline]
-    fn span(&self) -> &zinq_parse::Span {
+    fn span(&self) -> &Span {
         match self {
             Self::Keyword(v) => v.span(),
         }
