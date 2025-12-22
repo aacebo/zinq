@@ -20,6 +20,7 @@ use zinq_parse::{Cursor, Parse, Peek, Span};
 #[derive(Debug, Clone)]
 pub enum Token {
     Keyword(Keyword),
+    Ident(Ident),
 }
 
 impl Peek<TokenParser> for Token {
@@ -42,6 +43,7 @@ impl Parse<TokenParser> for Token {
     fn span(&self) -> &Span {
         match self {
             Self::Keyword(v) => v.span(),
+            Self::Ident(v) => v.span(),
         }
     }
 }

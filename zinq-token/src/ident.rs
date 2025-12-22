@@ -8,6 +8,13 @@ pub struct Ident {
     span: Span,
 }
 
+impl From<Ident> for crate::Token {
+    #[inline]
+    fn from(value: Ident) -> Self {
+        Self::Ident(value)
+    }
+}
+
 impl std::fmt::Display for Ident {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
