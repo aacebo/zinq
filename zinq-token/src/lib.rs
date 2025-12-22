@@ -4,12 +4,14 @@ mod group;
 mod ident;
 mod keyword;
 mod literal;
+mod parser;
 mod punct;
 
 pub use group::*;
 pub use ident::*;
 pub use keyword::*;
 pub use literal::*;
+pub use parser::*;
 pub use punct::*;
 
 use zinq_error::Result;
