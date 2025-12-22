@@ -7,6 +7,21 @@ macro_rules! define_keywords {
             $($name($name),)*
         }
 
+        impl Keyword {
+            #[inline]
+            pub fn try_from_span(span: &zinq_parse::Span) -> Option<Self> {
+                $(
+                    if $token.as_bytes() == span.bytes() {
+                        return Some(Self::$name($name {
+                            span: span.clone(),
+                        }));
+                    }
+                )*
+
+                None
+            }
+        }
+
         impl zinq_parse::Peek<$crate::TokenParser> for Keyword {
             #[inline]
             fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> bool {
@@ -22,7 +37,7 @@ macro_rules! define_keywords {
 
         impl zinq_parse::Parse<$crate::TokenParser> for Keyword {
             #[inline]
-            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
                 $(
                     if parser.peek_as::<$name>(cursor) {
                         return Ok(parser.parse_as::<$name>(cursor)?.clone().into());
@@ -63,14 +78,14 @@ macro_rules! define_keywords {
 
             impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
-                fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+                fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
                     if !(cursor.span() == &$token.as_bytes()) {
                         return Err(cursor.error(&format!("expected '{}'", $token)));
                     }
 
                     Ok(Self {
                         span: cursor.span().clone(),
-                    })
+                    }.into())
                 }
 
                 #[inline]
@@ -83,6 +98,13 @@ macro_rules! define_keywords {
                 #[inline]
                 fn from(value: $name) -> Self {
                     Self::$name(value)
+                }
+            }
+
+            impl From<$name> for $crate::Token {
+                #[inline]
+                fn from(value: $name) -> Self {
+                    Self::Keyword(Keyword::$name(value))
                 }
             }
         )*

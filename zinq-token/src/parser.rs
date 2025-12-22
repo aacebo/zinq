@@ -21,7 +21,7 @@ impl TokenParser {
     /// ## keyword
     /// `parse` a `Keyword` token
     ///
-    pub fn keyword(&mut self, cursor: &mut Cursor) -> Result<Keyword> {
+    pub fn keyword(&mut self, cursor: &mut Cursor) -> Result<Token> {
         self.parse_as::<Keyword>(cursor)
     }
 }

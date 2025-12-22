@@ -131,7 +131,7 @@ impl Cursor {
     /// false
     ///
     #[inline]
-    pub fn next_while<P: Fn(&&u8, &&Span) -> bool>(&mut self, predicate: P) -> Option<&Span> {
+    pub fn next_while<P: Fn(&&u8, &&Span) -> bool>(&mut self, predicate: P) -> &Span {
         let mut fork = self.clone();
 
         for byte in self.span().bytes().iter() {
@@ -143,7 +143,7 @@ impl Cursor {
         }
 
         *self = fork;
-        Some(self.span())
+        self.span()
     }
 
     ///
