@@ -1,4 +1,4 @@
-use zinq_error::{Builder, Error};
+use zinq_error::{Error, ErrorBuilder};
 
 use crate::{ParseError, Span, Tx};
 
@@ -172,16 +172,6 @@ impl Cursor {
     }
 
     ///
-    /// ## error
-    /// create an error with a given message
-    /// at the current parser location
-    ///
-    #[inline]
-    pub fn error(&self, message: &str) -> Builder {
-        Error::from(ParseError::from_str(self.span().clone(), message))
-    }
-
-    ///
     /// ## commit
     /// commit the staged changes to the transaction
     ///
@@ -202,6 +192,16 @@ impl Cursor {
     pub fn merge(&mut self, other: &Self) -> &mut Self {
         self.changes.next(other.span().clone());
         self
+    }
+
+    ///
+    /// ## error
+    /// create an error with a given message
+    /// at the current parser location
+    ///
+    #[inline]
+    pub fn error(&self, message: &str) -> ErrorBuilder {
+        Error::from_error(ParseError::from_str(self.span().clone(), message))
     }
 }
 

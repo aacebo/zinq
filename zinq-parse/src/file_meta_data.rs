@@ -1,4 +1,4 @@
-use zinq_error::{Error, Result};
+use zinq_error::{Error, ErrorCode, Result};
 
 use crate::Bytes;
 
@@ -20,19 +20,27 @@ impl FileMetaData {
         let p = std::path::Path::new(self.path.as_ref());
 
         if !p.exists() {
-            return Err(Error::not_found()
-                .with_message(&format!("file '{}' not found", self.path))
+            return Err(Error::from_str(&format!("file '{}' not found", self.path))
+                .code(ErrorCode {
+                    id: 0,
+                    name: "NotFound",
+                    description: "Not Found",
+                })
                 .build());
         }
 
         if !p.is_file() {
-            return Err(Error::bad_arguments()
-                .with_message("must be a file")
+            return Err(Error::from_str("must be a file")
+                .code(ErrorCode {
+                    id: 1,
+                    name: "BadArguments",
+                    description: "Bad Arguments",
+                })
                 .build());
         }
 
         let bytes = match std::fs::read(self.path.as_ref()) {
-            Err(err) => return Err(Error::from(err).build()),
+            Err(err) => return Err(Error::from_error(err).build()),
             Ok(v) => v,
         };
 
@@ -48,14 +56,22 @@ impl TryFrom<&str> for FileMetaData {
         let p = std::path::Path::new(path);
 
         if !p.exists() {
-            return Err(Error::not_found()
-                .with_message(&format!("file '{}' not found", path))
+            return Err(Error::from_str(&format!("file '{}' not found", path))
+                .code(ErrorCode {
+                    id: 0,
+                    name: "NotFound",
+                    description: "Not Found",
+                })
                 .build());
         }
 
         if !p.is_file() {
-            return Err(Error::bad_arguments()
-                .with_message("must be a file")
+            return Err(Error::from_str("must be a file")
+                .code(ErrorCode {
+                    id: 1,
+                    name: "BadArguments",
+                    description: "Bad Arguments",
+                })
                 .build());
         }
 

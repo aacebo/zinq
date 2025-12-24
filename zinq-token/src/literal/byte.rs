@@ -8,7 +8,7 @@ use crate::{Literal, Token, TokenParser};
 /// a literal byte
 /// ### Example
 /// `b'a'`
-/// 
+///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LByte {
     span: Span,
@@ -33,9 +33,11 @@ impl Parse<TokenParser> for LByte {
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
         let span = cursor.next_while(|_, span| !span.bytes().ends_with(b"'"));
 
-        if !span.bytes().ends_with(b"'") {
-            //Err(cursor.error(""))
-        }
+        //if !span.bytes().ends_with(b"'") {
+        //Err(cursor.error(""))
+        //}
+
+        todo!()
     }
 
     #[inline]

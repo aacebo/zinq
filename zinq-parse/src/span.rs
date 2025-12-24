@@ -1,9 +1,9 @@
 use std::ops::Index;
 
-use zinq_error::{Error, Result};
+use zinq_error::Result;
 
 use crate::{
-    Bytes, Cursor, FileMetaData, Location, ParseError,
+    Bytes, Cursor, FileMetaData, Location,
     delta::{self, Delta},
 };
 
@@ -138,11 +138,6 @@ impl Span {
         let mut span = self.clone();
         span.end = span.start;
         Cursor::from(span)
-    }
-
-    #[inline]
-    pub fn error(&self, message: &str) -> Error {
-        Error::from(ParseError::from_str(self.clone(), message)).build()
     }
 }
 

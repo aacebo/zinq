@@ -1,23 +1,30 @@
-#[repr(u32)]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub enum Code {
-    Unknown,
-    NotFound,
-    BadArguments,
-}
+pub const UNKNOWN: ErrorCode = ErrorCode {
+    id: 0,
+    name: "Unknown",
+    description: "an error that doesn't match a predefined error type",
+};
 
-impl std::fmt::Display for Code {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Unknown => write!(f, "Unknown"),
-            Self::NotFound => write!(f, "Not Found"),
-            Self::BadArguments => write!(f, "Bad Arguments"),
-        }
-    }
-}
+pub const NOT_FOUND: ErrorCode = ErrorCode {
+    id: 1,
+    name: "NotFound",
+    description: "some resource could not be found",
+};
 
-impl Default for Code {
-    fn default() -> Self {
-        Self::Unknown
-    }
+pub const BAD_ARGUMENTS: ErrorCode = ErrorCode {
+    id: 2,
+    name: "BadArguments",
+    description: "invalid input provided",
+};
+
+///
+/// ## ErrorCode
+/// an error type definition
+/// ### Examples
+/// `NotFound`, `BadArguments`, etc...
+///
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash)]
+pub struct ErrorCode {
+    pub id: u16,
+    pub name: &'static str,
+    pub description: &'static str,
 }

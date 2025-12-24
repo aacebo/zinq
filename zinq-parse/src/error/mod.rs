@@ -1,6 +1,12 @@
-use zinq_error::Error;
+use zinq_error::{Error, ErrorCategory};
 
 use crate::Span;
+
+pub const PARSE_ERROR: ErrorCategory = ErrorCategory {
+    id: "P",
+    name: "Parse",
+    description: "an error occurred during parsing",
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParseError {

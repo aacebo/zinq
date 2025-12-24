@@ -2,6 +2,7 @@ mod bytes;
 mod commit;
 mod cursor;
 pub mod delta;
+pub mod diagnostic;
 mod error;
 mod file_meta_data;
 mod location;
