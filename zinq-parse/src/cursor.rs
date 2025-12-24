@@ -1,15 +1,16 @@
 use zinq_error::{Error, ErrorBuilder};
 
-use crate::{ParseError, Span, Tx};
+use crate::{Diagnostic, ParseError, Span, Tx};
 
 ///
 /// ## Cursor
 /// a mutable `Span` that provides
 /// ways to move the `start` and `end`
 /// bounds
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone)]
 pub struct Cursor {
     changes: Tx<Span>,
+    diagnostics: Vec<Diagnostic>,
 }
 
 impl Cursor {
@@ -191,6 +192,7 @@ impl Cursor {
     #[inline]
     pub fn merge(&mut self, other: &Self) -> &mut Self {
         self.changes.next(other.span().clone());
+        self.diagnostics.extend(other.diagnostics.clone());
         self
     }
 
@@ -210,6 +212,7 @@ impl From<Span> for Cursor {
     fn from(span: Span) -> Self {
         Self {
             changes: Tx::<Span>::new(span.clone()),
+            diagnostics: vec![],
         }
     }
 }

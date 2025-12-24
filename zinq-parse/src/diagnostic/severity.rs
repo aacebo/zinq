@@ -43,15 +43,24 @@ pub enum Severity {
     /// “consider adding `mut`”, “try importing `Foo`”, “use `&` to borrow”.
     ///
     Help,
+
+    ///
+    /// ## None
+    /// No severity
+    /// ## Behavior
+    /// Used when a parent has children to report.
+    ///
+    None,
 }
 
 impl Severity {
-    pub fn prefix(&self) -> char {
+    pub fn prefix(&self) -> &'static str {
         match self {
-            Self::Error => 'E',
-            Self::Warning => 'W',
-            Self::Note => 'N',
-            Self::Help => 'H',
+            Self::Error => "E",
+            Self::Warning => "W",
+            Self::Note => "N",
+            Self::Help => "H",
+            Self::None => "",
         }
     }
 }
@@ -63,6 +72,13 @@ impl std::fmt::Display for Severity {
             Self::Warning => write!(f, "warn"),
             Self::Note => write!(f, "note"),
             Self::Help => write!(f, "help"),
+            Self::None => write!(f, ""),
         }
+    }
+}
+
+impl PartialOrd for Severity {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.to_string().cmp(&other.to_string()))
     }
 }

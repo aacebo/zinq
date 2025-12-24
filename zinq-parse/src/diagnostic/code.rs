@@ -10,8 +10,9 @@ use crate::{
 ///
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Code {
-    pub id: u16,                   // 0
-    pub severity: Severity,        // Severity::Error
+    pub id: u16,            // 0
+    pub severity: Severity, // Severity::Error
+    pub name: &'static str,
     pub description: &'static str, // a not found error...
 }
 
@@ -21,11 +22,12 @@ impl Code {
             code: self,
             span,
             message: None,
+            backtrace: None,
             children: vec![],
         }
     }
 
-    pub fn name(&self) -> String {
+    pub fn alias(&self) -> String {
         format!("{}{:04}", self.severity.prefix(), self.id)
     }
 }

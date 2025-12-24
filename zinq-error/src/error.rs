@@ -83,7 +83,9 @@ impl std::fmt::Display for Error {
 
         if let Some(message) = self.message() {
             write!(f, "{}", message)?;
-        } else if let Some(src) = self.source() {
+        }
+
+        if let Some(src) = self.source() {
             write!(f, "{}", src)?;
         }
 
@@ -144,6 +146,6 @@ mod test {
     #[test]
     pub fn should_create_dyn_error() {
         let err = CustomError::from("test").to_error();
-        debug_assert_eq!(err.to_string(), "test");
+        debug_assert_eq!(err.to_string(), "[0] => test"); // [0] because no category
     }
 }

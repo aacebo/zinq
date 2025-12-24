@@ -12,6 +12,7 @@ mod tx;
 pub use bytes::*;
 pub use commit::*;
 pub use cursor::*;
+pub use diagnostic::Diagnostic;
 pub use error::*;
 pub use file_meta_data::*;
 pub use location::*;
