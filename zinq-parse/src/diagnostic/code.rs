@@ -1,6 +1,6 @@
 use crate::{
     Span,
-    diagnostic::{Diagnostic, Severity},
+    diagnostic::{Builder, Severity},
 };
 
 ///
@@ -10,21 +10,15 @@ use crate::{
 ///
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Code {
-    pub id: u16,            // 0
-    pub severity: Severity, // Severity::Error
-    pub name: &'static str,
+    pub id: u16,                   // 0
+    pub severity: Severity,        // Severity::Error
+    pub name: &'static str,        // NotFound
     pub description: &'static str, // a not found error...
 }
 
 impl Code {
-    pub fn at(self, span: Span) -> Diagnostic {
-        Diagnostic {
-            code: self,
-            span,
-            message: None,
-            backtrace: None,
-            children: vec![],
-        }
+    pub fn at(self, span: Span) -> Builder {
+        Builder::new(span).code(self)
     }
 
     pub fn alias(&self) -> String {

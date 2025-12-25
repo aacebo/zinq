@@ -1,12 +1,8 @@
-use zinq_error::{Error, ErrorCategory};
+use std::rc::Rc;
+
+use zinq_error::{Error, ErrorCode, ZinqError};
 
 use crate::Span;
-
-pub const PARSE_ERROR: ErrorCategory = ErrorCategory {
-    id: "P",
-    name: "Parse",
-    description: "an error occurred during parsing",
-};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParseError {
@@ -36,6 +32,27 @@ impl ParseError {
     #[inline]
     pub fn inner(&self) -> &Error {
         &self.inner
+    }
+}
+
+impl ZinqError for ParseError {
+    fn code(&self) -> &ErrorCode {
+        self.inner.code()
+    }
+
+    fn message(&self) -> Option<&str> {
+        self.inner.message()
+    }
+
+    fn source(&self) -> Option<&dyn zinq_error::StdError> {
+        self.inner.source()
+    }
+
+    fn children(&self) -> &[Rc<dyn ZinqError>]
+    where
+        Self: Sized,
+    {
+        self.inner.children()
     }
 }
 

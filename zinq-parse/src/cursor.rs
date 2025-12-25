@@ -1,6 +1,6 @@
 use zinq_error::{Error, ErrorBuilder};
 
-use crate::{Diagnostic, ParseError, Span, Tx};
+use crate::{Diagnostic, ParseError, Span, Tx, diagnostic};
 
 ///
 /// ## Cursor
@@ -192,7 +192,11 @@ impl Cursor {
     #[inline]
     pub fn merge(&mut self, other: &Self) -> &mut Self {
         self.changes.next(other.span().clone());
-        self.diagnostics.extend(other.diagnostics.clone());
+        self.diagnostics.push(
+            Diagnostic::noop(self.span().clone())
+                .children(&other.diagnostics)
+                .build(),
+        );
         self
     }
 
@@ -204,6 +208,27 @@ impl Cursor {
     #[inline]
     pub fn error(&self, message: &str) -> ErrorBuilder {
         Error::from_error(ParseError::from_str(self.span().clone(), message))
+    }
+
+    ///
+    /// ## report
+    /// emit a diagnostic to be added to the analyzer report
+    ///
+    #[inline]
+    pub fn report(&mut self, code: diagnostic::Code) -> &mut Self {
+        self.diagnostics.push(code.at(self.span().clone()).build());
+        self
+    }
+
+    ///
+    /// ## report_as
+    /// emit a diagnostic to be added to the analyzer report
+    ///
+    #[inline]
+    pub fn report_as(&mut self, code: diagnostic::Code, message: &str) -> &mut Self {
+        self.diagnostics
+            .push(code.at(self.span().clone()).message(message).build());
+        self
     }
 }
 

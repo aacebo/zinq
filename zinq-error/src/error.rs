@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
-use crate::{ErrorBuilder, ErrorCategory, ErrorCode, StdError, ZinqError};
+use crate::{ErrorBuilder, ErrorCode, StdError, ZinqError};
 
 ///
 /// ## Error
@@ -11,10 +11,9 @@ use crate::{ErrorBuilder, ErrorCategory, ErrorCode, StdError, ZinqError};
 #[derive(Debug, Default, Clone)]
 pub struct Error {
     pub(crate) code: ErrorCode,
-    pub(crate) category: ErrorCategory,
     pub(crate) message: Option<String>,
-    pub(crate) source: Option<Arc<dyn StdError>>,
-    pub(crate) children: Vec<Self>,
+    pub(crate) source: Option<Rc<dyn StdError>>,
+    pub(crate) children: Vec<Rc<dyn ZinqError>>,
 }
 
 impl Error {
@@ -36,10 +35,6 @@ impl ZinqError for Error {
         &self.code
     }
 
-    fn category(&self) -> &ErrorCategory {
-        &self.category
-    }
-
     fn message(&self) -> Option<&str> {
         match &self.message {
             None => None,
@@ -54,7 +49,7 @@ impl ZinqError for Error {
         }
     }
 
-    fn children(&self) -> &[Self] {
+    fn children(&self) -> &[Rc<dyn ZinqError>] {
         &self.children
     }
 }
@@ -79,7 +74,7 @@ impl From<&str> for Error {
 
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}{}] => ", &self.category.id, &self.code.id)?;
+        write!(f, "[{}] => ", &self.code.id)?;
 
         if let Some(message) = self.message() {
             write!(f, "{}", message)?;
@@ -101,7 +96,7 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match &self.source {
             None => None,
-            Some(v) => Some(v),
+            Some(v) => Some(v.as_ref()),
         }
     }
 }

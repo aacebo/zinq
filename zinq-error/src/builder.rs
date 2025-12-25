@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
-use crate::{Error, ErrorCategory, ErrorCode, StdError};
+use crate::{Error, ErrorCode, StdError};
 
 #[derive(Debug, Default, Clone)]
 pub struct ErrorBuilder(Error);
@@ -15,23 +15,18 @@ impl ErrorBuilder {
         self
     }
 
-    pub fn category(mut self, category: ErrorCategory) -> Self {
-        self.0.category = category;
-        self
-    }
-
     pub fn message<T: ToString>(mut self, message: T) -> Self {
         self.0.message = Some(message.to_string());
         self
     }
 
     pub fn source<Err: StdError>(mut self, source: Err) -> Self {
-        self.0.source = Some(Arc::new(source));
+        self.0.source = Some(Rc::new(source));
         self
     }
 
     pub fn child(mut self, child: Error) -> Self {
-        self.0.children.push(child);
+        self.0.children.push(Rc::new(child));
         self
     }
 

@@ -1,7 +1,9 @@
+mod builder;
 mod code;
 mod codes;
 mod severity;
 
+pub use builder::*;
 pub use code::*;
 pub use codes::*;
 pub use severity::*;
@@ -23,9 +25,11 @@ use crate::Span;
 ///    |    print(...);
 /// ```
 /// #### Print Warning
+/// ```bash
 /// ./src/main.zq
 ///   --> warn [W1024](15,4): Unused variable "args"
 ///    |    var args = (...);
+/// ```
 ///
 #[derive(Debug, Clone)]
 pub struct Diagnostic {
@@ -37,31 +41,24 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    pub fn new(span: Span) -> Self {
-        Diagnostic {
-            code: NOOP,
-            span,
-            message: None,
-            backtrace: None,
-            children: vec![],
-        }
+    ///
+    /// ## new
+    /// create a new `Diagnostic`
+    /// from a span
+    ///
+    pub fn new(span: Span) -> Builder {
+        Builder::new(span)
     }
 
-    pub fn message(mut self, message: &str) -> Self {
-        self.message = Some(message.to_string());
-        self
-    }
-
-    pub fn add(mut self, children: &[Diagnostic]) -> Self {
-        self.children.extend_from_slice(children);
-        self
-    }
-
-    pub fn max_severity(&self) -> &Severity {
+    ///
+    /// ## severity
+    /// the max severity of this `Diagnostic`
+    ///
+    pub fn severity(&self) -> &Severity {
         let mut max = &self.code.severity;
 
         for child in &self.children {
-            let cmax = child.max_severity();
+            let cmax = child.severity();
 
             if cmax > max {
                 max = cmax

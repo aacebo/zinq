@@ -1,10 +1,10 @@
 mod builder;
-pub mod category;
 pub mod code;
 mod error;
 
+use std::rc::Rc;
+
 pub use builder::*;
-pub use category::ErrorCategory;
 pub use code::ErrorCode;
 pub use error::*;
 
@@ -25,10 +25,9 @@ impl<T: StdError> ToError for T {
 
 pub trait ZinqError: std::error::Error {
     fn code(&self) -> &ErrorCode;
-    fn category(&self) -> &ErrorCategory;
     fn message(&self) -> Option<&str>;
     fn source(&self) -> Option<&dyn StdError>;
-    fn children(&self) -> &[Self]
+    fn children(&self) -> &[Rc<dyn ZinqError>]
     where
         Self: Sized;
 }
