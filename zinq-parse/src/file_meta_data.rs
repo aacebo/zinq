@@ -1,4 +1,4 @@
-use zinq_error::{Error, ErrorCode, Result};
+use zinq_error::{BAD_ARGUMENTS, Error, NOT_FOUND, Result, ZinqError, ZinqErrorCode};
 
 use crate::Bytes;
 
@@ -21,26 +21,28 @@ impl FileMetaData {
 
         if !p.exists() {
             return Err(Error::from_str(&format!("file '{}' not found", self.path))
-                .code(ErrorCode {
+                .code(ZinqErrorCode {
                     id: 0,
                     name: "NotFound",
                     description: "Not Found",
                 })
-                .build());
+                .build()
+                .into());
         }
 
         if !p.is_file() {
             return Err(Error::from_str("must be a file")
-                .code(ErrorCode {
+                .code(ZinqErrorCode {
                     id: 1,
                     name: "BadArguments",
                     description: "Bad Arguments",
                 })
-                .build());
+                .build()
+                .into());
         }
 
         let bytes = match std::fs::read(self.path.as_ref()) {
-            Err(err) => return Err(Error::from_error(err).build()),
+            Err(err) => return Err(Error::from_error(err).build().into()),
             Ok(v) => v,
         };
 
@@ -49,7 +51,7 @@ impl FileMetaData {
 }
 
 impl TryFrom<&str> for FileMetaData {
-    type Error = Error;
+    type Error = ZinqError;
 
     #[inline]
     fn try_from(path: &str) -> std::result::Result<Self, Self::Error> {
@@ -57,22 +59,16 @@ impl TryFrom<&str> for FileMetaData {
 
         if !p.exists() {
             return Err(Error::from_str(&format!("file '{}' not found", path))
-                .code(ErrorCode {
-                    id: 0,
-                    name: "NotFound",
-                    description: "Not Found",
-                })
-                .build());
+                .code(NOT_FOUND)
+                .build()
+                .into());
         }
 
         if !p.is_file() {
             return Err(Error::from_str("must be a file")
-                .code(ErrorCode {
-                    id: 1,
-                    name: "BadArguments",
-                    description: "Bad Arguments",
-                })
-                .build());
+                .code(BAD_ARGUMENTS)
+                .build()
+                .into());
         }
 
         Ok(Self {

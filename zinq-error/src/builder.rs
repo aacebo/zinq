@@ -1,37 +1,47 @@
 use std::rc::Rc;
 
-use crate::{Error, ErrorCode, StdError};
+use crate::{Error, StdError, ZinqError, ZinqErrorCode};
 
 #[derive(Debug, Default, Clone)]
-pub struct ErrorBuilder(Error);
+pub struct ErrorBuilder {
+    code: Option<ZinqErrorCode>,
+    message: Option<String>,
+    source: Option<Rc<dyn StdError>>,
+    children: Vec<ZinqError>,
+}
 
 impl ErrorBuilder {
     pub fn new() -> Self {
-        Self(Error::default())
+        Self::default()
     }
 
-    pub fn code(mut self, code: ErrorCode) -> Self {
-        self.0.code = code;
+    pub fn code(mut self, code: ZinqErrorCode) -> Self {
+        self.code = Some(code);
         self
     }
 
     pub fn message<T: ToString>(mut self, message: T) -> Self {
-        self.0.message = Some(message.to_string());
+        self.message = Some(message.to_string());
         self
     }
 
     pub fn source<Err: StdError>(mut self, source: Err) -> Self {
-        self.0.source = Some(Rc::new(source));
+        self.source = Some(Rc::new(source));
         self
     }
 
-    pub fn child(mut self, child: Error) -> Self {
-        self.0.children.push(Rc::new(child));
+    pub fn child(mut self, child: ZinqError) -> Self {
+        self.children.push(child);
         self
     }
 
     pub fn build(self) -> Error {
-        self.0
+        Error {
+            code: self.code.expect("expected code"),
+            message: self.message,
+            source: self.source,
+            children: self.children,
+        }
     }
 }
 

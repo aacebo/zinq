@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{ErrorBuilder, ErrorCode, StdError, ZinqError};
+use crate::{ErrorBuilder, StdError, ZinqError, ZinqErrorCode};
 
 ///
 /// ## Error
@@ -10,10 +10,10 @@ use crate::{ErrorBuilder, ErrorCode, StdError, ZinqError};
 ///
 #[derive(Debug, Default, Clone)]
 pub struct Error {
-    pub(crate) code: ErrorCode,
-    pub(crate) message: Option<String>,
-    pub(crate) source: Option<Rc<dyn StdError>>,
-    pub(crate) children: Vec<Rc<dyn ZinqError>>,
+    pub code: ZinqErrorCode,
+    pub message: Option<String>,
+    pub source: Option<Rc<dyn StdError>>,
+    pub children: Vec<ZinqError>,
 }
 
 impl Error {
@@ -27,30 +27,6 @@ impl Error {
 
     pub fn from_str(message: &str) -> ErrorBuilder {
         ErrorBuilder::new().message(message)
-    }
-}
-
-impl ZinqError for Error {
-    fn code(&self) -> &ErrorCode {
-        &self.code
-    }
-
-    fn message(&self) -> Option<&str> {
-        match &self.message {
-            None => None,
-            Some(v) => Some(v),
-        }
-    }
-
-    fn source(&self) -> Option<&dyn StdError> {
-        match &self.source {
-            None => None,
-            Some(v) => Some(v.as_ref()),
-        }
-    }
-
-    fn children(&self) -> &[Rc<dyn ZinqError>] {
-        &self.children
     }
 }
 
@@ -76,11 +52,11 @@ impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "[{}] => ", &self.code.id)?;
 
-        if let Some(message) = self.message() {
+        if let Some(message) = &self.message {
             write!(f, "{}", message)?;
         }
 
-        if let Some(src) = self.source() {
+        if let Some(src) = &self.source {
             write!(f, "{}", src)?;
         }
 
@@ -105,11 +81,11 @@ impl Eq for Error {}
 
 impl PartialEq for Error {
     fn eq(&self, other: &Self) -> bool {
-        if self.code() != other.code() {
+        if &self.code != &other.code {
             return false;
         }
 
-        if self.message() != other.message() {
+        if &self.message != &other.message {
             return false;
         }
 
@@ -119,8 +95,6 @@ impl PartialEq for Error {
 
 #[cfg(test)]
 mod test {
-    use crate::ToError;
-
     #[derive(Debug)]
     struct CustomError(String);
 
@@ -140,7 +114,7 @@ mod test {
 
     #[test]
     pub fn should_create_dyn_error() {
-        let err = CustomError::from("test").to_error();
-        debug_assert_eq!(err.to_string(), "[0] => test"); // [0] because no category
+        let err = CustomError::from("test");
+        debug_assert_eq!(err.to_string(), "test"); // [0] because no category
     }
 }

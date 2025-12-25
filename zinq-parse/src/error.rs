@@ -1,18 +1,16 @@
-use std::rc::Rc;
-
-use zinq_error::{Error, ErrorCode, ZinqError};
+use zinq_error::{Error, ZinqError};
 
 use crate::Span;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct ParseError {
     span: Span,
-    inner: Error,
+    inner: ZinqError,
 }
 
 impl ParseError {
     #[inline]
-    pub fn from_error(span: Span, inner: Error) -> Self {
+    pub fn from_error(span: Span, inner: ZinqError) -> Self {
         Self { span, inner }
     }
 
@@ -20,7 +18,7 @@ impl ParseError {
     pub fn from_str(span: Span, message: &str) -> Self {
         Self {
             span,
-            inner: Error::from_str(message).build(),
+            inner: Error::from_str(message).build().into(),
         }
     }
 
@@ -30,29 +28,8 @@ impl ParseError {
     }
 
     #[inline]
-    pub fn inner(&self) -> &Error {
+    pub fn inner(&self) -> &ZinqError {
         &self.inner
-    }
-}
-
-impl ZinqError for ParseError {
-    fn code(&self) -> &ErrorCode {
-        self.inner.code()
-    }
-
-    fn message(&self) -> Option<&str> {
-        self.inner.message()
-    }
-
-    fn source(&self) -> Option<&dyn zinq_error::StdError> {
-        self.inner.source()
-    }
-
-    fn children(&self) -> &[Rc<dyn ZinqError>]
-    where
-        Self: Sized,
-    {
-        self.inner.children()
     }
 }
 
@@ -71,7 +48,7 @@ impl std::error::Error for ParseError {
 }
 
 impl std::ops::Deref for ParseError {
-    type Target = Error;
+    type Target = ZinqError;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
