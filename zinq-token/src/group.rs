@@ -33,7 +33,10 @@ impl std::fmt::Display for Group {
 impl Peek<TokenParser> for Group {
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        todo!()
+        match cursor.last() {
+            b'(' | b'[' | b'{' => true,
+            _ => false,
+        }
     }
 }
 

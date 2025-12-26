@@ -19,6 +19,40 @@ pub enum Literal {
     String(LString),
 }
 
+impl Literal {
+    pub fn is_byte(&self) -> bool {
+        match self {
+            Self::Byte(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_string(&self) -> bool {
+        match self {
+            Self::String(_) => true,
+            _ => false,
+        }
+    }
+}
+
+impl Token {
+    pub fn is_literal_byte(&self) -> bool {
+        if let Token::Literal(v) = &self {
+            return v.is_byte();
+        }
+
+        false
+    }
+
+    pub fn is_literal_string(&self) -> bool {
+        if let Token::Literal(v) = &self {
+            return v.is_string();
+        }
+
+        false
+    }
+}
+
 impl std::fmt::Display for Literal {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

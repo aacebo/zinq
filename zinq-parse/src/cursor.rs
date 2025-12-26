@@ -1,7 +1,7 @@
-use zinq_error::{Error, ErrorBuilder};
+use zinq_error::{Error, ErrorBuilder, Result};
 
 use crate::{
-    Diagnostic, ParseError, ParseResult, Span, Tx,
+    Diagnostic, EOF, ParseError, ParseResult, Span, Tx,
     diagnostic::{self, NOOP},
 };
 
@@ -54,8 +54,8 @@ impl Cursor {
     ///
     #[inline]
     pub fn peek_n(&self, n: usize) -> &[u8] {
-        let (_, items) = self.span().src().split_at(self.span().end().index() + n);
-        items
+        let end = self.span().end().index();
+        &self.span().src()[end + 1..end + n + 1]
     }
 
     ///
@@ -128,6 +128,32 @@ impl Cursor {
     }
 
     ///
+    /// ## next_n
+    /// advance forward by `n` and return the
+    /// resulting `Span`
+    ///
+    #[inline]
+    pub fn next_n(&mut self, n: usize) -> Result<()> {
+        for _ in 0..n {
+            self.next_or_err()?;
+        }
+
+        Ok(())
+    }
+
+    ///
+    /// ## next_or_err
+    /// advance or return EOF error
+    ///
+    #[inline]
+    pub fn next_or_err(&mut self) -> Result<&u8> {
+        match self.next() {
+            None => Err(Error::new().code(EOF).build().into()),
+            Some(v) => Ok(v),
+        }
+    }
+
+    ///
     /// ## next_if
     /// advance the end of the span by 1
     /// conditionally
@@ -148,11 +174,11 @@ impl Cursor {
     /// false
     ///
     #[inline]
-    pub fn next_while<P: Fn(&&u8, &&Span) -> bool>(&mut self, predicate: P) -> &Span {
+    pub fn next_while<P: Fn(&u8, &Span) -> bool>(&mut self, predicate: P) -> &Span {
         let mut fork = self.clone();
 
         while let Some(byte) = fork.peek() {
-            if !predicate(&byte, &fork.span()) {
+            if !predicate(byte, fork.span()) {
                 break;
             }
 
@@ -196,7 +222,7 @@ impl Cursor {
     pub fn commit(&mut self) -> &mut Self {
         let mut span = self.span().clone();
         span.start_mut()
-            .seek(self.span().end().index(), self.span().bytes());
+            .seek(self.span().end().index(), self.span().src());
         self.changes.next(span);
         self
     }
@@ -222,7 +248,7 @@ impl Cursor {
     /// at the current parser location
     ///
     #[inline]
-    pub fn error(&self, message: &str) -> ErrorBuilder {
+    pub fn error(&mut self, message: &str) -> ErrorBuilder {
         Error::from_error(ParseError::from_str(self.span().clone(), message))
     }
 
@@ -278,6 +304,15 @@ impl From<Span> for Cursor {
     }
 }
 
+impl std::ops::Deref for Cursor {
+    type Target = Span;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        self.span()
+    }
+}
+
 impl std::fmt::Display for Cursor {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -327,8 +362,8 @@ mod test {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
         let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
-        let mut fork = cursor.clone();
-        let prev = fork.next_while(|b, _| b != &&b'n');
+        let mut fork = cursor.fork();
+        let prev = fork.next_while(|b, _| b != &b'n');
 
         debug_assert_eq!(prev.bytes(), b"hi\nmy\n\n");
         debug_assert_eq!(cursor.span().bytes(), b"h");
@@ -338,5 +373,18 @@ mod test {
 
         debug_assert_eq!(cursor.span().bytes(), b"\n");
         debug_assert_eq!(fork.span().bytes(), b"\n");
+    }
+
+    #[test]
+    fn should_advance_by_n() {
+        let bytes = Bytes::from(b"b'\n'");
+        let span = Span::from_bytes(&bytes);
+        let mut cursor = span.cursor();
+
+        debug_assert_eq!(cursor.span().bytes(), b"b");
+
+        cursor.next_n(2).expect("should not error");
+
+        debug_assert_eq!(cursor.span().bytes(), b"b'\n");
     }
 }

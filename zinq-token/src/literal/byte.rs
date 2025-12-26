@@ -24,20 +24,19 @@ impl std::fmt::Display for LByte {
 impl Peek<TokenParser> for LByte {
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        cursor.peek_n(2) == b"b'"
+        cursor.last() == &b'b' && cursor.peek().unwrap_or(&0) == &b'\''
     }
 }
 
 impl Parse<TokenParser> for LByte {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
-        let span = cursor.next_while(|_, span| !span.bytes().ends_with(b"'"));
-
-        //if !span.bytes().ends_with(b"'") {
-        //Err(cursor.error(""))
-        //}
-
-        todo!()
+        cursor.next_while(|b, _| b != &b'\'');
+        cursor.next_n(3)?;
+        Ok(Self {
+            span: cursor.span().clone(),
+        }
+        .into())
     }
 
     #[inline]
@@ -55,5 +54,29 @@ impl From<LByte> for Literal {
 impl From<LByte> for Token {
     fn from(value: LByte) -> Self {
         Self::Literal(Literal::Byte(value))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_parse::{Parse, Parser, Peek, Span};
+
+    use crate::{LByte, TokenParser};
+
+    #[test]
+    fn should_parse_byte() {
+        let span = Span::from_bytes(b"b'p'");
+        let mut cursor = span.cursor();
+        let mut parser = TokenParser;
+
+        debug_assert!(LByte::peek(&mut cursor, &mut parser));
+
+        let token = parser
+            .parse_as::<LByte>(&mut cursor)
+            .expect("should not error");
+
+        debug_assert!(token.is_literal_byte());
+        debug_assert_eq!(token.to_string(), "b'p'");
+        debug_assert_eq!(cursor.span().bytes(), b"'");
     }
 }

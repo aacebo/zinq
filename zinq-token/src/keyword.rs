@@ -172,7 +172,7 @@ mod test {
     fn should_parse_mod() {
         let span = Span::from_str("mod");
         let mut token = Keyword::try_from_span(&span).expect("should have keyword");
-        
+
         debug_assert!(token.is_mod());
         debug_assert_eq!(token.to_string(), "mod");
     }
@@ -181,7 +181,7 @@ mod test {
     fn should_parse_pub() {
         let span = Span::from_str("pub");
         let mut token = Keyword::try_from_span(&span).expect("should have keyword");
-        
+
         debug_assert!(token.is_pub());
         debug_assert_eq!(token.to_string(), "pub");
     }

@@ -28,6 +28,43 @@ pub enum Token {
     Ident(Ident),
 }
 
+impl Token {
+    pub fn is_group(&self) -> bool {
+        match self {
+            Self::Group(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_punct(&self) -> bool {
+        match self {
+            Self::Punct(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_literal(&self) -> bool {
+        match self {
+            Self::Literal(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_keyword(&self) -> bool {
+        match self {
+            Self::Keyword(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_ident(&self) -> bool {
+        match self {
+            Self::Ident(_) => true,
+            _ => false,
+        }
+    }
+}
+
 impl std::fmt::Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -50,10 +87,23 @@ impl Peek<TokenParser> for Token {
 impl Parse<TokenParser> for Token {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
-        match Ident::parse(cursor, parser) {
-            Err(err) => Err(err),
-            Ok(v) => Ok(v.into()),
+        if cursor.last().is_ascii_whitespace() {
+            return Self::parse(cursor, parser);
         }
+
+        if Group::peek(cursor, parser) {
+            return Group::parse(cursor, parser);
+        }
+
+        if Punct::peek(cursor, parser) {
+            return Punct::parse(cursor, parser);
+        }
+
+        if Literal::peek(cursor, parser) {
+            return Literal::parse(cursor, parser);
+        }
+
+        Ident::parse(cursor, parser)
     }
 
     #[inline]
