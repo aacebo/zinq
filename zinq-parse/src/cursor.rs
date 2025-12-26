@@ -1,6 +1,9 @@
 use zinq_error::{Error, ErrorBuilder};
 
-use crate::{Diagnostic, ParseError, Span, Tx, diagnostic};
+use crate::{
+    Diagnostic, ParseError, ParseResult, Span, Tx,
+    diagnostic::{self, NOOP},
+};
 
 ///
 /// ## Cursor
@@ -14,6 +17,19 @@ pub struct Cursor {
 }
 
 impl Cursor {
+    ///
+    /// ## fork
+    /// fork the cursor, i.e. clone the cursor
+    /// without cloning the existing diagnostics.
+    ///
+    #[inline]
+    pub fn fork(&self) -> Self {
+        Self {
+            changes: self.changes.clone(),
+            diagnostics: vec![],
+        }
+    }
+
     ///
     /// ## span
     /// get the current span
@@ -230,6 +246,26 @@ impl Cursor {
             .push(code.at(self.span().clone()).message(message).build());
         self
     }
+
+    ///
+    /// ## build
+    /// build the parse result from the cursor
+    ///
+    #[inline]
+    pub fn build<T>(&self, value: T) -> ParseResult<T> {
+        if self.diagnostics.is_empty() {
+            return ParseResult::<T>::from_value(value);
+        }
+
+        ParseResult {
+            value,
+            diagnostic: Some(
+                NOOP.at(self.span().clone())
+                    .children(&self.diagnostics)
+                    .build(),
+            ),
+        }
+    }
 }
 
 impl From<Span> for Cursor {
@@ -256,7 +292,7 @@ mod test {
     #[test]
     fn should_peek() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes).expect("expected span");
+        let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
 
         debug_assert_eq!(cursor.span().bytes(), b"h");
@@ -272,7 +308,7 @@ mod test {
     #[test]
     fn should_shift() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes).expect("expected span");
+        let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
 
         debug_assert_eq!(cursor.span().bytes(), b"h");
@@ -289,7 +325,7 @@ mod test {
     #[test]
     fn should_merge() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes).expect("expected span");
+        let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
         let mut fork = cursor.clone();
         let prev = fork.next_while(|b, _| b != &&b'n');

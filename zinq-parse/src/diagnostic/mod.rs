@@ -71,7 +71,7 @@ impl Diagnostic {
 
 impl std::fmt::Display for Diagnostic {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.code == NOOP {
+        if self.code.severity == Severity::None {
             return Ok(());
         }
 

@@ -22,27 +22,27 @@ pub struct Span {
 
 impl Span {
     #[inline]
-    pub fn from_bytes(src: &[u8]) -> Result<Self> {
+    pub fn from_bytes(src: &[u8]) -> Self {
         let bytes = Bytes::from(src);
 
-        Ok(Self {
+        Self {
             start: bytes.first(),
             end: bytes.last(),
             file: None,
             bytes,
-        })
+        }
     }
 
     #[inline]
-    pub fn from_str(src: &str) -> Result<Self> {
+    pub fn from_str(src: &str) -> Self {
         let bytes = Bytes::from(src);
 
-        Ok(Self {
+        Self {
             start: bytes.first(),
             end: bytes.last(),
             file: None,
             bytes,
-        })
+        }
     }
 
     #[inline]
@@ -177,7 +177,7 @@ mod test {
     #[test]
     fn should_create_span() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes).expect("expected span");
+        let span = Span::from_bytes(&bytes);
 
         debug_assert_eq!(span.bytes(), bytes.as_ref());
         debug_assert!(span.eof());
@@ -187,9 +187,7 @@ mod test {
     #[test]
     fn should_create_sub_span() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes)
-            .expect("expected span")
-            .slice(7, 10);
+        let span = Span::from_bytes(&bytes).slice(7, 10);
 
         debug_assert_eq!(span.bytes(), b"name");
         debug_assert!(!span.eof());
@@ -199,7 +197,7 @@ mod test {
     #[test]
     fn should_create_delta() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes).expect("expected span");
+        let span = Span::from_bytes(&bytes);
         let a = span.slice(3, 4);
         let b = span.slice(4, 7);
 

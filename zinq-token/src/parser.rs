@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Parser, Tx};
 
-use crate::{Group, Ident, Keyword, Literal, Punct, Token};
+use crate::{Group, Ident, Keyword, Literal, Punct, Token, TokenStream};
 
 #[derive(Debug, Clone)]
 pub struct TokenParser;

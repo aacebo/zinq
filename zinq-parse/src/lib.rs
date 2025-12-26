@@ -6,6 +6,7 @@ pub mod diagnostic;
 mod error;
 mod file_meta_data;
 mod location;
+mod result;
 mod span;
 mod tx;
 
@@ -16,6 +17,7 @@ pub use diagnostic::Diagnostic;
 pub use error::*;
 pub use file_meta_data::*;
 pub use location::*;
+pub use result::*;
 pub use span::*;
 pub use tx::*;
 
@@ -67,7 +69,7 @@ pub trait Parser: Sized {
     where
         Self: Sized,
     {
-        let mut fork = cursor.clone();
+        let mut fork = cursor.fork();
         let value = Self::Item::parse(cursor, self)?;
         cursor.merge(fork.commit());
         Ok(value)
@@ -82,7 +84,7 @@ pub trait Parser: Sized {
     where
         Self: Sized,
     {
-        let mut fork = cursor.clone();
+        let mut fork = cursor.fork();
         let value = T::parse(&mut fork, self)?;
         cursor.merge(fork.commit());
         Ok(value)

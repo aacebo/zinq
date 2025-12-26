@@ -1,4 +1,4 @@
-use zinq_error::{Error, ZinqError};
+use zinq_error::{Error, ZinqError, ZinqErrorCode};
 
 use crate::Span;
 
@@ -55,3 +55,9 @@ impl std::ops::Deref for ParseError {
         &self.inner
     }
 }
+
+pub const EOF: ZinqErrorCode = ZinqErrorCode {
+    id: 10,
+    name: "EndOfFile",
+    description: "end of input stream.",
+};

@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek};
 
 macro_rules! define_keywords {
-    ($($token:literal pub struct $name:ident),*) => {
+    ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub enum Keyword {
             $($name($name),)*
@@ -20,6 +20,16 @@ macro_rules! define_keywords {
 
                 None
             }
+
+            $(
+                #[inline]
+                pub fn $is_method(&self) -> bool {
+                    match self {
+                        Self::$name(_) => true,
+                        _ => false,
+                    }
+                }
+            )*
         }
 
         impl zinq_parse::Peek<$crate::TokenParser> for Keyword {
@@ -62,6 +72,15 @@ macro_rules! define_keywords {
             }
         }
 
+        impl std::fmt::Display for Keyword {
+            #[inline]
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    $(Self::$name(v) => write!(f, "{}", v),)*
+                }
+            }
+        }
+
         $(
             #[doc = concat!('`', $token, '`')]
             #[derive(Debug, Clone, PartialEq, Eq)]
@@ -101,6 +120,13 @@ macro_rules! define_keywords {
                 }
             }
 
+            impl std::fmt::Display for $name {
+                #[inline]
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "{}", $token)
+                }
+            }
+
             impl From<$name> for $crate::Token {
                 #[inline]
                 fn from(value: $name) -> Self {
@@ -112,26 +138,51 @@ macro_rules! define_keywords {
 }
 
 define_keywords! {
-    "mod"       pub struct Mod,
-    "mut"       pub struct Mut,
-    "match"     pub struct Match,
-    "where"     pub struct Where,
-    "continue"  pub struct Continue,
-    "trait"     pub struct Trait,
-    "if"        pub struct If,
-    "else"      pub struct Else,
-    "for"       pub struct For,
-    "in"        pub struct In,
-    "as"        pub struct As,
-    "let"       pub struct Let,
-    "const"     pub struct Const,
-    "enum"      pub struct Enum,
-    "impl"      pub struct Impl,
-    "fn"        pub struct Fn,
-    "return"    pub struct Return,
-    "struct"    pub struct Struct,
-    "self"      pub struct SelfValue,
-    "Self"      pub struct SelfType,
-    "pub"       pub struct Pub,
-    "use"       pub struct Use
+    "mod",       pub struct Mod,        is_mod,
+    "mut",       pub struct Mut,        is_mut,
+    "match",     pub struct Match,      is_match,
+    "where",     pub struct Where,      is_where,
+    "continue",  pub struct Continue,   is_continue,
+    "trait",     pub struct Trait,      is_trait,
+    "if",        pub struct If,         is_if,
+    "else",      pub struct Else,       is_else,
+    "for",       pub struct For,        is_for,
+    "in",        pub struct In,         is_in,
+    "as",        pub struct As,         is_as,
+    "let",       pub struct Let,        is_let,
+    "const",     pub struct Const,      is_const,
+    "enum",      pub struct Enum,       is_enum,
+    "impl",      pub struct Impl,       is_impl,
+    "fn",        pub struct Fn,         is_fn,
+    "return",    pub struct Return,     is_return,
+    "struct",    pub struct Struct,     is_struct,
+    "self",      pub struct SelfValue,  is_self_type,
+    "Self",      pub struct SelfType,   is_self_value,
+    "pub",       pub struct Pub,        is_pub,
+    "use",       pub struct Use,        is_use
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_parse::Span;
+
+    use crate::Keyword;
+
+    #[test]
+    fn should_parse_mod() {
+        let span = Span::from_str("mod");
+        let mut token = Keyword::try_from_span(&span).expect("should have keyword");
+        
+        debug_assert!(token.is_mod());
+        debug_assert_eq!(token.to_string(), "mod");
+    }
+
+    #[test]
+    fn should_parse_pub() {
+        let span = Span::from_str("pub");
+        let mut token = Keyword::try_from_span(&span).expect("should have keyword");
+        
+        debug_assert!(token.is_pub());
+        debug_assert_eq!(token.to_string(), "pub");
+    }
 }
