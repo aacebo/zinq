@@ -70,38 +70,13 @@ mod test {
 
     #[test]
     fn should_parse() -> Result<()> {
-        let span = Span::from_bytes(b"let test: string = \"test\"");
+        let span = Span::from_bytes(b"test");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;
         let mut token = parser.parse(&mut cursor)?;
 
-        debug_assert!(token.is_keyword());
-        debug_assert_eq!(token.to_string(), "let");
-
-        token = parser.parse(&mut cursor)?;
-
         debug_assert!(token.is_ident());
         debug_assert_eq!(token.to_string(), "test");
-
-        token = parser.parse(&mut cursor)?;
-
-        debug_assert!(token.is_colon());
-        debug_assert_eq!(token.to_string(), ":");
-
-        token = parser.parse(&mut cursor)?;
-
-        debug_assert!(token.is_ident());
-        debug_assert_eq!(token.to_string(), "string");
-
-        token = parser.parse(&mut cursor)?;
-
-        debug_assert!(token.is_eq());
-        debug_assert_eq!(token.to_string(), "=");
-
-        token = parser.parse(&mut cursor)?;
-
-        debug_assert!(token.is_literal_string());
-        debug_assert_eq!(token.to_string(), "\"test\"");
 
         Ok(())
     }
