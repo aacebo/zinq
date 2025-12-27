@@ -65,7 +65,7 @@ mod test {
     use crate::{LString, TokenParser};
 
     #[test]
-    fn should_parse_string() -> Result<()> {
+    fn is_string() -> Result<()> {
         let span = Span::from_bytes(b"\"test\"");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;

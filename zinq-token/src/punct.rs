@@ -171,6 +171,7 @@ macro_rules! define_puncts {
                     let mut parser = TokenParser;
                     let token = parser.parse(&mut cursor)?;
 
+                    debug_assert!(token.is_punct());
                     debug_assert!(token.$is_method());
                     debug_assert_eq!(token.to_string(), $token);
 

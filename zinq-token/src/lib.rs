@@ -136,7 +136,7 @@ mod test {
     use crate::{Ident, TokenParser};
 
     #[test]
-    fn should_parse_assignment() -> Result<()> {
+    fn is_assignment() -> Result<()> {
         let span = Span::from_bytes(b"let test: string = \"test\";");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;

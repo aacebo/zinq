@@ -71,7 +71,7 @@ mod test {
     use crate::{LByte, TokenParser};
 
     #[test]
-    fn should_parse_byte() -> Result<()> {
+    fn is_byte() -> Result<()> {
         let span = Span::from_bytes(b"b'p'");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;
