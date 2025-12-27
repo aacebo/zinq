@@ -186,25 +186,32 @@ define_keywords! {
 
 #[cfg(test)]
 mod test {
-    use zinq_parse::Span;
+    use zinq_error::Result;
+    use zinq_parse::{Parser, Span};
 
-    use crate::Keyword;
+    use crate::{Keyword, TokenParser};
 
     #[test]
-    fn should_parse_mod() {
-        let span = Span::from_str("mod");
-        let mut token = Keyword::try_from_span(&span).expect("should have keyword");
+    fn should_parse_mod() -> Result<()> {
+        let mut cursor = Span::from_str("mod").cursor();
+        let mut parser = TokenParser;
+        let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_mod());
         debug_assert_eq!(token.to_string(), "mod");
+
+        Ok(())
     }
 
     #[test]
-    fn should_parse_pub() {
-        let span = Span::from_str("pub");
-        let mut token = Keyword::try_from_span(&span).expect("should have keyword");
+    fn should_parse_pub() -> Result<()> {
+        let mut cursor = Span::from_str("pub").cursor();
+        let mut parser = TokenParser;
+        let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_pub());
         debug_assert_eq!(token.to_string(), "pub");
+
+        Ok(())
     }
 }

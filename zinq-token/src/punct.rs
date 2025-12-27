@@ -209,13 +209,7 @@ mod test {
     fn should_parse_comma() -> Result<()> {
         let mut cursor = Span::from_str(",").cursor();
         let mut parser = TokenParser;
-        let token = match parser.parse(&mut cursor) {
-            Err(err) => {
-                println!("{:#?}", cursor);
-                return Err(err);
-            }
-            Ok(v) => v,
-        };
+        let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_comma());
         debug_assert_eq!(token.to_string(), ",");
