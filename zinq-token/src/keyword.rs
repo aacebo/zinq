@@ -156,6 +156,28 @@ macro_rules! define_keywords {
                 }
             }
         )*
+
+        #[cfg(test)]
+        mod test {
+            use zinq_error::Result;
+            use zinq_parse::{Cursor, Parser, Span};
+
+            use crate::TokenParser;
+
+            $(
+                #[test]
+                fn $is_method() -> Result<()> {
+                    let mut cursor = Span::from_str($token).cursor();
+                    let mut parser = TokenParser;
+                    let token = parser.parse(&mut cursor)?;
+
+                    debug_assert!(token.$is_method());
+                    debug_assert_eq!(token.to_string(), $token);
+
+                    Ok(())
+                }
+            )*
+        }
     };
 }
 
@@ -182,36 +204,4 @@ define_keywords! {
     "Self",      pub struct SelfType,   is_self_value,
     "pub",       pub struct Pub,        is_pub,
     "use",       pub struct Use,        is_use
-}
-
-#[cfg(test)]
-mod test {
-    use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
-
-    use crate::{Keyword, TokenParser};
-
-    #[test]
-    fn should_parse_mod() -> Result<()> {
-        let mut cursor = Span::from_str("mod").cursor();
-        let mut parser = TokenParser;
-        let token = parser.parse(&mut cursor)?;
-
-        debug_assert!(token.is_mod());
-        debug_assert_eq!(token.to_string(), "mod");
-
-        Ok(())
-    }
-
-    #[test]
-    fn should_parse_pub() -> Result<()> {
-        let mut cursor = Span::from_str("pub").cursor();
-        let mut parser = TokenParser;
-        let token = parser.parse(&mut cursor)?;
-
-        debug_assert!(token.is_pub());
-        debug_assert_eq!(token.to_string(), "pub");
-
-        Ok(())
-    }
 }
