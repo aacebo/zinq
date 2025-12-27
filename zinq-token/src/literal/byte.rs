@@ -31,8 +31,8 @@ impl Peek<TokenParser> for LByte {
 impl Parse<TokenParser> for LByte {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
-        cursor.next_while(|b, _| b != &b'\'');
-        cursor.next_n(3)?;
+        cursor.next_while(|b, _| b != &b'\'')?.next_n(3)?;
+
         Ok(Self {
             span: cursor.span().clone(),
         }
@@ -77,6 +77,6 @@ mod test {
 
         debug_assert!(token.is_literal_byte());
         debug_assert_eq!(token.to_string(), "b'p'");
-        debug_assert_eq!(cursor.span().bytes(), b"'");
+        debug_assert_eq!(cursor.bytes(), b"'");
     }
 }

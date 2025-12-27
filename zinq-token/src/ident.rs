@@ -44,7 +44,7 @@ impl Peek<TokenParser> for Ident {
 impl Parse<TokenParser> for Ident {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
-        let span = cursor.next_while(|b, _| b.is_ascii_alphanumeric());
+        let span = cursor.next_while(|b, _| b.is_ascii_alphanumeric())?.span();
 
         if let Some(keyword) = Keyword::try_from_span(span) {
             return Ok(keyword.into());

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use zinq_error::{Error, ZinqError, ZinqErrorCode};
 
 use crate::Span;
@@ -53,6 +55,12 @@ impl std::ops::Deref for ParseError {
     #[inline]
     fn deref(&self) -> &Self::Target {
         &self.inner
+    }
+}
+
+impl Into<ZinqError> for ParseError {
+    fn into(self) -> ZinqError {
+        ZinqError::Std(Rc::new(self))
     }
 }
 

@@ -35,8 +35,8 @@ impl TokenStream {
     }
 
     pub fn next(&mut self) -> Result<Token> {
-        if self.cursor.span().eof() {
-            return Err(self.cursor.error("End Of File").code(EOF).build().into());
+        if self.cursor.eof() {
+            return Err(self.cursor.error(EOF, "End Of File"));
         }
 
         let value = self.parser.parse(&mut self.cursor)?;

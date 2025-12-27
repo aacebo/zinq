@@ -4,8 +4,8 @@ mod string;
 pub use byte::*;
 pub use string::*;
 
-use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
+use zinq_error::{NOT_FOUND, Result};
+use zinq_parse::{Cursor, Parse, ParseError, Parser, Peek, Span};
 
 use crate::{Keyword, Token, TokenParser};
 
@@ -66,14 +66,26 @@ impl std::fmt::Display for Literal {
 impl Peek<TokenParser> for Literal {
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        todo!()
+        if parser.peek_as::<LByte>(cursor) {
+            return true;
+        }
+
+        parser.peek_as::<LString>(cursor)
     }
 }
 
 impl Parse<TokenParser> for Literal {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
-        todo!()
+        if parser.peek_as::<LByte>(cursor) {
+            return parser.parse_as::<LByte>(cursor);
+        }
+
+        if parser.peek_as::<LString>(cursor) {
+            return parser.parse_as::<LString>(cursor);
+        }
+
+        Err(cursor.error(NOT_FOUND, "not found"))
     }
 
     #[inline]

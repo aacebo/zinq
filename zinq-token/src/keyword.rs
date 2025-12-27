@@ -54,7 +54,7 @@ macro_rules! define_keywords {
                     }
                 )*
 
-                Err(cursor.error(&format!("unknown tokens '{}'", cursor.span())).build().into())
+                Err(cursor.error(zinq_error::NOT_FOUND, &format!("unknown tokens '{}'", cursor)))
             }
 
             #[inline]
@@ -99,7 +99,7 @@ macro_rules! define_keywords {
                 #[inline]
                 fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
                     if !(cursor.span() == &$token.as_bytes()) {
-                        return Err(cursor.error(&format!("expected '{}'", $token)).build().into());
+                        return Err(cursor.error(zinq_error::NOT_FOUND, &format!("expected '{}'", $token)));
                     }
 
                     Ok(Self {
