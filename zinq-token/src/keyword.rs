@@ -21,6 +21,13 @@ macro_rules! define_keywords {
                 None
             }
 
+            #[inline]
+            pub fn name(&self) -> &'static str {
+                match self {
+                    $(Self::$name(v) => v.name(),)*
+                }
+            }
+
             $(
                 #[inline]
                 pub fn $is_method(&self) -> bool {
@@ -34,14 +41,14 @@ macro_rules! define_keywords {
 
         impl zinq_parse::Peek<$crate::TokenParser> for Keyword {
             #[inline]
-            fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> bool {
+            fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> zinq_error::Result<bool> {
                 $(
-                    if parser.peek_as::<$name>(cursor) {
-                        return true;
+                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
+                        return Ok(true);
                     }
                 )*
 
-                false
+                Ok(false)
             }
         }
 
@@ -49,8 +56,8 @@ macro_rules! define_keywords {
             #[inline]
             fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
                 $(
-                    if parser.peek_as::<$name>(cursor) {
-                        return Ok(parser.parse_as::<$name>(cursor)?.clone().into());
+                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
+                        return parser.parse_as::<$name>(cursor);
                     }
                 )*
 
@@ -88,10 +95,16 @@ macro_rules! define_keywords {
                 span: zinq_parse::Span,
             }
 
+            impl $name {
+                pub fn name(&self) -> &'static str {
+                    stringify!($name)
+                }
+            }
+
             impl zinq_parse::Peek<$crate::TokenParser> for $name {
                 #[inline]
-                fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> bool {
-                    cursor.span() == &$token.as_bytes()
+                fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> zinq_error::Result<bool> {
+                    Ok(cursor.peek_n($token.len())? == $token.as_bytes())
                 }
             }
 
@@ -131,6 +144,15 @@ macro_rules! define_keywords {
                 #[inline]
                 fn from(value: $name) -> Self {
                     Self::Keyword(Keyword::$name(value))
+                }
+            }
+
+            impl $crate::Token {
+                pub fn $is_method(&self) -> bool {
+                    match self {
+                        Self::Keyword(keyword) => keyword.$is_method(),
+                        _ => false,
+                    }
                 }
             }
         )*

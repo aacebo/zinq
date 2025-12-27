@@ -16,6 +16,12 @@ pub struct Ident {
     span: Span,
 }
 
+impl Ident {
+    pub fn name(&self) -> &'static str {
+        "Ident"
+    }
+}
+
 impl From<Ident> for Token {
     #[inline]
     fn from(value: Ident) -> Self {
@@ -32,12 +38,8 @@ impl std::fmt::Display for Ident {
 
 impl Peek<TokenParser> for Ident {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        if let Some(b) = cursor.peek() {
-            return b.is_ascii_alphabetic();
-        }
-
-        false
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        Ok(cursor.peek()?.is_ascii_alphabetic())
     }
 }
 
@@ -56,5 +58,51 @@ impl Parse<TokenParser> for Ident {
     #[inline]
     fn span(&self) -> &Span {
         &self.span
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::{Parser, Span};
+
+    use crate::{Ident, TokenParser};
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let span = Span::from_bytes(b"let test: string = \"test\"");
+        let mut cursor = span.cursor();
+        let mut parser = TokenParser;
+        let mut token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_keyword());
+        debug_assert_eq!(token.to_string(), "let");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_ident());
+        debug_assert_eq!(token.to_string(), "test");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_colon());
+        debug_assert_eq!(token.to_string(), ":");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_ident());
+        debug_assert_eq!(token.to_string(), "string");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_eq());
+        debug_assert_eq!(token.to_string(), "=");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_literal_string());
+        debug_assert_eq!(token.to_string(), "\"test\"");
+
+        Ok(())
     }
 }

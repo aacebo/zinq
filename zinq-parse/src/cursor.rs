@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use zinq_error::{Error, Result, ZinqError, ZinqErrorCode};
 
 use crate::{
@@ -18,6 +20,15 @@ pub struct Cursor {
 
 impl Cursor {
     ///
+    /// ## tx
+    /// the transaction state
+    ///
+    #[inline]
+    pub fn tx(&self) -> &Tx<Span> {
+        &self.changes
+    }
+
+    ///
     /// ## fork
     /// fork the cursor, i.e. clone the cursor
     /// without cloning the existing diagnostics.
@@ -25,7 +36,7 @@ impl Cursor {
     #[inline]
     pub fn fork(&self) -> Self {
         Self {
-            changes: self.changes.clone(),
+            changes: Tx::new(self.span().clone()),
             diagnostics: vec![],
         }
     }
@@ -44,8 +55,8 @@ impl Cursor {
     /// peek at the next byte
     ///
     #[inline]
-    pub fn peek(&self) -> Option<&u8> {
-        self.peek_n(1).first()
+    pub fn peek(&self) -> Result<&u8> {
+        Ok(self.peek_n(1)?.first().expect("expected at least one byte"))
     }
 
     ///
@@ -53,9 +64,14 @@ impl Cursor {
     /// peek n indices ahead of the current position
     ///
     #[inline]
-    pub fn peek_n(&self, n: usize) -> &[u8] {
+    pub fn peek_n(&self, n: usize) -> Result<&[u8]> {
         let end = self.span().end().index();
-        &self.span().src()[end + 1..end + n + 1]
+
+        if end + n > self.src().len() {
+            return Err(self.error(EOF, "end of input stream"));
+        }
+
+        Ok(&self.span().src()[end..end + n])
     }
 
     ///
@@ -63,8 +79,12 @@ impl Cursor {
     /// peek at an item by its index
     ///
     #[inline]
-    pub fn peek_at(&self, index: usize) -> Option<&u8> {
-        self.span().src().get(index)
+    pub fn peek_at(&self, index: usize) -> Result<&u8> {
+        if index > self.span().src().len() - 1 {
+            return Err(self.error(EOF, "end of input stream"));
+        }
+
+        Ok(self.span().src().index(index))
     }
 
     ///
@@ -73,12 +93,19 @@ impl Cursor {
     /// backwards 1
     ///
     #[inline]
-    pub fn shift_back(&mut self) -> &mut Self {
+    pub fn shift_back(&mut self) -> Result<&mut Self> {
         let mut span = self.span().clone();
-        span.start_mut().back(self.span().src());
-        span.end_mut().back(self.span().src());
+
+        if !span.start_mut().back(self.span().src()) {
+            return Err(self.error(EOF, "end of input stream"));
+        }
+
+        if !span.end_mut().back(self.span().src()) {
+            return Err(self.error(EOF, "end of input stream"));
+        }
+
         self.changes.next(span);
-        self
+        Ok(self)
     }
 
     ///
@@ -87,12 +114,19 @@ impl Cursor {
     /// forward 1
     ///
     #[inline]
-    pub fn shift_next(&mut self) -> &mut Self {
+    pub fn shift_next(&mut self) -> Result<&mut Self> {
         let mut span = self.span().clone();
-        span.start_mut().next(self.span().src());
-        span.end_mut().next(self.span().src());
+
+        if !span.start_mut().next(self.span().src()) {
+            return Err(self.error(EOF, "end of input stream"));
+        }
+
+        if !span.end_mut().next(self.span().src()) {
+            return Err(self.error(EOF, "end of input stream"));
+        }
+
         self.changes.next(span);
-        self
+        Ok(self)
     }
 
     ///
@@ -102,7 +136,7 @@ impl Cursor {
     #[inline]
     pub fn back(&mut self) -> Result<&mut Self> {
         if self.span().sof() {
-            return Err(Error::new().code(EOF).build().into());
+            return Err(self.error(EOF, "end of input stream"));
         }
 
         let mut span = self.span().clone();
@@ -118,7 +152,7 @@ impl Cursor {
     #[inline]
     pub fn next(&mut self) -> Result<&mut Self> {
         if self.span().eof() {
-            return Err(Error::new().code(EOF).build().into());
+            return Err(self.error(EOF, "end of input stream"));
         }
 
         let mut span = self.span().clone();
@@ -148,7 +182,7 @@ impl Cursor {
     ///
     #[inline]
     pub fn next_if<P: FnOnce(&u8, &Span) -> bool>(&mut self, predicate: P) -> Result<&mut Self> {
-        if predicate(self.span().last(), self.span()) {
+        if predicate(self.peek()?, self.span()) {
             return self.next();
         }
 
@@ -165,7 +199,7 @@ impl Cursor {
     pub fn next_while<P: Fn(&u8, &Span) -> bool>(&mut self, predicate: P) -> Result<&mut Self> {
         let mut fork = self.clone();
 
-        while let Some(byte) = fork.peek() {
+        while let Ok(byte) = fork.peek() {
             if !predicate(byte, fork.span()) {
                 break;
             }
@@ -196,12 +230,16 @@ impl Cursor {
     ///
     #[inline]
     pub fn merge(&mut self, other: &Self) -> &mut Self {
-        self.changes.next(other.span().clone());
-        self.diagnostics.push(
-            Diagnostic::noop(self.span().clone())
-                .children(&other.diagnostics)
-                .build(),
-        );
+        self.changes.append(other.tx().clone());
+
+        if !other.diagnostics.is_empty() {
+            self.diagnostics.push(
+                Diagnostic::noop(self.span().clone())
+                    .children(&other.diagnostics)
+                    .build(),
+            );
+        }
+
         self
     }
 
@@ -211,7 +249,7 @@ impl Cursor {
     /// at the current parser location
     ///
     #[inline]
-    pub fn error(&mut self, code: ZinqErrorCode, message: &str) -> ZinqError {
+    pub fn error(&self, code: ZinqErrorCode, message: &str) -> ZinqError {
         ParseError::from_error(
             self.span().clone(),
             Error::new().code(code).message(message).build().into(),
@@ -299,13 +337,13 @@ mod test {
         let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
 
-        debug_assert_eq!(cursor.bytes(), b"h");
+        debug_assert_eq!(cursor.next()?.bytes(), b"h");
         debug_assert_eq!(cursor.next()?.last(), &b'i');
         debug_assert_eq!(cursor.bytes(), b"hi");
 
-        debug_assert_eq!(cursor.peek(), Some(&b'\n'));
+        debug_assert_eq!(cursor.peek()?, &b'\n');
         debug_assert_eq!(cursor.bytes(), b"hi");
-        debug_assert_eq!(cursor.peek_at(8), Some(&b'a'));
+        debug_assert_eq!(cursor.peek_at(8)?, &b'a');
         debug_assert_eq!(cursor.bytes(), b"hi");
 
         Ok(())
@@ -317,14 +355,14 @@ mod test {
         let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
 
-        debug_assert_eq!(cursor.bytes(), b"h");
+        debug_assert_eq!(cursor.next()?.bytes(), b"h");
         debug_assert_eq!(cursor.next()?.last(), &b'i');
         debug_assert_eq!(cursor.bytes(), b"hi");
 
-        debug_assert_eq!(cursor.shift_next().bytes(), b"i\n");
+        debug_assert_eq!(cursor.shift_next()?.bytes(), b"i\n");
         debug_assert_eq!(cursor.bytes(), b"i\n");
 
-        debug_assert_eq!(cursor.shift_back().bytes(), b"hi");
+        debug_assert_eq!(cursor.shift_back()?.bytes(), b"hi");
         debug_assert_eq!(cursor.bytes(), b"hi");
 
         Ok(())
@@ -335,31 +373,33 @@ mod test {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
         let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
-        let mut fork = cursor.fork();
+        let mut fork = cursor.next()?.fork();
 
         fork.next_while(|b, _| b != &b'n')?;
 
         debug_assert_eq!(fork.bytes(), b"hi\nmy\n\n");
         debug_assert_eq!(cursor.bytes(), b"h");
 
-        cursor.merge(&fork.commit());
+        cursor.merge(fork.commit());
 
-        debug_assert_eq!(cursor.bytes(), b"\n");
-        debug_assert_eq!(fork.span().bytes(), b"\n");
+        debug_assert_eq!(cursor.next()?.bytes(), b"n");
+        debug_assert_eq!(fork.span().bytes(), b"");
 
         Ok(())
     }
 
     #[test]
-    fn should_advance_by_n() {
+    fn should_advance_by_n() -> Result<()> {
         let bytes = Bytes::from(b"b'\n'");
         let span = Span::from_bytes(&bytes);
         let mut cursor = span.cursor();
 
-        debug_assert_eq!(cursor.bytes(), b"b");
+        debug_assert_eq!(cursor.next()?.bytes(), b"b");
 
         cursor.next_n(2).expect("should not error");
 
         debug_assert_eq!(cursor.bytes(), b"b'\n");
+
+        Ok(())
     }
 }

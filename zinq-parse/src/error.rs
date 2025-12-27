@@ -66,6 +66,6 @@ impl Into<ZinqError> for ParseError {
 
 pub const EOF: ZinqErrorCode = ZinqErrorCode {
     id: 10,
-    name: "EndOfFile",
+    name: "EOF",
     description: "end of input stream.",
 };

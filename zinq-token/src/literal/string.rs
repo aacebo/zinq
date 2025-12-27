@@ -8,6 +8,12 @@ pub struct LString {
     span: Span,
 }
 
+impl LString {
+    pub fn name(&self) -> &'static str {
+        "LString"
+    }
+}
+
 impl std::fmt::Display for LString {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -17,8 +23,8 @@ impl std::fmt::Display for LString {
 
 impl Peek<TokenParser> for LString {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        cursor.last() == &b'"'
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        Ok(cursor.peek()? == &b'"')
     }
 }
 
@@ -64,13 +70,13 @@ mod test {
         let mut cursor = span.cursor();
         let mut parser = TokenParser;
 
-        debug_assert!(LString::peek(&mut cursor, &mut parser));
+        debug_assert!(parser.peek_as::<LString>(&cursor)?);
 
         let token = parser.parse_as::<LString>(&mut cursor)?;
 
         debug_assert!(token.is_literal_string());
         debug_assert_eq!(token.to_string(), "\"test\"");
-        debug_assert_eq!(cursor.bytes(), b"\"");
+        debug_assert_eq!(cursor.bytes(), b"");
 
         Ok(())
     }

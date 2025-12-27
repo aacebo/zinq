@@ -28,7 +28,7 @@ impl Bytes {
 
     #[inline]
     pub fn last(&self) -> Location {
-        self.at(self.len() - 1)
+        self.at(self.len())
     }
 
     #[inline]
@@ -100,7 +100,7 @@ mod test {
 
         debug_assert_eq!(bytes.len(), 23);
         debug_assert_eq!(bytes.first(), Location::new(0, &bytes));
-        debug_assert_eq!(bytes.last(), Location::new(bytes.len() - 1, &bytes));
+        debug_assert_eq!(bytes.last(), Location::new(bytes.len(), &bytes));
     }
 
     #[test]

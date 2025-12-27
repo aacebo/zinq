@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{backtrace::Backtrace, rc::Rc};
 
 use crate::{ErrorBuilder, StdError, ZinqError, ZinqErrorCode};
 
@@ -13,6 +13,7 @@ pub struct Error {
     pub code: ZinqErrorCode,
     pub message: Option<String>,
     pub source: Option<Rc<dyn StdError>>,
+    pub backtrace: Option<Rc<Backtrace>>,
     pub children: Vec<ZinqError>,
 }
 

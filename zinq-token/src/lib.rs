@@ -17,7 +17,7 @@ pub use punct::*;
 pub use stream::*;
 
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, Peek, Span};
+use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
@@ -63,6 +63,16 @@ impl Token {
             _ => false,
         }
     }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Group(v) => v.name(),
+            Self::Ident(v) => v.name(),
+            Self::Keyword(v) => v.name(),
+            Self::Literal(v) => v.name(),
+            Self::Punct(v) => v.name(),
+        }
+    }
 }
 
 impl std::fmt::Display for Token {
@@ -79,27 +89,27 @@ impl std::fmt::Display for Token {
 
 impl Peek<TokenParser> for Token {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        true
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        Ok(true)
     }
 }
 
 impl Parse<TokenParser> for Token {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
-        if cursor.last().is_ascii_whitespace() {
-            return Self::parse(cursor, parser);
+        if cursor.peek()?.is_ascii_whitespace() {
+            return parser.parse(cursor.shift_next()?);
         }
 
-        if Group::peek(cursor, parser) {
+        if Group::peek(cursor, parser)? {
             return Group::parse(cursor, parser);
         }
 
-        if Punct::peek(cursor, parser) {
-            return Punct::parse(cursor, parser);
+        if Punct::peek(cursor, parser)? {
+            return parser.parse_as::<Punct>(cursor);
         }
 
-        if Literal::peek(cursor, parser) {
+        if Literal::peek(cursor, parser)? {
             return Literal::parse(cursor, parser);
         }
 

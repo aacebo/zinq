@@ -91,11 +91,16 @@ impl Location {
     ///
     #[inline]
     pub fn next(&mut self, bytes: &[u8]) -> bool {
-        if self.index + 1 > bytes.len() - 1 {
+        if self.index + 1 > bytes.len() {
             return false;
         }
 
         self.index += 1;
+
+        if self.index == bytes.len() {
+            return true;
+        }
+
         self.column += 1;
 
         if bytes.index(self.index) == &b'\n' {

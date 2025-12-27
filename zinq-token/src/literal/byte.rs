@@ -14,6 +14,12 @@ pub struct LByte {
     span: Span,
 }
 
+impl LByte {
+    pub fn name(&self) -> &'static str {
+        "LByte"
+    }
+}
+
 impl std::fmt::Display for LByte {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -23,8 +29,8 @@ impl std::fmt::Display for LByte {
 
 impl Peek<TokenParser> for LByte {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        cursor.last() == &b'b' && cursor.peek().unwrap_or(&0) == &b'\''
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        Ok(cursor.peek_n(2)? == b"b'")
     }
 }
 
@@ -59,24 +65,23 @@ impl From<LByte> for Token {
 
 #[cfg(test)]
 mod test {
+    use zinq_error::Result;
     use zinq_parse::{Parse, Parser, Peek, Span};
 
     use crate::{LByte, TokenParser};
 
     #[test]
-    fn should_parse_byte() {
+    fn should_parse_byte() -> Result<()> {
         let span = Span::from_bytes(b"b'p'");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;
 
-        debug_assert!(LByte::peek(&mut cursor, &mut parser));
-
-        let token = parser
-            .parse_as::<LByte>(&mut cursor)
-            .expect("should not error");
+        let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_literal_byte());
         debug_assert_eq!(token.to_string(), "b'p'");
-        debug_assert_eq!(cursor.bytes(), b"'");
+        debug_assert_eq!(cursor.bytes(), b"");
+
+        Ok(())
     }
 }

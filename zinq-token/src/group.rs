@@ -10,10 +10,17 @@ use crate::{Keyword, Token, TokenParser};
 /// - (...)
 /// - {...}
 /// - [...]
+/// - <...>
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Group {
     span: Span,
+}
+
+impl Group {
+    pub fn name(&self) -> &'static str {
+        "Group"
+    }
 }
 
 impl From<Group> for Token {
@@ -32,10 +39,10 @@ impl std::fmt::Display for Group {
 
 impl Peek<TokenParser> for Group {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        match cursor.last() {
-            b'(' | b'[' | b'{' => true,
-            _ => false,
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        match cursor.peek()? {
+            b'(' | b'[' | b'{' => Ok(true),
+            _ => Ok(false),
         }
     }
 }

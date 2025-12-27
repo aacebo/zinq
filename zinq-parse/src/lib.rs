@@ -28,7 +28,7 @@ use zinq_error::Result;
 /// implementers can be peeked by `Parser`
 ///
 pub trait Peek<P: Parser> {
-    fn peek(cursor: &Cursor, parser: &P) -> bool;
+    fn peek(cursor: &Cursor, parser: &P) -> Result<bool>;
 }
 
 ///
@@ -53,7 +53,7 @@ pub trait Parser: Sized {
     /// parse a type
     ///
     #[inline]
-    fn peek_as<T: Peek<Self>>(&self, cursor: &Cursor) -> bool
+    fn peek_as<T: Peek<Self>>(&self, cursor: &Cursor) -> Result<bool>
     where
         Self: Sized,
     {
@@ -70,7 +70,7 @@ pub trait Parser: Sized {
         Self: Sized,
     {
         let mut fork = cursor.fork();
-        let value = Self::Item::parse(cursor, self)?;
+        let value = Self::Item::parse(&mut fork, self)?;
         cursor.merge(fork.commit());
         Ok(value)
     }

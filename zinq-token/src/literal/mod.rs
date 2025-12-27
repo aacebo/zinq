@@ -33,6 +33,13 @@ impl Literal {
             _ => false,
         }
     }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Byte(v) => v.name(),
+            Self::String(v) => v.name(),
+        }
+    }
 }
 
 impl Token {
@@ -65,9 +72,9 @@ impl std::fmt::Display for Literal {
 
 impl Peek<TokenParser> for Literal {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> bool {
-        if parser.peek_as::<LByte>(cursor) {
-            return true;
+    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        if parser.peek_as::<LByte>(cursor)? {
+            return Ok(true);
         }
 
         parser.peek_as::<LString>(cursor)
@@ -77,11 +84,11 @@ impl Peek<TokenParser> for Literal {
 impl Parse<TokenParser> for Literal {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
-        if parser.peek_as::<LByte>(cursor) {
+        if parser.peek_as::<LByte>(cursor)? {
             return parser.parse_as::<LByte>(cursor);
         }
 
-        if parser.peek_as::<LString>(cursor) {
+        if parser.peek_as::<LString>(cursor)? {
             return parser.parse_as::<LString>(cursor);
         }
 

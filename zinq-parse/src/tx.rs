@@ -3,8 +3,6 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-use zinq_error::Result;
-
 use crate::{
     Commit,
     delta::{self, Delta},
@@ -105,6 +103,15 @@ where
     }
 
     ///
+    /// ## append
+    /// append the commits from one tx to another
+    ///
+    #[inline]
+    pub fn append(&mut self, mut tx: Self) {
+        self.commits.append(&mut tx.commits);
+    }
+
+    ///
     /// ## revert
     /// revert back to the state of the commit
     /// before our current commit
@@ -131,25 +138,6 @@ where
         Self {
             id: self.id,
             commits: vec![first, last],
-        }
-    }
-
-    ///
-    /// ## run
-    /// runs your handler and, if successful, adds a new commit
-    /// to the transaction
-    ///
-    #[inline]
-    pub fn run<Handler: FnOnce() -> Result<T>>(&mut self, handler: Handler) -> Result<&Commit<T>> {
-        match handler() {
-            Err(err) => Err(err),
-            Ok(v) => {
-                self.commits.push(Commit::from(v));
-                Ok(self
-                    .commits
-                    .last()
-                    .expect("expected at least one commit to be in transaction"))
-            }
         }
     }
 }

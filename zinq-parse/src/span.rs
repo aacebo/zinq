@@ -87,7 +87,11 @@ impl Span {
 
     #[inline]
     pub fn last(&self) -> &u8 {
-        self.bytes.index(self.end.index())
+        if self.sof() {
+            return &0;
+        }
+
+        self.bytes.index(self.end.index() - 1)
     }
 
     #[inline]
@@ -102,17 +106,17 @@ impl Span {
 
     #[inline]
     pub fn eof(&self) -> bool {
-        self.end.index() == self.bytes.len() - 1
+        self.end.index() == self.bytes.len()
     }
 
     #[inline]
     pub fn len(&self) -> usize {
-        (self.end.index() + 1) - self.start.index()
+        self.end.index() - self.start.index()
     }
 
     #[inline]
     pub fn bytes(&self) -> &[u8] {
-        &self.bytes[self.start.index()..self.end.index() + 1]
+        &self.bytes[self.start.index()..self.end.index()]
     }
 
     #[inline]
@@ -187,7 +191,7 @@ mod test {
     #[test]
     fn should_create_sub_span() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
-        let span = Span::from_bytes(&bytes).slice(7, 10);
+        let span = Span::from_bytes(&bytes).slice(7, 11);
 
         debug_assert_eq!(span.bytes(), b"name");
         debug_assert!(!span.eof());
@@ -198,8 +202,8 @@ mod test {
     fn should_create_delta() {
         let bytes = Bytes::from(b"hi\nmy\n\nname\n\n\nis\n\n\n\nbob");
         let span = Span::from_bytes(&bytes);
-        let a = span.slice(3, 4);
-        let b = span.slice(4, 7);
+        let a = span.slice(3, 5);
+        let b = span.slice(4, 8);
 
         debug_assert_eq!(a.bytes(), b"my");
         debug_assert_eq!(b.bytes(), b"y\n\nn");

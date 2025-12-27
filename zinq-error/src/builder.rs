@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{backtrace::Backtrace, rc::Rc};
 
 use crate::{Error, StdError, ZinqError, ZinqErrorCode};
 
@@ -36,10 +36,13 @@ impl ErrorBuilder {
     }
 
     pub fn build(self) -> Error {
+        let backtrace = Backtrace::force_capture();
+
         Error {
             code: self.code.expect("expected code"),
             message: self.message,
             source: self.source,
+            backtrace: Some(Rc::new(backtrace)),
             children: self.children,
         }
     }

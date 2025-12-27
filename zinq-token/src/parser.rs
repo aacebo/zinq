@@ -8,7 +8,7 @@ pub struct TokenParser;
 
 impl TokenParser {
     #[inline]
-    pub fn is_group(&self, cursor: &Cursor) -> bool {
+    pub fn is_group(&self, cursor: &Cursor) -> Result<bool> {
         self.peek_as::<Group>(cursor)
     }
 
@@ -18,7 +18,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn is_punct(&self, cursor: &Cursor) -> bool {
+    pub fn is_punct(&self, cursor: &Cursor) -> Result<bool> {
         self.peek_as::<Punct>(cursor)
     }
 
@@ -28,7 +28,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn is_literal(&self, cursor: &Cursor) -> bool {
+    pub fn is_literal(&self, cursor: &Cursor) -> Result<bool> {
         self.peek_as::<Literal>(cursor)
     }
 
@@ -38,7 +38,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn is_keyword(&self, cursor: &Cursor) -> bool {
+    pub fn is_keyword(&self, cursor: &Cursor) -> Result<bool> {
         self.peek_as::<Keyword>(cursor)
     }
 
@@ -48,7 +48,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn is_ident(&self, cursor: &Cursor) -> bool {
+    pub fn is_ident(&self, cursor: &Cursor) -> Result<bool> {
         self.peek_as::<Ident>(cursor)
     }
 
