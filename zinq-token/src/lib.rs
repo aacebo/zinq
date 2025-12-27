@@ -101,19 +101,19 @@ impl Parse<TokenParser> for Token {
             return parser.parse(cursor.shift_next()?);
         }
 
-        if Group::peek(cursor, parser)? {
-            return Group::parse(cursor, parser);
+        if parser.peek_as::<Group>(cursor)? {
+            return parser.parse_as::<Group>(cursor);
         }
 
-        if Punct::peek(cursor, parser)? {
+        if parser.peek_as::<Punct>(cursor)? {
             return parser.parse_as::<Punct>(cursor);
         }
 
-        if Literal::peek(cursor, parser)? {
-            return Literal::parse(cursor, parser);
+        if parser.peek_as::<Literal>(cursor)? {
+            return parser.parse_as::<Literal>(cursor);
         }
 
-        Ident::parse(cursor, parser)
+        parser.parse_as::<Ident>(cursor)
     }
 
     #[inline]
