@@ -1,4 +1,5 @@
 mod delimiter;
+mod error;
 mod ident;
 mod keyword;
 mod literal;
@@ -7,6 +8,7 @@ mod punct;
 mod stream;
 
 pub use delimiter::*;
+pub use error::*;
 pub use ident::*;
 pub use keyword::*;
 pub use literal::*;
@@ -34,6 +36,18 @@ impl Token {
         }
     }
 
+    pub fn try_to_punct(&self) -> Result<&Punct> {
+        match self {
+            Self::Punct(v) => Ok(v),
+            other => Err(TokenExpectedError::from(
+                b"Punct",
+                other.name().as_bytes(),
+                other.span().clone(),
+            )
+            .into()),
+        }
+    }
+
     pub fn is_literal(&self) -> bool {
         match self {
             Self::Literal(_) => true,
@@ -52,6 +66,18 @@ impl Token {
         match self {
             Self::Ident(_) => true,
             _ => false,
+        }
+    }
+
+    pub fn try_to_ident(&self) -> Result<&Ident> {
+        match self {
+            Self::Ident(v) => Ok(v),
+            other => Err(TokenExpectedError::from(
+                b"Ident",
+                other.name().as_bytes(),
+                other.span().clone(),
+            )
+            .into()),
         }
     }
 
