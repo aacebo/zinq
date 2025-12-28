@@ -14,6 +14,42 @@ impl TokenStream {
     }
 }
 
+impl TryFrom<&[u8]> for TokenStream {
+    type Error = ZinqError;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let mut parser = TokenParser;
+        let span = Span::from_bytes(value);
+        let mut cursor = span.cursor();
+        let mut tokens = vec![];
+
+        while !cursor.eof() {
+            let token = parser.parse(&mut cursor)?;
+            tokens.push(token);
+        }
+
+        Ok(Self(tokens))
+    }
+}
+
+impl<const N: usize> TryFrom<&[u8; N]> for TokenStream {
+    type Error = ZinqError;
+
+    fn try_from(value: &[u8; N]) -> Result<Self, Self::Error> {
+        let mut parser = TokenParser;
+        let span = Span::from_bytes(value);
+        let mut cursor = span.cursor();
+        let mut tokens = vec![];
+
+        while !cursor.eof() {
+            let token = parser.parse(&mut cursor)?;
+            tokens.push(token);
+        }
+
+        Ok(Self(tokens))
+    }
+}
+
 impl FromStr for TokenStream {
     type Err = ZinqError;
 
@@ -130,6 +166,15 @@ mod test {
             "lettest:string=\"test\";println(\"hello world\");"
         );
 
+        Ok(())
+    }
+
+    #[test]
+    fn should_check_equality() -> Result<()> {
+        let a = TokenStream::from_str("\n\nlet a = b'a'")?;
+        let b = TokenStream::try_from(b"let a = b'a'")?;
+
+        debug_assert_eq!(a.to_string(), b.to_string());
         Ok(())
     }
 }
