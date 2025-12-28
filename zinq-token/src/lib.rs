@@ -1,6 +1,4 @@
-#![allow(unused)]
-
-mod group;
+mod delimiter;
 mod ident;
 mod keyword;
 mod literal;
@@ -8,7 +6,7 @@ mod parser;
 mod punct;
 mod stream;
 
-pub use group::*;
+pub use delimiter::*;
 pub use ident::*;
 pub use keyword::*;
 pub use literal::*;
@@ -21,21 +19,14 @@ use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
-    Group(Group),
     Punct(Punct),
     Literal(Literal),
     Keyword(Keyword),
     Ident(Ident),
+    Delim(Delim),
 }
 
 impl Token {
-    pub fn is_group(&self) -> bool {
-        match self {
-            Self::Group(_) => true,
-            _ => false,
-        }
-    }
-
     pub fn is_punct(&self) -> bool {
         match self {
             Self::Punct(_) => true,
@@ -64,13 +55,20 @@ impl Token {
         }
     }
 
+    pub fn is_delim(&self) -> bool {
+        match self {
+            Self::Delim(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn name(&self) -> &'static str {
         match self {
-            Self::Group(v) => v.name(),
             Self::Ident(v) => v.name(),
             Self::Keyword(v) => v.name(),
             Self::Literal(v) => v.name(),
             Self::Punct(v) => v.name(),
+            Self::Delim(v) => v.name(),
         }
     }
 }
@@ -78,16 +76,17 @@ impl Token {
 impl std::fmt::Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Group(v) => write!(f, "{}", v),
             Self::Ident(v) => write!(f, "{}", v),
             Self::Keyword(v) => write!(f, "{}", v),
             Self::Literal(v) => write!(f, "{}", v),
             Self::Punct(v) => write!(f, "{}", v),
+            Self::Delim(v) => write!(f, "{}", v),
         }
     }
 }
 
 impl Peek<TokenParser> for Token {
+    #[allow(unused)]
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
         Ok(true)
@@ -101,12 +100,12 @@ impl Parse<TokenParser> for Token {
             return parser.parse(cursor.shift_next()?);
         }
 
-        if parser.peek_as::<Group>(cursor)? {
-            return parser.parse_as::<Group>(cursor);
-        }
-
         if parser.peek_as::<Punct>(cursor)? {
             return parser.parse_as::<Punct>(cursor);
+        }
+
+        if parser.peek_as::<Delim>(cursor)? {
+            return parser.parse_as::<Delim>(cursor);
         }
 
         if parser.peek_as::<Literal>(cursor)? {
@@ -119,11 +118,11 @@ impl Parse<TokenParser> for Token {
     #[inline]
     fn span(&self) -> &Span {
         match self {
-            Self::Group(v) => v.span(),
             Self::Punct(v) => v.span(),
             Self::Literal(v) => v.span(),
             Self::Keyword(v) => v.span(),
             Self::Ident(v) => v.span(),
+            Self::Delim(v) => v.span(),
         }
     }
 }
@@ -133,7 +132,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{Ident, TokenParser};
+    use crate::TokenParser;
 
     #[test]
     fn is_assignment() -> Result<()> {

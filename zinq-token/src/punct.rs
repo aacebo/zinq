@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::Parser;
 
 macro_rules! define_puncts {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
@@ -103,14 +103,14 @@ macro_rules! define_puncts {
 
             impl zinq_parse::Peek<$crate::TokenParser> for $name {
                 #[inline]
-                fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> zinq_error::Result<bool> {
+                fn peek(cursor: &zinq_parse::Cursor, _: &$crate::TokenParser) -> zinq_error::Result<bool> {
                     Ok(cursor.peek_n($token.len())? == $token.as_bytes())
                 }
             }
 
             impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
-                fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
+                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
                     if !(cursor.next_n($token.len())?.span() == &$token.as_bytes()) {
                         return Err(cursor.error(zinq_error::NOT_FOUND, &format!("expected '{}'", $token)));
                     }
@@ -160,7 +160,7 @@ macro_rules! define_puncts {
         #[cfg(test)]
         mod test {
             use zinq_error::Result;
-            use zinq_parse::{Cursor, Parser, Span};
+            use zinq_parse::{Parser, Span};
 
             use crate::TokenParser;
 

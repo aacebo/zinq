@@ -2,7 +2,7 @@ use std::ops::Index;
 
 use zinq_error::Result;
 
-use zinq_parse::{Cursor, EOF, Parse, ParseResult, Parser, Span};
+use zinq_parse::{Cursor, EOF, Parser, Span};
 
 use crate::{Token, TokenParser};
 

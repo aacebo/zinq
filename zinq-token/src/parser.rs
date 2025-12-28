@@ -1,22 +1,12 @@
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, Parser, Tx};
+use zinq_parse::{Cursor, Parser};
 
-use crate::{Group, Ident, Keyword, Literal, Punct, Token, TokenStream};
+use crate::{Delim, Ident, Keyword, Literal, Punct, Token};
 
 #[derive(Debug, Clone)]
 pub struct TokenParser;
 
 impl TokenParser {
-    #[inline]
-    pub fn is_group(&self, cursor: &Cursor) -> Result<bool> {
-        self.peek_as::<Group>(cursor)
-    }
-
-    #[inline]
-    pub fn group(&mut self, cursor: &mut Cursor) -> Result<Token> {
-        self.parse_as::<Group>(cursor)
-    }
-
     #[inline]
     pub fn is_punct(&self, cursor: &Cursor) -> Result<bool> {
         self.peek_as::<Punct>(cursor)
@@ -55,6 +45,16 @@ impl TokenParser {
     #[inline]
     pub fn ident(&mut self, cursor: &mut Cursor) -> Result<Token> {
         self.parse_as::<Ident>(cursor)
+    }
+
+    #[inline]
+    pub fn is_delim(&self, cursor: &Cursor) -> Result<bool> {
+        self.peek_as::<Delim>(cursor)
+    }
+
+    #[inline]
+    pub fn delim(&mut self, cursor: &mut Cursor) -> Result<Token> {
+        self.parse_as::<Delim>(cursor)
     }
 }
 

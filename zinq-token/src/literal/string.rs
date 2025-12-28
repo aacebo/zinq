@@ -23,14 +23,14 @@ impl std::fmt::Display for LString {
 
 impl Peek<TokenParser> for LString {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
         Ok(cursor.peek()? == &b'"')
     }
 }
 
 impl Parse<TokenParser> for LString {
     #[inline]
-    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
         cursor.next()?.next_while(|next, _| next != &b'"')?.next()?;
 
         Ok(Self {
@@ -60,7 +60,7 @@ impl From<LString> for Token {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parse, Parser, Peek, Span};
+    use zinq_parse::{Parser, Span};
 
     use crate::{LString, TokenParser};
 

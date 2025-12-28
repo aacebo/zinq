@@ -1,5 +1,5 @@
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
+use zinq_parse::{Cursor, Parse, Peek, Span};
 
 use crate::{Keyword, Token, TokenParser};
 
@@ -38,14 +38,14 @@ impl std::fmt::Display for Ident {
 
 impl Peek<TokenParser> for Ident {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
         Ok(cursor.peek()?.is_ascii_alphabetic())
     }
 }
 
 impl Parse<TokenParser> for Ident {
     #[inline]
-    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
         let span = cursor.next_while(|b, _| b.is_ascii_alphanumeric())?.span();
 
         if let Some(keyword) = Keyword::try_from_span(span) {
@@ -66,14 +66,14 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{Ident, TokenParser};
+    use crate::TokenParser;
 
     #[test]
     fn should_parse() -> Result<()> {
         let span = Span::from_bytes(b"test");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;
-        let mut token = parser.parse(&mut cursor)?;
+        let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_ident());
         debug_assert_eq!(token.to_string(), "test");

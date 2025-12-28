@@ -1,13 +1,13 @@
 use zinq_parse::Parser;
 
-macro_rules! define_keywords {
+macro_rules! define_open_delimiters {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub enum Keyword {
+        pub enum OpenDelim {
             $($name($name),)*
         }
 
-        impl Keyword {
+        impl OpenDelim {
             #[inline]
             pub fn try_from_span(span: &zinq_parse::Span) -> Option<Self> {
                 $(
@@ -39,11 +39,11 @@ macro_rules! define_keywords {
             )*
         }
 
-        impl zinq_parse::Peek<$crate::TokenParser> for Keyword {
+        impl zinq_parse::Peek<$crate::TokenParser> for OpenDelim {
             #[inline]
             fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> zinq_error::Result<bool> {
                 $(
-                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
+                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok == true {
                         return Ok(true);
                     }
                 )*
@@ -52,7 +52,7 @@ macro_rules! define_keywords {
             }
         }
 
-        impl zinq_parse::Parse<$crate::TokenParser> for Keyword {
+        impl zinq_parse::Parse<$crate::TokenParser> for OpenDelim {
             #[inline]
             fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
                 $(
@@ -72,14 +72,21 @@ macro_rules! define_keywords {
             }
         }
 
-        impl From<Keyword> for $crate::Token {
+        impl From<OpenDelim> for $crate::Delim {
             #[inline]
-            fn from(value: Keyword) -> Self {
-                Self::Keyword(value)
+            fn from(value: OpenDelim) -> Self {
+                Self::Open(value.into())
             }
         }
 
-        impl std::fmt::Display for Keyword {
+        impl From<OpenDelim> for $crate::Token {
+            #[inline]
+            fn from(value: OpenDelim) -> Self {
+                Self::Delim(value.into())
+            }
+        }
+
+        impl std::fmt::Display for OpenDelim {
             #[inline]
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 match self {
@@ -111,7 +118,7 @@ macro_rules! define_keywords {
             impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
                 fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
-                    if !(cursor.span() == &$token.as_bytes()) {
+                    if !(cursor.next_n($token.len())?.span() == &$token.as_bytes()) {
                         return Err(cursor.error(zinq_error::NOT_FOUND, &format!("expected '{}'", $token)));
                     }
 
@@ -126,7 +133,7 @@ macro_rules! define_keywords {
                 }
             }
 
-            impl From<$name> for Keyword {
+            impl From<$name> for OpenDelim {
                 #[inline]
                 fn from(value: $name) -> Self {
                     Self::$name(value)
@@ -140,17 +147,33 @@ macro_rules! define_keywords {
                 }
             }
 
+            impl From<$name> for $crate::Delim {
+                #[inline]
+                fn from(value: $name) -> Self {
+                    Self::Open(OpenDelim::$name(value))
+                }
+            }
+
             impl From<$name> for $crate::Token {
                 #[inline]
                 fn from(value: $name) -> Self {
-                    Self::Keyword(Keyword::$name(value))
+                    Self::Delim($crate::Delim::Open(OpenDelim::$name(value)))
+                }
+            }
+
+            impl $crate::Delim {
+                pub fn $is_method(&self) -> bool {
+                    match self {
+                        Self::Open(delim) => delim.$is_method(),
+                        _ => false,
+                    }
                 }
             }
 
             impl $crate::Token {
                 pub fn $is_method(&self) -> bool {
                     match self {
-                        Self::Keyword(keyword) => keyword.$is_method(),
+                        Self::Delim(delim) => delim.$is_method(),
                         _ => false,
                     }
                 }
@@ -171,7 +194,7 @@ macro_rules! define_keywords {
                     let mut parser = TokenParser;
                     let token = parser.parse(&mut cursor)?;
 
-                    debug_assert!(token.is_keyword());
+                    debug_assert!(token.is_delim());
                     debug_assert!(token.$is_method());
                     debug_assert_eq!(token.to_string(), $token);
 
@@ -182,27 +205,8 @@ macro_rules! define_keywords {
     };
 }
 
-define_keywords! {
-    "mod",       pub struct Mod,        is_mod,
-    "mut",       pub struct Mut,        is_mut,
-    "match",     pub struct Match,      is_match,
-    "where",     pub struct Where,      is_where,
-    "continue",  pub struct Continue,   is_continue,
-    "trait",     pub struct Trait,      is_trait,
-    "if",        pub struct If,         is_if,
-    "else",      pub struct Else,       is_else,
-    "for",       pub struct For,        is_for,
-    "in",        pub struct In,         is_in,
-    "as",        pub struct As,         is_as,
-    "let",       pub struct Let,        is_let,
-    "const",     pub struct Const,      is_const,
-    "enum",      pub struct Enum,       is_enum,
-    "impl",      pub struct Impl,       is_impl,
-    "fn",        pub struct Fn,         is_fn,
-    "return",    pub struct Return,     is_return,
-    "struct",    pub struct Struct,     is_struct,
-    "self",      pub struct SelfValue,  is_self_type,
-    "Self",      pub struct SelfType,   is_self_value,
-    "pub",       pub struct Pub,        is_pub,
-    "use",       pub struct Use,        is_use
+define_open_delimiters! {
+    "{",    pub struct LBrace,      is_left_brace,
+    "[",    pub struct LBracket,    is_left_bracket,
+    "(",    pub struct LParen,      is_left_paren
 }

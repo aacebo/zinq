@@ -7,9 +7,9 @@ pub use int::*;
 pub use string::*;
 
 use zinq_error::{NOT_FOUND, Result};
-use zinq_parse::{Cursor, Parse, ParseError, Parser, Peek, Span};
+use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
-use crate::{Keyword, Token, TokenParser};
+use crate::{Token, TokenParser};
 
 ///
 /// ## Literal

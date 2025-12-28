@@ -1,5 +1,5 @@
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, ParseError, Peek, Span};
+use zinq_parse::{Cursor, Parse, Peek, Span};
 
 use crate::{Literal, Token, TokenParser};
 
@@ -29,14 +29,14 @@ impl std::fmt::Display for LByte {
 
 impl Peek<TokenParser> for LByte {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
         Ok(cursor.peek_n(2)? == b"b'")
     }
 }
 
 impl Parse<TokenParser> for LByte {
     #[inline]
-    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
         cursor.next_while(|b, _| b != &b'\'')?.next_n(3)?;
 
         Ok(Self {
@@ -66,9 +66,9 @@ impl From<LByte> for Token {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parse, Parser, Peek, Span};
+    use zinq_parse::{Parser, Span};
 
-    use crate::{LByte, TokenParser};
+    use crate::TokenParser;
 
     #[test]
     fn is_byte() -> Result<()> {
