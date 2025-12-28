@@ -178,12 +178,12 @@ impl Parse<TokenParser> for Token {
             return parser.parse_as::<Delim>(cursor);
         }
 
-        if parser.peek_as::<Keyword>(cursor)? {
-            return parser.parse_as::<Keyword>(cursor);
-        }
-
         if parser.peek_as::<Literal>(cursor)? {
             return parser.parse_as::<Literal>(cursor);
+        }
+
+        if parser.peek_as::<Keyword>(cursor)? {
+            return parser.parse_as::<Keyword>(cursor);
         }
 
         parser.parse_as::<Ident>(cursor)
@@ -209,7 +209,7 @@ mod test {
     use crate::TokenParser;
 
     #[test]
-    fn is_assignment() -> Result<()> {
+    fn is_string_assignment() -> Result<()> {
         let span = Span::from_bytes(b"let test: string = \"test\";");
         let mut cursor = span.cursor();
         let mut parser = TokenParser;
@@ -242,6 +242,49 @@ mod test {
 
         debug_assert!(token.is_string_literal());
         debug_assert_eq!(token.to_string(), "\"test\"");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_semi_colon());
+        debug_assert_eq!(token.to_string(), ";");
+
+        Ok(())
+    }
+
+    #[test]
+    fn is_int_assignment() -> Result<()> {
+        let span = Span::from_bytes(b"let test: int = 121u16;");
+        let mut cursor = span.cursor();
+        let mut parser = TokenParser;
+        let mut token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_keyword());
+        debug_assert_eq!(token.to_string(), "let");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_ident());
+        debug_assert_eq!(token.to_string(), "test");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_colon());
+        debug_assert_eq!(token.to_string(), ":");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_ident());
+        debug_assert_eq!(token.to_string(), "int");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_eq());
+        debug_assert_eq!(token.to_string(), "=");
+
+        token = parser.parse(&mut cursor)?;
+
+        debug_assert!(token.is_u16_literal());
+        debug_assert_eq!(token.to_string(), "121u16");
 
         token = parser.parse(&mut cursor)?;
 

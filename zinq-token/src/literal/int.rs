@@ -50,6 +50,22 @@ impl LInt {
     pub fn is_i64(&self) -> bool {
         self.span.bytes().ends_with(b"i64")
     }
+
+    pub fn digits(&self) -> &[u8] {
+        if self.is_u8() || self.is_i8() {
+            return &self.span.bytes()[0..self.span.len() - 2];
+        }
+
+        &self.span.bytes()[0..self.span.len() - 3]
+    }
+
+    pub fn suffix(&self) -> &[u8] {
+        if self.is_u8() || self.is_i8() {
+            return &self.span.bytes()[self.span.len() - 2..self.span.len()];
+        }
+
+        &self.span.bytes()[self.span.len() - 3..self.span.len()]
+    }
 }
 
 impl Literal {
@@ -231,11 +247,13 @@ mod test {
         debug_assert_eq!(token.to_string(), "103");
         debug_assert_eq!(cursor.bytes(), b"");
 
-        cursor = Span::from_bytes(b"103u8").cursor();
+        cursor = Span::from_bytes(b"103u16").cursor();
         token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_int_literal());
-        debug_assert_eq!(token.to_string(), "103u8");
+        debug_assert_eq!(token.to_string(), "103u16");
+        debug_assert_eq!(token.try_to_literal()?.try_to_int()?.digits(), b"103");
+        debug_assert_eq!(token.try_to_literal()?.try_to_int()?.suffix(), b"u16");
 
         Ok(())
     }

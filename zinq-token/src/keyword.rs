@@ -91,7 +91,7 @@ macro_rules! define_keywords {
             impl zinq_parse::Peek<$crate::TokenParser> for $name {
                 #[inline]
                 fn peek(cursor: &zinq_parse::Cursor, _: &$crate::TokenParser) -> zinq_error::Result<bool> {
-                    Ok(cursor.peek_n($token.len())? == $token.as_bytes())
+                    Ok(cursor.fork().next_while(|b, _| b.is_ascii_alphanumeric())?.span() == &$token.as_bytes())
                 }
             }
 
