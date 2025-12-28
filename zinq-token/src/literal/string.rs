@@ -74,7 +74,7 @@ mod test {
 
         let token = parser.parse_as::<LString>(&mut cursor)?;
 
-        debug_assert!(token.is_literal_string());
+        debug_assert!(token.is_string_literal());
         debug_assert_eq!(token.to_string(), "\"test\"");
         debug_assert_eq!(cursor.bytes(), b"");
 

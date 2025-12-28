@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Keyword, Token, TokenParser};
+use crate::{Token, TokenParser};
 
 ///
 /// ## Ident
@@ -47,11 +47,6 @@ impl Parse<TokenParser> for Ident {
     #[inline]
     fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
         let span = cursor.next_while(|b, _| b.is_ascii_alphanumeric())?.span();
-
-        if let Some(keyword) = Keyword::try_from_span(span) {
-            return Ok(keyword.into());
-        }
-
         Ok(Self { span: span.clone() }.into())
     }
 

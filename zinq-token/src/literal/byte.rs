@@ -78,7 +78,7 @@ mod test {
 
         let token = parser.parse(&mut cursor)?;
 
-        debug_assert!(token.is_literal_byte());
+        debug_assert!(token.is_byte_literal());
         debug_assert_eq!(token.to_string(), "b'p'");
         debug_assert_eq!(cursor.bytes(), b"");
 

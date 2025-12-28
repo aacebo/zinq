@@ -63,6 +63,8 @@ impl std::ops::Deref for TokenStream {
     }
 }
 
+impl Eq for TokenStream {}
+
 impl PartialEq for TokenStream {
     fn eq(&self, other: &Self) -> bool {
         if self.items.len() != other.items.len() {

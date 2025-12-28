@@ -22,6 +22,126 @@ impl LInt {
     pub fn is_u8(&self) -> bool {
         self.span.bytes().ends_with(b"u8")
     }
+
+    pub fn is_i8(&self) -> bool {
+        self.span.bytes().ends_with(b"i8")
+    }
+
+    pub fn is_u16(&self) -> bool {
+        self.span.bytes().ends_with(b"u16")
+    }
+
+    pub fn is_i16(&self) -> bool {
+        self.span.bytes().ends_with(b"i16")
+    }
+
+    pub fn is_u32(&self) -> bool {
+        self.span.bytes().ends_with(b"u32")
+    }
+
+    pub fn is_i32(&self) -> bool {
+        self.span.bytes().ends_with(b"i32")
+    }
+
+    pub fn is_u64(&self) -> bool {
+        self.span.bytes().ends_with(b"u64")
+    }
+
+    pub fn is_i64(&self) -> bool {
+        self.span.bytes().ends_with(b"i64")
+    }
+}
+
+impl Literal {
+    pub fn is_i8(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_i8(),
+            _ => false,
+        }
+    }
+
+    pub fn is_u8(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_u8(),
+            _ => false,
+        }
+    }
+
+    pub fn is_i16(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_i16(),
+            _ => false,
+        }
+    }
+
+    pub fn is_u16(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_u16(),
+            _ => false,
+        }
+    }
+
+    pub fn is_i32(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_i32(),
+            _ => false,
+        }
+    }
+
+    pub fn is_u32(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_u32(),
+            _ => false,
+        }
+    }
+
+    pub fn is_i64(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_i64(),
+            _ => false,
+        }
+    }
+
+    pub fn is_u64(&self) -> bool {
+        match self {
+            Self::Int(v) => v.is_u64(),
+            _ => false,
+        }
+    }
+}
+
+impl Token {
+    pub fn is_u8_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_u8()
+    }
+
+    pub fn is_i8_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_i8()
+    }
+
+    pub fn is_u16_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_u16()
+    }
+
+    pub fn is_i16_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_i16()
+    }
+
+    pub fn is_u32_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_u32()
+    }
+
+    pub fn is_i32_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_i32()
+    }
+
+    pub fn is_u64_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_u64()
+    }
+
+    pub fn is_i64_literal(&self) -> bool {
+        self.is_literal() && self.try_to_literal().expect("must be literal").is_i64()
+    }
 }
 
 impl std::fmt::Display for LInt {
@@ -107,14 +227,14 @@ mod test {
         let mut token = parser.parse(&mut cursor)?;
         println!("{} => {}", token.name(), token.to_string());
 
-        debug_assert!(token.is_literal_int());
+        debug_assert!(token.is_int_literal());
         debug_assert_eq!(token.to_string(), "103");
         debug_assert_eq!(cursor.bytes(), b"");
 
         cursor = Span::from_bytes(b"103u8").cursor();
         token = parser.parse(&mut cursor)?;
 
-        debug_assert!(token.is_literal_int());
+        debug_assert!(token.is_int_literal());
         debug_assert_eq!(token.to_string(), "103u8");
 
         Ok(())

@@ -9,19 +9,6 @@ macro_rules! define_open_delimiters {
 
         impl OpenDelim {
             #[inline]
-            pub fn try_from_span(span: &zinq_parse::Span) -> Option<Self> {
-                $(
-                    if $token.as_bytes() == span.bytes() {
-                        return Some(Self::$name($name {
-                            span: span.clone(),
-                        }));
-                    }
-                )*
-
-                None
-            }
-
-            #[inline]
             pub fn name(&self) -> &'static str {
                 match self {
                     $(Self::$name(v) => v.name(),)*

@@ -6,7 +6,7 @@ pub use open::*;
 
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::TokenParser;
+use crate::{Token, TokenParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Delim {
@@ -15,6 +15,13 @@ pub enum Delim {
 }
 
 impl Delim {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Close(v) => v.name(),
+            Self::Open(v) => v.name(),
+        }
+    }
+
     pub fn is_open(&self) -> bool {
         match self {
             Self::Open(_) => true,
@@ -28,11 +35,20 @@ impl Delim {
             _ => false,
         }
     }
+}
 
-    pub fn name(&self) -> &'static str {
+impl Token {
+    pub fn is_open_delim(&self) -> bool {
         match self {
-            Self::Close(v) => v.name(),
-            Self::Open(v) => v.name(),
+            Self::Delim(v) => v.is_open(),
+            _ => false,
+        }
+    }
+
+    pub fn is_close_delim(&self) -> bool {
+        match self {
+            Self::Delim(v) => v.is_close(),
+            _ => false,
         }
     }
 }

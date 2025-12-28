@@ -9,7 +9,7 @@ pub use string::*;
 use zinq_error::{NOT_FOUND, Result};
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
-use crate::{Token, TokenParser};
+use crate::{Token, TokenMismatchError, TokenParser};
 
 ///
 /// ## Literal
@@ -23,10 +23,30 @@ pub enum Literal {
 }
 
 impl Literal {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Int(v) => v.name(),
+            Self::Byte(v) => v.name(),
+            Self::String(v) => v.name(),
+        }
+    }
+
     pub fn is_int(&self) -> bool {
         match self {
             Self::Int(_) => true,
             _ => false,
+        }
+    }
+
+    pub fn try_to_int(&self) -> Result<&LInt> {
+        match self {
+            Self::Int(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("LInt", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
         }
     }
 
@@ -37,6 +57,18 @@ impl Literal {
         }
     }
 
+    pub fn try_to_byte(&self) -> Result<&LByte> {
+        match self {
+            Self::Byte(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("LByte", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
+        }
+    }
+
     pub fn is_string(&self) -> bool {
         match self {
             Self::String(_) => true,
@@ -44,17 +76,21 @@ impl Literal {
         }
     }
 
-    pub fn name(&self) -> &'static str {
+    pub fn try_to_string(&self) -> Result<&LString> {
         match self {
-            Self::Int(v) => v.name(),
-            Self::Byte(v) => v.name(),
-            Self::String(v) => v.name(),
+            Self::String(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("LString", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
         }
     }
 }
 
 impl Token {
-    pub fn is_literal_int(&self) -> bool {
+    pub fn is_int_literal(&self) -> bool {
         if let Token::Literal(v) = &self {
             return v.is_int();
         }
@@ -62,7 +98,7 @@ impl Token {
         false
     }
 
-    pub fn is_literal_byte(&self) -> bool {
+    pub fn is_byte_literal(&self) -> bool {
         if let Token::Literal(v) = &self {
             return v.is_byte();
         }
@@ -70,7 +106,7 @@ impl Token {
         false
     }
 
-    pub fn is_literal_string(&self) -> bool {
+    pub fn is_string_literal(&self) -> bool {
         if let Token::Literal(v) = &self {
             return v.is_string();
         }

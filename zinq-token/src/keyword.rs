@@ -9,19 +9,6 @@ macro_rules! define_keywords {
 
         impl Keyword {
             #[inline]
-            pub fn try_from_span(span: &zinq_parse::Span) -> Option<Self> {
-                $(
-                    if $token.as_bytes() == span.bytes() {
-                        return Some(Self::$name($name {
-                            span: span.clone(),
-                        }));
-                    }
-                )*
-
-                None
-            }
-
-            #[inline]
             pub fn name(&self) -> &'static str {
                 match self {
                     $(Self::$name(v) => v.name(),)*
@@ -111,12 +98,14 @@ macro_rules! define_keywords {
             impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
                 fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
-                    if !(cursor.span() == &$token.as_bytes()) {
+                    let span = cursor.next_n($token.len())?.span();
+
+                    if span != &$token.as_bytes() {
                         return Err(cursor.error(zinq_error::NOT_FOUND, &format!("expected '{}'", $token)));
                     }
 
                     Ok(Self {
-                        span: cursor.span().clone(),
+                        span: span.clone(),
                     }.into())
                 }
 

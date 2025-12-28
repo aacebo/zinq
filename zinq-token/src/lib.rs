@@ -19,6 +19,14 @@ pub use stream::*;
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
+pub trait FromTokens: Sized {
+    fn from_tokens(tokens: TokenStream) -> Result<Self>;
+}
+
+pub trait ToTokens {
+    fn to_tokens(&self) -> Result<TokenStream>;
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
     Punct(Punct),
@@ -39,12 +47,12 @@ impl Token {
     pub fn try_to_punct(&self) -> Result<&Punct> {
         match self {
             Self::Punct(v) => Ok(v),
-            other => Err(TokenExpectedError::from(
-                b"Punct",
-                other.name().as_bytes(),
-                other.span().clone(),
-            )
-            .into()),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("Punct", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
         }
     }
 
@@ -55,10 +63,34 @@ impl Token {
         }
     }
 
+    pub fn try_to_literal(&self) -> Result<&Literal> {
+        match self {
+            Self::Literal(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("Literal", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
+        }
+    }
+
     pub fn is_keyword(&self) -> bool {
         match self {
             Self::Keyword(_) => true,
             _ => false,
+        }
+    }
+
+    pub fn try_to_keyword(&self) -> Result<&Keyword> {
+        match self {
+            Self::Keyword(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("Keyword", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
         }
     }
 
@@ -72,12 +104,12 @@ impl Token {
     pub fn try_to_ident(&self) -> Result<&Ident> {
         match self {
             Self::Ident(v) => Ok(v),
-            other => Err(TokenExpectedError::from(
-                b"Ident",
-                other.name().as_bytes(),
-                other.span().clone(),
-            )
-            .into()),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("Ident", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
         }
     }
 
@@ -85,6 +117,18 @@ impl Token {
         match self {
             Self::Delim(_) => true,
             _ => false,
+        }
+    }
+
+    pub fn try_to_delim(&self) -> Result<&Delim> {
+        match self {
+            Self::Delim(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("Delim", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
         }
     }
 
@@ -132,6 +176,10 @@ impl Parse<TokenParser> for Token {
 
         if parser.peek_as::<Delim>(cursor)? {
             return parser.parse_as::<Delim>(cursor);
+        }
+
+        if parser.peek_as::<Keyword>(cursor)? {
+            return parser.parse_as::<Keyword>(cursor);
         }
 
         if parser.peek_as::<Literal>(cursor)? {
@@ -192,7 +240,7 @@ mod test {
 
         token = parser.parse(&mut cursor)?;
 
-        debug_assert!(token.is_literal_string());
+        debug_assert!(token.is_string_literal());
         debug_assert_eq!(token.to_string(), "\"test\"");
 
         token = parser.parse(&mut cursor)?;
