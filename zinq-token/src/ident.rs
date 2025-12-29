@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Token, TokenParser};
+use crate::{ToTokens, Token, TokenParser, TokenStream};
 
 ///
 /// ## Ident
@@ -53,6 +53,12 @@ impl Parse<TokenParser> for Ident {
     #[inline]
     fn span(&self) -> &Span {
         &self.span
+    }
+}
+
+impl ToTokens for Ident {
+    fn to_tokens(&self) -> Result<TokenStream> {
+        Ok(Token::Ident(self.clone()).into())
     }
 }
 

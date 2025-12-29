@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, Token, TokenParser};
+use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
 
 ///
 /// ## LInt
@@ -244,6 +244,12 @@ impl From<LInt> for Literal {
 impl From<LInt> for Token {
     fn from(value: LInt) -> Self {
         Self::Literal(Literal::Int(value))
+    }
+}
+
+impl ToTokens for LInt {
+    fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
+        Ok(Token::Literal(Literal::Int(self.clone())).into())
     }
 }
 

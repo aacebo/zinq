@@ -6,7 +6,7 @@ pub use open::*;
 
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::{Token, TokenParser};
+use crate::{ToTokens, Token, TokenParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Delim {
@@ -100,5 +100,11 @@ impl Parse<TokenParser> for Delim {
             Self::Open(v) => v.span(),
             Self::Close(v) => v.span(),
         }
+    }
+}
+
+impl ToTokens for Delim {
+    fn to_tokens(&self) -> zinq_error::Result<crate::TokenStream> {
+        Ok(Token::Delim(self.clone()).into())
     }
 }

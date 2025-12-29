@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, Token, TokenParser};
+use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LString {
@@ -54,6 +54,12 @@ impl From<LString> for Literal {
 impl From<LString> for Token {
     fn from(value: LString) -> Self {
         Self::Literal(Literal::String(value))
+    }
+}
+
+impl ToTokens for LString {
+    fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
+        Ok(Token::Literal(Literal::String(self.clone())).into())
     }
 }
 

@@ -201,6 +201,12 @@ impl Parse<TokenParser> for Token {
     }
 }
 
+impl ToTokens for Token {
+    fn to_tokens(&self) -> Result<TokenStream> {
+        Ok(self.clone().into())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use zinq_error::Result;

@@ -13,7 +13,7 @@ pub use string::*;
 use zinq_error::{NOT_FOUND, Result};
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
-use crate::{Token, TokenMismatchError, TokenParser};
+use crate::{ToTokens, Token, TokenMismatchError, TokenParser, TokenStream};
 
 ///
 /// ## Literal
@@ -255,5 +255,11 @@ impl From<Literal> for Token {
     #[inline]
     fn from(value: Literal) -> Self {
         Self::Literal(value)
+    }
+}
+
+impl ToTokens for Literal {
+    fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
+        Ok(Token::Literal(self.clone()).into())
     }
 }

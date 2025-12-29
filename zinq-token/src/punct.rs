@@ -75,6 +75,12 @@ macro_rules! define_puncts {
             }
         }
 
+        impl $crate::ToTokens for Punct {
+            fn to_tokens(&self) -> zinq_error::Result<$crate::TokenStream> {
+                Ok($crate::Token::Punct(self.clone()).into())
+            }
+        }
+
         $(
             #[doc = concat!('`', $token, '`')]
             #[derive(Debug, Clone, PartialEq, Eq)]
@@ -140,6 +146,12 @@ macro_rules! define_puncts {
                         Self::Punct(punct) => punct.$is_method(),
                         _ => false,
                     }
+                }
+            }
+
+            impl $crate::ToTokens for $name {
+                fn to_tokens(&self) -> zinq_error::Result<$crate::TokenStream> {
+                    Ok($crate::Token::Punct($crate::Punct::$name(self.clone())).into())
                 }
             }
         )*

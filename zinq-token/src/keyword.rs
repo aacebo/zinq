@@ -75,6 +75,12 @@ macro_rules! define_keywords {
             }
         }
 
+        impl $crate::ToTokens for Keyword {
+            fn to_tokens(&self) -> zinq_error::Result<$crate::TokenStream> {
+                Ok($crate::Token::Keyword(self.clone()).into())
+            }
+        }
+
         $(
             #[doc = concat!('`', $token, '`')]
             #[derive(Debug, Clone, PartialEq, Eq)]
@@ -142,6 +148,12 @@ macro_rules! define_keywords {
                         Self::Keyword(keyword) => keyword.$is_method(),
                         _ => false,
                     }
+                }
+            }
+
+            impl $crate::ToTokens for $name {
+                fn to_tokens(&self) -> zinq_error::Result<$crate::TokenStream> {
+                    Ok($crate::Token::Keyword($crate::Keyword::$name(self.clone())).into())
                 }
             }
         )*

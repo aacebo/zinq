@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, Token, TokenParser};
+use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
 
 ///
 /// ## LBool
@@ -67,6 +67,12 @@ impl From<LBool> for Literal {
 impl From<LBool> for Token {
     fn from(value: LBool) -> Self {
         Self::Literal(Literal::Bool(value))
+    }
+}
+
+impl ToTokens for LBool {
+    fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
+        Ok(Token::Literal(Literal::Bool(self.clone())).into())
     }
 }
 

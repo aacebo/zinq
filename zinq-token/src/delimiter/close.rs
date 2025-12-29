@@ -82,6 +82,12 @@ macro_rules! define_close_delimiters {
             }
         }
 
+        impl $crate::ToTokens for CloseDelim {
+            fn to_tokens(&self) -> zinq_error::Result<$crate::TokenStream> {
+                Ok($crate::Token::Delim($crate::Delim::Close(self.clone())).into())
+            }
+        }
+
         $(
             #[doc = concat!('`', $token, '`')]
             #[derive(Debug, Clone, PartialEq, Eq)]
@@ -163,6 +169,12 @@ macro_rules! define_close_delimiters {
                         Self::Delim(delim) => delim.$is_method(),
                         _ => false,
                     }
+                }
+            }
+
+            impl $crate::ToTokens for $name {
+                fn to_tokens(&self) -> zinq_error::Result<$crate::TokenStream> {
+                    Ok($crate::Token::Delim($crate::Delim::Close(CloseDelim::$name(self.clone()))).into())
                 }
             }
         )*

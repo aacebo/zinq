@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, Token, TokenParser};
+use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
 
 ///
 /// ## LFloat
@@ -133,6 +133,12 @@ impl From<LFloat> for Literal {
 impl From<LFloat> for Token {
     fn from(value: LFloat) -> Self {
         Self::Literal(Literal::Float(value))
+    }
+}
+
+impl ToTokens for LFloat {
+    fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
+        Ok(Token::Literal(Literal::Float(self.clone())).into())
     }
 }
 

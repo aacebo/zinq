@@ -3,7 +3,7 @@ use std::{ops::Index, str::FromStr};
 use zinq_error::ZinqError;
 use zinq_parse::{Parser, Span};
 
-use crate::{Token, TokenParser};
+use crate::{ToTokens, Token, TokenParser};
 
 #[derive(Debug, Default, Clone)]
 pub struct TokenStream(Vec<Token>);
@@ -140,6 +140,12 @@ impl PartialEq for TokenStream {
         }
 
         true
+    }
+}
+
+impl ToTokens for TokenStream {
+    fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
+        Ok(self.clone())
     }
 }
 
