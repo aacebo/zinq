@@ -171,10 +171,10 @@ mod test {
 
     #[test]
     fn should_check_equality() -> Result<()> {
-        let a = TokenStream::from_str("\n\nlet a = b'a'")?;
+        let a = TokenStream::from_str("let a = b'a'")?;
         let b = TokenStream::try_from(b"let a = b'a'")?;
 
-        debug_assert_eq!(a.to_string(), b.to_string());
+        debug_assert_eq!(a, b);
         Ok(())
     }
 }
