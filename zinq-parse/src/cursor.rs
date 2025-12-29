@@ -20,15 +20,6 @@ pub struct Cursor {
 
 impl Cursor {
     ///
-    /// ## tx
-    /// the transaction state
-    ///
-    #[inline]
-    pub fn tx(&self) -> &Tx<Span> {
-        &self.changes
-    }
-
-    ///
     /// ## fork
     /// fork the cursor, i.e. clone the cursor
     /// without cloning the existing diagnostics.
@@ -230,7 +221,7 @@ impl Cursor {
     ///
     #[inline]
     pub fn merge(&mut self, other: &Self) -> &mut Self {
-        self.changes.append(other.tx().clone());
+        self.changes.append(other.changes.clone());
 
         if !other.diagnostics.is_empty() {
             self.diagnostics.push(
