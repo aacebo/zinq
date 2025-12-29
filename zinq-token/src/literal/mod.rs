@@ -1,8 +1,10 @@
+mod bool;
 mod byte;
 mod float;
 mod int;
 mod string;
 
+pub use bool::*;
 pub use byte::*;
 pub use float::*;
 pub use int::*;
@@ -22,6 +24,7 @@ pub enum Literal {
     Int(LInt),
     Float(LFloat),
     Byte(LByte),
+    Bool(LBool),
     String(LString),
 }
 
@@ -31,6 +34,7 @@ impl Literal {
             Self::Int(v) => v.name(),
             Self::Float(v) => v.name(),
             Self::Byte(v) => v.name(),
+            Self::Bool(v) => v.name(),
             Self::String(v) => v.name(),
         }
     }
@@ -92,6 +96,25 @@ impl Literal {
         }
     }
 
+    pub fn is_bool(&self) -> bool {
+        match self {
+            Self::Bool(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn try_to_bool(&self) -> Result<&LBool> {
+        match self {
+            Self::Bool(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("LBool", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
+        }
+    }
+
     pub fn is_string(&self) -> bool {
         match self {
             Self::String(_) => true,
@@ -137,6 +160,14 @@ impl Token {
         false
     }
 
+    pub fn is_bool_literal(&self) -> bool {
+        if let Token::Literal(v) = &self {
+            return v.is_bool();
+        }
+
+        false
+    }
+
     pub fn is_string_literal(&self) -> bool {
         if let Token::Literal(v) = &self {
             return v.is_string();
@@ -153,6 +184,7 @@ impl std::fmt::Display for Literal {
             Self::Int(v) => write!(f, "{}", v),
             Self::Float(v) => write!(f, "{}", v),
             Self::Byte(v) => write!(f, "{}", v),
+            Self::Bool(v) => write!(f, "{}", v),
             Self::String(v) => write!(f, "{}", v),
         }
     }
@@ -170,6 +202,10 @@ impl Peek<TokenParser> for Literal {
         }
 
         if parser.peek_as::<LByte>(cursor)? {
+            return Ok(true);
+        }
+
+        if parser.peek_as::<LBool>(cursor)? {
             return Ok(true);
         }
 
@@ -196,6 +232,10 @@ impl Parse<TokenParser> for Literal {
             return parser.parse_as::<LString>(cursor);
         }
 
+        if parser.peek_as::<LBool>(cursor)? {
+            return parser.parse_as::<LBool>(cursor);
+        }
+
         Err(cursor.error(NOT_FOUND, "not found"))
     }
 
@@ -205,6 +245,7 @@ impl Parse<TokenParser> for Literal {
             Self::Int(v) => v.span(),
             Self::Float(v) => v.span(),
             Self::Byte(v) => v.span(),
+            Self::Bool(v) => v.span(),
             Self::String(v) => v.span(),
         }
     }
