@@ -1,8 +1,10 @@
 mod byte;
+mod float;
 mod int;
 mod string;
 
 pub use byte::*;
+pub use float::*;
 pub use int::*;
 pub use string::*;
 
@@ -18,6 +20,7 @@ use crate::{Token, TokenMismatchError, TokenParser};
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Literal {
     Int(LInt),
+    Float(LFloat),
     Byte(LByte),
     String(LString),
 }
@@ -26,6 +29,7 @@ impl Literal {
     pub fn name(&self) -> &'static str {
         match self {
             Self::Int(v) => v.name(),
+            Self::Float(v) => v.name(),
             Self::Byte(v) => v.name(),
             Self::String(v) => v.name(),
         }
@@ -44,6 +48,25 @@ impl Literal {
             other => {
                 Err(
                     TokenMismatchError::from_types("LInt", other.name(), other.span().clone())
+                        .into(),
+                )
+            }
+        }
+    }
+
+    pub fn is_float(&self) -> bool {
+        match self {
+            Self::Float(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn try_to_float(&self) -> Result<&LFloat> {
+        match self {
+            Self::Float(v) => Ok(v),
+            other => {
+                Err(
+                    TokenMismatchError::from_types("LFloat", other.name(), other.span().clone())
                         .into(),
                 )
             }
@@ -98,6 +121,14 @@ impl Token {
         false
     }
 
+    pub fn is_float_literal(&self) -> bool {
+        if let Token::Literal(v) = &self {
+            return v.is_float();
+        }
+
+        false
+    }
+
     pub fn is_byte_literal(&self) -> bool {
         if let Token::Literal(v) = &self {
             return v.is_byte();
@@ -120,6 +151,7 @@ impl std::fmt::Display for Literal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Int(v) => write!(f, "{}", v),
+            Self::Float(v) => write!(f, "{}", v),
             Self::Byte(v) => write!(f, "{}", v),
             Self::String(v) => write!(f, "{}", v),
         }
@@ -129,6 +161,10 @@ impl std::fmt::Display for Literal {
 impl Peek<TokenParser> for Literal {
     #[inline]
     fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+        if parser.peek_as::<LFloat>(cursor)? {
+            return Ok(true);
+        }
+
         if parser.peek_as::<LInt>(cursor)? {
             return Ok(true);
         }
@@ -144,6 +180,10 @@ impl Peek<TokenParser> for Literal {
 impl Parse<TokenParser> for Literal {
     #[inline]
     fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
+        if parser.peek_as::<LFloat>(cursor)? {
+            return parser.parse_as::<LFloat>(cursor);
+        }
+
         if parser.peek_as::<LInt>(cursor)? {
             return parser.parse_as::<LInt>(cursor);
         }
@@ -163,6 +203,7 @@ impl Parse<TokenParser> for Literal {
     fn span(&self) -> &Span {
         match self {
             Self::Int(v) => v.span(),
+            Self::Float(v) => v.span(),
             Self::Byte(v) => v.span(),
             Self::String(v) => v.span(),
         }

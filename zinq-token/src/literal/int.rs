@@ -56,7 +56,17 @@ impl LInt {
             return &self.span.bytes()[0..self.span.len() - 2];
         }
 
-        &self.span.bytes()[0..self.span.len() - 3]
+        if self.is_u16()
+            || self.is_i16()
+            || self.is_u32()
+            || self.is_i32()
+            || self.is_u64()
+            || self.is_i64()
+        {
+            return &self.span.bytes()[0..self.span.len() - 3];
+        }
+
+        self.span.bytes()
     }
 
     pub fn suffix(&self) -> &[u8] {
@@ -64,7 +74,17 @@ impl LInt {
             return &self.span.bytes()[self.span.len() - 2..self.span.len()];
         }
 
-        &self.span.bytes()[self.span.len() - 3..self.span.len()]
+        if self.is_u16()
+            || self.is_i16()
+            || self.is_u32()
+            || self.is_i32()
+            || self.is_u64()
+            || self.is_i64()
+        {
+            return &self.span.bytes()[self.span.len() - 3..self.span.len()];
+        }
+
+        &[]
     }
 }
 
