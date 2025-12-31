@@ -3,6 +3,7 @@ mod error;
 mod ident;
 mod keyword;
 mod literal;
+pub mod macros;
 mod parser;
 mod punct;
 mod stream;
@@ -19,10 +20,11 @@ pub use stream::*;
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
-pub trait FromTokens: Sized {
-    fn from_tokens(tokens: TokenStream) -> Result<Self>;
-}
-
+///
+/// ## ToTokens
+/// when implemented makes any type
+/// token stream compatible
+///
 pub trait ToTokens {
     fn to_tokens(&self) -> Result<TokenStream>;
 }

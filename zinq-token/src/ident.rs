@@ -39,14 +39,16 @@ impl std::fmt::Display for Ident {
 impl Peek<TokenParser> for Ident {
     #[inline]
     fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
-        Ok(cursor.peek()?.is_ascii_alphabetic())
+        Ok(cursor.peek()?.is_ascii_alphabetic() || cursor.peek()? == &b'_')
     }
 }
 
 impl Parse<TokenParser> for Ident {
     #[inline]
     fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
-        let span = cursor.next_while(|b, _| b.is_ascii_alphanumeric())?.span();
+        let span = cursor
+            .next_while(|b, _| b.is_ascii_alphanumeric() || b == &b'_')?
+            .span();
         Ok(Self { span: span.clone() }.into())
     }
 
