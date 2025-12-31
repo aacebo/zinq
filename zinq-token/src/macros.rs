@@ -18,12 +18,9 @@ mod test {
         }?;
 
         debug_assert_eq!(stream.len(), 11);
+        stream = Stream!(let test: u16 = 500u16)?;
+        debug_assert_eq!(stream.len(), 6);
 
-        stream = Stream! {
-            let test: u16 = 500u16;
-        }?;
-
-        debug_assert_eq!(stream.len(), 7);
         Ok(())
     }
 }
