@@ -16,6 +16,7 @@ name = "zinq-ast"
 version = "0.0.1"
 dependencies = [
  "zinq-error",
+ "zinq-token",
 ]
 
 [[package]]
@@ -28,6 +29,10 @@ version = "0.0.1"
 dependencies = [
  "zinq-error",
 ]
+
+[[package]]
+name = "zinq-reflect"
+version = "0.0.1"
 
 [[package]]
 name = "zinq-token"
