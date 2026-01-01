@@ -37,7 +37,7 @@ impl Peek<TokenParser> for LBool {
 
 impl Parse<TokenParser> for LBool {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
         if cursor.peek_n(4).unwrap_or(&[]) == b"true" {
             cursor.next_n(4)?;
         }

@@ -215,25 +215,25 @@ impl Peek<TokenParser> for Literal {
 
 impl Parse<TokenParser> for Literal {
     #[inline]
-    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
         if parser.peek_as::<LFloat>(cursor)? {
-            return parser.parse_as::<LFloat>(cursor);
+            return Ok(parser.parse_as::<LFloat>(cursor)?.into());
         }
 
         if parser.peek_as::<LInt>(cursor)? {
-            return parser.parse_as::<LInt>(cursor);
+            return Ok(parser.parse_as::<LInt>(cursor)?.into());
         }
 
         if parser.peek_as::<LByte>(cursor)? {
-            return parser.parse_as::<LByte>(cursor);
+            return Ok(parser.parse_as::<LByte>(cursor)?.into());
         }
 
         if parser.peek_as::<LString>(cursor)? {
-            return parser.parse_as::<LString>(cursor);
+            return Ok(parser.parse_as::<LString>(cursor)?.into());
         }
 
         if parser.peek_as::<LBool>(cursor)? {
-            return parser.parse_as::<LBool>(cursor);
+            return Ok(parser.parse_as::<LBool>(cursor)?.into());
         }
 
         Err(cursor.error(NOT_FOUND, "not found"))

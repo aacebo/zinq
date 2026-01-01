@@ -30,13 +30,12 @@ impl Peek<TokenParser> for LString {
 
 impl Parse<TokenParser> for LString {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
         cursor.next()?.next_while(|next, _| next != &b'"')?.next()?;
 
         Ok(Self {
             span: cursor.span().clone(),
-        }
-        .into())
+        })
     }
 
     #[inline]
@@ -78,7 +77,7 @@ mod test {
 
         debug_assert!(parser.peek_as::<LString>(&cursor)?);
 
-        let token = parser.parse_as::<LString>(&mut cursor)?;
+        let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_string_literal());
         debug_assert_eq!(token.to_string(), "\"test\"");

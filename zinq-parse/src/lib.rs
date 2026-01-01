@@ -36,7 +36,7 @@ pub trait Peek<P: Parser> {
 /// implementers can be parsed by `Parser`
 ///
 pub trait Parse<P: Parser>: Peek<P> + std::fmt::Debug + Clone {
-    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<P::Item>;
+    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self>;
     fn span(&self) -> &Span;
 }
 
@@ -80,7 +80,7 @@ pub trait Parser: Sized {
     /// parse a type
     ///
     #[inline]
-    fn parse_as<T: Parse<Self>>(&mut self, cursor: &mut Cursor) -> Result<Self::Item>
+    fn parse_as<T: Parse<Self>>(&mut self, cursor: &mut Cursor) -> Result<T>
     where
         Self: Sized,
     {

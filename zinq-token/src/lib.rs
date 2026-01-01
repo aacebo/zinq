@@ -6,6 +6,7 @@ mod literal;
 pub mod macros;
 mod parser;
 mod punct;
+mod punctuated;
 mod stream;
 
 pub use delimiter::*;
@@ -15,6 +16,7 @@ pub use keyword::*;
 pub use literal::*;
 pub use parser::*;
 pub use punct::*;
+pub use punctuated::*;
 pub use stream::*;
 
 use zinq_error::Result;
@@ -173,22 +175,22 @@ impl Parse<TokenParser> for Token {
         }
 
         if parser.peek_as::<Punct>(cursor)? {
-            return parser.parse_as::<Punct>(cursor);
+            return Ok(parser.parse_as::<Punct>(cursor)?.into());
         }
 
         if parser.peek_as::<Delim>(cursor)? {
-            return parser.parse_as::<Delim>(cursor);
+            return Ok(parser.parse_as::<Delim>(cursor)?.into());
         }
 
         if parser.peek_as::<Literal>(cursor)? {
-            return parser.parse_as::<Literal>(cursor);
+            return Ok(parser.parse_as::<Literal>(cursor)?.into());
         }
 
         if parser.peek_as::<Keyword>(cursor)? {
-            return parser.parse_as::<Keyword>(cursor);
+            return Ok(parser.parse_as::<Keyword>(cursor)?.into());
         }
 
-        parser.parse_as::<Ident>(cursor)
+        Ok(parser.parse_as::<Ident>(cursor)?.into())
     }
 
     #[inline]

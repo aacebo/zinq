@@ -45,11 +45,11 @@ impl Peek<TokenParser> for Ident {
 
 impl Parse<TokenParser> for Ident {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
         let span = cursor
             .next_while(|b, _| b.is_ascii_alphanumeric() || b == &b'_')?
             .span();
-        Ok(Self { span: span.clone() }.into())
+        Ok(Self { span: span.clone() })
     }
 
     #[inline]

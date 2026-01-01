@@ -53,6 +53,13 @@ impl Token {
     }
 }
 
+impl From<Delim> for Token {
+    #[inline]
+    fn from(value: Delim) -> Self {
+        Self::Delim(value)
+    }
+}
+
 impl std::fmt::Display for Delim {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -80,13 +87,13 @@ impl Parse<TokenParser> for Delim {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
-    ) -> zinq_error::Result<<TokenParser as Parser>::Item> {
+    ) -> zinq_error::Result<Self> {
         if parser.peek_as::<OpenDelim>(cursor)? {
-            return parser.parse_as::<OpenDelim>(cursor);
+            return Ok(parser.parse_as::<OpenDelim>(cursor)?.into());
         }
 
         if parser.peek_as::<CloseDelim>(cursor)? {
-            return parser.parse_as::<CloseDelim>(cursor);
+            return Ok(parser.parse_as::<CloseDelim>(cursor)?.into());
         }
 
         Err(cursor.error(

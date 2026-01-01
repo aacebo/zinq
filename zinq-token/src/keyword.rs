@@ -41,10 +41,10 @@ macro_rules! define_keywords {
 
         impl zinq_parse::Parse<$crate::TokenParser> for Keyword {
             #[inline]
-            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
+            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
                 $(
                     if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
-                        return parser.parse_as::<$name>(cursor);
+                        return Ok(parser.parse_as::<$name>(cursor)?.into());
                     }
                 )*
 
@@ -103,7 +103,7 @@ macro_rules! define_keywords {
 
             impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
-                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
+                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
                     let span = cursor.next_n($token.len())?.span();
 
                     if span != &$token.as_bytes() {
@@ -112,7 +112,7 @@ macro_rules! define_keywords {
 
                     Ok(Self {
                         span: span.clone(),
-                    }.into())
+                    })
                 }
 
                 #[inline]

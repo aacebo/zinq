@@ -31,10 +31,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "zinq-reflect"
-version = "0.0.1"
-
-[[package]]
 name = "zinq-token"
 version = "0.0.1"
 dependencies = [

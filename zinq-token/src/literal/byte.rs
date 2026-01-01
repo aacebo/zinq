@@ -36,7 +36,7 @@ impl Peek<TokenParser> for LByte {
 
 impl Parse<TokenParser> for LByte {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
         cursor.next_while(|b, _| b != &b'\'')?.next_n(3)?;
 
         Ok(Self {

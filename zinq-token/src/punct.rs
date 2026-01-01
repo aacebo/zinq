@@ -41,10 +41,10 @@ macro_rules! define_puncts {
 
         impl zinq_parse::Parse<$crate::TokenParser> for Punct {
             #[inline]
-            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
+            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
                 $(
                     if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
-                        return parser.parse_as::<$name>(cursor);
+                        return Ok(parser.parse_as::<$name>(cursor)?.into());
                     }
                 )*
 
@@ -103,14 +103,14 @@ macro_rules! define_puncts {
 
             impl zinq_parse::Parse<$crate::TokenParser> for $name {
                 #[inline]
-                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<$crate::Token> {
+                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
                     if !(cursor.next_n($token.len())?.span() == &$token.as_bytes()) {
                         return Err(cursor.error(zinq_error::NOT_FOUND, &format!("expected '{}'", $token)));
                     }
 
                     Ok(Self {
                         span: cursor.span().clone(),
-                    }.into())
+                    })
                 }
 
                 #[inline]

@@ -196,7 +196,7 @@ impl Peek<TokenParser> for LInt {
 
 impl Parse<TokenParser> for LInt {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
         cursor.next_while(|b, _| b.is_ascii_digit())?;
 
         if cursor.peek_n(2).unwrap_or(&[]) == b"u8" || cursor.peek_n(2).unwrap_or(&[]) == b"i8" {

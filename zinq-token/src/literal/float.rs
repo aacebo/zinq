@@ -97,7 +97,7 @@ impl Peek<TokenParser> for LFloat {
 
 impl Parse<TokenParser> for LFloat {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Token> {
+    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
         cursor
             .next_while(|b, _| b.is_ascii_digit())?
             .next_if(|b, _| b == &b'.')?

@@ -13,7 +13,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn punct(&mut self, cursor: &mut Cursor) -> Result<Token> {
+    pub fn punct(&mut self, cursor: &mut Cursor) -> Result<Punct> {
         self.parse_as::<Punct>(cursor)
     }
 
@@ -23,7 +23,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn literal(&mut self, cursor: &mut Cursor) -> Result<Token> {
+    pub fn literal(&mut self, cursor: &mut Cursor) -> Result<Literal> {
         self.parse_as::<Literal>(cursor)
     }
 
@@ -33,7 +33,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn keyword(&mut self, cursor: &mut Cursor) -> Result<Token> {
+    pub fn keyword(&mut self, cursor: &mut Cursor) -> Result<Keyword> {
         self.parse_as::<Keyword>(cursor)
     }
 
@@ -43,7 +43,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn ident(&mut self, cursor: &mut Cursor) -> Result<Token> {
+    pub fn ident(&mut self, cursor: &mut Cursor) -> Result<Ident> {
         self.parse_as::<Ident>(cursor)
     }
 
@@ -53,7 +53,7 @@ impl TokenParser {
     }
 
     #[inline]
-    pub fn delim(&mut self, cursor: &mut Cursor) -> Result<Token> {
+    pub fn delim(&mut self, cursor: &mut Cursor) -> Result<Delim> {
         self.parse_as::<Delim>(cursor)
     }
 }
