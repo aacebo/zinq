@@ -33,17 +33,7 @@ where
     P: std::fmt::Display + Parse<TokenParser>,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (i, (token, punct)) in self.segments.iter().enumerate() {
-            write!(f, "{}", token)?;
-
-            if i < self.segments.len() - 1
-                && let Some(p) = punct
-            {
-                write!(f, "{}", p)?;
-            }
-        }
-
-        Ok(())
+        write!(f, "{}", &self.span)
     }
 }
 
@@ -100,7 +90,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{Comma, LInt, Punctuated, TokenParser};
+    use crate::{ColonColon, Comma, LInt, Punctuated, Token, TokenParser};
 
     #[test]
     fn should_parse_int_list() -> Result<()> {
@@ -108,8 +98,20 @@ mod test {
         let mut cursor = Span::from_bytes(b"1, 2, 3").cursor();
         let stream = parser.parse_as::<Punctuated<LInt, Comma>>(&mut cursor)?;
 
-        println!("{}", &stream);
         debug_assert_eq!(stream.len(), 3);
+        debug_assert_eq!(stream.to_string(), "1, 2, 3");
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_ident_list() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(b"hello::world::mod").cursor();
+        let stream = parser.parse_as::<Punctuated<Token, ColonColon>>(&mut cursor)?;
+
+        debug_assert_eq!(stream.len(), 3);
+        debug_assert_eq!(stream.to_string(), "hello::world::mod");
 
         Ok(())
     }
