@@ -189,7 +189,7 @@ define_keywords! {
     "match",     pub struct Match,      is_match,
     "where",     pub struct Where,      is_where,
     "continue",  pub struct Continue,   is_continue,
-    "trait",     pub struct Trait,      is_trait,
+    "iface",     pub struct IFace,      is_iface,
     "if",        pub struct If,         is_if,
     "else",      pub struct Else,       is_else,
     "for",       pub struct For,        is_for,

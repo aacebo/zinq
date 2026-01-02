@@ -1,16 +1,22 @@
 use std::{ops::Index, str::FromStr};
 
 use zinq_error::ZinqError;
-use zinq_parse::{Parser, Span};
+use zinq_parse::{Parse, Parser, Peek, Span};
 
 use crate::{ToTokens, Token, TokenParser};
 
 #[derive(Debug, Default, Clone)]
-pub struct TokenStream(Vec<Token>);
+pub struct TokenStream {
+    span: Span,
+    inner: Vec<Token>,
+}
 
 impl TokenStream {
     pub fn new() -> Self {
-        Self(vec![])
+        Self {
+            span: Span::default(),
+            inner: vec![],
+        }
     }
 }
 
@@ -18,17 +24,14 @@ impl TryFrom<&[u8]> for TokenStream {
     type Error = ZinqError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut parser = TokenParser;
-        let span = Span::from_bytes(value);
-        let mut cursor = span.cursor();
-        let mut tokens = vec![];
-
-        while !cursor.eof() {
-            let token = parser.parse(&mut cursor)?;
-            tokens.push(token);
+        if value.is_empty() {
+            return Ok(Self::new());
         }
 
-        Ok(Self(tokens))
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(value).cursor();
+
+        parser.parse_as::<Self>(&mut cursor)
     }
 }
 
@@ -36,17 +39,14 @@ impl<const N: usize> TryFrom<&[u8; N]> for TokenStream {
     type Error = ZinqError;
 
     fn try_from(value: &[u8; N]) -> Result<Self, Self::Error> {
-        let mut parser = TokenParser;
-        let span = Span::from_bytes(value);
-        let mut cursor = span.cursor();
-        let mut tokens = vec![];
-
-        while !cursor.eof() {
-            let token = parser.parse(&mut cursor)?;
-            tokens.push(token);
+        if value.is_empty() {
+            return Ok(Self::new());
         }
 
-        Ok(Self(tokens))
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(value).cursor();
+
+        parser.parse_as::<Self>(&mut cursor)
     }
 }
 
@@ -54,35 +54,54 @@ impl FromStr for TokenStream {
     type Err = ZinqError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut parser = TokenParser;
-        let span = Span::from_str(s);
-        let mut cursor = span.cursor();
-        let mut tokens = vec![];
-
-        while !cursor.eof() {
-            let token = parser.parse(&mut cursor)?;
-            tokens.push(token);
+        if s.is_empty() {
+            return Ok(Self::new());
         }
 
-        Ok(Self(tokens))
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_str(s).cursor();
+
+        parser.parse_as::<Self>(&mut cursor)
     }
 }
 
 impl From<Token> for TokenStream {
     fn from(value: Token) -> Self {
-        Self(vec![value])
+        Self {
+            span: value.span().clone(),
+            inner: vec![value],
+        }
     }
 }
 
 impl FromIterator<Token> for TokenStream {
     fn from_iter<T: IntoIterator<Item = Token>>(iter: T) -> Self {
-        Self(iter.into_iter().collect::<Vec<Token>>())
+        let tokens = iter.into_iter().collect::<Vec<Token>>();
+
+        Self {
+            span: Span::from_bounds(
+                tokens.first().unwrap().span(),
+                tokens.last().unwrap().span(),
+            ),
+            inner: tokens,
+        }
     }
 }
 
 impl FromIterator<Self> for TokenStream {
     fn from_iter<T: IntoIterator<Item = Self>>(iter: T) -> Self {
-        Self(iter.into_iter().flat_map(|v| v.0).collect::<Vec<Token>>())
+        let tokens = iter
+            .into_iter()
+            .flat_map(|v| v.inner)
+            .collect::<Vec<Token>>();
+
+        Self {
+            span: Span::from_bounds(
+                tokens.first().unwrap().span(),
+                tokens.last().unwrap().span(),
+            ),
+            inner: tokens,
+        }
     }
 }
 
@@ -91,25 +110,25 @@ impl IntoIterator for TokenStream {
     type IntoIter = std::vec::IntoIter<Token>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
+        self.inner.into_iter()
     }
 }
 
 impl Extend<Token> for TokenStream {
     fn extend<T: IntoIterator<Item = Token>>(&mut self, iter: T) {
-        self.0.extend(iter)
+        self.inner.extend(iter)
     }
 }
 
 impl Extend<Self> for TokenStream {
     fn extend<T: IntoIterator<Item = Self>>(&mut self, iter: T) {
-        self.0.extend(iter.into_iter().flat_map(|v| v.0))
+        self.inner.extend(iter.into_iter().flat_map(|v| v.inner))
     }
 }
 
 impl std::fmt::Display for TokenStream {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for token in &self.0 {
+        for token in &self.inner {
             write!(f, "{}", token)?;
         }
 
@@ -121,7 +140,7 @@ impl std::ops::Deref for TokenStream {
     type Target = [Token];
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.inner
     }
 }
 
@@ -129,12 +148,12 @@ impl Eq for TokenStream {}
 
 impl PartialEq for TokenStream {
     fn eq(&self, other: &Self) -> bool {
-        if self.0.len() != other.0.len() {
+        if self.inner.len() != other.inner.len() {
             return false;
         }
 
-        for i in 0..self.0.len() {
-            if self.0.index(i) != other.0.index(i) {
+        for i in 0..self.inner.len() {
+            if self.inner.index(i) != other.inner.index(i) {
                 return false;
             }
         }
@@ -146,6 +165,38 @@ impl PartialEq for TokenStream {
 impl ToTokens for TokenStream {
     fn to_tokens(&self) -> zinq_error::Result<TokenStream> {
         Ok(self.clone())
+    }
+}
+
+impl Peek<TokenParser> for TokenStream {
+    fn peek(_: &zinq_parse::Cursor, _: &TokenParser) -> zinq_error::Result<bool> {
+        Ok(true)
+    }
+}
+
+impl Parse<TokenParser> for TokenStream {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut TokenParser,
+    ) -> zinq_error::Result<Self> {
+        let mut tokens = vec![];
+
+        while !cursor.eof() {
+            let token = parser.parse(cursor)?;
+            tokens.push(token);
+        }
+
+        Ok(Self {
+            span: Span::from_bounds(
+                tokens.first().unwrap().span(),
+                tokens.last().unwrap().span(),
+            ),
+            inner: tokens,
+        })
+    }
+
+    fn span(&self) -> &Span {
+        &self.span
     }
 }
 
