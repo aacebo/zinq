@@ -57,6 +57,10 @@ pub trait Parser: Sized {
     where
         Self: Sized,
     {
+        if cursor.peek()?.is_ascii_whitespace() {
+            return self.peek_as::<T>(cursor.fork().shift_next()?);
+        }
+
         T::peek(cursor, self)
     }
 
@@ -96,5 +100,28 @@ pub trait Parser: Sized {
         let value = T::parse(&mut fork, self)?;
         cursor.merge(fork.commit());
         Ok(value)
+    }
+}
+
+impl<T: Peek<P>, P: Parser> Peek<P> for Option<T> {
+    fn peek(_: &Cursor, _: &P) -> Result<bool> {
+        Ok(true)
+    }
+}
+
+impl<T: Parse<P>, P: Parser> Parse<P> for Option<T> {
+    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self> {
+        if !parser.peek_as::<T>(cursor).unwrap_or(false) {
+            return Ok(Self::None);
+        }
+
+        Ok(Some(parser.parse_as::<T>(cursor)?))
+    }
+
+    fn span(&self) -> &Span {
+        match self {
+            None => panic!("attempted to call Parse::span on None"),
+            Some(v) => v.span(),
+        }
     }
 }

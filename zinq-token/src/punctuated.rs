@@ -12,6 +12,18 @@ where
     segments: Vec<(T, Option<P>)>,
 }
 
+impl<T, P> std::ops::Deref for Punctuated<T, P>
+where
+    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse<TokenParser>,
+{
+    type Target = [(T, Option<P>)];
+
+    fn deref(&self) -> &Self::Target {
+        &self.segments
+    }
+}
+
 impl<T, P> Punctuated<T, P>
 where
     T: std::fmt::Display + Parse<TokenParser>,
@@ -59,7 +71,7 @@ where
         let mut segments = vec![];
         let start = cursor.span().clone();
 
-        while !cursor.eof() {
+        while !cursor.eof() && parser.peek_as::<T>(cursor).unwrap_or(false) {
             let value = parser.parse_as::<T>(cursor)?;
 
             if parser.peek_as::<P>(cursor).unwrap_or(false) {

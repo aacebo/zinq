@@ -11,6 +11,7 @@ mod punct;
 mod punctuated;
 mod stream;
 mod suffixed;
+pub mod syntax;
 
 pub use delimiter::*;
 pub use enclosed::*;
