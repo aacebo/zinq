@@ -6,9 +6,11 @@ mod keyword;
 mod literal;
 pub mod macros;
 mod parser;
+mod prefixed;
 mod punct;
 mod punctuated;
 mod stream;
+mod suffixed;
 
 pub use delimiter::*;
 pub use enclosed::*;
@@ -17,9 +19,11 @@ pub use ident::*;
 pub use keyword::*;
 pub use literal::*;
 pub use parser::*;
+pub use prefixed::*;
 pub use punct::*;
 pub use punctuated::*;
 pub use stream::*;
+pub use suffixed::*;
 
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
