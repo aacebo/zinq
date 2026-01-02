@@ -1,4 +1,5 @@
 mod delimiter;
+mod enclosed;
 mod error;
 mod ident;
 mod keyword;
@@ -10,6 +11,7 @@ mod punctuated;
 mod stream;
 
 pub use delimiter::*;
+pub use enclosed::*;
 pub use error::*;
 pub use ident::*;
 pub use keyword::*;
