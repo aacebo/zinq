@@ -69,6 +69,10 @@ pub trait Parser: Sized {
     where
         Self: Sized,
     {
+        if cursor.peek()?.is_ascii_whitespace() {
+            return self.parse(cursor.shift_next()?);
+        }
+
         let mut fork = cursor.fork();
         let value = Self::Item::parse(&mut fork, self)?;
         cursor.merge(fork.commit());
@@ -84,6 +88,10 @@ pub trait Parser: Sized {
     where
         Self: Sized,
     {
+        if cursor.peek()?.is_ascii_whitespace() {
+            return self.parse_as::<T>(cursor.shift_next()?);
+        }
+
         let mut fork = cursor.fork();
         let value = T::parse(&mut fork, self)?;
         cursor.merge(fork.commit());

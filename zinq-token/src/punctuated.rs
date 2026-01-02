@@ -57,37 +57,60 @@ where
     }
 }
 
-// impl<T, P> Parse<TokenParser> for Punctuated<T, P>
-// where
-//     T: std::fmt::Display + Parse<TokenParser>,
-//     P: std::fmt::Display + Parse<TokenParser>,
-// {
-//     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> zinq_error::Result<Token> {
-//         let mut segments = vec![];
+impl<T, P> Parse<TokenParser> for Punctuated<T, P>
+where
+    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse<TokenParser>,
+{
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut TokenParser,
+    ) -> zinq_error::Result<Self> {
+        let mut segments = vec![];
+        let start = cursor.span().clone();
 
-//         while !cursor.eof() {
-//             let value = parser.parse_as::<T>(cursor)?;
-//             let mut delim: Option<Token> = None;
+        while !cursor.eof() {
+            let value = parser.parse_as::<T>(cursor)?;
 
-//             if parser.peek_as::<P>(cursor)? {
-//                 delim = Some(parser.parse_as::<P>(cursor)?);
-//             }
+            if parser.peek_as::<P>(cursor).unwrap_or(false) {
+                let delim = parser.parse_as::<P>(cursor)?;
+                segments.push((value, Some(delim)));
+                continue;
+            }
 
-//             segments.push((value));
-//         }
-//     }
+            segments.push((value, None));
+            break;
+        }
 
-//     fn span(&self) -> &Span {
-//         &self.span
-//     }
-// }
+        let end = cursor.span().clone();
+
+        Ok(Self {
+            span: Span::from_bounds(&start, &end),
+            segments,
+        })
+    }
+
+    fn span(&self) -> &Span {
+        &self.span
+    }
+}
 
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
+    use zinq_parse::{Parser, Span};
+
+    use crate::{Comma, LInt, Punctuated, TokenParser};
 
     #[test]
-    fn should_parse_path() -> Result<()> {
+    fn should_parse_int_list() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(b"1, 2, 3").cursor();
+        let stream = parser.parse_as::<Punctuated<LInt, Comma>>(&mut cursor)?;
+
+        println!("{}", &stream);
+        debug_assert_eq!(stream.len(), 3);
+
         Ok(())
     }
 }
