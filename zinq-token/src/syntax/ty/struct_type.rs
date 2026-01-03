@@ -1,6 +1,9 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 
-use crate::{Ident, Pub, Struct, TokenParser, syntax::fields::Fields};
+use crate::{
+    Ident, Pub, Struct, TokenParser,
+    syntax::{fields::Fields, ty},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructType {
@@ -9,6 +12,12 @@ pub struct StructType {
     pub keyword: Struct,
     pub name: Ident,
     pub fields: Fields,
+}
+
+impl From<StructType> for ty::Type {
+    fn from(value: StructType) -> Self {
+        ty::Type::Struct(value)
+    }
 }
 
 impl std::fmt::Display for StructType {
