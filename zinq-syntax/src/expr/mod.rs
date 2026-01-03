@@ -26,6 +26,10 @@ use zinq_token::TokenParser;
 
 use crate::{Node, Syntax, Visitor};
 
+///
+/// ## Expression
+/// Something that can be evaluated, usually to a value (even if that value is `()`).
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expr {
     Assign(AssignExpr),

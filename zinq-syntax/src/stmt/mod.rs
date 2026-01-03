@@ -18,6 +18,12 @@ use zinq_token::TokenParser;
 
 use crate::{Node, Syntax, Visitor};
 
+///
+/// ## Statement
+/// Something that can appear as a “line” inside a block
+/// and doesn’t itself produce a value you can use in
+/// a larger expression.
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Stmt {
     Block(BlockStmt),
