@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, Mut, TokenParser};
+use zinq_token::{Mut, TokenParser};
 
 use crate::{Node, ty::Type};
 
@@ -7,7 +7,7 @@ use crate::{Node, ty::Type};
 pub struct MutType {
     pub span: Span,
     pub keyword: Mut,
-    pub ty: Ident,
+    pub ty: Box<Type>,
 }
 
 impl From<MutType> for Type {
@@ -53,12 +53,12 @@ impl Parse<TokenParser> for MutType {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse_as::<Mut>(cursor)?;
-        let ty = parser.parse_as::<Ident>(cursor)?;
+        let ty = parser.parse_as::<Type>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(keyword.span(), ty.span()),
             keyword,
-            ty,
+            ty: Box::new(ty),
         })
     }
 

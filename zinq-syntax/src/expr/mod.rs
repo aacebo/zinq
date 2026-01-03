@@ -1,10 +1,15 @@
 mod assign;
 mod binary;
 mod invoke;
+mod resolve;
+mod resolve_field;
 
 pub use assign::*;
 pub use binary::*;
 pub use invoke::*;
+pub use resolve::*;
+pub use resolve_field::*;
+
 use zinq_error::Result;
 use zinq_parse::{Parse, Parser, Peek};
 use zinq_token::TokenParser;
@@ -16,6 +21,8 @@ pub enum Expr {
     Assign(AssignExpr),
     Binary(BinaryExpr),
     Invoke(InvokeExpr),
+    ResolveField(ResolveFieldExpr),
+    Resolve(ResolveExpr),
 }
 
 impl Node for Expr {
@@ -24,6 +31,8 @@ impl Node for Expr {
             Self::Assign(v) => v.name(),
             Self::Binary(v) => v.name(),
             Self::Invoke(v) => v.name(),
+            Self::ResolveField(v) => v.name(),
+            Self::Resolve(v) => v.name(),
         }
     }
 
@@ -47,6 +56,8 @@ impl std::fmt::Display for Expr {
             Self::Assign(v) => write!(f, "{}", v),
             Self::Binary(v) => write!(f, "{}", v),
             Self::Invoke(v) => write!(f, "{}", v),
+            Self::ResolveField(v) => write!(f, "{}", v),
+            Self::Resolve(v) => write!(f, "{}", v),
         }
     }
 }
@@ -65,6 +76,14 @@ impl Peek<TokenParser> for Expr {
 
 impl Parse<TokenParser> for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
+        if parser.peek_as::<ResolveExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<ResolveExpr>(cursor)?.into());
+        }
+
+        if parser.peek_as::<ResolveFieldExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<ResolveFieldExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
         }
@@ -88,6 +107,8 @@ impl Parse<TokenParser> for Expr {
             Self::Assign(v) => v.span(),
             Self::Binary(v) => v.span(),
             Self::Invoke(v) => v.span(),
+            Self::ResolveField(v) => v.span(),
+            Self::Resolve(v) => v.span(),
         }
     }
 }

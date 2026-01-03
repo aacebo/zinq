@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{And, Ident, TokenParser};
+use zinq_token::{And, TokenParser};
 
 use crate::{Node, ty::Type};
 
@@ -7,7 +7,7 @@ use crate::{Node, ty::Type};
 pub struct RefType {
     pub span: Span,
     pub and: And,
-    pub expr: Ident,
+    pub to: Box<Type>,
 }
 
 impl From<RefType> for Type {
@@ -53,12 +53,12 @@ impl Parse<TokenParser> for RefType {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let and = parser.parse_as::<And>(cursor)?;
-        let expr = parser.parse_as::<Ident>(cursor)?;
+        let to = parser.parse_as::<Type>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(and.span(), expr.span()),
+            span: Span::from_bounds(and.span(), to.span()),
             and,
-            expr,
+            to: Box::new(to),
         })
     }
 
@@ -81,7 +81,7 @@ mod test {
         let value = parser.parse_as::<RefType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&int");
-        debug_assert_eq!(value.expr.to_string(), "int");
+        debug_assert_eq!(value.to.to_string(), "int");
 
         Ok(())
     }
