@@ -71,16 +71,16 @@ impl Parse<TokenParser> for Type {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
+        if parser.peek_as::<MutType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<MutType>(cursor)?.into());
+        }
+
         if parser.peek_as::<PathType>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<PathType>(cursor)?.into());
         }
 
         if parser.peek_as::<RefType>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<RefType>(cursor)?.into());
-        }
-
-        if parser.peek_as::<MutType>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<MutType>(cursor)?.into());
         }
 
         if parser.peek_as::<StructType>(cursor).unwrap_or(false) {

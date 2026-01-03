@@ -85,4 +85,16 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn should_parse_mut() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(b"&mut int").cursor();
+        let value = parser.parse_as::<RefType>(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "&mut int");
+        debug_assert_eq!(value.to.to_string(), "mut int");
+
+        Ok(())
+    }
 }
