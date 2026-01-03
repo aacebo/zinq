@@ -3,6 +3,7 @@ mod binary;
 mod group;
 mod invoke;
 mod literal;
+mod logical;
 mod resolve;
 mod resolve_field;
 
@@ -11,6 +12,7 @@ pub use binary::*;
 pub use group::*;
 pub use invoke::*;
 pub use literal::*;
+pub use logical::*;
 pub use resolve::*;
 pub use resolve_field::*;
 
@@ -27,8 +29,67 @@ pub enum Expr {
     Group(GroupExpr),
     Invoke(InvokeExpr),
     Literal(LiteralExpr),
+    Logical(LogicalExpr),
     ResolveField(ResolveFieldExpr),
     Resolve(ResolveExpr),
+}
+
+impl Expr {
+    pub fn is_assign(&self) -> bool {
+        match self {
+            Self::Assign(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_binary(&self) -> bool {
+        match self {
+            Self::Binary(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_group(&self) -> bool {
+        match self {
+            Self::Group(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_invoke(&self) -> bool {
+        match self {
+            Self::Invoke(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_literal(&self) -> bool {
+        match self {
+            Self::Literal(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_logical(&self) -> bool {
+        match self {
+            Self::Logical(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_resolve_field(&self) -> bool {
+        match self {
+            Self::ResolveField(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_resolve(&self) -> bool {
+        match self {
+            Self::Resolve(_) => true,
+            _ => false,
+        }
+    }
 }
 
 impl Node for Expr {
@@ -39,6 +100,7 @@ impl Node for Expr {
             Self::Group(v) => v.name(),
             Self::Invoke(v) => v.name(),
             Self::Literal(v) => v.name(),
+            Self::Logical(v) => v.name(),
             Self::ResolveField(v) => v.name(),
             Self::Resolve(v) => v.name(),
         }
@@ -66,6 +128,7 @@ impl std::fmt::Display for Expr {
             Self::Group(v) => write!(f, "{}", v),
             Self::Invoke(v) => write!(f, "{}", v),
             Self::Literal(v) => write!(f, "{}", v),
+            Self::Logical(v) => write!(f, "{}", v),
             Self::ResolveField(v) => write!(f, "{}", v),
             Self::Resolve(v) => write!(f, "{}", v),
         }
@@ -102,6 +165,10 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
         }
 
+        if parser.peek_as::<LogicalExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<LogicalExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<BinaryExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<BinaryExpr>(cursor)?.into());
         }
@@ -127,6 +194,7 @@ impl Parse<TokenParser> for Expr {
             Self::Group(v) => v.span(),
             Self::Invoke(v) => v.span(),
             Self::Literal(v) => v.span(),
+            Self::Logical(v) => v.span(),
             Self::ResolveField(v) => v.span(),
             Self::Resolve(v) => v.span(),
         }

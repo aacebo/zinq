@@ -3,6 +3,10 @@ use zinq_token::{Punct, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Binary Expression
+/// `==` or `!=`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BinaryExpr {
     pub span: Span,

@@ -3,6 +3,10 @@ use zinq_token::{Eq, Ident, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Assign Expression
+/// `message = (...)`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssignExpr {
     pub span: Span,

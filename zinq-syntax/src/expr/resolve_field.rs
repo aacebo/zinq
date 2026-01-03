@@ -3,6 +3,10 @@ use zinq_token::{Dot, Ident, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Resolve Field Expression
+/// `my.field`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResolveFieldExpr {
     pub span: Span,

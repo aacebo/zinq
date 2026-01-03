@@ -3,6 +3,10 @@ use zinq_token::{LParen, RParen, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Group Expression
+/// `(...)`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GroupExpr {
     pub span: Span,

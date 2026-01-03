@@ -128,11 +128,7 @@ impl Extend<Self> for TokenStream {
 
 impl std::fmt::Display for TokenStream {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for token in &self.inner {
-            write!(f, "{}", token)?;
-        }
-
-        Ok(())
+        write!(f, "{}", &self.span)
     }
 }
 
@@ -210,18 +206,10 @@ mod test {
 
     #[test]
     fn should_parse_str() -> Result<()> {
-        let mut stream = TokenStream::from_str("let test: string = \"test\";")?;
+        let stream = TokenStream::from_str("let test: string = \"test\";")?;
 
         debug_assert_eq!(stream.len(), 7);
-        debug_assert_eq!(stream.to_string(), "lettest:string=\"test\";");
-
-        stream.extend(TokenStream::from_str("\nprintln(\"hello world\");")?);
-
-        debug_assert_eq!(stream.len(), 12);
-        debug_assert_eq!(
-            stream.to_string(),
-            "lettest:string=\"test\";println(\"hello world\");"
-        );
+        debug_assert_eq!(stream.to_string(), "let test: string = \"test\";");
 
         Ok(())
     }

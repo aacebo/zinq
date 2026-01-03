@@ -3,6 +3,10 @@ use zinq_token::{Comma, LParen, Punctuated, RParen, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Invoke Expression
+/// `do_stuff(arg1, arg2, ...)`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InvokeExpr {
     pub span: Span,

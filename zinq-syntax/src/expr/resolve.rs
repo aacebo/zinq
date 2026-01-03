@@ -3,6 +3,10 @@ use zinq_token::{Ident, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Resolve Expression
+/// `my_var`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResolveExpr {
     pub span: Span,

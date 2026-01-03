@@ -3,6 +3,10 @@ use zinq_token::{Literal, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
+///
+/// ## Literal Expression
+/// `"test"`
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LiteralExpr {
     pub span: Span,
