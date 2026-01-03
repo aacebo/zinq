@@ -2,6 +2,7 @@ mod assign;
 mod binary;
 mod group;
 mod invoke;
+mod literal;
 mod resolve;
 mod resolve_field;
 
@@ -9,6 +10,7 @@ pub use assign::*;
 pub use binary::*;
 pub use group::*;
 pub use invoke::*;
+pub use literal::*;
 pub use resolve::*;
 pub use resolve_field::*;
 
@@ -24,6 +26,7 @@ pub enum Expr {
     Binary(BinaryExpr),
     Group(GroupExpr),
     Invoke(InvokeExpr),
+    Literal(LiteralExpr),
     ResolveField(ResolveFieldExpr),
     Resolve(ResolveExpr),
 }
@@ -35,6 +38,7 @@ impl Node for Expr {
             Self::Binary(v) => v.name(),
             Self::Group(v) => v.name(),
             Self::Invoke(v) => v.name(),
+            Self::Literal(v) => v.name(),
             Self::ResolveField(v) => v.name(),
             Self::Resolve(v) => v.name(),
         }
@@ -61,6 +65,7 @@ impl std::fmt::Display for Expr {
             Self::Binary(v) => write!(f, "{}", v),
             Self::Group(v) => write!(f, "{}", v),
             Self::Invoke(v) => write!(f, "{}", v),
+            Self::Literal(v) => write!(f, "{}", v),
             Self::ResolveField(v) => write!(f, "{}", v),
             Self::Resolve(v) => write!(f, "{}", v),
         }
@@ -81,16 +86,16 @@ impl Peek<TokenParser> for Expr {
 
 impl Parse<TokenParser> for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
+        if parser.peek_as::<LiteralExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<LiteralExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<ResolveExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<ResolveExpr>(cursor)?.into());
         }
 
         if parser.peek_as::<ResolveFieldExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<ResolveFieldExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
         }
 
         if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
@@ -105,6 +110,10 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<InvokeExpr>(cursor)?.into());
         }
 
+        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
+        }
+
         Err(cursor.error(
             zinq_error::NOT_FOUND,
             &format!("unknown tokens '{}'", cursor),
@@ -117,6 +126,7 @@ impl Parse<TokenParser> for Expr {
             Self::Binary(v) => v.span(),
             Self::Group(v) => v.span(),
             Self::Invoke(v) => v.span(),
+            Self::Literal(v) => v.span(),
             Self::ResolveField(v) => v.span(),
             Self::Resolve(v) => v.span(),
         }

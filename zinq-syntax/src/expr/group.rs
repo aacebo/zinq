@@ -89,10 +89,10 @@ mod test {
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = TokenParser;
-        let mut cursor = Span::from_bytes(b"(test f32)").cursor();
+        let mut cursor = Span::from_bytes(b"(test 0.5 b'h')").cursor();
         let value = parser.parse_as::<GroupExpr>(&mut cursor)?;
 
-        debug_assert_eq!(value.to_string(), "(test f32)");
+        debug_assert_eq!(value.to_string(), "(test 0.5 b'h')");
 
         Ok(())
     }
