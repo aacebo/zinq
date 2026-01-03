@@ -4,24 +4,24 @@ use zinq_token::{Ident, TokenParser};
 use crate::{Node, Visitor, expr::Expr};
 
 ///
-/// ## Resolve Expression
+/// ## Get Expression
 /// `my_var`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ResolveExpr {
+pub struct GetExpr {
     pub span: Span,
     pub name: Ident,
 }
 
-impl From<ResolveExpr> for Expr {
-    fn from(value: ResolveExpr) -> Self {
-        Self::Resolve(value)
+impl From<GetExpr> for Expr {
+    fn from(value: GetExpr) -> Self {
+        Self::Get(value)
     }
 }
 
-impl Node for ResolveExpr {
+impl Node for GetExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Resolve"
+        "Syntax::Expr::Get"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -32,13 +32,13 @@ impl Node for ResolveExpr {
     }
 }
 
-impl std::fmt::Display for ResolveExpr {
+impl std::fmt::Display for GetExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for ResolveExpr {
+impl Peek<TokenParser> for GetExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -50,7 +50,7 @@ impl Peek<TokenParser> for ResolveExpr {
     }
 }
 
-impl Parse<TokenParser> for ResolveExpr {
+impl Parse<TokenParser> for GetExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,

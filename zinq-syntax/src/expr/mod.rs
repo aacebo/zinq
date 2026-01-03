@@ -1,21 +1,23 @@
 mod assign;
 mod binary;
+mod get;
+mod get_field;
 mod group;
 mod invoke;
 mod literal;
 mod logical;
-mod resolve;
-mod resolve_field;
+mod set_field;
 mod unary;
 
 pub use assign::*;
 pub use binary::*;
+pub use get::*;
+pub use get_field::*;
 pub use group::*;
 pub use invoke::*;
 pub use literal::*;
 pub use logical::*;
-pub use resolve::*;
-pub use resolve_field::*;
+pub use set_field::*;
 pub use unary::*;
 
 use zinq_error::Result;
@@ -32,8 +34,9 @@ pub enum Expr {
     Invoke(InvokeExpr),
     Literal(LiteralExpr),
     Logical(LogicalExpr),
-    ResolveField(ResolveFieldExpr),
-    Resolve(ResolveExpr),
+    GetField(GetFieldExpr),
+    Get(GetExpr),
+    SetField(SetFieldExpr),
     Unary(UnaryExpr),
 }
 
@@ -80,16 +83,23 @@ impl Expr {
         }
     }
 
-    pub fn is_resolve_field(&self) -> bool {
+    pub fn is_get_field(&self) -> bool {
         match self {
-            Self::ResolveField(_) => true,
+            Self::GetField(_) => true,
             _ => false,
         }
     }
 
-    pub fn is_resolve(&self) -> bool {
+    pub fn is_get(&self) -> bool {
         match self {
-            Self::Resolve(_) => true,
+            Self::Get(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_set_field(&self) -> bool {
+        match self {
+            Self::SetField(_) => true,
             _ => false,
         }
     }
@@ -111,8 +121,9 @@ impl Node for Expr {
             Self::Invoke(v) => v.name(),
             Self::Literal(v) => v.name(),
             Self::Logical(v) => v.name(),
-            Self::ResolveField(v) => v.name(),
-            Self::Resolve(v) => v.name(),
+            Self::GetField(v) => v.name(),
+            Self::Get(v) => v.name(),
+            Self::SetField(v) => v.name(),
             Self::Unary(v) => v.name(),
         }
     }
@@ -140,8 +151,9 @@ impl std::fmt::Display for Expr {
             Self::Invoke(v) => write!(f, "{}", v),
             Self::Literal(v) => write!(f, "{}", v),
             Self::Logical(v) => write!(f, "{}", v),
-            Self::ResolveField(v) => write!(f, "{}", v),
-            Self::Resolve(v) => write!(f, "{}", v),
+            Self::GetField(v) => write!(f, "{}", v),
+            Self::Get(v) => write!(f, "{}", v),
+            Self::SetField(v) => write!(f, "{}", v),
             Self::Unary(v) => write!(f, "{}", v),
         }
     }
@@ -169,12 +181,16 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<LiteralExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<ResolveExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ResolveExpr>(cursor)?.into());
+        if parser.peek_as::<GetExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<GetExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<ResolveFieldExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ResolveFieldExpr>(cursor)?.into());
+        if parser.peek_as::<GetFieldExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<GetFieldExpr>(cursor)?.into());
+        }
+
+        if parser.peek_as::<SetFieldExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<SetFieldExpr>(cursor)?.into());
         }
 
         if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
@@ -211,8 +227,9 @@ impl Parse<TokenParser> for Expr {
             Self::Invoke(v) => v.span(),
             Self::Literal(v) => v.span(),
             Self::Logical(v) => v.span(),
-            Self::ResolveField(v) => v.span(),
-            Self::Resolve(v) => v.span(),
+            Self::GetField(v) => v.span(),
+            Self::Get(v) => v.span(),
+            Self::SetField(v) => v.span(),
             Self::Unary(v) => v.span(),
         }
     }

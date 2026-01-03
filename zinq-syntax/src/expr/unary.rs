@@ -93,7 +93,7 @@ mod test {
 
         debug_assert_eq!(value.to_string(), "&b");
         debug_assert!(value.op.is_and());
-        debug_assert!(value.right.is_resolve());
+        debug_assert!(value.right.is_get());
 
         Ok(())
     }
@@ -119,7 +119,7 @@ mod test {
 
         debug_assert_eq!(value.to_string(), "!b");
         debug_assert!(value.op.is_not());
-        debug_assert!(value.right.is_resolve());
+        debug_assert!(value.right.is_get());
 
         Ok(())
     }

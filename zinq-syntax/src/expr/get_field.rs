@@ -4,26 +4,26 @@ use zinq_token::{Dot, Ident, TokenParser};
 use crate::{Node, Visitor, expr::Expr};
 
 ///
-/// ## Resolve Field Expression
+/// ## Get Field Expression
 /// `my.field`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ResolveFieldExpr {
+pub struct GetFieldExpr {
     pub span: Span,
     pub target: Box<Expr>,
     pub dot: Dot,
-    pub field: Ident,
+    pub name: Ident,
 }
 
-impl From<ResolveFieldExpr> for Expr {
-    fn from(value: ResolveFieldExpr) -> Self {
-        Self::ResolveField(value)
+impl From<GetFieldExpr> for Expr {
+    fn from(value: GetFieldExpr) -> Self {
+        Self::GetField(value)
     }
 }
 
-impl Node for ResolveFieldExpr {
+impl Node for GetFieldExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Resolve::Field"
+        "Syntax::Expr::Get::Field"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -34,13 +34,13 @@ impl Node for ResolveFieldExpr {
     }
 }
 
-impl std::fmt::Display for ResolveFieldExpr {
+impl std::fmt::Display for GetFieldExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for ResolveFieldExpr {
+impl Peek<TokenParser> for GetFieldExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -52,20 +52,20 @@ impl Peek<TokenParser> for ResolveFieldExpr {
     }
 }
 
-impl Parse<TokenParser> for ResolveFieldExpr {
+impl Parse<TokenParser> for GetFieldExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let target = parser.parse_as::<Expr>(cursor)?;
         let dot = parser.parse_as::<Dot>(cursor)?;
-        let field = parser.parse_as::<Ident>(cursor)?;
+        let name = parser.parse_as::<Ident>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(target.span(), field.span()),
+            span: Span::from_bounds(target.span(), name.span()),
             target: Box::new(target),
             dot,
-            field,
+            name,
         })
     }
 

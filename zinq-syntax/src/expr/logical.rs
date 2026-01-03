@@ -96,7 +96,7 @@ mod test {
         let value = parser.parse_as::<LogicalExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "a || true");
-        debug_assert!(value.left.is_resolve());
+        debug_assert!(value.left.is_get());
         debug_assert_eq!(value.left.to_string(), "a");
 
         debug_assert!(value.op.is_or_or());
