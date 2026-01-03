@@ -1,18 +1,31 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{And, Ident, TokenParser};
 
-use crate::ty::Type;
+use crate::{Node, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefType {
     pub span: Span,
     pub and: And,
-    pub ty: Ident,
+    pub expr: Ident,
 }
 
 impl From<RefType> for Type {
     fn from(value: RefType) -> Self {
         Type::Ref(value)
+    }
+}
+
+impl Node for RefType {
+    fn name(&self) -> &str {
+        "Syntax::Type::Ref"
+    }
+
+    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
     }
 }
 
@@ -27,15 +40,10 @@ impl Peek<TokenParser> for RefType {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        if fork_parser.peek_as::<And>(&mut fork).unwrap_or(false) {
-            fork_parser.parse_as::<And>(&mut fork)?;
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
         }
-
-        if fork_parser.peek_as::<Type>(&mut fork).unwrap_or(false) {
-            fork_parser.parse_as::<Type>(&mut fork)?;
-        }
-
-        Ok(true)
     }
 }
 
@@ -45,12 +53,12 @@ impl Parse<TokenParser> for RefType {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let and = parser.parse_as::<And>(cursor)?;
-        let ty = parser.parse_as::<Ident>(cursor)?;
+        let expr = parser.parse_as::<Ident>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(and.span(), ty.span()),
+            span: Span::from_bounds(and.span(), expr.span()),
             and,
-            ty,
+            expr,
         })
     }
 
@@ -73,7 +81,7 @@ mod test {
         let value = parser.parse_as::<RefType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&int");
-        debug_assert_eq!(value.ty.to_string(), "int");
+        debug_assert_eq!(value.expr.to_string(), "int");
 
         Ok(())
     }

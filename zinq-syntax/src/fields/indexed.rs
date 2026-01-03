@@ -1,6 +1,8 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Comma, Ident, LParen, Pub, Punctuated, RParen, TokenParser};
 
+use crate::{Node, Visitor};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedField {
     pub span: Span,
@@ -53,6 +55,19 @@ pub struct IndexedFields {
     pub left_paren: LParen,
     pub fields: Punctuated<IndexedField, Comma>,
     pub right_paren: RParen,
+}
+
+impl Node for IndexedFields {
+    fn name(&self) -> &str {
+        "Syntax::Fields::Indexed"
+    }
+
+    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
 }
 
 impl std::ops::Deref for IndexedFields {

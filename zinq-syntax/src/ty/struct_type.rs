@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Ident, Pub, Struct, TokenParser};
 
-use crate::{fields::Fields, ty};
+use crate::{Node, fields::Fields, ty};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructType {
@@ -18,6 +18,19 @@ impl From<StructType> for ty::Type {
     }
 }
 
+impl Node for StructType {
+    fn name(&self) -> &str {
+        "Syntax::Type::Struct"
+    }
+
+    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
 impl std::fmt::Display for StructType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
@@ -29,15 +42,10 @@ impl Peek<TokenParser> for StructType {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        if fork_parser.peek_as::<Pub>(&mut fork).unwrap_or(false) {
-            fork_parser.parse_as::<Pub>(&mut fork)?;
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
         }
-
-        if fork_parser.peek_as::<Struct>(&mut fork).unwrap_or(false) {
-            fork_parser.parse_as::<Struct>(&mut fork)?;
-        }
-
-        Ok(true)
     }
 }
 

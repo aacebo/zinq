@@ -1,6 +1,8 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Colon, Comma, Ident, LBrace, Pub, Punctuated, RBrace, TokenParser};
 
+use crate::{Node, Visitor};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedField {
     pub span: Span,
@@ -63,6 +65,19 @@ pub struct NamedFields {
     pub left_brace: LBrace,
     pub fields: Punctuated<NamedField, Comma>,
     pub right_brace: RBrace,
+}
+
+impl Node for NamedFields {
+    fn name(&self) -> &str {
+        "Syntax::Fields::Named"
+    }
+
+    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
 }
 
 impl std::ops::Deref for NamedFields {

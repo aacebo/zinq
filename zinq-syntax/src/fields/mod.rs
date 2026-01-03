@@ -5,7 +5,7 @@ pub use indexed::*;
 pub use named::*;
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::TokenParser;
+use crate::{Node, Syntax, TokenParser, Visitor};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {
@@ -22,6 +22,28 @@ impl Fields {
     }
 }
 
+impl From<Fields> for Syntax {
+    fn from(value: Fields) -> Self {
+        Self::Fields(value)
+    }
+}
+
+impl Node for Fields {
+    fn name(&self) -> &str {
+        match self {
+            Self::Indexed(v) => v.name(),
+            Self::Named(v) => v.name(),
+        }
+    }
+
+    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
 impl std::fmt::Display for Fields {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -33,8 +55,13 @@ impl std::fmt::Display for Fields {
 
 impl Peek<TokenParser> for Fields {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<IndexedFields>(cursor).unwrap_or(false)
-            || parser.peek_as::<NamedFields>(cursor).unwrap_or(false))
+        let mut fork = cursor.fork();
+        let mut fork_parser = parser.clone();
+
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
+        }
     }
 }
 

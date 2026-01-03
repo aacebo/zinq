@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Ident, Mut, TokenParser};
 
-use crate::ty::Type;
+use crate::{Node, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MutType {
@@ -16,6 +16,19 @@ impl From<MutType> for Type {
     }
 }
 
+impl Node for MutType {
+    fn name(&self) -> &str {
+        "Syntax::Type::Mut"
+    }
+
+    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
 impl std::fmt::Display for MutType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
@@ -24,7 +37,13 @@ impl std::fmt::Display for MutType {
 
 impl Peek<TokenParser> for MutType {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<Mut>(cursor).unwrap_or(false))
+        let mut fork = cursor.fork();
+        let mut fork_parser = parser.clone();
+
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
+        }
     }
 }
 

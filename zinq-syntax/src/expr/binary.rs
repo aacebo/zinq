@@ -19,7 +19,7 @@ impl From<BinaryExpr> for Expr {
 
 impl Node for BinaryExpr {
     fn name(&self) -> &str {
-        "Expr::Binary"
+        "Syntax::Expr::Binary"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

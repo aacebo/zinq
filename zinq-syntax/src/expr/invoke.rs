@@ -20,7 +20,7 @@ impl From<InvokeExpr> for Expr {
 
 impl Node for InvokeExpr {
     fn name(&self) -> &str {
-        "Expr::Invoke"
+        "Syntax::Expr::Invoke"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

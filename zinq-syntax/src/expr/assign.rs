@@ -19,7 +19,7 @@ impl From<AssignExpr> for Expr {
 
 impl Node for AssignExpr {
     fn name(&self) -> &str {
-        "Expr::Assign"
+        "Syntax::Expr::Assign"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

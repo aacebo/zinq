@@ -7,13 +7,36 @@ pub use ref_type::*;
 pub use struct_type::*;
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::TokenParser;
+use crate::{Node, Syntax, TokenParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
     Mut(MutType),
     Ref(RefType),
     Struct(StructType),
+}
+
+impl From<Type> for Syntax {
+    fn from(value: Type) -> Self {
+        Self::Type(value)
+    }
+}
+
+impl Node for Type {
+    fn name(&self) -> &str {
+        match self {
+            Self::Mut(v) => v.name(),
+            Self::Ref(v) => v.name(),
+            Self::Struct(v) => v.name(),
+        }
+    }
+
+    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
 }
 
 impl std::fmt::Display for Type {
@@ -28,9 +51,13 @@ impl std::fmt::Display for Type {
 
 impl Peek<TokenParser> for Type {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<StructType>(cursor).unwrap_or(false)
-            || parser.peek_as::<MutType>(cursor).unwrap_or(false)
-            || parser.peek_as::<RefType>(cursor).unwrap_or(false))
+        let mut fork = cursor.fork();
+        let mut fork_parser = parser.clone();
+
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
+        }
     }
 }
 
