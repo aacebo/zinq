@@ -6,6 +6,7 @@ mod literal;
 mod logical;
 mod resolve;
 mod resolve_field;
+mod unary;
 
 pub use assign::*;
 pub use binary::*;
@@ -15,6 +16,7 @@ pub use literal::*;
 pub use logical::*;
 pub use resolve::*;
 pub use resolve_field::*;
+pub use unary::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Parser, Peek};
@@ -32,6 +34,7 @@ pub enum Expr {
     Logical(LogicalExpr),
     ResolveField(ResolveFieldExpr),
     Resolve(ResolveExpr),
+    Unary(UnaryExpr),
 }
 
 impl Expr {
@@ -90,6 +93,13 @@ impl Expr {
             _ => false,
         }
     }
+
+    pub fn is_unary(&self) -> bool {
+        match self {
+            Self::Unary(_) => true,
+            _ => false,
+        }
+    }
 }
 
 impl Node for Expr {
@@ -103,6 +113,7 @@ impl Node for Expr {
             Self::Logical(v) => v.name(),
             Self::ResolveField(v) => v.name(),
             Self::Resolve(v) => v.name(),
+            Self::Unary(v) => v.name(),
         }
     }
 
@@ -131,6 +142,7 @@ impl std::fmt::Display for Expr {
             Self::Logical(v) => write!(f, "{}", v),
             Self::ResolveField(v) => write!(f, "{}", v),
             Self::Resolve(v) => write!(f, "{}", v),
+            Self::Unary(v) => write!(f, "{}", v),
         }
     }
 }
@@ -149,6 +161,10 @@ impl Peek<TokenParser> for Expr {
 
 impl Parse<TokenParser> for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
+        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<LiteralExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<LiteralExpr>(cursor)?.into());
         }
@@ -169,16 +185,16 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<LogicalExpr>(cursor)?.into());
         }
 
+        if parser.peek_as::<UnaryExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<UnaryExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<BinaryExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<BinaryExpr>(cursor)?.into());
         }
 
         if parser.peek_as::<InvokeExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<InvokeExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
         }
 
         Err(cursor.error(
@@ -197,6 +213,7 @@ impl Parse<TokenParser> for Expr {
             Self::Logical(v) => v.span(),
             Self::ResolveField(v) => v.span(),
             Self::Resolve(v) => v.span(),
+            Self::Unary(v) => v.span(),
         }
     }
 }
