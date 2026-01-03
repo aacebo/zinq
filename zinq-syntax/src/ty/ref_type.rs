@@ -1,6 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
+use zinq_token::{And, Ident, TokenParser};
 
-use crate::{And, Ident, TokenParser, syntax::ty::Type};
+use crate::ty::Type;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefType {
@@ -63,7 +64,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, syntax::ty::RefType};
+    use crate::{TokenParser, ty::RefType};
 
     #[test]
     fn should_parse() -> Result<()> {

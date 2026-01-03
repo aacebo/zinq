@@ -1,6 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-
-use crate::{Comma, Ident, LParen, Pub, Punctuated, RParen, TokenParser};
+use zinq_token::{Comma, Ident, LParen, Pub, Punctuated, RParen, TokenParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedField {
@@ -121,7 +120,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, syntax::fields::IndexedFields};
+    use crate::{TokenParser, fields::IndexedFields};
 
     #[test]
     fn should_parse_many() -> Result<()> {

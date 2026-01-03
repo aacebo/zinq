@@ -1,6 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
+use zinq_token::{Ident, Mut, TokenParser};
 
-use crate::{Ident, Mut, TokenParser, syntax::ty::Type};
+use crate::ty::Type;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MutType {
@@ -52,7 +53,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, syntax::ty::MutType};
+    use crate::{TokenParser, ty::MutType};
 
     #[test]
     fn should_parse() -> Result<()> {

@@ -1,6 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-
-use crate::{Colon, Comma, Ident, LBrace, Pub, Punctuated, RBrace, TokenParser};
+use zinq_token::{Colon, Comma, Ident, LBrace, Pub, Punctuated, RBrace, TokenParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedField {
@@ -129,7 +128,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, syntax::fields::NamedFields};
+    use crate::{TokenParser, fields::NamedFields};
 
     #[test]
     fn should_parse() -> Result<()> {

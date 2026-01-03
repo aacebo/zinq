@@ -1,9 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
+use zinq_token::{Ident, Pub, Struct, TokenParser};
 
-use crate::{
-    Ident, Pub, Struct, TokenParser,
-    syntax::{fields::Fields, ty},
-};
+use crate::{fields::Fields, ty};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructType {
@@ -77,7 +75,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, syntax::ty};
+    use crate::{TokenParser, ty};
 
     #[test]
     fn should_parse_private() -> Result<()> {

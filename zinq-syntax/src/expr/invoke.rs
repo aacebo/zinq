@@ -1,25 +1,26 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Eq, Ident, TokenParser};
+use zinq_token::{Comma, LParen, Punctuated, RParen, TokenParser};
 
 use crate::{Node, Visitor, expr::Expr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AssignExpr {
+pub struct InvokeExpr {
     pub span: Span,
-    pub name: Ident,
-    pub eq: Eq,
-    pub expr: Box<Expr>,
+    pub target: Box<Expr>,
+    pub left_paren: LParen,
+    pub args: Punctuated<Expr, Comma>,
+    pub right_paren: RParen,
 }
 
-impl From<AssignExpr> for Expr {
-    fn from(value: AssignExpr) -> Self {
-        Self::Assign(value)
+impl From<InvokeExpr> for Expr {
+    fn from(value: InvokeExpr) -> Self {
+        Self::Invoke(value)
     }
 }
 
-impl Node for AssignExpr {
+impl Node for InvokeExpr {
     fn name(&self) -> &str {
-        "Expr::Assign"
+        "Expr::Invoke"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -30,13 +31,13 @@ impl Node for AssignExpr {
     }
 }
 
-impl std::fmt::Display for AssignExpr {
+impl std::fmt::Display for InvokeExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for AssignExpr {
+impl Peek<TokenParser> for InvokeExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -48,20 +49,22 @@ impl Peek<TokenParser> for AssignExpr {
     }
 }
 
-impl Parse<TokenParser> for AssignExpr {
+impl Parse<TokenParser> for InvokeExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let eq = parser.parse_as::<Eq>(cursor)?;
-        let expr = parser.parse_as::<Expr>(cursor)?;
+        let target = parser.parse_as::<Expr>(cursor)?;
+        let left_paren = parser.parse_as::<LParen>(cursor)?;
+        let args = parser.parse_as::<Punctuated<Expr, Comma>>(cursor)?;
+        let right_paren = parser.parse_as::<RParen>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(name.span(), expr.span()),
-            name,
-            eq,
-            expr: Box::new(expr),
+            span: Span::from_bounds(left_paren.span(), right_paren.span()),
+            target: Box::new(target),
+            left_paren,
+            args,
+            right_paren,
         })
     }
 
