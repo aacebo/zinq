@@ -5,7 +5,7 @@ pub use indexed::*;
 pub use named::*;
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::{Node, Syntax, TokenParser, Visitor};
+use crate::{Node, TokenParser, Visitor};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {
@@ -19,12 +19,6 @@ impl Fields {
             Self::Indexed(v) => v.len(),
             Self::Named(v) => v.len(),
         }
-    }
-}
-
-impl From<Fields> for Syntax {
-    fn from(value: Fields) -> Self {
-        Self::Fields(value)
     }
 }
 

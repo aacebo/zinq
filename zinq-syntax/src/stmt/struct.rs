@@ -1,10 +1,10 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Ident, Pub, Struct, TokenParser};
 
-use crate::{Node, fields::Fields, ty};
+use crate::{Node, fields::Fields, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct StructType {
+pub struct StructStmt {
     pub span: Span,
     pub vis: Option<Pub>,
     pub keyword: Struct,
@@ -12,15 +12,15 @@ pub struct StructType {
     pub fields: Fields,
 }
 
-impl From<StructType> for ty::Type {
-    fn from(value: StructType) -> Self {
-        ty::Type::Struct(value)
+impl From<StructStmt> for Stmt {
+    fn from(value: StructStmt) -> Self {
+        Self::Struct(value)
     }
 }
 
-impl Node for StructType {
+impl Node for StructStmt {
     fn name(&self) -> &str {
-        "Syntax::Type::Struct"
+        "Syntax::Stmt::Struct"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -31,13 +31,13 @@ impl Node for StructType {
     }
 }
 
-impl std::fmt::Display for StructType {
+impl std::fmt::Display for StructStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for StructType {
+impl Peek<TokenParser> for StructStmt {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -49,7 +49,7 @@ impl Peek<TokenParser> for StructType {
     }
 }
 
-impl Parse<TokenParser> for StructType {
+impl Parse<TokenParser> for StructStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
@@ -83,7 +83,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, ty};
+    use crate::{TokenParser, stmt::StructStmt};
 
     #[test]
     fn should_parse_private() -> Result<()> {
@@ -96,7 +96,7 @@ mod test {
         )
         .cursor();
 
-        let ty = parser.parse_as::<ty::StructType>(&mut cursor)?;
+        let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_none());
         debug_assert_eq!(ty.fields.len(), 2);
@@ -122,7 +122,7 @@ mod test {
         )
         .cursor();
 
-        let ty = parser.parse_as::<ty::StructType>(&mut cursor)?;
+        let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_some());
         debug_assert_eq!(ty.fields.len(), 2);
@@ -141,7 +141,7 @@ mod test {
     fn should_parse_indexed() -> Result<()> {
         let mut parser = TokenParser;
         let mut cursor = Span::from_bytes(b"pub struct MyStruct(string, pub i32)").cursor();
-        let ty = parser.parse_as::<ty::StructType>(&mut cursor)?;
+        let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_some());
         debug_assert_eq!(ty.fields.len(), 2);

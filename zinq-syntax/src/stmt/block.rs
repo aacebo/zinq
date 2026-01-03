@@ -1,23 +1,25 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{ColonColon, Ident, Punctuated, TokenParser};
+use zinq_token::{LBrace, RBrace, TokenParser};
 
-use crate::{Node, ty::Type};
+use crate::{Node, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PathType {
+pub struct BlockStmt {
     pub span: Span,
-    pub path: Punctuated<Ident, ColonColon>,
+    pub left_brace: LBrace,
+    pub stmts: Vec<Stmt>,
+    pub right_brace: RBrace,
 }
 
-impl From<PathType> for Type {
-    fn from(value: PathType) -> Self {
-        Type::Path(value)
+impl From<BlockStmt> for Stmt {
+    fn from(value: BlockStmt) -> Self {
+        Self::Block(value)
     }
 }
 
-impl Node for PathType {
+impl Node for BlockStmt {
     fn name(&self) -> &str {
-        "Syntax::Type::Path"
+        "Syntax::Stmt::Block"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -28,13 +30,13 @@ impl Node for PathType {
     }
 }
 
-impl std::fmt::Display for PathType {
+impl std::fmt::Display for BlockStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for PathType {
+impl Peek<TokenParser> for BlockStmt {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -46,16 +48,29 @@ impl Peek<TokenParser> for PathType {
     }
 }
 
-impl Parse<TokenParser> for PathType {
+impl Parse<TokenParser> for BlockStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse_as::<Punctuated<Ident, ColonColon>>(cursor)?;
+        let left_brace = parser.parse_as::<LBrace>(cursor)?;
+        let mut stmts = vec![];
+
+        while !cursor.eof() {
+            if parser.peek_as::<RBrace>(cursor).unwrap_or(true) {
+                break;
+            }
+
+            stmts.push(parser.parse_as::<Stmt>(cursor)?);
+        }
+
+        let right_brace = parser.parse_as::<RBrace>(cursor)?;
 
         Ok(Self {
-            span: path.span().clone(),
-            path,
+            span: Span::from_bounds(left_brace.span(), right_brace.span()),
+            left_brace,
+            stmts,
+            right_brace,
         })
     }
 

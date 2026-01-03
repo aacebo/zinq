@@ -138,7 +138,7 @@ impl Node for Expr {
 
 impl From<Expr> for Syntax {
     fn from(value: Expr) -> Self {
-        Syntax::Expr(value)
+        Self::Expr(value)
     }
 }
 

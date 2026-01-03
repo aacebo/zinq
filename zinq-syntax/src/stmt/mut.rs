@@ -1,24 +1,24 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Mut, TokenParser};
 
-use crate::{Node, ty::Type};
+use crate::{Node, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MutType {
+pub struct MutStmt {
     pub span: Span,
     pub keyword: Mut,
-    pub ty: Box<Type>,
+    pub ty: Box<Stmt>,
 }
 
-impl From<MutType> for Type {
-    fn from(value: MutType) -> Self {
-        Type::Mut(value)
+impl From<MutStmt> for Stmt {
+    fn from(value: MutStmt) -> Self {
+        Self::Mut(value)
     }
 }
 
-impl Node for MutType {
+impl Node for MutStmt {
     fn name(&self) -> &str {
-        "Syntax::Type::Mut"
+        "Syntax::Stmt::Mut"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -29,13 +29,13 @@ impl Node for MutType {
     }
 }
 
-impl std::fmt::Display for MutType {
+impl std::fmt::Display for MutStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for MutType {
+impl Peek<TokenParser> for MutStmt {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -47,13 +47,13 @@ impl Peek<TokenParser> for MutType {
     }
 }
 
-impl Parse<TokenParser> for MutType {
+impl Parse<TokenParser> for MutStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse_as::<Mut>(cursor)?;
-        let ty = parser.parse_as::<Box<Type>>(cursor)?;
+        let ty = parser.parse_as::<Box<Stmt>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(keyword.span(), ty.span()),
@@ -72,13 +72,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, ty::MutType};
+    use crate::{TokenParser, stmt::MutStmt};
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = TokenParser;
         let mut cursor = Span::from_bytes(b"mut int").cursor();
-        let value = parser.parse_as::<MutType>(&mut cursor)?;
+        let value = parser.parse_as::<MutStmt>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "mut int");
         debug_assert_eq!(value.ty.to_string(), "int");
