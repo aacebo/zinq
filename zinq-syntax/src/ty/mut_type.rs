@@ -53,12 +53,12 @@ impl Parse<TokenParser> for MutType {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse_as::<Mut>(cursor)?;
-        let ty = parser.parse_as::<Type>(cursor)?;
+        let ty = parser.parse_as::<Box<Type>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(keyword.span(), ty.span()),
             keyword,
-            ty: Box::new(ty),
+            ty,
         })
     }
 

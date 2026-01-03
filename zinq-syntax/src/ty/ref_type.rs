@@ -53,12 +53,12 @@ impl Parse<TokenParser> for RefType {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let and = parser.parse_as::<And>(cursor)?;
-        let to = parser.parse_as::<Type>(cursor)?;
+        let to = parser.parse_as::<Box<Type>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(and.span(), to.span()),
             and,
-            to: Box::new(to),
+            to,
         })
     }
 

@@ -1,11 +1,13 @@
 mod assign;
 mod binary;
+mod group;
 mod invoke;
 mod resolve;
 mod resolve_field;
 
 pub use assign::*;
 pub use binary::*;
+pub use group::*;
 pub use invoke::*;
 pub use resolve::*;
 pub use resolve_field::*;
@@ -20,6 +22,7 @@ use crate::{Node, Syntax, Visitor};
 pub enum Expr {
     Assign(AssignExpr),
     Binary(BinaryExpr),
+    Group(GroupExpr),
     Invoke(InvokeExpr),
     ResolveField(ResolveFieldExpr),
     Resolve(ResolveExpr),
@@ -30,6 +33,7 @@ impl Node for Expr {
         match self {
             Self::Assign(v) => v.name(),
             Self::Binary(v) => v.name(),
+            Self::Group(v) => v.name(),
             Self::Invoke(v) => v.name(),
             Self::ResolveField(v) => v.name(),
             Self::Resolve(v) => v.name(),
@@ -55,6 +59,7 @@ impl std::fmt::Display for Expr {
         match self {
             Self::Assign(v) => write!(f, "{}", v),
             Self::Binary(v) => write!(f, "{}", v),
+            Self::Group(v) => write!(f, "{}", v),
             Self::Invoke(v) => write!(f, "{}", v),
             Self::ResolveField(v) => write!(f, "{}", v),
             Self::Resolve(v) => write!(f, "{}", v),
@@ -84,6 +89,10 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<ResolveFieldExpr>(cursor)?.into());
         }
 
+        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
         }
@@ -106,6 +115,7 @@ impl Parse<TokenParser> for Expr {
         match self {
             Self::Assign(v) => v.span(),
             Self::Binary(v) => v.span(),
+            Self::Group(v) => v.span(),
             Self::Invoke(v) => v.span(),
             Self::ResolveField(v) => v.span(),
             Self::Resolve(v) => v.span(),

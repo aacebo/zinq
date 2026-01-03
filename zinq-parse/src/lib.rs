@@ -125,3 +125,19 @@ impl<T: Parse<P>, P: Parser> Parse<P> for Option<T> {
         }
     }
 }
+
+impl<T: Peek<P>, P: Parser> Peek<P> for Box<T> {
+    fn peek(cursor: &Cursor, parser: &P) -> Result<bool> {
+        parser.peek_as::<T>(cursor)
+    }
+}
+
+impl<T: Parse<P>, P: Parser> Parse<P> for Box<T> {
+    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self> {
+        Ok(Box::new(parser.parse_as::<T>(cursor)?))
+    }
+
+    fn span(&self) -> &Span {
+        self.as_ref().span()
+    }
+}
