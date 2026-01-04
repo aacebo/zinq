@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Comma, LParen, Pub, Punctuated, RParen, TokenParser};
+use zinq_token::{Comma, LParen, Punctuated, RParen, TokenParser};
 
-use crate::{Node, Visitor, ty::Type};
+use crate::{Node, Visibility, Visitor, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedField {
     pub span: Span,
-    pub vis: Option<Pub>,
+    pub vis: Visibility,
     pub ty: Type,
 }
 
@@ -33,13 +33,9 @@ impl Parse<TokenParser> for IndexedField {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Option<Pub>>(cursor)?;
+        let vis = parser.parse_as::<Visibility>(cursor)?;
         let ty = parser.parse_as::<Type>(cursor)?;
-        let mut span = ty.span().clone();
-
-        if let Some(v) = &vis {
-            span = Span::from_bounds(v.span(), ty.span())
-        }
+        let span = Span::from_bounds(vis.span(), ty.span());
 
         Ok(Self { span, vis, ty })
     }
@@ -139,15 +135,15 @@ mod test {
 
     #[test]
     fn should_parse_many() -> Result<()> {
-        let mut cursor = Span::from_bytes(b"(string, uint, pub bool)").cursor();
+        let mut cursor = Span::from_bytes(b"(string, uint, pub super bool)").cursor();
         let mut parser = TokenParser;
         let fields = parser.parse_as::<IndexedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 3);
-        debug_assert_eq!(fields.to_string(), "(string, uint, pub bool)");
+        debug_assert_eq!(fields.to_string(), "(string, uint, pub super bool)");
         debug_assert_eq!(fields.first().unwrap().0.to_string(), "string");
         debug_assert_eq!(fields.index(1).0.to_string(), "uint");
-        debug_assert_eq!(fields.last().unwrap().0.to_string(), "pub bool");
+        debug_assert_eq!(fields.last().unwrap().0.to_string(), "pub super bool");
 
         Ok(())
     }

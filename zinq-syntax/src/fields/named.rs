@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Colon, Comma, Ident, LBrace, Pub, Punctuated, RBrace, TokenParser};
+use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace, TokenParser};
 
-use crate::{Node, Visitor, ty::Type};
+use crate::{Node, Visibility, Visitor, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedField {
     pub span: Span,
-    pub vis: Option<Pub>,
+    pub vis: Visibility,
     pub name: Ident,
     pub colon: Colon,
     pub ty: Type,
@@ -35,15 +35,11 @@ impl Parse<TokenParser> for NamedField {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Option<Pub>>(cursor)?;
+        let vis = parser.parse_as::<Visibility>(cursor)?;
         let name = parser.parse_as::<Ident>(cursor)?;
         let colon = parser.parse_as::<Colon>(cursor)?;
         let ty = parser.parse_as::<Type>(cursor)?;
-        let mut span = Span::from_bounds(name.span(), ty.span());
-
-        if let Some(v) = &vis {
-            span = Span::from_bounds(v.span(), ty.span())
-        }
+        let span = Span::from_bounds(vis.span(), ty.span());
 
         Ok(Self {
             span,

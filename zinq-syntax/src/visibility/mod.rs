@@ -21,6 +21,36 @@ pub enum Visibility {
     Priv(PrivateVisibility),
 }
 
+impl Visibility {
+    pub fn is_pub(&self) -> bool {
+        match self {
+            Self::Pub(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_super(&self) -> bool {
+        match self {
+            Self::Super(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_mod(&self) -> bool {
+        match self {
+            Self::Mod(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_priv(&self) -> bool {
+        match self {
+            Self::Priv(_) => true,
+            _ => false,
+        }
+    }
+}
+
 impl From<Visibility> for Syntax {
     fn from(value: Visibility) -> Self {
         Self::Visibility(value)

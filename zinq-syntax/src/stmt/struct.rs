@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, Pub, Struct, TokenParser};
+use zinq_token::{Ident, Struct, TokenParser};
 
-use crate::{Node, fields::Fields, stmt::Stmt};
+use crate::{Node, Visibility, fields::Fields, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructStmt {
     pub span: Span,
-    pub vis: Option<Pub>,
+    pub vis: Visibility,
     pub keyword: Struct,
     pub name: Ident,
     pub fields: Fields,
@@ -54,15 +54,11 @@ impl Parse<TokenParser> for StructStmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Option<Pub>>(cursor)?;
+        let vis = parser.parse_as::<Visibility>(cursor)?;
         let keyword = parser.parse_as::<Struct>(cursor)?;
         let name = parser.parse_as::<Ident>(cursor)?;
         let fields = parser.parse_as::<Fields>(cursor)?;
-        let mut span = Span::from_bounds(keyword.span(), fields.span());
-
-        if let Some(v) = &vis {
-            span = Span::from_bounds(v.span(), fields.span());
-        }
+        let span = Span::from_bounds(vis.span(), fields.span());
 
         Ok(Self {
             span,
@@ -98,7 +94,7 @@ mod test {
 
         let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
-        debug_assert!(ty.vis.is_none());
+        debug_assert!(ty.vis.is_priv());
         debug_assert_eq!(ty.fields.len(), 2);
         debug_assert_eq!(
             ty.to_string(),
@@ -124,7 +120,7 @@ mod test {
 
         let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
-        debug_assert!(ty.vis.is_some());
+        debug_assert!(ty.vis.is_pub());
         debug_assert_eq!(ty.fields.len(), 2);
         debug_assert_eq!(
             ty.to_string(),
@@ -140,12 +136,12 @@ mod test {
     #[test]
     fn should_parse_indexed() -> Result<()> {
         let mut parser = TokenParser;
-        let mut cursor = Span::from_bytes(b"pub struct MyStruct(string, pub i32)").cursor();
+        let mut cursor = Span::from_bytes(b"pub mod struct MyStruct(string, pub i32)").cursor();
         let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
-        debug_assert!(ty.vis.is_some());
+        debug_assert!(ty.vis.is_mod());
         debug_assert_eq!(ty.fields.len(), 2);
-        debug_assert_eq!(ty.to_string(), "pub struct MyStruct(string, pub i32)");
+        debug_assert_eq!(ty.to_string(), "pub mod struct MyStruct(string, pub i32)");
 
         Ok(())
     }
