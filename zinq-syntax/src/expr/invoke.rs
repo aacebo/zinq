@@ -5,7 +5,7 @@ use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Invoke Expression
-/// `do_stuff(arg1, arg2, ...)`
+/// `do_stuff(arg1, arg2 = "test", ...)`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InvokeExpr {
@@ -64,7 +64,7 @@ impl Parse<TokenParser> for InvokeExpr {
         let right_paren = parser.parse_as::<RParen>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(left_paren.span(), right_paren.span()),
+            span: Span::from_bounds(target.span(), right_paren.span()),
             target: Box::new(target),
             left_paren,
             args,
@@ -74,5 +74,31 @@ impl Parse<TokenParser> for InvokeExpr {
 
     fn span(&self) -> &Span {
         &self.span
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::{Parser, Span};
+
+    use crate::{TokenParser, expr::InvokeExpr};
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(b"stuff(a, b = \"test\")").cursor();
+        let value = parser.parse_as::<InvokeExpr>(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "stuff(a, b = \"test\")");
+        debug_assert_eq!(value.args.len(), 2);
+
+        debug_assert!(value.args.get(0).unwrap().0.is_get());
+        debug_assert_eq!(value.args.get(0).unwrap().0.to_string(), "a");
+
+        debug_assert!(value.args.get(1).unwrap().0.is_assign());
+        debug_assert_eq!(value.args.get(1).unwrap().0.to_string(), "b = \"test\"");
+
+        Ok(())
     }
 }

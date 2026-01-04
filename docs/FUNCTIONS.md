@@ -3,8 +3,13 @@
 ## Basic
 
 ```
-fn hello_world() -> string {
-    "hello, world"
+fn hello_world(text: string) {
+    println("{}", &text);
+}
+
+fn main() {
+    hello_world("test");
+    hello_world(text = "test");
 }
 ```
 

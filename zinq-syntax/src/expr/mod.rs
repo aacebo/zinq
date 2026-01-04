@@ -181,6 +181,10 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
         }
 
+        if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<LiteralExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<LiteralExpr>(cursor)?.into());
         }
@@ -195,10 +199,6 @@ impl Parse<TokenParser> for Expr {
 
         if parser.peek_as::<SetFieldExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<SetFieldExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
         }
 
         if parser.peek_as::<LogicalExpr>(cursor).unwrap_or(false) {

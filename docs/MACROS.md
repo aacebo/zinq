@@ -11,8 +11,10 @@ pub struct Message {
 
 ## Method
 
+> Feature flagged http handler for post requests
+
 ```
-#[http::post("/api/messages")]
+#[if = feature(http), http::post("/api/messages")]
 pub fn on_message() {
     ...
 }
