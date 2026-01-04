@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Colon, Comma, Ident, LBrace, Pub, Punctuated, RBrace, TokenParser};
 
-use crate::{Node, Visitor};
+use crate::{Node, Visitor, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedField {
@@ -9,7 +9,7 @@ pub struct NamedField {
     pub vis: Option<Pub>,
     pub name: Ident,
     pub colon: Colon,
-    pub ty: Ident,
+    pub ty: Type,
 }
 
 impl std::fmt::Display for NamedField {
@@ -38,7 +38,7 @@ impl Parse<TokenParser> for NamedField {
         let vis = parser.parse_as::<Option<Pub>>(cursor)?;
         let name = parser.parse_as::<Ident>(cursor)?;
         let colon = parser.parse_as::<Colon>(cursor)?;
-        let ty = parser.parse_as::<Ident>(cursor)?;
+        let ty = parser.parse_as::<Type>(cursor)?;
         let mut span = Span::from_bounds(name.span(), ty.span());
 
         if let Some(v) = &vis {
@@ -161,13 +161,19 @@ mod test {
 
     #[test]
     fn should_parse_trailing_comma() -> Result<()> {
-        let mut cursor = Span::from_bytes(b"{ hello: string, world: u32, }").cursor();
+        let mut cursor = Span::from_bytes(b"{ hello: std::string::string, world: u32, }").cursor();
         let mut parser = TokenParser;
         let fields = parser.parse_as::<NamedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
-        debug_assert_eq!(fields.to_string(), "{ hello: string, world: u32, }");
-        debug_assert_eq!(fields.first().unwrap().0.to_string(), "hello: string");
+        debug_assert_eq!(
+            fields.to_string(),
+            "{ hello: std::string::string, world: u32, }"
+        );
+        debug_assert_eq!(
+            fields.first().unwrap().0.to_string(),
+            "hello: std::string::string"
+        );
         debug_assert_eq!(fields.last().unwrap().0.to_string(), "world: u32");
 
         Ok(())

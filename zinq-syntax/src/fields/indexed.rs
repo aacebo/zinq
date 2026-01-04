@@ -1,13 +1,13 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Comma, Ident, LParen, Pub, Punctuated, RParen, TokenParser};
+use zinq_token::{Comma, LParen, Pub, Punctuated, RParen, TokenParser};
 
-use crate::{Node, Visitor};
+use crate::{Node, Visitor, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedField {
     pub span: Span,
     pub vis: Option<Pub>,
-    pub ty: Ident,
+    pub ty: Type,
 }
 
 impl std::fmt::Display for IndexedField {
@@ -34,7 +34,7 @@ impl Parse<TokenParser> for IndexedField {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let vis = parser.parse_as::<Option<Pub>>(cursor)?;
-        let ty = parser.parse_as::<Ident>(cursor)?;
+        let ty = parser.parse_as::<Type>(cursor)?;
         let mut span = ty.span().clone();
 
         if let Some(v) = &vis {
