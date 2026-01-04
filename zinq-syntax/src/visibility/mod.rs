@@ -115,14 +115,7 @@ impl Parse<TokenParser> for Visibility {
             return Ok(parser.parse_as::<PublicVisibility>(cursor)?.into());
         }
 
-        if parser.peek_as::<PrivateVisibility>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<PrivateVisibility>(cursor)?.into());
-        }
-
-        Err(cursor.error(
-            zinq_error::NOT_FOUND,
-            &format!("unknown tokens '{}'", cursor),
-        ))
+        Ok(parser.parse_as::<PrivateVisibility>(cursor)?.into())
     }
 
     fn span(&self) -> &zinq_parse::Span {

@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Mod, Pub, Suffixed, TokenParser};
+use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed, TokenParser};
 
 use crate::{Node, Visibility};
 
@@ -10,7 +10,7 @@ use crate::{Node, Visibility};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModVisibility {
     pub span: Span,
-    pub keyword: Suffixed<Pub, Mod>,
+    pub keyword: Suffixed<Pub, Enclosed<LParen, Mod, RParen>>,
 }
 
 impl From<ModVisibility> for Visibility {
@@ -55,7 +55,7 @@ impl Parse<TokenParser> for ModVisibility {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let keyword = parser.parse_as::<Suffixed<Pub, Mod>>(cursor)?;
+        let keyword = parser.parse_as::<Suffixed<Pub, Enclosed<LParen, Mod, RParen>>>(cursor)?;
 
         Ok(Self {
             span: keyword.span().clone(),
@@ -78,11 +78,11 @@ mod test {
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = TokenParser;
-        let mut cursor = Span::from_bytes(b"pub mod").cursor();
+        let mut cursor = Span::from_bytes(b"pub(mod)").cursor();
         let value = parser.parse_as::<ModVisibility>(&mut cursor)?;
 
-        debug_assert_eq!(value.to_string(), "pub mod");
-        debug_assert_eq!(value.keyword.suffix.to_string(), "mod");
+        debug_assert_eq!(value.to_string(), "pub(mod)");
+        debug_assert_eq!(value.keyword.suffix.to_string(), "(mod)");
 
         Ok(())
     }

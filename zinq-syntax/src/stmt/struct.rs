@@ -136,12 +136,12 @@ mod test {
     #[test]
     fn should_parse_indexed() -> Result<()> {
         let mut parser = TokenParser;
-        let mut cursor = Span::from_bytes(b"pub mod struct MyStruct(string, pub i32)").cursor();
+        let mut cursor = Span::from_bytes(b"pub(mod) struct MyStruct(string, pub i32)").cursor();
         let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_mod());
         debug_assert_eq!(ty.fields.len(), 2);
-        debug_assert_eq!(ty.to_string(), "pub mod struct MyStruct(string, pub i32)");
+        debug_assert_eq!(ty.to_string(), "pub(mod) struct MyStruct(string, pub i32)");
 
         Ok(())
     }

@@ -1,9 +1,11 @@
 mod block;
 mod expr;
+mod module;
 mod r#struct;
 
 pub use block::*;
 pub use expr::*;
+pub use module::*;
 pub use r#struct::*;
 
 use zinq_error::Result;
@@ -22,6 +24,7 @@ use crate::{Node, Syntax, Visitor};
 pub enum Stmt {
     Block(BlockStmt),
     Expr(ExprStmt),
+    Mod(ModStmt),
     Struct(StructStmt),
 }
 
@@ -36,6 +39,7 @@ impl Node for Stmt {
         match self {
             Self::Block(v) => v.name(),
             Self::Expr(v) => v.name(),
+            Self::Mod(v) => v.name(),
             Self::Struct(v) => v.name(),
         }
     }
@@ -53,6 +57,7 @@ impl std::fmt::Display for Stmt {
         match self {
             Self::Block(v) => write!(f, "{}", v),
             Self::Expr(v) => write!(f, "{}", v),
+            Self::Mod(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
         }
     }
@@ -79,6 +84,10 @@ impl Parse<TokenParser> for Stmt {
             return Ok(parser.parse_as::<StructStmt>(cursor)?.into());
         }
 
+        if parser.peek_as::<ModStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<ModStmt>(cursor)?.into());
+        }
+
         if parser.peek_as::<BlockStmt>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<BlockStmt>(cursor)?.into());
         }
@@ -98,6 +107,7 @@ impl Parse<TokenParser> for Stmt {
             Self::Block(v) => v.span(),
             Self::Expr(v) => v.span(),
             Self::Struct(v) => v.span(),
+            Self::Mod(v) => v.span(),
         }
     }
 }
