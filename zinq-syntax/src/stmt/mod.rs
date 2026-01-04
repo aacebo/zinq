@@ -1,10 +1,12 @@
 mod block;
 mod expr;
+mod r#let;
 mod module;
 mod r#struct;
 
 pub use block::*;
 pub use expr::*;
+pub use r#let::*;
 pub use module::*;
 pub use r#struct::*;
 
@@ -24,6 +26,7 @@ use crate::{Node, Syntax, Visitor};
 pub enum Stmt {
     Block(BlockStmt),
     Expr(ExprStmt),
+    Let(LetStmt),
     Mod(ModStmt),
     Struct(StructStmt),
 }
@@ -39,6 +42,7 @@ impl Node for Stmt {
         match self {
             Self::Block(v) => v.name(),
             Self::Expr(v) => v.name(),
+            Self::Let(v) => v.name(),
             Self::Mod(v) => v.name(),
             Self::Struct(v) => v.name(),
         }
@@ -57,6 +61,7 @@ impl std::fmt::Display for Stmt {
         match self {
             Self::Block(v) => write!(f, "{}", v),
             Self::Expr(v) => write!(f, "{}", v),
+            Self::Let(v) => write!(f, "{}", v),
             Self::Mod(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
         }
@@ -80,6 +85,10 @@ impl Parse<TokenParser> for Stmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
+        if parser.peek_as::<LetStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<LetStmt>(cursor)?.into());
+        }
+
         if parser.peek_as::<StructStmt>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<StructStmt>(cursor)?.into());
         }
@@ -106,6 +115,7 @@ impl Parse<TokenParser> for Stmt {
         match self {
             Self::Block(v) => v.span(),
             Self::Expr(v) => v.span(),
+            Self::Let(v) => v.span(),
             Self::Struct(v) => v.span(),
             Self::Mod(v) => v.span(),
         }
