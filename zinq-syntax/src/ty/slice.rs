@@ -4,7 +4,7 @@ use zinq_token::{LBracket, RBracket, TokenParser};
 use crate::{Node, ty::Type};
 
 ///
-/// ## Reference Type
+/// ## Slice Type
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SliceType {

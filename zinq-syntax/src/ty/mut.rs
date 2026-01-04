@@ -3,6 +3,9 @@ use zinq_token::{Mut, TokenParser};
 
 use crate::{Node, ty::Type};
 
+///
+/// ## Mut Type
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MutType {
     pub span: Span,

@@ -1,10 +1,12 @@
 mod r#mut;
 mod r#ref;
 mod slice;
+mod tuple;
 
 pub use r#mut::*;
 pub use r#ref::*;
 pub use slice::*;
+pub use tuple::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Parser, Peek};
@@ -21,6 +23,7 @@ pub enum Type {
     Mut(MutType),
     Ref(RefType),
     Slice(SliceType),
+    Tuple(TupleType),
 }
 
 impl From<Type> for Syntax {
@@ -36,6 +39,7 @@ impl Node for Type {
             Self::Mut(v) => v.name(),
             Self::Ref(v) => v.name(),
             Self::Slice(v) => v.name(),
+            Self::Tuple(v) => v.name(),
         }
     }
 
@@ -54,6 +58,7 @@ impl std::fmt::Display for Type {
             Self::Mut(v) => write!(f, "{}", v),
             Self::Ref(v) => write!(f, "{}", v),
             Self::Slice(v) => write!(f, "{}", v),
+            Self::Tuple(v) => write!(f, "{}", v),
         }
     }
 }
@@ -75,6 +80,10 @@ impl Parse<TokenParser> for Type {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
+        if parser.peek_as::<RefType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<RefType>(cursor)?.into());
+        }
+
         if parser.peek_as::<MutType>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<MutType>(cursor)?.into());
         }
@@ -83,12 +92,12 @@ impl Parse<TokenParser> for Type {
             return Ok(parser.parse_as::<Path>(cursor)?.into());
         }
 
-        if parser.peek_as::<RefType>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<RefType>(cursor)?.into());
-        }
-
         if parser.peek_as::<SliceType>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<SliceType>(cursor)?.into());
+        }
+
+        if parser.peek_as::<TupleType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<TupleType>(cursor)?.into());
         }
 
         Err(cursor.error(
@@ -103,6 +112,7 @@ impl Parse<TokenParser> for Type {
             Self::Mut(v) => v.span(),
             Self::Ref(v) => v.span(),
             Self::Slice(v) => v.span(),
+            Self::Tuple(v) => v.span(),
         }
     }
 }

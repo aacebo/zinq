@@ -71,17 +71,19 @@ where
         let mut segments = vec![];
         let start = cursor.span().clone();
 
-        while !cursor.eof() && parser.peek_as::<T>(cursor).unwrap_or(false) {
+        while parser.peek_as::<T>(cursor).unwrap_or(false) {
             let value = parser.parse_as::<T>(cursor)?;
+            let mut delim: Option<P> = None;
 
             if parser.peek_as::<P>(cursor).unwrap_or(false) {
-                let delim = parser.parse_as::<P>(cursor)?;
-                segments.push((value, Some(delim)));
-                continue;
+                delim = Some(parser.parse_as::<P>(cursor)?);
             }
 
-            segments.push((value, None));
-            break;
+            segments.push((value, delim.clone()));
+
+            if let None = &delim {
+                break;
+            }
         }
 
         let end = cursor.span().clone();
