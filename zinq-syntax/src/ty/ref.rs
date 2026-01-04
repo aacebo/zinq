@@ -5,6 +5,7 @@ use crate::{Node, ty::Type};
 
 ///
 /// ## Reference Type
+/// `&T`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefType {

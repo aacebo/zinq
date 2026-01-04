@@ -5,6 +5,7 @@ use crate::{Node, ty::Type};
 
 ///
 /// ## Mut Type
+/// `mut T`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MutType {

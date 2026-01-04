@@ -5,6 +5,7 @@ use crate::{Node, ty::Type};
 
 ///
 /// ## Tuple Type
+/// `(u32, string, bool)`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TupleType {

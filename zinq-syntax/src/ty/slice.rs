@@ -5,6 +5,7 @@ use crate::{Node, ty::Type};
 
 ///
 /// ## Slice Type
+/// `[T]`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SliceType {
