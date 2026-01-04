@@ -1,15 +1,9 @@
 mod block;
 mod expr;
-mod r#mut;
-mod path;
-mod r#ref;
 mod r#struct;
 
 pub use block::*;
 pub use expr::*;
-pub use r#mut::*;
-pub use path::*;
-pub use r#ref::*;
 pub use r#struct::*;
 
 use zinq_error::Result;
@@ -28,9 +22,6 @@ use crate::{Node, Syntax, Visitor};
 pub enum Stmt {
     Block(BlockStmt),
     Expr(ExprStmt),
-    Mut(MutStmt),
-    Path(PathStmt),
-    Ref(RefStmt),
     Struct(StructStmt),
 }
 
@@ -45,9 +36,6 @@ impl Node for Stmt {
         match self {
             Self::Block(v) => v.name(),
             Self::Expr(v) => v.name(),
-            Self::Mut(v) => v.name(),
-            Self::Path(v) => v.name(),
-            Self::Ref(v) => v.name(),
             Self::Struct(v) => v.name(),
         }
     }
@@ -65,9 +53,6 @@ impl std::fmt::Display for Stmt {
         match self {
             Self::Block(v) => write!(f, "{}", v),
             Self::Expr(v) => write!(f, "{}", v),
-            Self::Mut(v) => write!(f, "{}", v),
-            Self::Path(v) => write!(f, "{}", v),
-            Self::Ref(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
         }
     }
@@ -90,18 +75,6 @@ impl Parse<TokenParser> for Stmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<MutStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<MutStmt>(cursor)?.into());
-        }
-
-        if parser.peek_as::<PathStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<PathStmt>(cursor)?.into());
-        }
-
-        if parser.peek_as::<RefStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<RefStmt>(cursor)?.into());
-        }
-
         if parser.peek_as::<StructStmt>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<StructStmt>(cursor)?.into());
         }
@@ -124,9 +97,6 @@ impl Parse<TokenParser> for Stmt {
         match self {
             Self::Block(v) => v.span(),
             Self::Expr(v) => v.span(),
-            Self::Mut(v) => v.span(),
-            Self::Path(v) => v.span(),
-            Self::Ref(v) => v.span(),
             Self::Struct(v) => v.span(),
         }
     }

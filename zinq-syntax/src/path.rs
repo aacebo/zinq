@@ -1,26 +1,29 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{ColonColon, Ident, Punctuated, TokenParser};
 
-use crate::{Node, stmt::Stmt};
+use crate::{Node, Visitor, ty::Type};
 
+///
+/// ## Path
+///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PathStmt {
+pub struct Path {
     pub span: Span,
     pub path: Punctuated<Ident, ColonColon>,
 }
 
-impl From<PathStmt> for Stmt {
-    fn from(value: PathStmt) -> Self {
+impl From<Path> for Type {
+    fn from(value: Path) -> Self {
         Self::Path(value)
     }
 }
 
-impl Node for PathStmt {
+impl Node for Path {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Path"
+        "Path"
     }
 
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
     where
         Self: Sized,
     {
@@ -28,13 +31,13 @@ impl Node for PathStmt {
     }
 }
 
-impl std::fmt::Display for PathStmt {
+impl std::fmt::Display for Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for PathStmt {
+impl Peek<TokenParser> for Path {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -46,7 +49,7 @@ impl Peek<TokenParser> for PathStmt {
     }
 }
 
-impl Parse<TokenParser> for PathStmt {
+impl Parse<TokenParser> for Path {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
