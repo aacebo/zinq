@@ -3,8 +3,10 @@ pub mod fields;
 mod path;
 pub mod stmt;
 pub mod ty;
+pub mod visibility;
 
 pub use path::*;
+pub use visibility::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Parser, Peek};
@@ -31,6 +33,7 @@ pub enum Syntax {
     Expr(Expr),
     Stmt(Stmt),
     Type(Type),
+    Visibility(Visibility),
 }
 
 impl std::fmt::Display for Syntax {
@@ -39,6 +42,7 @@ impl std::fmt::Display for Syntax {
             Self::Expr(v) => write!(f, "{}", v),
             Self::Stmt(v) => write!(f, "{}", v),
             Self::Type(v) => write!(f, "{}", v),
+            Self::Visibility(v) => write!(f, "{}", v),
         }
     }
 }
@@ -49,6 +53,7 @@ impl Node for Syntax {
             Self::Expr(v) => v.name(),
             Self::Stmt(v) => v.name(),
             Self::Type(v) => v.name(),
+            Self::Visibility(v) => v.name(),
         }
     }
 
@@ -74,6 +79,10 @@ impl Peek<TokenParser> for Syntax {
 
 impl Parse<TokenParser> for Syntax {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
+        if parser.peek_as::<Visibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<Visibility>(cursor)?.into());
+        }
+
         if parser.peek_as::<Type>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<Type>(cursor)?.into());
         }
@@ -97,6 +106,7 @@ impl Parse<TokenParser> for Syntax {
             Self::Expr(v) => v.span(),
             Self::Stmt(v) => v.span(),
             Self::Type(v) => v.span(),
+            Self::Visibility(v) => v.span(),
         }
     }
 }

@@ -1,0 +1,89 @@
+use zinq_parse::{Parse, Parser, Peek, Span};
+use zinq_token::{Mod, Pub, Suffixed, TokenParser};
+
+use crate::{Node, Visibility};
+
+///
+/// ## Mod Visibility
+/// `pub mod test: string`
+///
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModVisibility {
+    pub span: Span,
+    pub keyword: Suffixed<Pub, Mod>,
+}
+
+impl From<ModVisibility> for Visibility {
+    fn from(value: ModVisibility) -> Self {
+        Self::Mod(value)
+    }
+}
+
+impl Node for ModVisibility {
+    fn name(&self) -> &str {
+        "Syntax::Visibility::Mod"
+    }
+
+    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
+impl std::fmt::Display for ModVisibility {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", &self.span)
+    }
+}
+
+impl Peek<TokenParser> for ModVisibility {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+        let mut fork = cursor.fork();
+        let mut fork_parser = parser.clone();
+
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
+        }
+    }
+}
+
+impl Parse<TokenParser> for ModVisibility {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut TokenParser,
+    ) -> zinq_error::Result<Self> {
+        let keyword = parser.parse_as::<Suffixed<Pub, Mod>>(cursor)?;
+
+        Ok(Self {
+            span: keyword.span().clone(),
+            keyword,
+        })
+    }
+
+    fn span(&self) -> &Span {
+        &self.span
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::{Parser, Span};
+
+    use crate::{ModVisibility, TokenParser};
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(b"pub mod").cursor();
+        let value = parser.parse_as::<ModVisibility>(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "pub mod");
+        debug_assert_eq!(value.keyword.suffix.to_string(), "mod");
+
+        Ok(())
+    }
+}

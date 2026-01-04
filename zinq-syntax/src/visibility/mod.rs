@@ -1,0 +1,106 @@
+mod mod_visibility;
+mod private_visibility;
+mod public_visibility;
+mod super_visibility;
+
+pub use mod_visibility::*;
+pub use private_visibility::*;
+pub use public_visibility::*;
+pub use super_visibility::*;
+use zinq_error::Result;
+use zinq_parse::{Parse, Parser, Peek};
+use zinq_token::TokenParser;
+
+use crate::{Node, Syntax, Visitor};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Visibility {
+    Pub(PublicVisibility),
+    Super(SuperVisibility),
+    Mod(ModVisibility),
+    Priv(PrivateVisibility),
+}
+
+impl From<Visibility> for Syntax {
+    fn from(value: Visibility) -> Self {
+        Self::Visibility(value)
+    }
+}
+
+impl Node for Visibility {
+    fn name(&self) -> &str {
+        match self {
+            Self::Pub(v) => v.name(),
+            Self::Mod(v) => v.name(),
+            Self::Super(v) => v.name(),
+            Self::Priv(v) => v.name(),
+        }
+    }
+
+    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
+impl std::fmt::Display for Visibility {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pub(v) => write!(f, "{}", v),
+            Self::Mod(v) => write!(f, "{}", v),
+            Self::Super(v) => write!(f, "{}", v),
+            Self::Priv(v) => write!(f, "{}", v),
+        }
+    }
+}
+
+impl Peek<TokenParser> for Visibility {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> Result<bool> {
+        let mut fork = cursor.fork();
+        let mut fork_parser = parser.clone();
+
+        match fork_parser.parse_as::<Self>(&mut fork) {
+            Err(_) => Ok(false),
+            Ok(_) => Ok(true),
+        }
+    }
+}
+
+impl Parse<TokenParser> for Visibility {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut TokenParser,
+    ) -> zinq_error::Result<Self> {
+        if parser.peek_as::<ModVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<ModVisibility>(cursor)?.into());
+        }
+
+        if parser.peek_as::<SuperVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<SuperVisibility>(cursor)?.into());
+        }
+
+        if parser.peek_as::<PublicVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<PublicVisibility>(cursor)?.into());
+        }
+
+        if parser.peek_as::<PrivateVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<PrivateVisibility>(cursor)?.into());
+        }
+
+        Err(cursor.error(
+            zinq_error::NOT_FOUND,
+            &format!("unknown tokens '{}'", cursor),
+        ))
+    }
+
+    fn span(&self) -> &zinq_parse::Span {
+        match self {
+            Self::Pub(v) => v.span(),
+            Self::Mod(v) => v.span(),
+            Self::Super(v) => v.span(),
+            Self::Priv(v) => v.span(),
+        }
+    }
+}

@@ -184,6 +184,7 @@ macro_rules! define_keywords {
 }
 
 define_keywords! {
+    "crate",     pub struct Crate,      is_crate,
     "mod",       pub struct Mod,        is_mod,
     "mut",       pub struct Mut,        is_mut,
     "match",     pub struct Match,      is_match,
@@ -204,6 +205,7 @@ define_keywords! {
     "struct",    pub struct Struct,     is_struct,
     "self",      pub struct SelfValue,  is_self_type,
     "Self",      pub struct SelfType,   is_self_value,
+    "super",     pub struct Super,      is_super,
     "pub",       pub struct Pub,        is_pub,
     "use",       pub struct Use,        is_use
 }
