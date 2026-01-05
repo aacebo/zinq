@@ -6,6 +6,7 @@ mod group;
 mod invoke;
 mod literal;
 mod logical;
+mod r#ref;
 mod set_field;
 mod unary;
 
@@ -17,6 +18,7 @@ pub use group::*;
 pub use invoke::*;
 pub use literal::*;
 pub use logical::*;
+pub use r#ref::*;
 pub use set_field::*;
 pub use unary::*;
 
@@ -40,6 +42,7 @@ pub enum Expr {
     Logical(LogicalExpr),
     GetField(GetFieldExpr),
     Get(GetExpr),
+    Ref(RefExpr),
     SetField(SetFieldExpr),
     Unary(UnaryExpr),
 }
@@ -101,6 +104,13 @@ impl Expr {
         }
     }
 
+    pub fn is_ref(&self) -> bool {
+        match self {
+            Self::Ref(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn is_set_field(&self) -> bool {
         match self {
             Self::SetField(_) => true,
@@ -127,6 +137,7 @@ impl Node for Expr {
             Self::Logical(v) => v.name(),
             Self::GetField(v) => v.name(),
             Self::Get(v) => v.name(),
+            Self::Ref(v) => v.name(),
             Self::SetField(v) => v.name(),
             Self::Unary(v) => v.name(),
         }
@@ -157,6 +168,7 @@ impl std::fmt::Display for Expr {
             Self::Logical(v) => write!(f, "{}", v),
             Self::GetField(v) => write!(f, "{}", v),
             Self::Get(v) => write!(f, "{}", v),
+            Self::Ref(v) => write!(f, "{}", v),
             Self::SetField(v) => write!(f, "{}", v),
             Self::Unary(v) => write!(f, "{}", v),
         }
@@ -177,6 +189,10 @@ impl Peek<TokenParser> for Expr {
 
 impl Parse<TokenParser> for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
+        if parser.peek_as::<RefExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<RefExpr>(cursor)?.into());
+        }
+
         if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
         }
@@ -233,6 +249,7 @@ impl Parse<TokenParser> for Expr {
             Self::Logical(v) => v.span(),
             Self::GetField(v) => v.span(),
             Self::Get(v) => v.span(),
+            Self::Ref(v) => v.span(),
             Self::SetField(v) => v.span(),
             Self::Unary(v) => v.span(),
         }
