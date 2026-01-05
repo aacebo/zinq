@@ -1,11 +1,13 @@
 mod block;
 mod expr;
+mod r#fn;
 mod r#let;
 mod module;
 mod r#struct;
 
 pub use block::*;
 pub use expr::*;
+pub use r#fn::*;
 pub use r#let::*;
 pub use module::*;
 pub use r#struct::*;
@@ -29,6 +31,7 @@ pub enum Stmt {
     Let(LetStmt),
     Mod(ModStmt),
     Struct(StructStmt),
+    Fn(FnStmt),
 }
 
 impl From<Stmt> for Syntax {
@@ -45,6 +48,7 @@ impl Node for Stmt {
             Self::Let(v) => v.name(),
             Self::Mod(v) => v.name(),
             Self::Struct(v) => v.name(),
+            Self::Fn(v) => v.name(),
         }
     }
 
@@ -64,6 +68,7 @@ impl std::fmt::Display for Stmt {
             Self::Let(v) => write!(f, "{}", v),
             Self::Mod(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
+            Self::Fn(v) => write!(f, "{}", v),
         }
     }
 }
@@ -93,6 +98,10 @@ impl Parse<TokenParser> for Stmt {
             return Ok(parser.parse_as::<StructStmt>(cursor)?.into());
         }
 
+        if parser.peek_as::<FnStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<FnStmt>(cursor)?.into());
+        }
+
         if parser.peek_as::<ModStmt>(cursor).unwrap_or(false) {
             return Ok(parser.parse_as::<ModStmt>(cursor)?.into());
         }
@@ -118,6 +127,7 @@ impl Parse<TokenParser> for Stmt {
             Self::Let(v) => v.span(),
             Self::Struct(v) => v.span(),
             Self::Mod(v) => v.span(),
+            Self::Fn(v) => v.span(),
         }
     }
 }

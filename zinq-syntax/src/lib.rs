@@ -1,5 +1,6 @@
 pub mod expr;
 pub mod fields;
+pub mod param;
 mod path;
 pub mod stmt;
 pub mod ty;
