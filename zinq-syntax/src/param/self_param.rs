@@ -1,20 +1,12 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{And, Mut, SelfValue, TokenParser};
 
-use crate::param::MethodParam;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelfParam {
     pub span: Span,
     pub and: Option<And>,
     pub mutable: Option<Mut>,
     pub keyword: SelfValue,
-}
-
-impl From<SelfParam> for MethodParam {
-    fn from(value: SelfParam) -> Self {
-        Self::Receiver(value)
-    }
 }
 
 impl std::fmt::Display for SelfParam {
