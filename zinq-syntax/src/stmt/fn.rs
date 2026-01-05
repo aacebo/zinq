@@ -3,7 +3,7 @@ use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed,
 
 use crate::{
     Node, Visibility,
-    param::Param,
+    param::FnParam,
     stmt::{BlockStmt, Stmt},
     ty::Type,
 };
@@ -19,7 +19,7 @@ pub struct FnStmt {
     pub keyword: Fn,
     pub name: Ident,
     pub left_paren: LParen,
-    pub params: Punctuated<Param, Comma>,
+    pub params: Punctuated<FnParam, Comma>,
     pub right_paren: RParen,
     pub return_ty: Option<Suffixed<RArrow, Type>>,
     pub block: BlockStmt,
@@ -71,7 +71,7 @@ impl Parse<TokenParser> for FnStmt {
         let keyword = parser.parse_as::<Fn>(cursor)?;
         let name = parser.parse_as::<Ident>(cursor)?;
         let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let params = parser.parse_as::<Punctuated<Param, Comma>>(cursor)?;
+        let params = parser.parse_as::<Punctuated<FnParam, Comma>>(cursor)?;
         let right_paren = parser.parse_as::<RParen>(cursor)?;
         let return_ty = parser.parse_as::<Option<Suffixed<RArrow, Type>>>(cursor)?;
         let block = parser.parse_as::<BlockStmt>(cursor)?;
@@ -138,11 +138,11 @@ mod test {
     #[test]
     fn should_parse_with_params() -> Result<()> {
         let mut parser = TokenParser;
-        let mut cursor = Span::from_bytes(b"fn stuff(self, a: string, b: u32) { }").cursor();
+        let mut cursor = Span::from_bytes(b"fn stuff(a: string, b: u32) { }").cursor();
         let ty = parser.parse_as::<FnStmt>(&mut cursor)?;
 
-        debug_assert_eq!(ty.to_string(), "fn stuff(self, a: string, b: u32) { }");
-        debug_assert_eq!(ty.params.len(), 3);
+        debug_assert_eq!(ty.to_string(), "fn stuff(a: string, b: u32) { }");
+        debug_assert_eq!(ty.params.len(), 2);
 
         Ok(())
     }

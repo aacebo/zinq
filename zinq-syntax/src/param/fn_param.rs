@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{Colon, Ident, TokenParser};
 
-use crate::{param::Param, ty::Type};
+use crate::{param::MethodParam, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FnParam {
@@ -11,7 +11,7 @@ pub struct FnParam {
     pub ty: Type,
 }
 
-impl From<FnParam> for Param {
+impl From<FnParam> for MethodParam {
     fn from(value: FnParam) -> Self {
         Self::Fn(value)
     }

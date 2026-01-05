@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{And, Mut, SelfValue, TokenParser};
 
-use crate::param::Param;
+use crate::param::MethodParam;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelfParam {
@@ -11,7 +11,7 @@ pub struct SelfParam {
     pub keyword: SelfValue,
 }
 
-impl From<SelfParam> for Param {
+impl From<SelfParam> for MethodParam {
     fn from(value: SelfParam) -> Self {
         Self::Receiver(value)
     }
