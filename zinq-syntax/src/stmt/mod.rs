@@ -15,8 +15,8 @@ pub use module::*;
 pub use r#struct::*;
 
 use zinq_error::Result;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, Syntax, Visitor};
 
@@ -78,48 +78,48 @@ impl std::fmt::Display for Stmt {
     }
 }
 
-impl Peek<TokenParser> for Stmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> Result<bool> {
+impl Peek for Stmt {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Stmt {
+impl Parse for Stmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<LetStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<LetStmt>(cursor)?.into());
+        if parser.peek::<LetStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<LetStmt>(cursor)?.into());
         }
 
-        if parser.peek_as::<ImplStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ImplStmt>(cursor)?.into());
+        if parser.peek::<ImplStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<ImplStmt>(cursor)?.into());
         }
 
-        if parser.peek_as::<StructStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<StructStmt>(cursor)?.into());
+        if parser.peek::<StructStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<StructStmt>(cursor)?.into());
         }
 
-        if parser.peek_as::<FnStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<FnStmt>(cursor)?.into());
+        if parser.peek::<FnStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<FnStmt>(cursor)?.into());
         }
 
-        if parser.peek_as::<ModStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ModStmt>(cursor)?.into());
+        if parser.peek::<ModStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<ModStmt>(cursor)?.into());
         }
 
-        if parser.peek_as::<BlockStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<BlockStmt>(cursor)?.into());
+        if parser.peek::<BlockStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<BlockStmt>(cursor)?.into());
         }
 
-        Ok(parser.parse_as::<ExprStmt>(cursor)?.into())
+        Ok(parser.parse::<ExprStmt>(cursor)?.into())
     }
 
     fn span(&self) -> &zinq_parse::Span {

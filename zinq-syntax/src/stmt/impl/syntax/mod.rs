@@ -1,8 +1,8 @@
 mod method;
 
 pub use method::*;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ImplSyntax {
@@ -25,25 +25,28 @@ impl std::fmt::Display for ImplSyntax {
     }
 }
 
-impl Peek<TokenParser> for ImplSyntax {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for ImplSyntax {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for ImplSyntax {
+impl Parse for ImplSyntax {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<ImplMethod>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ImplMethod>(cursor)?.into());
+        if parser.peek::<ImplMethod>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<ImplMethod>(cursor)?.into());
         }
 
         Err(cursor.error(

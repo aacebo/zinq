@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{And, Mut, SelfValue, TokenParser};
+use zinq_token::{And, Mut, SelfValue, zinq_parse::ZinqParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelfParam {
@@ -15,26 +15,29 @@ impl std::fmt::Display for SelfParam {
     }
 }
 
-impl Peek<TokenParser> for SelfParam {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for SelfParam {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for SelfParam {
+impl Parse for SelfParam {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let and = parser.parse_as::<Option<And>>(cursor)?;
-        let mutable = parser.parse_as::<Option<Mut>>(cursor)?;
-        let keyword = parser.parse_as::<SelfValue>(cursor)?;
+        let and = parser.parse::<Option<And>>(cursor)?;
+        let mutable = parser.parse::<Option<Mut>>(cursor)?;
+        let keyword = parser.parse::<SelfValue>(cursor)?;
         let mut first = keyword.span().clone();
 
         if let Some(v) = &mutable {

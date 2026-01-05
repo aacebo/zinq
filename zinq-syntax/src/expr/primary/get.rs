@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, TokenParser};
+use zinq_token::{Ident, zinq_parse::ZinqParser};
 
 use crate::{Node, Visitor, expr::PrimaryExpr};
 
@@ -38,18 +38,21 @@ impl std::fmt::Display for GetExpr {
     }
 }
 
-impl Peek<TokenParser> for GetExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<Ident>(cursor).unwrap_or(false))
+impl Peek for GetExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<Ident>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse<TokenParser> for GetExpr {
+impl Parse for GetExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let name = parser.parse_as::<Ident>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
 
         Ok(Self {
             span: name.span().clone(),

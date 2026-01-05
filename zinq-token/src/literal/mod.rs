@@ -13,7 +13,7 @@ pub use string::*;
 use zinq_error::{NOT_FOUND, Result};
 use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
 
-use crate::{ToTokens, Token, TokenMismatchError, TokenParser, TokenStream};
+use crate::{ToTokens, Token, TokenMismatchError, TokenStream, zinq_parse::ZinqParser};
 
 ///
 /// ## Literal
@@ -190,50 +190,50 @@ impl std::fmt::Display for Literal {
     }
 }
 
-impl Peek<TokenParser> for Literal {
+impl Peek for Literal {
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
-        if parser.peek_as::<LFloat>(cursor)? {
+    fn peek(cursor: &Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
+        if parser.peek::<LFloat>(cursor)? {
             return Ok(true);
         }
 
-        if parser.peek_as::<LInt>(cursor)? {
+        if parser.peek::<LInt>(cursor)? {
             return Ok(true);
         }
 
-        if parser.peek_as::<LByte>(cursor)? {
+        if parser.peek::<LByte>(cursor)? {
             return Ok(true);
         }
 
-        if parser.peek_as::<LBool>(cursor)? {
+        if parser.peek::<LBool>(cursor)? {
             return Ok(true);
         }
 
-        parser.peek_as::<LString>(cursor)
+        parser.peek::<LString>(cursor)
     }
 }
 
-impl Parse<TokenParser> for Literal {
+impl Parse for Literal {
     #[inline]
-    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
-        if parser.peek_as::<LFloat>(cursor)? {
-            return Ok(parser.parse_as::<LFloat>(cursor)?.into());
+    fn parse(cursor: &mut Cursor, parser: &mut zinq_parse::ZinqParser) -> Result<Self> {
+        if parser.peek::<LFloat>(cursor)? {
+            return Ok(parser.parse::<LFloat>(cursor)?.into());
         }
 
-        if parser.peek_as::<LInt>(cursor)? {
-            return Ok(parser.parse_as::<LInt>(cursor)?.into());
+        if parser.peek::<LInt>(cursor)? {
+            return Ok(parser.parse::<LInt>(cursor)?.into());
         }
 
-        if parser.peek_as::<LByte>(cursor)? {
-            return Ok(parser.parse_as::<LByte>(cursor)?.into());
+        if parser.peek::<LByte>(cursor)? {
+            return Ok(parser.parse::<LByte>(cursor)?.into());
         }
 
-        if parser.peek_as::<LString>(cursor)? {
-            return Ok(parser.parse_as::<LString>(cursor)?.into());
+        if parser.peek::<LString>(cursor)? {
+            return Ok(parser.parse::<LString>(cursor)?.into());
         }
 
-        if parser.peek_as::<LBool>(cursor)? {
-            return Ok(parser.parse_as::<LBool>(cursor)?.into());
+        if parser.peek::<LBool>(cursor)? {
+            return Ok(parser.parse::<LBool>(cursor)?.into());
         }
 
         Err(cursor.error(NOT_FOUND, "not found"))

@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 
-use crate::TokenParser;
+use crate::zinq_parse::ZinqParser;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prefixed<P, T>
 where
-    P: std::fmt::Display + Parse<TokenParser>,
-    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
 {
     pub span: Span,
     pub prefix: P,
@@ -15,8 +15,8 @@ where
 
 impl<P, T> std::ops::Deref for Prefixed<P, T>
 where
-    P: std::fmt::Display + Parse<TokenParser>,
-    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
 {
     type Target = T;
 
@@ -27,50 +27,53 @@ where
 
 impl<P, T> std::fmt::Display for Prefixed<P, T>
 where
-    P: std::fmt::Display + Parse<TokenParser>,
-    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl<P, T> Peek<TokenParser> for Prefixed<P, T>
+impl<P, T> Peek for Prefixed<P, T>
 where
-    P: std::fmt::Display + Parse<TokenParser>,
-    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
 {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        if !parser.peek_as::<P>(cursor)? {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        if !parser.peek::<P>(cursor)? {
             return Ok(false);
         }
 
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<P>(&mut fork) {
+        match fork_parser.parse::<P>(&mut fork) {
             Err(_) => return Ok(false),
             Ok(_) => {}
         };
 
-        match fork_parser.parse_as::<T>(&mut fork) {
+        match fork_parser.parse::<T>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl<P, T> Parse<TokenParser> for Prefixed<P, T>
+impl<P, T> Parse for Prefixed<P, T>
 where
-    P: std::fmt::Display + Parse<TokenParser>,
-    T: std::fmt::Display + Parse<TokenParser>,
+    P: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
 {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let prefix = parser.parse_as::<P>(cursor)?;
-        let inner = parser.parse_as::<T>(cursor)?;
+        let prefix = parser.parse::<P>(cursor)?;
+        let inner = parser.parse::<T>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(prefix.span(), inner.span()),
@@ -89,13 +92,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{LInt, Plus, Prefixed, TokenParser};
+    use crate::{LInt, Plus, Prefixed, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_prefixed() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"+66").cursor();
-        let stream: Prefixed<Plus, LInt> = parser.parse_as::<Prefixed<Plus, LInt>>(&mut cursor)?;
+        let stream: Prefixed<Plus, LInt> = parser.parse::<Prefixed<Plus, LInt>>(&mut cursor)?;
 
         debug_assert_eq!(stream.to_string(), "+66");
 

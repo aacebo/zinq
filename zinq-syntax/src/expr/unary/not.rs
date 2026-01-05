@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Not, TokenParser};
+use zinq_token::{Not, zinq_parse::ZinqParser};
 
 use crate::{
     Node, Visitor,
@@ -42,19 +42,22 @@ impl std::fmt::Display for NotExpr {
     }
 }
 
-impl Peek<TokenParser> for NotExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<Not>(cursor).unwrap_or(false))
+impl Peek for NotExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<Not>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse<TokenParser> for NotExpr {
+impl Parse for NotExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let not = parser.parse_as::<Not>(cursor)?;
-        let right = parser.parse_as::<Box<Expr>>(cursor)?;
+        let not = parser.parse::<Not>(cursor)?;
+        let right = parser.parse::<Box<Expr>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(not.span(), right.span()),
@@ -73,13 +76,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, expr::NotExpr};
+    use crate::{expr::NotExpr, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_not() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"!b").cursor();
-        let value = parser.parse_as::<NotExpr>(&mut cursor)?;
+        let value = parser.parse::<NotExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "!b");
         Ok(())
@@ -87,9 +90,9 @@ mod test {
 
     #[test]
     fn should_parse_not_of_group() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"!(a)").cursor();
-        let value = parser.parse_as::<NotExpr>(&mut cursor)?;
+        let value = parser.parse::<NotExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "!(a)");
         Ok(())

@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Literal, TokenParser};
+use zinq_token::{Literal, zinq_parse::ZinqParser};
 
 use crate::{Node, Visitor, expr::PrimaryExpr};
 
@@ -38,24 +38,27 @@ impl std::fmt::Display for LiteralExpr {
     }
 }
 
-impl Peek<TokenParser> for LiteralExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for LiteralExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for LiteralExpr {
+impl Parse for LiteralExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let value = parser.parse_as::<Literal>(cursor)?;
+        let value = parser.parse::<Literal>(cursor)?;
 
         Ok(Self {
             span: value.span().clone(),

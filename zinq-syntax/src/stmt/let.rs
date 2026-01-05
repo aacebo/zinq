@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Colon, Eq, Ident, Let, SemiColon, Suffixed, TokenParser};
+use zinq_token::{Colon, Eq, Ident, Let, SemiColon, Suffixed, zinq_parse::ZinqParser};
 
 use crate::{Node, expr::Expr, stmt::Stmt, ty::Type};
 
@@ -42,28 +42,31 @@ impl std::fmt::Display for LetStmt {
     }
 }
 
-impl Peek<TokenParser> for LetStmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for LetStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for LetStmt {
+impl Parse for LetStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let keyword = parser.parse_as::<Let>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let ty = parser.parse_as::<Option<Suffixed<Colon, Type>>>(cursor)?;
-        let init = parser.parse_as::<Option<Suffixed<Eq, Expr>>>(cursor)?;
-        let semi = parser.parse_as::<SemiColon>(cursor)?;
+        let keyword = parser.parse::<Let>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let ty = parser.parse::<Option<Suffixed<Colon, Type>>>(cursor)?;
+        let init = parser.parse::<Option<Suffixed<Eq, Expr>>>(cursor)?;
+        let semi = parser.parse::<SemiColon>(cursor)?;
         let span = Span::from_bounds(keyword.span(), semi.span());
 
         Ok(Self {
@@ -86,13 +89,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, stmt::LetStmt};
+    use crate::{stmt::LetStmt, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_with_init() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"let a = b'f';").cursor();
-        let ty = parser.parse_as::<LetStmt>(&mut cursor)?;
+        let ty = parser.parse::<LetStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "let a = b'f';");
 
@@ -101,9 +104,9 @@ mod test {
 
     #[test]
     fn should_parse_with_type() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"let a: string;").cursor();
-        let ty = parser.parse_as::<LetStmt>(&mut cursor)?;
+        let ty = parser.parse::<LetStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "let a: string;");
 
@@ -112,9 +115,9 @@ mod test {
 
     #[test]
     fn should_parse_with_type_and_init() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"let a: byte = b'f';").cursor();
-        let ty = parser.parse_as::<LetStmt>(&mut cursor)?;
+        let ty = parser.parse::<LetStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "let a: byte = b'f';");
 

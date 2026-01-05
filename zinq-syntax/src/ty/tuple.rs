@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Comma, LParen, Punctuated, RParen, TokenParser};
+use zinq_token::{Comma, LParen, Punctuated, RParen, zinq_parse::ZinqParser};
 
 use crate::{Node, ty::Type};
 
@@ -40,26 +40,29 @@ impl std::fmt::Display for TupleType {
     }
 }
 
-impl Peek<TokenParser> for TupleType {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for TupleType {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for TupleType {
+impl Parse for TupleType {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let items = parser.parse_as::<Punctuated<Type, Comma>>(cursor)?;
-        let right_paren = parser.parse_as::<RParen>(cursor)?;
+        let left_paren = parser.parse::<LParen>(cursor)?;
+        let items = parser.parse::<Punctuated<Type, Comma>>(cursor)?;
+        let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_paren.span(), right_paren.span()),
@@ -79,13 +82,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, ty::TupleType};
+    use crate::{ty::TupleType, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"(u32, string, &mut hello::World)").cursor();
-        let value = parser.parse_as::<TupleType>(&mut cursor)?;
+        let value = parser.parse::<TupleType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "(u32, string, &mut hello::World)");
         debug_assert_eq!(value.items.len(), 3);

@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{And, TokenParser};
+use zinq_token::{And, zinq_parse::ZinqParser};
 
 use crate::{Node, ty::Type};
 
@@ -39,25 +39,28 @@ impl std::fmt::Display for RefType {
     }
 }
 
-impl Peek<TokenParser> for RefType {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for RefType {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for RefType {
+impl Parse for RefType {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let and = parser.parse_as::<And>(cursor)?;
-        let to = parser.parse_as::<Box<Type>>(cursor)?;
+        let and = parser.parse::<And>(cursor)?;
+        let to = parser.parse::<Box<Type>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(and.span(), to.span()),
@@ -76,13 +79,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, ty::RefType};
+    use crate::{ty::RefType, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"&int").cursor();
-        let value = parser.parse_as::<RefType>(&mut cursor)?;
+        let value = parser.parse::<RefType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&int");
         debug_assert_eq!(value.to.to_string(), "int");
@@ -92,9 +95,9 @@ mod test {
 
     #[test]
     fn should_parse_mut() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"&mut int").cursor();
-        let value = parser.parse_as::<RefType>(&mut cursor)?;
+        let value = parser.parse::<RefType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&mut int");
         debug_assert_eq!(value.to.to_string(), "mut int");

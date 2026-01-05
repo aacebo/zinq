@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{LParen, RParen, TokenParser};
+use zinq_token::{LParen, RParen, zinq_parse::ZinqParser};
 
 use crate::{
     Node, Visitor,
@@ -43,20 +43,23 @@ impl std::fmt::Display for GroupExpr {
     }
 }
 
-impl Peek<TokenParser> for GroupExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<LParen>(cursor).unwrap_or(false))
+impl Peek for GroupExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<LParen>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse<TokenParser> for GroupExpr {
+impl Parse for GroupExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let inner = parser.parse_as::<Box<Expr>>(cursor)?;
-        let right_paren = parser.parse_as::<RParen>(cursor)?;
+        let left_paren = parser.parse::<LParen>(cursor)?;
+        let inner = parser.parse::<Box<Expr>>(cursor)?;
+        let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_paren.span(), right_paren.span()),
@@ -76,13 +79,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, expr::GroupExpr};
+    use crate::{expr::GroupExpr, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"(test 0.5 b'h')").cursor();
-        let value = parser.parse_as::<GroupExpr>(&mut cursor)?;
+        let value = parser.parse::<GroupExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "(test 0.5 b'h')");
         Ok(())

@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::{AndAnd, OrOr, TokenParser};
+use crate::{AndAnd, OrOr, zinq_parse::ZinqParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Logical {
@@ -52,24 +52,27 @@ impl std::fmt::Display for Logical {
     }
 }
 
-impl Peek<TokenParser> for Logical {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<AndAnd>(cursor).unwrap_or(false)
-            || parser.peek_as::<OrOr>(cursor).unwrap_or(false))
+impl Peek for Logical {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<AndAnd>(cursor).unwrap_or(false)
+            || parser.peek::<OrOr>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse<TokenParser> for Logical {
+impl Parse for Logical {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<AndAnd>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<AndAnd>(cursor)?.into());
+        if parser.peek::<AndAnd>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<AndAnd>(cursor)?.into());
         }
 
-        if parser.peek_as::<OrOr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<OrOr>(cursor)?.into());
+        if parser.peek::<OrOr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<OrOr>(cursor)?.into());
         }
 
         Err(cursor.error(

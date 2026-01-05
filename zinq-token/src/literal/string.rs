@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
+use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LString {
@@ -21,16 +21,16 @@ impl std::fmt::Display for LString {
     }
 }
 
-impl Peek<TokenParser> for LString {
+impl Peek for LString {
     #[inline]
-    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
         Ok(cursor.peek()? == &b'"')
     }
 }
 
-impl Parse<TokenParser> for LString {
+impl Parse for LString {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, _: &mut zinq_parse::ZinqParser) -> Result<Self> {
         cursor.next()?.next_while(|next, _| next != &b'"')?.next()?;
 
         Ok(Self {
@@ -67,15 +67,15 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{LString, TokenParser};
+    use crate::{LString, zinq_parse::ZinqParser};
 
     #[test]
     fn is_string() -> Result<()> {
         let span = Span::from_bytes(b"\"test\"");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
 
-        debug_assert!(parser.peek_as::<LString>(&cursor)?);
+        debug_assert!(parser.peek::<LString>(&cursor)?);
 
         let token = parser.parse(&mut cursor)?;
 

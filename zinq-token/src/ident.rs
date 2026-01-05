@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{ToTokens, Token, TokenParser, TokenStream};
+use crate::{ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
 
 ///
 /// ## Ident
@@ -36,16 +36,16 @@ impl std::fmt::Display for Ident {
     }
 }
 
-impl Peek<TokenParser> for Ident {
+impl Peek for Ident {
     #[inline]
-    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
         Ok(cursor.peek()?.is_ascii_alphabetic() || cursor.peek()? == &b'_')
     }
 }
 
-impl Parse<TokenParser> for Ident {
+impl Parse for Ident {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, _: &mut zinq_parse::ZinqParser) -> Result<Self> {
         let span = cursor
             .next_while(|b, _| b.is_ascii_alphanumeric() || b == &b'_')?
             .span();
@@ -69,13 +69,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::TokenParser;
+    use crate::zinq_parse::ZinqParser;
 
     #[test]
     fn should_parse() -> Result<()> {
         let span = Span::from_bytes(b"test");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_ident());

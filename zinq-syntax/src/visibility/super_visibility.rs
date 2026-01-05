@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Enclosed, LParen, Pub, RParen, Suffixed, Super, TokenParser};
+use zinq_token::{Enclosed, LParen, Pub, RParen, Suffixed, Super, zinq_parse::ZinqParser};
 
 use crate::{Node, Visibility};
 
@@ -38,24 +38,27 @@ impl std::fmt::Display for SuperVisibility {
     }
 }
 
-impl Peek<TokenParser> for SuperVisibility {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for SuperVisibility {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for SuperVisibility {
+impl Parse for SuperVisibility {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let keyword = parser.parse_as::<Suffixed<Pub, Enclosed<LParen, Super, RParen>>>(cursor)?;
+        let keyword = parser.parse::<Suffixed<Pub, Enclosed<LParen, Super, RParen>>>(cursor)?;
 
         Ok(Self {
             span: keyword.span().clone(),
@@ -73,13 +76,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{SuperVisibility, TokenParser};
+    use crate::{SuperVisibility, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"pub(super)").cursor();
-        let value = parser.parse_as::<SuperVisibility>(&mut cursor)?;
+        let value = parser.parse::<SuperVisibility>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "pub(super)");
         debug_assert_eq!(value.keyword.suffix.to_string(), "(super)");

@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
+use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
 
 ///
 /// ## LByte
@@ -27,16 +27,16 @@ impl std::fmt::Display for LByte {
     }
 }
 
-impl Peek<TokenParser> for LByte {
+impl Peek for LByte {
     #[inline]
-    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
         Ok(cursor.peek_n(2)? == b"b'")
     }
 }
 
-impl Parse<TokenParser> for LByte {
+impl Parse for LByte {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, _: &mut zinq_parse::ZinqParser) -> Result<Self> {
         cursor.next_while(|b, _| b != &b'\'')?.next_n(3)?;
 
         Ok(Self {
@@ -74,13 +74,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::TokenParser;
+    use crate::zinq_parse::ZinqParser;
 
     #[test]
     fn is_byte() -> Result<()> {
         let span = Span::from_bytes(b"b'p'");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
 
         let token = parser.parse(&mut cursor)?;
 

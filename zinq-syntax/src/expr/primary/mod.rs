@@ -8,8 +8,8 @@ pub use get_field::*;
 pub use group::*;
 pub use literal::*;
 
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, expr::Expr};
 
@@ -86,37 +86,40 @@ impl Node for PrimaryExpr {
     }
 }
 
-impl Peek<TokenParser> for PrimaryExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for PrimaryExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for PrimaryExpr {
+impl Parse for PrimaryExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<LiteralExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<LiteralExpr>(cursor)?.into());
+        if parser.peek::<LiteralExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<LiteralExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<GetFieldExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GetFieldExpr>(cursor)?.into());
+        if parser.peek::<GetFieldExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<GetFieldExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<GetExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GetExpr>(cursor)?.into());
+        if parser.peek::<GetExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<GetExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
+        if parser.peek::<GroupExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<GroupExpr>(cursor)?.into());
         }
 
         Err(cursor.error(

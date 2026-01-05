@@ -2,8 +2,8 @@ mod call;
 
 pub use call::*;
 
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, expr::Expr};
 
@@ -49,25 +49,28 @@ impl Node for PostfixExpr {
     }
 }
 
-impl Peek<TokenParser> for PostfixExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for PostfixExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for PostfixExpr {
+impl Parse for PostfixExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<CallExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<CallExpr>(cursor)?.into());
+        if parser.peek::<CallExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<CallExpr>(cursor)?.into());
         }
 
         Err(cursor.error(

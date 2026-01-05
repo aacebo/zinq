@@ -1,5 +1,7 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed, TokenParser};
+use zinq_token::{
+    Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed, zinq_parse::ZinqParser,
+};
 
 use crate::{
     Node, Visibility,
@@ -50,31 +52,34 @@ impl std::fmt::Display for FnStmt {
     }
 }
 
-impl Peek<TokenParser> for FnStmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for FnStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for FnStmt {
+impl Parse for FnStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Visibility>(cursor)?;
-        let keyword = parser.parse_as::<Fn>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let params = parser.parse_as::<Punctuated<FnParam, Comma>>(cursor)?;
-        let right_paren = parser.parse_as::<RParen>(cursor)?;
-        let return_ty = parser.parse_as::<Option<Suffixed<RArrow, Type>>>(cursor)?;
-        let block = parser.parse_as::<BlockStmt>(cursor)?;
+        let vis = parser.parse::<Visibility>(cursor)?;
+        let keyword = parser.parse::<Fn>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let left_paren = parser.parse::<LParen>(cursor)?;
+        let params = parser.parse::<Punctuated<FnParam, Comma>>(cursor)?;
+        let right_paren = parser.parse::<RParen>(cursor)?;
+        let return_ty = parser.parse::<Option<Suffixed<RArrow, Type>>>(cursor)?;
+        let block = parser.parse::<BlockStmt>(cursor)?;
         let span = Span::from_bounds(vis.span(), block.span());
 
         Ok(Self {
@@ -100,13 +105,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, stmt::FnStmt};
+    use crate::{stmt::FnStmt, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"fn stuff() { }").cursor();
-        let ty = parser.parse_as::<FnStmt>(&mut cursor)?;
+        let ty = parser.parse::<FnStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "fn stuff() { }");
 
@@ -115,9 +120,9 @@ mod test {
 
     #[test]
     fn should_parse_with_visibility() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"pub(super) fn stuff() { }").cursor();
-        let ty = parser.parse_as::<FnStmt>(&mut cursor)?;
+        let ty = parser.parse::<FnStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "pub(super) fn stuff() { }");
 
@@ -126,9 +131,9 @@ mod test {
 
     #[test]
     fn should_parse_with_return_type() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"fn stuff() -> models::User { }").cursor();
-        let ty = parser.parse_as::<FnStmt>(&mut cursor)?;
+        let ty = parser.parse::<FnStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "fn stuff() -> models::User { }");
 
@@ -137,9 +142,9 @@ mod test {
 
     #[test]
     fn should_parse_with_params() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"fn stuff(a: string, b: u32) { }").cursor();
-        let ty = parser.parse_as::<FnStmt>(&mut cursor)?;
+        let ty = parser.parse::<FnStmt>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "fn stuff(a: string, b: u32) { }");
         debug_assert_eq!(ty.params.len(), 2);

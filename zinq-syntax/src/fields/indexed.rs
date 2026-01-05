@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Comma, LParen, Punctuated, RParen, TokenParser};
+use zinq_token::{Comma, LParen, Punctuated, RParen, zinq_parse::ZinqParser};
 
 use crate::{Node, Visibility, Visitor, ty::Type};
 
@@ -16,25 +16,28 @@ impl std::fmt::Display for IndexedField {
     }
 }
 
-impl Peek<TokenParser> for IndexedField {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for IndexedField {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for IndexedField {
+impl Parse for IndexedField {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Visibility>(cursor)?;
-        let ty = parser.parse_as::<Type>(cursor)?;
+        let vis = parser.parse::<Visibility>(cursor)?;
+        let ty = parser.parse::<Type>(cursor)?;
         let span = Span::from_bounds(vis.span(), ty.span());
 
         Ok(Self { span, vis, ty })
@@ -86,30 +89,33 @@ impl std::fmt::Display for IndexedFields {
     }
 }
 
-impl Peek<TokenParser> for IndexedFields {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        if !parser.peek_as::<LParen>(cursor).unwrap_or(false) {
+impl Peek for IndexedFields {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        if !parser.peek::<LParen>(cursor).unwrap_or(false) {
             return Ok(false);
         }
 
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for IndexedFields {
+impl Parse for IndexedFields {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let fields = parser.parse_as::<Punctuated<IndexedField, Comma>>(cursor)?;
-        let right_paren = parser.parse_as::<RParen>(cursor)?;
+        let left_paren = parser.parse::<LParen>(cursor)?;
+        let fields = parser.parse::<Punctuated<IndexedField, Comma>>(cursor)?;
+        let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_paren.span(), right_paren.span()),
@@ -131,13 +137,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, fields::IndexedFields};
+    use crate::{fields::IndexedFields, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_many() -> Result<()> {
         let mut cursor = Span::from_bytes(b"(string, uint, pub(super) bool)").cursor();
-        let mut parser = TokenParser;
-        let fields = parser.parse_as::<IndexedFields>(&mut cursor)?;
+        let mut parser = zinq_parse::ZinqParser;
+        let fields = parser.parse::<IndexedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 3);
         debug_assert_eq!(fields.to_string(), "(string, uint, pub(super) bool)");

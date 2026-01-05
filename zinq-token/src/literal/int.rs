@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
+use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
 
 ///
 /// ## LInt
@@ -187,16 +187,16 @@ impl std::fmt::Display for LInt {
     }
 }
 
-impl Peek<TokenParser> for LInt {
+impl Peek for LInt {
     #[inline]
-    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
         Ok(cursor.peek()?.is_ascii_digit())
     }
 }
 
-impl Parse<TokenParser> for LInt {
+impl Parse for LInt {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, _: &mut zinq_parse::ZinqParser) -> Result<Self> {
         cursor.next_while(|b, _| b.is_ascii_digit())?;
 
         if cursor.peek_n(2).unwrap_or(&[]) == b"u8" || cursor.peek_n(2).unwrap_or(&[]) == b"i8" {
@@ -258,13 +258,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::TokenParser;
+    use crate::zinq_parse::ZinqParser;
 
     #[test]
     fn is_int() -> Result<()> {
         let span = Span::from_bytes(b"103");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
 
         let mut token = parser.parse(&mut cursor)?;
         println!("{} => {}", token.name(), token.to_string());

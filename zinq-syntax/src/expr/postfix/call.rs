@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Comma, LParen, Punctuated, RParen, TokenParser};
+use zinq_token::{Comma, LParen, Punctuated, RParen, zinq_parse::ZinqParser};
 
 use crate::{
     Node, Visitor,
@@ -44,27 +44,30 @@ impl std::fmt::Display for CallExpr {
     }
 }
 
-impl Peek<TokenParser> for CallExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for CallExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for CallExpr {
+impl Parse for CallExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let target = parser.parse_as::<PrimaryExpr>(cursor)?;
-        let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let args = parser.parse_as::<Punctuated<Expr, Comma>>(cursor)?;
-        let right_paren = parser.parse_as::<RParen>(cursor)?;
+        let target = parser.parse::<PrimaryExpr>(cursor)?;
+        let left_paren = parser.parse::<LParen>(cursor)?;
+        let args = parser.parse::<Punctuated<Expr, Comma>>(cursor)?;
+        let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(target.span(), right_paren.span()),
@@ -85,13 +88,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, expr::CallExpr};
+    use crate::{expr::CallExpr, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"stuff(a, b = \"test\")").cursor();
-        let value = parser.parse_as::<CallExpr>(&mut cursor)?;
+        let value = parser.parse::<CallExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "stuff(a, b = \"test\")");
         debug_assert_eq!(value.args.len(), 2);

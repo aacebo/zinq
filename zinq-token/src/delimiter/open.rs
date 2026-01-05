@@ -1,5 +1,3 @@
-use zinq_parse::Parser;
-
 macro_rules! define_open_delimiters {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
         #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,11 +24,11 @@ macro_rules! define_open_delimiters {
             )*
         }
 
-        impl zinq_parse::Peek<$crate::TokenParser> for OpenDelim {
+        impl zinq_parse::Peek for OpenDelim {
             #[inline]
-            fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> zinq_error::Result<bool> {
+            fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
                 $(
-                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok == true {
+                    if let Ok(ok) = parser.peek::<$name>(cursor) && ok == true {
                         return Ok(true);
                     }
                 )*
@@ -39,12 +37,12 @@ macro_rules! define_open_delimiters {
             }
         }
 
-        impl zinq_parse::Parse<$crate::TokenParser> for OpenDelim {
+        impl zinq_parse::Parse for OpenDelim {
             #[inline]
-            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut zinq_parse::ZinqParser) -> zinq_error::Result<Self> {
                 $(
-                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
-                        return Ok(parser.parse_as::<$name>(cursor)?.into());
+                    if let Ok(ok) = parser.peek::<$name>(cursor) && ok {
+                        return Ok(parser.parse::<$name>(cursor)?.into());
                     }
                 )*
 
@@ -103,16 +101,16 @@ macro_rules! define_open_delimiters {
                 }
             }
 
-            impl zinq_parse::Peek<$crate::TokenParser> for $name {
+            impl zinq_parse::Peek for $name {
                 #[inline]
-                fn peek(cursor: &zinq_parse::Cursor, _: &$crate::TokenParser) -> zinq_error::Result<bool> {
+                fn peek(cursor: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
                     Ok(cursor.peek_n($token.len())? == $token.as_bytes())
                 }
             }
 
-            impl zinq_parse::Parse<$crate::TokenParser> for $name {
+            impl zinq_parse::Parse for $name {
                 #[inline]
-                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut zinq_parse::ZinqParser) -> zinq_error::Result<Self> {
                     if !(cursor.next_n($token.len())?.span() == &$token.as_bytes()) {
                         return Err(cursor.error(zinq_error::NOT_FOUND, &format!("expected '{}'", $token)));
                     }
@@ -184,16 +182,14 @@ macro_rules! define_open_delimiters {
         #[cfg(test)]
         mod test {
             use zinq_error::Result;
-            use zinq_parse::{Parser, Span};
-
-            use crate::TokenParser;
+            use zinq_parse::Span;
 
             $(
                 #[test]
                 fn $is_method() -> Result<()> {
                     let mut cursor = Span::from_str($token).cursor();
-                    let mut parser = TokenParser;
-                    let token = parser.parse(&mut cursor)?;
+                    let mut parser = zinq_parse::ZinqParser;
+                    let token = parser.parse::<$crate::Token>(&mut cursor)?;
 
                     debug_assert!(token.is_delim());
                     debug_assert!(token.$is_method());

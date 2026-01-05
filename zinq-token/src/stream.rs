@@ -3,7 +3,7 @@ use std::{ops::Index, str::FromStr};
 use zinq_error::ZinqError;
 use zinq_parse::{Parse, Parser, Peek, Span};
 
-use crate::{ToTokens, Token, TokenParser};
+use crate::{ToTokens, Token, zinq_parse::ZinqParser};
 
 #[derive(Debug, Default, Clone)]
 pub struct TokenStream {
@@ -28,10 +28,10 @@ impl TryFrom<&[u8]> for TokenStream {
             return Ok(Self::new());
         }
 
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(value).cursor();
 
-        parser.parse_as::<Self>(&mut cursor)
+        parser.parse::<Self>(&mut cursor)
     }
 }
 
@@ -43,10 +43,10 @@ impl<const N: usize> TryFrom<&[u8; N]> for TokenStream {
             return Ok(Self::new());
         }
 
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(value).cursor();
 
-        parser.parse_as::<Self>(&mut cursor)
+        parser.parse::<Self>(&mut cursor)
     }
 }
 
@@ -58,10 +58,10 @@ impl FromStr for TokenStream {
             return Ok(Self::new());
         }
 
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_str(s).cursor();
 
-        parser.parse_as::<Self>(&mut cursor)
+        parser.parse::<Self>(&mut cursor)
     }
 }
 
@@ -164,16 +164,16 @@ impl ToTokens for TokenStream {
     }
 }
 
-impl Peek<TokenParser> for TokenStream {
-    fn peek(_: &zinq_parse::Cursor, _: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for TokenStream {
+    fn peek(_: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
         Ok(true)
     }
 }
 
-impl Parse<TokenParser> for TokenStream {
+impl Parse for TokenStream {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let mut tokens = vec![];
 

@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
+use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
 
 ///
 /// ## LFloat
@@ -77,9 +77,9 @@ impl std::fmt::Display for LFloat {
     }
 }
 
-impl Peek<TokenParser> for LFloat {
+impl Peek for LFloat {
     #[inline]
-    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
         if !cursor.peek()?.is_ascii_digit() {
             return Ok(false);
         }
@@ -95,9 +95,9 @@ impl Peek<TokenParser> for LFloat {
     }
 }
 
-impl Parse<TokenParser> for LFloat {
+impl Parse for LFloat {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, _: &mut zinq_parse::ZinqParser) -> Result<Self> {
         cursor
             .next_while(|b, _| b.is_ascii_digit())?
             .next_if(|b, _| b == &b'.')?
@@ -147,13 +147,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::TokenParser;
+    use crate::zinq_parse::ZinqParser;
 
     #[test]
     fn is_float() -> Result<()> {
         let span = Span::from_bytes(b"103.63f64");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
 
         let token = parser.parse(&mut cursor)?;
         println!("{} => {}", token.name(), token.to_string());

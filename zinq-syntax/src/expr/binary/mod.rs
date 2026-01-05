@@ -5,8 +5,8 @@ mod logical;
 pub use assign::*;
 pub use cmp::*;
 pub use logical::*;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, expr::Expr};
 
@@ -73,33 +73,36 @@ impl Node for BinaryExpr {
     }
 }
 
-impl Peek<TokenParser> for BinaryExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for BinaryExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for BinaryExpr {
+impl Parse for BinaryExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<CmpExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<CmpExpr>(cursor)?.into());
+        if parser.peek::<CmpExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<CmpExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<LogicalExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<LogicalExpr>(cursor)?.into());
+        if parser.peek::<LogicalExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<LogicalExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
+        if parser.peek::<AssignExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<AssignExpr>(cursor)?.into());
         }
 
         Err(cursor.error(

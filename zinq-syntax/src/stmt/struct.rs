@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, Struct, TokenParser};
+use zinq_token::{Ident, Struct, zinq_parse::ZinqParser};
 
 use crate::{Node, Visibility, fields::Fields, stmt::Stmt};
 
@@ -37,27 +37,30 @@ impl std::fmt::Display for StructStmt {
     }
 }
 
-impl Peek<TokenParser> for StructStmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for StructStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for StructStmt {
+impl Parse for StructStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Visibility>(cursor)?;
-        let keyword = parser.parse_as::<Struct>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let fields = parser.parse_as::<Fields>(cursor)?;
+        let vis = parser.parse::<Visibility>(cursor)?;
+        let keyword = parser.parse::<Struct>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let fields = parser.parse::<Fields>(cursor)?;
         let span = Span::from_bounds(vis.span(), fields.span());
 
         Ok(Self {
@@ -79,11 +82,11 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, stmt::StructStmt};
+    use crate::{stmt::StructStmt, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_private() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(
             b"struct MyStruct {
             a: i8,
@@ -92,7 +95,7 @@ mod test {
         )
         .cursor();
 
-        let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
+        let ty = parser.parse::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_priv());
         debug_assert_eq!(ty.fields.len(), 2);
@@ -109,7 +112,7 @@ mod test {
 
     #[test]
     fn should_parse_public() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(
             b"pub struct MyStruct {
             pub a: i8,
@@ -118,7 +121,7 @@ mod test {
         )
         .cursor();
 
-        let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
+        let ty = parser.parse::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_pub());
         debug_assert_eq!(ty.fields.len(), 2);
@@ -135,9 +138,9 @@ mod test {
 
     #[test]
     fn should_parse_indexed() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"pub(mod) struct MyStruct(string, pub i32)").cursor();
-        let ty = parser.parse_as::<StructStmt>(&mut cursor)?;
+        let ty = parser.parse::<StructStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_mod());
         debug_assert_eq!(ty.fields.len(), 2);

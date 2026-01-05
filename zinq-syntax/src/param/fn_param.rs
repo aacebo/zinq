@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Colon, Ident, TokenParser};
+use zinq_token::{Colon, Ident, zinq_parse::ZinqParser};
 
 use crate::ty::Type;
 
@@ -17,26 +17,29 @@ impl std::fmt::Display for FnParam {
     }
 }
 
-impl Peek<TokenParser> for FnParam {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for FnParam {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for FnParam {
+impl Parse for FnParam {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let colon = parser.parse_as::<Colon>(cursor)?;
-        let ty = parser.parse_as::<Type>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let colon = parser.parse::<Colon>(cursor)?;
+        let ty = parser.parse::<Type>(cursor)?;
         let span = Span::from_bounds(name.span(), ty.span());
 
         Ok(Self {

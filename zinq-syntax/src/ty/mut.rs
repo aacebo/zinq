@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Mut, TokenParser};
+use zinq_token::{Mut, zinq_parse::ZinqParser};
 
 use crate::{Node, ty::Type};
 
@@ -39,25 +39,28 @@ impl std::fmt::Display for MutType {
     }
 }
 
-impl Peek<TokenParser> for MutType {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for MutType {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for MutType {
+impl Parse for MutType {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let keyword = parser.parse_as::<Mut>(cursor)?;
-        let ty = parser.parse_as::<Box<Type>>(cursor)?;
+        let keyword = parser.parse::<Mut>(cursor)?;
+        let ty = parser.parse::<Box<Type>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(keyword.span(), ty.span()),
@@ -76,13 +79,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, ty::MutType};
+    use crate::{ty::MutType, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"mut int").cursor();
-        let value = parser.parse_as::<MutType>(&mut cursor)?;
+        let value = parser.parse::<MutType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "mut int");
         debug_assert_eq!(value.ty.to_string(), "int");

@@ -5,7 +5,7 @@ pub use indexed::*;
 pub use named::*;
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::{Node, TokenParser, Visitor};
+use crate::{Node, Visitor, zinq_parse::ZinqParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {
@@ -47,29 +47,32 @@ impl std::fmt::Display for Fields {
     }
 }
 
-impl Peek<TokenParser> for Fields {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for Fields {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Fields {
+impl Parse for Fields {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<IndexedFields>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<IndexedFields>(cursor)?.into());
+        if parser.peek::<IndexedFields>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<IndexedFields>(cursor)?.into());
         }
 
-        if parser.peek_as::<NamedFields>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<NamedFields>(cursor)?.into());
+        if parser.peek::<NamedFields>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<NamedFields>(cursor)?.into());
         }
 
         Err(cursor.error(

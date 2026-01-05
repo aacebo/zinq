@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed, TokenParser};
+use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed, zinq_parse::ZinqParser};
 
 use crate::{Node, Visibility};
 
@@ -38,24 +38,27 @@ impl std::fmt::Display for ModVisibility {
     }
 }
 
-impl Peek<TokenParser> for ModVisibility {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for ModVisibility {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for ModVisibility {
+impl Parse for ModVisibility {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let keyword = parser.parse_as::<Suffixed<Pub, Enclosed<LParen, Mod, RParen>>>(cursor)?;
+        let keyword = parser.parse::<Suffixed<Pub, Enclosed<LParen, Mod, RParen>>>(cursor)?;
 
         Ok(Self {
             span: keyword.span().clone(),
@@ -73,13 +76,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{ModVisibility, TokenParser};
+    use crate::{ModVisibility, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"pub(mod)").cursor();
-        let value = parser.parse_as::<ModVisibility>(&mut cursor)?;
+        let value = parser.parse::<ModVisibility>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "pub(mod)");
         debug_assert_eq!(value.keyword.suffix.to_string(), "(mod)");

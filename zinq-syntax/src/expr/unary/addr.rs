@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{And, TokenParser};
+use zinq_token::{And, zinq_parse::ZinqParser};
 
 use crate::{
     Node, Visitor,
@@ -42,19 +42,22 @@ impl std::fmt::Display for AddrExpr {
     }
 }
 
-impl Peek<TokenParser> for AddrExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<And>(cursor).unwrap_or(false))
+impl Peek for AddrExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<And>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse<TokenParser> for AddrExpr {
+impl Parse for AddrExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let and = parser.parse_as::<And>(cursor)?;
-        let right = parser.parse_as::<Box<Expr>>(cursor)?;
+        let and = parser.parse::<And>(cursor)?;
+        let right = parser.parse::<Box<Expr>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(and.span(), right.span()),
@@ -73,13 +76,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, expr::AddrExpr};
+    use crate::{expr::AddrExpr, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_ref() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"&b").cursor();
-        let value = parser.parse_as::<AddrExpr>(&mut cursor)?;
+        let value = parser.parse::<AddrExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&b");
         Ok(())
@@ -87,9 +90,9 @@ mod test {
 
     #[test]
     fn should_parse_ref_of_group() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"&(a)").cursor();
-        let value = parser.parse_as::<AddrExpr>(&mut cursor)?;
+        let value = parser.parse::<AddrExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&(a)");
         Ok(())

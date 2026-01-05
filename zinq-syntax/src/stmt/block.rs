@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{LBrace, RBrace, TokenParser};
+use zinq_token::{LBrace, RBrace, zinq_parse::ZinqParser};
 
 use crate::{Node, stmt::Stmt};
 
@@ -36,31 +36,34 @@ impl std::fmt::Display for BlockStmt {
     }
 }
 
-impl Peek<TokenParser> for BlockStmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for BlockStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for BlockStmt {
+impl Parse for BlockStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left_brace = parser.parse_as::<LBrace>(cursor)?;
+        let left_brace = parser.parse::<LBrace>(cursor)?;
         let mut stmts = vec![];
 
-        while !cursor.eof() && !parser.peek_as::<RBrace>(cursor).unwrap_or(false) {
-            stmts.push(parser.parse_as::<Stmt>(cursor)?);
+        while !cursor.eof() && !parser.peek::<RBrace>(cursor).unwrap_or(false) {
+            stmts.push(parser.parse::<Stmt>(cursor)?);
         }
 
-        let right_brace = parser.parse_as::<RBrace>(cursor)?;
+        let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_brace.span(), right_brace.span()),

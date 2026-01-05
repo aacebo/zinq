@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 
-use crate::TokenParser;
+use crate::zinq_parse::ZinqParser;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Punctuated<T, P>
 where
-    T: std::fmt::Display + Parse<TokenParser>,
-    P: std::fmt::Display + Parse<TokenParser>,
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
 {
     span: Span,
     segments: Vec<(T, Option<P>)>,
@@ -14,8 +14,8 @@ where
 
 impl<T, P> std::ops::Deref for Punctuated<T, P>
 where
-    T: std::fmt::Display + Parse<TokenParser>,
-    P: std::fmt::Display + Parse<TokenParser>,
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
 {
     type Target = [(T, Option<P>)];
 
@@ -26,8 +26,8 @@ where
 
 impl<T, P> Punctuated<T, P>
 where
-    T: std::fmt::Display + Parse<TokenParser>,
-    P: std::fmt::Display + Parse<TokenParser>,
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
 {
     pub fn len(&self) -> usize {
         self.segments.len()
@@ -41,42 +41,45 @@ where
 
 impl<T, P> std::fmt::Display for Punctuated<T, P>
 where
-    T: std::fmt::Display + Parse<TokenParser>,
-    P: std::fmt::Display + Parse<TokenParser>,
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl<T, P> Peek<TokenParser> for Punctuated<T, P>
+impl<T, P> Peek for Punctuated<T, P>
 where
-    T: std::fmt::Display + Parse<TokenParser>,
-    P: std::fmt::Display + Parse<TokenParser>,
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
 {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        parser.peek_as::<T>(cursor)
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        parser.peek::<T>(cursor)
     }
 }
 
-impl<T, P> Parse<TokenParser> for Punctuated<T, P>
+impl<T, P> Parse for Punctuated<T, P>
 where
-    T: std::fmt::Display + Parse<TokenParser>,
-    P: std::fmt::Display + Parse<TokenParser>,
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
 {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let mut segments = vec![];
         let start = cursor.span().clone();
 
-        while parser.peek_as::<T>(cursor).unwrap_or(false) {
-            let value = parser.parse_as::<T>(cursor)?;
+        while parser.peek::<T>(cursor).unwrap_or(false) {
+            let value = parser.parse::<T>(cursor)?;
             let mut delim: Option<P> = None;
 
-            if parser.peek_as::<P>(cursor).unwrap_or(false) {
-                delim = Some(parser.parse_as::<P>(cursor)?);
+            if parser.peek::<P>(cursor).unwrap_or(false) {
+                delim = Some(parser.parse::<P>(cursor)?);
             }
 
             segments.push((value, delim.clone()));
@@ -104,13 +107,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{ColonColon, Comma, LInt, Punctuated, Token, TokenParser};
+    use crate::{ColonColon, Comma, LInt, Punctuated, Token, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_int_list() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"1, 2, 3").cursor();
-        let stream = parser.parse_as::<Punctuated<LInt, Comma>>(&mut cursor)?;
+        let stream = parser.parse::<Punctuated<LInt, Comma>>(&mut cursor)?;
 
         debug_assert_eq!(stream.len(), 3);
         debug_assert_eq!(stream.to_string(), "1, 2, 3");
@@ -120,9 +123,9 @@ mod test {
 
     #[test]
     fn should_parse_ident_list() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"hello::world::mod").cursor();
-        let stream = parser.parse_as::<Punctuated<Token, ColonColon>>(&mut cursor)?;
+        let stream = parser.parse::<Punctuated<Token, ColonColon>>(&mut cursor)?;
 
         debug_assert_eq!(stream.len(), 3);
         debug_assert_eq!(stream.to_string(), "hello::world::mod");

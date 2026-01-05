@@ -9,8 +9,8 @@ pub use primary::*;
 pub use unary::*;
 
 use zinq_error::Result;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, Syntax, Visitor};
 
@@ -91,34 +91,34 @@ impl std::fmt::Display for Expr {
     }
 }
 
-impl Peek<TokenParser> for Expr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> Result<bool> {
+impl Peek for Expr {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Expr {
-    fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
-        if parser.peek_as::<PrimaryExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<PrimaryExpr>(cursor)?.into());
+impl Parse for Expr {
+    fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut zinq_parse::ZinqParser) -> Result<Self> {
+        if parser.peek::<PrimaryExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<PrimaryExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<PostfixExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<PostfixExpr>(cursor)?.into());
+        if parser.peek::<PostfixExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<PostfixExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<UnaryExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<UnaryExpr>(cursor)?.into());
+        if parser.peek::<UnaryExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<UnaryExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<BinaryExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<BinaryExpr>(cursor)?.into());
+        if parser.peek::<BinaryExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<BinaryExpr>(cursor)?.into());
         }
 
         Err(cursor.error(

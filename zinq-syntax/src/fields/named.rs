@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace, TokenParser};
+use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace, zinq_parse::ZinqParser};
 
 use crate::{Node, Visibility, Visitor, ty::Type};
 
@@ -18,27 +18,30 @@ impl std::fmt::Display for NamedField {
     }
 }
 
-impl Peek<TokenParser> for NamedField {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for NamedField {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for NamedField {
+impl Parse for NamedField {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Visibility>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let colon = parser.parse_as::<Colon>(cursor)?;
-        let ty = parser.parse_as::<Type>(cursor)?;
+        let vis = parser.parse::<Visibility>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let colon = parser.parse::<Colon>(cursor)?;
+        let ty = parser.parse::<Type>(cursor)?;
         let span = Span::from_bounds(vis.span(), ty.span());
 
         Ok(Self {
@@ -96,30 +99,33 @@ impl std::fmt::Display for NamedFields {
     }
 }
 
-impl Peek<TokenParser> for NamedFields {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        if !parser.peek_as::<LBrace>(cursor).unwrap_or(false) {
+impl Peek for NamedFields {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        if !parser.peek::<LBrace>(cursor).unwrap_or(false) {
             return Ok(false);
         }
 
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for NamedFields {
+impl Parse for NamedFields {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left_brace = parser.parse_as::<LBrace>(cursor)?;
-        let fields = parser.parse_as::<Punctuated<NamedField, Comma>>(cursor)?;
-        let right_brace = parser.parse_as::<RBrace>(cursor)?;
+        let left_brace = parser.parse::<LBrace>(cursor)?;
+        let fields = parser.parse::<Punctuated<NamedField, Comma>>(cursor)?;
+        let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_brace.span(), right_brace.span()),
@@ -139,13 +145,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, fields::NamedFields};
+    use crate::{fields::NamedFields, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut cursor = Span::from_bytes(b"{ hello: string, world: u32 }").cursor();
-        let mut parser = TokenParser;
-        let fields = parser.parse_as::<NamedFields>(&mut cursor)?;
+        let mut parser = zinq_parse::ZinqParser;
+        let fields = parser.parse::<NamedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(fields.to_string(), "{ hello: string, world: u32 }");
@@ -158,8 +164,8 @@ mod test {
     #[test]
     fn should_parse_trailing_comma() -> Result<()> {
         let mut cursor = Span::from_bytes(b"{ hello: std::string::string, world: u32, }").cursor();
-        let mut parser = TokenParser;
-        let fields = parser.parse_as::<NamedFields>(&mut cursor)?;
+        let mut parser = zinq_parse::ZinqParser;
+        let fields = parser.parse::<NamedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(
@@ -185,8 +191,8 @@ mod test {
         )
         .cursor();
 
-        let mut parser = TokenParser;
-        let fields = parser.parse_as::<NamedFields>(&mut cursor)?;
+        let mut parser = zinq_parse::ZinqParser;
+        let fields = parser.parse::<NamedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(

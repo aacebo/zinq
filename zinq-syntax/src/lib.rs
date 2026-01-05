@@ -12,12 +12,12 @@ pub use path::*;
 pub use visibility::*;
 
 use zinq_error::Result;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{expr::Expr, stmt::Stmt, ty::Type};
 
-pub trait Node: Parse<TokenParser> {
+pub trait Node: Parse {
     fn name(&self) -> &str;
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> Result<()>
     where
@@ -68,34 +68,34 @@ impl Node for Syntax {
     }
 }
 
-impl Peek<TokenParser> for Syntax {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> Result<bool> {
+impl Peek for Syntax {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Syntax {
-    fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
-        if parser.peek_as::<Visibility>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Visibility>(cursor)?.into());
+impl Parse for Syntax {
+    fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut zinq_parse::ZinqParser) -> Result<Self> {
+        if parser.peek::<Visibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Visibility>(cursor)?.into());
         }
 
-        if parser.peek_as::<Type>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Type>(cursor)?.into());
+        if parser.peek::<Type>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Type>(cursor)?.into());
         }
 
-        if parser.peek_as::<Expr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Expr>(cursor)?.into());
+        if parser.peek::<Expr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Expr>(cursor)?.into());
         }
 
-        if parser.peek_as::<Stmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Stmt>(cursor)?.into());
+        if parser.peek::<Stmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Stmt>(cursor)?.into());
         }
 
         Err(cursor.error(

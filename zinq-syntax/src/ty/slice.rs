@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{LBracket, RBracket, TokenParser};
+use zinq_token::{LBracket, RBracket, zinq_parse::ZinqParser};
 
 use crate::{Node, ty::Type};
 
@@ -40,26 +40,29 @@ impl std::fmt::Display for SliceType {
     }
 }
 
-impl Peek<TokenParser> for SliceType {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for SliceType {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for SliceType {
+impl Parse for SliceType {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left_bracket = parser.parse_as::<LBracket>(cursor)?;
-        let item_ty = parser.parse_as::<Box<Type>>(cursor)?;
-        let right_bracket = parser.parse_as::<RBracket>(cursor)?;
+        let left_bracket = parser.parse::<LBracket>(cursor)?;
+        let item_ty = parser.parse::<Box<Type>>(cursor)?;
+        let right_bracket = parser.parse::<RBracket>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_bracket.span(), right_bracket.span()),
@@ -79,13 +82,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, ty::SliceType};
+    use crate::{ty::SliceType, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"[u32]").cursor();
-        let value = parser.parse_as::<SliceType>(&mut cursor)?;
+        let value = parser.parse::<SliceType>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "[u32]");
         debug_assert_eq!(value.item_ty.to_string(), "u32");

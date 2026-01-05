@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Parser, Peek};
 
-use crate::{EqEq, Gt, GtEq, Lt, LtEq, NotEq, TokenParser};
+use crate::{EqEq, Gt, GtEq, Lt, LtEq, NotEq, zinq_parse::ZinqParser};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Cmp {
@@ -116,44 +116,47 @@ impl std::fmt::Display for Cmp {
     }
 }
 
-impl Peek<TokenParser> for Cmp {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        Ok(parser.peek_as::<EqEq>(cursor).unwrap_or(false)
-            || parser.peek_as::<NotEq>(cursor).unwrap_or(false)
-            || parser.peek_as::<GtEq>(cursor).unwrap_or(false)
-            || parser.peek_as::<Gt>(cursor).unwrap_or(false)
-            || parser.peek_as::<LtEq>(cursor).unwrap_or(false)
-            || parser.peek_as::<Lt>(cursor).unwrap_or(false))
+impl Peek for Cmp {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<EqEq>(cursor).unwrap_or(false)
+            || parser.peek::<NotEq>(cursor).unwrap_or(false)
+            || parser.peek::<GtEq>(cursor).unwrap_or(false)
+            || parser.peek::<Gt>(cursor).unwrap_or(false)
+            || parser.peek::<LtEq>(cursor).unwrap_or(false)
+            || parser.peek::<Lt>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse<TokenParser> for Cmp {
+impl Parse for Cmp {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<EqEq>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<EqEq>(cursor)?.into());
+        if parser.peek::<EqEq>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<EqEq>(cursor)?.into());
         }
 
-        if parser.peek_as::<NotEq>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<NotEq>(cursor)?.into());
+        if parser.peek::<NotEq>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<NotEq>(cursor)?.into());
         }
 
-        if parser.peek_as::<GtEq>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GtEq>(cursor)?.into());
+        if parser.peek::<GtEq>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<GtEq>(cursor)?.into());
         }
 
-        if parser.peek_as::<Gt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Gt>(cursor)?.into());
+        if parser.peek::<Gt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Gt>(cursor)?.into());
         }
 
-        if parser.peek_as::<LtEq>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<LtEq>(cursor)?.into());
+        if parser.peek::<LtEq>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<LtEq>(cursor)?.into());
         }
 
-        if parser.peek_as::<Lt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Lt>(cursor)?.into());
+        if parser.peek::<Lt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Lt>(cursor)?.into());
         }
 
         Err(cursor.error(

@@ -25,18 +25,18 @@ use zinq_error::Result;
 
 ///
 /// ## Peek
-/// implementers can be peeked by `Parser`
+/// implementers can be peeked by a `ZinqParser`
 ///
-pub trait Peek<P: Parser> {
-    fn peek(cursor: &Cursor, parser: &P) -> Result<bool>;
+pub trait Peek {
+    fn peek(cursor: &Cursor, parser: &ZinqParser) -> Result<bool>;
 }
 
 ///
 /// ## Parse
-/// implementers can be parsed by `Parser`
+/// implementers can be parsed by a `ZinqParser`
 ///
-pub trait Parse<P: Parser>: Peek<P> + std::fmt::Debug + Clone {
-    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self>;
+pub trait Parse: Peek + std::fmt::Debug + Clone {
+    fn parse(cursor: &mut Cursor, parser: &mut ZinqParser) -> Result<Self>;
     fn span(&self) -> &Span;
 }
 
@@ -45,20 +45,18 @@ pub trait Parse<P: Parser>: Peek<P> + std::fmt::Debug + Clone {
 /// a convenient way to conditionally
 /// traverse/parse a sequence of data
 ///
-pub trait Parser: Sized {
-    type Item: Parse<Self> + std::fmt::Debug + Clone;
+#[derive(Debug, Clone)]
+pub struct ZinqParser;
 
+impl ZinqParser {
     ///
-    /// ## peek_as
-    /// parse a type
+    /// ## peek
+    /// peek a type without moving the cursor
     ///
     #[inline]
-    fn peek_as<T: Peek<Self>>(&self, cursor: &Cursor) -> Result<bool>
-    where
-        Self: Sized,
-    {
+    pub fn peek<T: Peek>(&self, cursor: &Cursor) -> Result<bool> {
         if cursor.peek()?.is_ascii_whitespace() {
-            return self.peek_as::<T>(cursor.fork().shift_next()?);
+            return self.peek::<T>(cursor.fork().shift_next()?);
         }
 
         T::peek(cursor, self)
@@ -66,34 +64,12 @@ pub trait Parser: Sized {
 
     ///
     /// ## parse
-    /// parse an item
+    /// parse a type, moving the cursor forward
     ///
     #[inline]
-    fn parse(&mut self, cursor: &mut Cursor) -> Result<Self::Item>
-    where
-        Self: Sized,
-    {
+    pub fn parse<T: Parse>(&mut self, cursor: &mut Cursor) -> Result<T> {
         if cursor.peek()?.is_ascii_whitespace() {
-            return self.parse(cursor.shift_next()?);
-        }
-
-        let mut fork = cursor.fork();
-        let value = Self::Item::parse(&mut fork, self)?;
-        cursor.merge(fork.commit());
-        Ok(value)
-    }
-
-    ///
-    /// ## parse_as
-    /// parse a type
-    ///
-    #[inline]
-    fn parse_as<T: Parse<Self>>(&mut self, cursor: &mut Cursor) -> Result<T>
-    where
-        Self: Sized,
-    {
-        if cursor.peek()?.is_ascii_whitespace() {
-            return self.parse_as::<T>(cursor.shift_next()?);
+            return self.parse::<T>(cursor.shift_next()?);
         }
 
         let mut fork = cursor.fork();
@@ -103,19 +79,19 @@ pub trait Parser: Sized {
     }
 }
 
-impl<T: Peek<P>, P: Parser> Peek<P> for Option<T> {
-    fn peek(_: &Cursor, _: &P) -> Result<bool> {
+impl<T: Peek> Peek for Option<T> {
+    fn peek(_: &Cursor, _: &ZinqParser) -> Result<bool> {
         Ok(true)
     }
 }
 
-impl<T: Parse<P>, P: Parser> Parse<P> for Option<T> {
-    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self> {
-        if !parser.peek_as::<T>(cursor).unwrap_or(false) {
+impl<T: Parse> Parse for Option<T> {
+    fn parse(cursor: &mut Cursor, parser: &mut ZinqParser) -> Result<Self> {
+        if !parser.peek::<T>(cursor).unwrap_or(false) {
             return Ok(Self::None);
         }
 
-        Ok(Some(parser.parse_as::<T>(cursor)?))
+        Ok(Some(parser.parse::<T>(cursor)?))
     }
 
     fn span(&self) -> &Span {
@@ -126,15 +102,15 @@ impl<T: Parse<P>, P: Parser> Parse<P> for Option<T> {
     }
 }
 
-impl<T: Peek<P>, P: Parser> Peek<P> for Box<T> {
-    fn peek(cursor: &Cursor, parser: &P) -> Result<bool> {
-        parser.peek_as::<T>(cursor)
+impl<T: Peek> Peek for Box<T> {
+    fn peek(cursor: &Cursor, parser: &ZinqParser) -> Result<bool> {
+        parser.peek::<T>(cursor)
     }
 }
 
-impl<T: Parse<P>, P: Parser> Parse<P> for Box<T> {
-    fn parse(cursor: &mut Cursor, parser: &mut P) -> Result<Self> {
-        Ok(Box::new(parser.parse_as::<T>(cursor)?))
+impl<T: Parse> Parse for Box<T> {
+    fn parse(cursor: &mut Cursor, parser: &mut ZinqParser) -> Result<Self> {
+        Ok(Box::new(parser.parse::<T>(cursor)?))
     }
 
     fn span(&self) -> &Span {

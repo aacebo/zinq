@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{ColonColon, Ident, Punctuated, TokenParser};
+use zinq_token::{ColonColon, Ident, Punctuated, zinq_parse::ZinqParser};
 
 use crate::{Node, Visitor, ty::Type};
 
@@ -37,24 +37,27 @@ impl std::fmt::Display for Path {
     }
 }
 
-impl Peek<TokenParser> for Path {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for Path {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Path {
+impl Parse for Path {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse_as::<Punctuated<Ident, ColonColon>>(cursor)?;
+        let path = parser.parse::<Punctuated<Ident, ColonColon>>(cursor)?;
 
         Ok(Self {
             span: path.span().clone(),

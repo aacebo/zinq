@@ -4,9 +4,9 @@ mod open;
 pub use close::*;
 pub use open::*;
 
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
-use crate::{ToTokens, Token, TokenParser};
+use crate::{ToTokens, Token};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Delim {
@@ -69,13 +69,16 @@ impl std::fmt::Display for Delim {
     }
 }
 
-impl Peek<TokenParser> for Delim {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        if parser.peek_as::<OpenDelim>(cursor)? {
+impl Peek for Delim {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        if parser.peek::<OpenDelim>(cursor)? {
             return Ok(true);
         }
 
-        if parser.peek_as::<CloseDelim>(cursor)? {
+        if parser.peek::<CloseDelim>(cursor)? {
             return Ok(true);
         }
 
@@ -83,17 +86,17 @@ impl Peek<TokenParser> for Delim {
     }
 }
 
-impl Parse<TokenParser> for Delim {
+impl Parse for Delim {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<OpenDelim>(cursor)? {
-            return Ok(parser.parse_as::<OpenDelim>(cursor)?.into());
+        if parser.peek::<OpenDelim>(cursor)? {
+            return Ok(parser.parse::<OpenDelim>(cursor)?.into());
         }
 
-        if parser.peek_as::<CloseDelim>(cursor)? {
-            return Ok(parser.parse_as::<CloseDelim>(cursor)?.into());
+        if parser.peek::<CloseDelim>(cursor)? {
+            return Ok(parser.parse::<CloseDelim>(cursor)?.into());
         }
 
         Err(cursor.error(

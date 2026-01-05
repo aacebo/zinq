@@ -9,8 +9,8 @@ pub use slice::*;
 pub use tuple::*;
 
 use zinq_error::Result;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, Path, Syntax, Visitor};
 
@@ -63,41 +63,41 @@ impl std::fmt::Display for Type {
     }
 }
 
-impl Peek<TokenParser> for Type {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> Result<bool> {
+impl Peek for Type {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Type {
+impl Parse for Type {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<RefType>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<RefType>(cursor)?.into());
+        if parser.peek::<RefType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<RefType>(cursor)?.into());
         }
 
-        if parser.peek_as::<MutType>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<MutType>(cursor)?.into());
+        if parser.peek::<MutType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<MutType>(cursor)?.into());
         }
 
-        if parser.peek_as::<Path>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<Path>(cursor)?.into());
+        if parser.peek::<Path>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Path>(cursor)?.into());
         }
 
-        if parser.peek_as::<SliceType>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<SliceType>(cursor)?.into());
+        if parser.peek::<SliceType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<SliceType>(cursor)?.into());
         }
 
-        if parser.peek_as::<TupleType>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<TupleType>(cursor)?.into());
+        if parser.peek::<TupleType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<TupleType>(cursor)?.into());
         }
 
         Err(cursor.error(

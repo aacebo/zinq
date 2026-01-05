@@ -1,5 +1,5 @@
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::TokenParser;
 
 use crate::{Node, Visibility};
 
@@ -37,20 +37,26 @@ impl std::fmt::Display for PrivateVisibility {
     }
 }
 
-impl Peek<TokenParser> for PrivateVisibility {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for PrivateVisibility {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for PrivateVisibility {
-    fn parse(cursor: &mut zinq_parse::Cursor, _: &mut TokenParser) -> zinq_error::Result<Self> {
+impl Parse for PrivateVisibility {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        _: &mut zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<Self> {
         Ok(Self {
             span: cursor.span().clone(),
         })

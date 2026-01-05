@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenParser, TokenStream};
+use crate::{Literal, ToTokens, Token, TokenStream};
 
 ///
 /// ## LBool
@@ -27,17 +27,17 @@ impl std::fmt::Display for LBool {
     }
 }
 
-impl Peek<TokenParser> for LBool {
+impl Peek for LBool {
     #[inline]
-    fn peek(cursor: &Cursor, _: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
         Ok(cursor.peek_n(4).unwrap_or(&[]) == b"true"
             || cursor.peek_n(5).unwrap_or(&[]) == b"false")
     }
 }
 
-impl Parse<TokenParser> for LBool {
+impl Parse for LBool {
     #[inline]
-    fn parse(cursor: &mut Cursor, _: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, _: &mut zinq_parse::ZinqParser) -> Result<Self> {
         if cursor.peek_n(4).unwrap_or(&[]) == b"true" {
             cursor.next_n(4)?;
         }
@@ -79,17 +79,16 @@ impl ToTokens for LBool {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::TokenParser;
+    use crate::Token;
 
     #[test]
     fn is_bool() -> Result<()> {
         let span = Span::from_bytes(b"false");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
-
-        let token = parser.parse(&mut cursor)?;
+        let mut parser = zinq_parse::ZinqParser;
+        let token = parser.parse::<Token>(&mut cursor)?;
 
         debug_assert!(token.is_bool_literal());
         debug_assert_eq!(token.to_string(), "false");

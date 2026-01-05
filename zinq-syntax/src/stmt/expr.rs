@@ -1,5 +1,5 @@
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::TokenParser;
 
 use crate::{Node, expr::Expr, stmt::Stmt};
 
@@ -34,24 +34,27 @@ impl std::fmt::Display for ExprStmt {
     }
 }
 
-impl Peek<TokenParser> for ExprStmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for ExprStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for ExprStmt {
+impl Parse for ExprStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let expr = parser.parse_as::<Expr>(cursor)?;
+        let expr = parser.parse::<Expr>(cursor)?;
 
         Ok(Self {
             span: expr.span().clone(),

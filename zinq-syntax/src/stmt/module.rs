@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, Mod, SemiColon, TokenParser};
+use zinq_token::{Ident, Mod, SemiColon, zinq_parse::ZinqParser};
 
 use crate::{Node, Visibility, stmt::Stmt};
 
@@ -37,27 +37,30 @@ impl std::fmt::Display for ModStmt {
     }
 }
 
-impl Peek<TokenParser> for ModStmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for ModStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for ModStmt {
+impl Parse for ModStmt {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let vis = parser.parse_as::<Visibility>(cursor)?;
-        let keyword = parser.parse_as::<Mod>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
-        let semi = parser.parse_as::<SemiColon>(cursor)?;
+        let vis = parser.parse::<Visibility>(cursor)?;
+        let keyword = parser.parse::<Mod>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let semi = parser.parse::<SemiColon>(cursor)?;
         let span = Span::from_bounds(vis.span(), semi.span());
 
         Ok(Self {
@@ -79,14 +82,14 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, stmt::ModStmt};
+    use crate::{stmt::ModStmt, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse_private() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"mod test;").cursor();
 
-        let ty = parser.parse_as::<ModStmt>(&mut cursor)?;
+        let ty = parser.parse::<ModStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_priv());
         debug_assert_eq!(ty.to_string(), "mod test;");
@@ -96,10 +99,10 @@ mod test {
 
     #[test]
     fn should_parse_public() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"pub mod test;").cursor();
 
-        let ty = parser.parse_as::<ModStmt>(&mut cursor)?;
+        let ty = parser.parse::<ModStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_pub());
         debug_assert_eq!(ty.to_string(), "pub mod test;");

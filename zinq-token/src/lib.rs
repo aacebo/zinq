@@ -5,7 +5,6 @@ mod ident;
 mod keyword;
 mod literal;
 pub mod macros;
-mod parser;
 mod prefixed;
 mod punct;
 mod punctuated;
@@ -18,7 +17,6 @@ pub use error::*;
 pub use ident::*;
 pub use keyword::*;
 pub use literal::*;
-pub use parser::*;
 pub use prefixed::*;
 pub use punct::*;
 pub use punctuated::*;
@@ -165,38 +163,38 @@ impl std::fmt::Display for Token {
     }
 }
 
-impl Peek<TokenParser> for Token {
+impl Peek for Token {
     #[allow(unused)]
     #[inline]
-    fn peek(cursor: &Cursor, parser: &TokenParser) -> Result<bool> {
+    fn peek(cursor: &Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
         Ok(true)
     }
 }
 
-impl Parse<TokenParser> for Token {
+impl Parse for Token {
     #[inline]
-    fn parse(cursor: &mut Cursor, parser: &mut TokenParser) -> Result<Self> {
+    fn parse(cursor: &mut Cursor, parser: &mut zinq_parse::ZinqParser) -> Result<Self> {
         if cursor.peek()?.is_ascii_whitespace() {
             return parser.parse(cursor.shift_next()?);
         }
 
-        if parser.peek_as::<Punct>(cursor)? {
-            return Ok(parser.parse_as::<Punct>(cursor)?.into());
+        if parser.peek::<Punct>(cursor)? {
+            return Ok(parser.parse::<Punct>(cursor)?.into());
         }
 
-        if parser.peek_as::<Delim>(cursor)? {
-            return Ok(parser.parse_as::<Delim>(cursor)?.into());
+        if parser.peek::<Delim>(cursor)? {
+            return Ok(parser.parse::<Delim>(cursor)?.into());
         }
 
-        if parser.peek_as::<Literal>(cursor)? {
-            return Ok(parser.parse_as::<Literal>(cursor)?.into());
+        if parser.peek::<Literal>(cursor)? {
+            return Ok(parser.parse::<Literal>(cursor)?.into());
         }
 
-        if parser.peek_as::<Keyword>(cursor)? {
-            return Ok(parser.parse_as::<Keyword>(cursor)?.into());
+        if parser.peek::<Keyword>(cursor)? {
+            return Ok(parser.parse::<Keyword>(cursor)?.into());
         }
 
-        Ok(parser.parse_as::<Ident>(cursor)?.into())
+        Ok(parser.parse::<Ident>(cursor)?.into())
     }
 
     #[inline]
@@ -222,13 +220,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::TokenParser;
+    use crate::zinq_parse::ZinqParser;
 
     #[test]
     fn is_string_assignment() -> Result<()> {
         let span = Span::from_bytes(b"let test: string = \"test\";");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_keyword());
@@ -271,7 +269,7 @@ mod test {
     fn is_int_assignment() -> Result<()> {
         let span = Span::from_bytes(b"let test: int = 121u16;");
         let mut cursor = span.cursor();
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut token = parser.parse(&mut cursor)?;
 
         debug_assert!(token.is_keyword());

@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Dot, Ident, TokenParser};
+use zinq_token::{Dot, Ident, zinq_parse::ZinqParser};
 
 use crate::{
     Node, Visitor,
@@ -43,26 +43,29 @@ impl std::fmt::Display for GetFieldExpr {
     }
 }
 
-impl Peek<TokenParser> for GetFieldExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for GetFieldExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for GetFieldExpr {
+impl Parse for GetFieldExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let target = parser.parse_as::<Expr>(cursor)?;
-        let dot = parser.parse_as::<Dot>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
+        let target = parser.parse::<Expr>(cursor)?;
+        let dot = parser.parse::<Dot>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(target.span(), name.span()),

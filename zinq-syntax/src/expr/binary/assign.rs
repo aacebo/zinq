@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Eq, TokenParser};
+use zinq_token::{Eq, zinq_parse::ZinqParser};
 
 use crate::{
     Node, Visitor,
@@ -43,26 +43,29 @@ impl std::fmt::Display for AssignExpr {
     }
 }
 
-impl Peek<TokenParser> for AssignExpr {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
+impl Peek for AssignExpr {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for AssignExpr {
+impl Parse for AssignExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let left = parser.parse_as::<Box<Expr>>(cursor)?;
-        let eq = parser.parse_as::<Eq>(cursor)?;
-        let right = parser.parse_as::<Box<Expr>>(cursor)?;
+        let left = parser.parse::<Box<Expr>>(cursor)?;
+        let eq = parser.parse::<Eq>(cursor)?;
+        let right = parser.parse::<Box<Expr>>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left.span(), right.span()),
@@ -82,13 +85,13 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, expr::AssignExpr};
+    use crate::{expr::AssignExpr, zinq_parse::ZinqParser};
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut parser = TokenParser;
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"a = b'h'").cursor();
-        let value = parser.parse_as::<AssignExpr>(&mut cursor)?;
+        let value = parser.parse::<AssignExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "a = b'h'");
         debug_assert_eq!(value.left.to_string(), "a");

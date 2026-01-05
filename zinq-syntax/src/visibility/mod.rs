@@ -8,8 +8,8 @@ pub use private_visibility::*;
 pub use public_visibility::*;
 pub use super_visibility::*;
 use zinq_error::Result;
+use zinq_parse::ZinqParser;
 use zinq_parse::{Parse, Parser, Peek};
-use zinq_token::TokenParser;
 
 use crate::{Node, Syntax, Visitor};
 
@@ -86,36 +86,36 @@ impl std::fmt::Display for Visibility {
     }
 }
 
-impl Peek<TokenParser> for Visibility {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> Result<bool> {
+impl Peek for Visibility {
+    fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse_as::<Self>(&mut fork) {
+        match fork_parser.parse::<Self>(&mut fork) {
             Err(_) => Ok(false),
             Ok(_) => Ok(true),
         }
     }
 }
 
-impl Parse<TokenParser> for Visibility {
+impl Parse for Visibility {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
-        parser: &mut TokenParser,
+        parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek_as::<ModVisibility>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ModVisibility>(cursor)?.into());
+        if parser.peek::<ModVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<ModVisibility>(cursor)?.into());
         }
 
-        if parser.peek_as::<SuperVisibility>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<SuperVisibility>(cursor)?.into());
+        if parser.peek::<SuperVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<SuperVisibility>(cursor)?.into());
         }
 
-        if parser.peek_as::<PublicVisibility>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<PublicVisibility>(cursor)?.into());
+        if parser.peek::<PublicVisibility>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<PublicVisibility>(cursor)?.into());
         }
 
-        Ok(parser.parse_as::<PrivateVisibility>(cursor)?.into())
+        Ok(parser.parse::<PrivateVisibility>(cursor)?.into())
     }
 
     fn span(&self) -> &zinq_parse::Span {

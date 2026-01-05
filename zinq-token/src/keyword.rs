@@ -26,11 +26,11 @@ macro_rules! define_keywords {
             )*
         }
 
-        impl zinq_parse::Peek<$crate::TokenParser> for Keyword {
+        impl zinq_parse::Peek for Keyword {
             #[inline]
-            fn peek(cursor: &zinq_parse::Cursor, parser: &$crate::TokenParser) -> zinq_error::Result<bool> {
+            fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
                 $(
-                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
+                    if let Ok(ok) = parser.peek::<$name>(cursor) && ok {
                         return Ok(true);
                     }
                 )*
@@ -39,12 +39,12 @@ macro_rules! define_keywords {
             }
         }
 
-        impl zinq_parse::Parse<$crate::TokenParser> for Keyword {
+        impl zinq_parse::Parse for Keyword {
             #[inline]
-            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+            fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut zinq_parse::ZinqParser) -> zinq_error::Result<Self> {
                 $(
-                    if let Ok(ok) = parser.peek_as::<$name>(cursor) && ok {
-                        return Ok(parser.parse_as::<$name>(cursor)?.into());
+                    if let Ok(ok) = parser.peek::<$name>(cursor) && ok {
+                        return Ok(parser.parse::<$name>(cursor)?.into());
                     }
                 )*
 
@@ -96,16 +96,16 @@ macro_rules! define_keywords {
                 }
             }
 
-            impl zinq_parse::Peek<$crate::TokenParser> for $name {
+            impl zinq_parse::Peek for $name {
                 #[inline]
-                fn peek(cursor: &zinq_parse::Cursor, _: &$crate::TokenParser) -> zinq_error::Result<bool> {
+                fn peek(cursor: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
                     Ok(cursor.fork().next_while(|b, _| b.is_ascii_alphanumeric())?.span() == &$token.as_bytes())
                 }
             }
 
-            impl zinq_parse::Parse<$crate::TokenParser> for $name {
+            impl zinq_parse::Parse for $name {
                 #[inline]
-                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut $crate::TokenParser) -> zinq_error::Result<Self> {
+                fn parse(cursor: &mut zinq_parse::Cursor, _: &mut zinq_parse::ZinqParser) -> zinq_error::Result<Self> {
                     let span = cursor.next_n($token.len())?.span();
 
                     if span != &$token.as_bytes() {
@@ -165,13 +165,13 @@ macro_rules! define_keywords {
             use zinq_error::Result;
             use zinq_parse::{Parser, Span};
 
-            use crate::TokenParser;
+            use crate::zinq_parse::ZinqParser;
 
             $(
                 #[test]
                 fn $is_method() -> Result<()> {
                     let mut cursor = Span::from_str($token).cursor();
-                    let mut parser = TokenParser;
+                    let mut parser = zinq_parse::ZinqParser;
                     let token = parser.parse(&mut cursor)?;
 
                     debug_assert!(token.is_keyword());
