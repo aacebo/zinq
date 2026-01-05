@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
+use crate::{Literal, ToTokens, Token, TokenStream};
 
 ///
 /// ## LFloat
@@ -145,9 +145,9 @@ impl ToTokens for LFloat {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::zinq_parse::ZinqParser;
+    use crate::Token;
 
     #[test]
     fn is_float() -> Result<()> {
@@ -155,7 +155,7 @@ mod test {
         let mut cursor = span.cursor();
         let mut parser = zinq_parse::ZinqParser;
 
-        let token = parser.parse(&mut cursor)?;
+        let token = parser.parse::<Token>(&mut cursor)?;
         println!("{} => {}", token.name(), token.to_string());
 
         debug_assert!(token.is_float_literal());

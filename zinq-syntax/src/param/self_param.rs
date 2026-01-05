@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{And, Mut, SelfValue, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{And, Mut, SelfValue};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelfParam {

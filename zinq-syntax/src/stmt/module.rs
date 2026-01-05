@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, Mod, SemiColon, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{Ident, Mod, SemiColon};
 
 use crate::{Node, Visibility, stmt::Stmt};
 
@@ -80,9 +80,9 @@ impl Parse for ModStmt {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{stmt::ModStmt, zinq_parse::ZinqParser};
+    use crate::stmt::ModStmt;
 
     #[test]
     fn should_parse_private() -> Result<()> {

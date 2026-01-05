@@ -11,9 +11,9 @@ pub use int::*;
 pub use string::*;
 
 use zinq_error::{NOT_FOUND, Result};
-use zinq_parse::{Cursor, Parse, Parser, Peek, Span};
+use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{ToTokens, Token, TokenMismatchError, TokenStream, zinq_parse::ZinqParser};
+use crate::{ToTokens, Token, TokenMismatchError, TokenStream};
 
 ///
 /// ## Literal

@@ -9,8 +9,7 @@ pub use slice::*;
 pub use tuple::*;
 
 use zinq_error::Result;
-use zinq_parse::ZinqParser;
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
 use crate::{Node, Path, Syntax, Visitor};
 

@@ -1,8 +1,8 @@
 mod syntax;
 
 pub use syntax::*;
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Impl, LBrace, RBrace, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{Impl, LBrace, RBrace};
 
 use crate::{Node, stmt::Stmt, ty::Type};
 
@@ -90,9 +90,9 @@ impl Parse for ImplStmt {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{stmt::ImplStmt, zinq_parse::ZinqParser};
+    use crate::stmt::ImplStmt;
 
     #[test]
     fn should_parse() -> Result<()> {

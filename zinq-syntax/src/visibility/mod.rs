@@ -8,8 +8,7 @@ pub use private_visibility::*;
 pub use public_visibility::*;
 pub use super_visibility::*;
 use zinq_error::Result;
-use zinq_parse::ZinqParser;
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
 use crate::{Node, Syntax, Visitor};
 

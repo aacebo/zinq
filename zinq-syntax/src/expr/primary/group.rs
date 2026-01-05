@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{LParen, RParen, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{LParen, RParen};
 
 use crate::{
     Node, Visitor,
@@ -77,9 +77,9 @@ impl Parse for GroupExpr {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{expr::GroupExpr, zinq_parse::ZinqParser};
+    use crate::expr::GroupExpr;
 
     #[test]
     fn should_parse() -> Result<()> {

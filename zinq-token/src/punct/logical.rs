@@ -1,6 +1,6 @@
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
-use crate::{AndAnd, OrOr, zinq_parse::ZinqParser};
+use crate::{AndAnd, OrOr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Logical {

@@ -4,8 +4,6 @@ mod logical;
 pub use cmp::*;
 pub use logical::*;
 
-use zinq_parse::Parser;
-
 macro_rules! define_puncts {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
         #[derive(Debug, Clone, PartialEq, Eq)]
@@ -167,16 +165,14 @@ macro_rules! define_puncts {
         #[cfg(test)]
         mod test {
             use zinq_error::Result;
-            use zinq_parse::{Parser, Span};
-
-            use crate::zinq_parse::ZinqParser;
+            use zinq_parse::Span;
 
             $(
                 #[test]
                 fn $is_method() -> Result<()> {
                     let mut cursor = Span::from_str($token).cursor();
                     let mut parser = zinq_parse::ZinqParser;
-                    let token = parser.parse(&mut cursor)?;
+                    let token = parser.parse::<$crate::Token>(&mut cursor)?;
 
                     debug_assert!(token.is_punct());
                     debug_assert!(token.$is_method());

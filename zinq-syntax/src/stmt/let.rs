@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Colon, Eq, Ident, Let, SemiColon, Suffixed, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{Colon, Eq, Ident, Let, SemiColon, Suffixed};
 
 use crate::{Node, expr::Expr, stmt::Stmt, ty::Type};
 
@@ -87,9 +87,9 @@ impl Parse for LetStmt {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{stmt::LetStmt, zinq_parse::ZinqParser};
+    use crate::stmt::LetStmt;
 
     #[test]
     fn should_parse_with_init() -> Result<()> {

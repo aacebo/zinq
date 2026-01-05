@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::Ident;
 
 use crate::{Node, Visitor, expr::PrimaryExpr};
 

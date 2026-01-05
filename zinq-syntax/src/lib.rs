@@ -12,8 +12,7 @@ pub use path::*;
 pub use visibility::*;
 
 use zinq_error::Result;
-use zinq_parse::ZinqParser;
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
 use crate::{expr::Expr, stmt::Stmt, ty::Type};
 

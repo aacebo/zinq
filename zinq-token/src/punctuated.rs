@@ -1,6 +1,4 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-
-use crate::zinq_parse::ZinqParser;
+use zinq_parse::{Parse, Peek, Span};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Punctuated<T, P>
@@ -105,9 +103,9 @@ where
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{ColonColon, Comma, LInt, Punctuated, Token, zinq_parse::ZinqParser};
+    use crate::{ColonColon, Comma, LInt, Punctuated, Token};
 
     #[test]
     fn should_parse_int_list() -> Result<()> {

@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
+use crate::{ToTokens, Token, TokenStream};
 
 ///
 /// ## Ident
@@ -67,16 +67,16 @@ impl ToTokens for Ident {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::zinq_parse::ZinqParser;
+    use crate::Token;
 
     #[test]
     fn should_parse() -> Result<()> {
         let span = Span::from_bytes(b"test");
         let mut cursor = span.cursor();
         let mut parser = zinq_parse::ZinqParser;
-        let token = parser.parse(&mut cursor)?;
+        let token = parser.parse::<Token>(&mut cursor)?;
 
         debug_assert!(token.is_ident());
         debug_assert_eq!(token.to_string(), "test");

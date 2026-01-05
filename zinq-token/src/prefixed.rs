@@ -1,6 +1,4 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-
-use crate::zinq_parse::ZinqParser;
+use zinq_parse::{Parse, Peek, Span};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prefixed<P, T>
@@ -90,9 +88,9 @@ where
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{LInt, Plus, Prefixed, zinq_parse::ZinqParser};
+    use crate::{LInt, Plus, Prefixed};
 
     #[test]
     fn should_parse_prefixed() -> Result<()> {

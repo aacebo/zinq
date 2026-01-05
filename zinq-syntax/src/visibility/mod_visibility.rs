@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed};
 
 use crate::{Node, Visibility};
 
@@ -74,9 +74,9 @@ impl Parse for ModVisibility {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{ModVisibility, zinq_parse::ZinqParser};
+    use crate::ModVisibility;
 
     #[test]
     fn should_parse() -> Result<()> {

@@ -1,6 +1,6 @@
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
-use crate::{EqEq, Gt, GtEq, Lt, LtEq, NotEq, zinq_parse::ZinqParser};
+use crate::{EqEq, Gt, GtEq, Lt, LtEq, NotEq};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Cmp {

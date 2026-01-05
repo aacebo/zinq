@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{And, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::And;
 
 use crate::{
     Node, Visitor,
@@ -74,9 +74,9 @@ impl Parse for AddrExpr {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{expr::AddrExpr, zinq_parse::ZinqParser};
+    use crate::expr::AddrExpr;
 
     #[test]
     fn should_parse_ref() -> Result<()> {

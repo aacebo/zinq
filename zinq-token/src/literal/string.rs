@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
+use crate::{Literal, ToTokens, Token, TokenStream};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LString {
@@ -65,9 +65,9 @@ impl ToTokens for LString {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{LString, zinq_parse::ZinqParser};
+    use crate::{LString, Token};
 
     #[test]
     fn is_string() -> Result<()> {
@@ -77,7 +77,7 @@ mod test {
 
         debug_assert!(parser.peek::<LString>(&cursor)?);
 
-        let token = parser.parse(&mut cursor)?;
+        let token = parser.parse::<Token>(&mut cursor)?;
 
         debug_assert!(token.is_string_literal());
         debug_assert_eq!(token.to_string(), "\"test\"");

@@ -2,8 +2,7 @@ mod call;
 
 pub use call::*;
 
-use zinq_parse::ZinqParser;
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
 use crate::{Node, expr::Expr};
 

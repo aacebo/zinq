@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{LBracket, RBracket, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::{LBracket, RBracket};
 
 use crate::{Node, ty::Type};
 
@@ -80,9 +80,9 @@ impl Parse for SliceType {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{ty::SliceType, zinq_parse::ZinqParser};
+    use crate::ty::SliceType;
 
     #[test]
     fn should_parse() -> Result<()> {

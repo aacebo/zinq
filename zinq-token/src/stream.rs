@@ -1,9 +1,9 @@
 use std::{ops::Index, str::FromStr};
 
 use zinq_error::ZinqError;
-use zinq_parse::{Parse, Parser, Peek, Span};
+use zinq_parse::{Parse, Peek, Span};
 
-use crate::{ToTokens, Token, zinq_parse::ZinqParser};
+use crate::{ToTokens, Token};
 
 #[derive(Debug, Default, Clone)]
 pub struct TokenStream {
@@ -178,7 +178,7 @@ impl Parse for TokenStream {
         let mut tokens = vec![];
 
         while !cursor.eof() {
-            let token = parser.parse(cursor)?;
+            let token = parser.parse::<Token>(cursor)?;
             tokens.push(token);
         }
 

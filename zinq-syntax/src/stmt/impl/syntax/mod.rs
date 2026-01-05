@@ -1,8 +1,7 @@
 mod method;
 
 pub use method::*;
-use zinq_parse::ZinqParser;
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ImplSyntax {

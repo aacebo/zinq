@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
+use crate::{Literal, ToTokens, Token, TokenStream};
 
 ///
 /// ## LByte
@@ -72,9 +72,9 @@ impl ToTokens for LByte {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::zinq_parse::ZinqParser;
+    use crate::Token;
 
     #[test]
     fn is_byte() -> Result<()> {
@@ -82,7 +82,7 @@ mod test {
         let mut cursor = span.cursor();
         let mut parser = zinq_parse::ZinqParser;
 
-        let token = parser.parse(&mut cursor)?;
+        let token = parser.parse::<Token>(&mut cursor)?;
 
         debug_assert!(token.is_byte_literal());
         debug_assert_eq!(token.to_string(), "b'p'");

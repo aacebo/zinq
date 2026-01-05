@@ -1,6 +1,4 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-
-use crate::zinq_parse::ZinqParser;
+use zinq_parse::{Parse, Peek, Span};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Enclosed<S, T, E>
@@ -103,9 +101,9 @@ where
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{Comma, Enclosed, LInt, LParen, Punctuated, RParen, zinq_parse::ZinqParser};
+    use crate::{Comma, Enclosed, LInt, LParen, Punctuated, RParen};
 
     #[test]
     fn should_parse_enclosed_int_list() -> Result<()> {

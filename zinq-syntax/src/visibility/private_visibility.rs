@@ -1,5 +1,4 @@
-use zinq_parse::ZinqParser;
-use zinq_parse::{Parse, Parser, Peek, Span};
+use zinq_parse::{Parse, Peek, Span};
 
 use crate::{Node, Visibility};
 

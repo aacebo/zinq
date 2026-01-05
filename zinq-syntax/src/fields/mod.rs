@@ -3,9 +3,9 @@ mod named;
 
 pub use indexed::*;
 pub use named::*;
-use zinq_parse::{Parse, Parser, Peek};
+use zinq_parse::{Parse, Peek};
 
-use crate::{Node, Visitor, zinq_parse::ZinqParser};
+use crate::{Node, Visitor};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {

@@ -1,10 +1,9 @@
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parser};
-use zinq_token::{Token, zinq_parse::ZinqParser};
+use zinq_parse::Cursor;
 
 use crate::{Visibility, expr::Expr, stmt::Stmt, ty::Type};
 
-pub trait SyntaxParser: Parser<Item = Token> {
+pub trait SyntaxParser {
     fn is_expr(&self, cursor: &Cursor) -> bool;
     fn expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
 

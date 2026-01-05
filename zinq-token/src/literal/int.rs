@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, Parse, Peek, Span};
 
-use crate::{Literal, ToTokens, Token, TokenStream, zinq_parse::ZinqParser};
+use crate::{Literal, ToTokens, Token, TokenStream};
 
 ///
 /// ## LInt
@@ -256,9 +256,9 @@ impl ToTokens for LInt {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::zinq_parse::ZinqParser;
+    use crate::Token;
 
     #[test]
     fn is_int() -> Result<()> {
@@ -266,7 +266,7 @@ mod test {
         let mut cursor = span.cursor();
         let mut parser = zinq_parse::ZinqParser;
 
-        let mut token = parser.parse(&mut cursor)?;
+        let mut token = parser.parse::<Token>(&mut cursor)?;
         println!("{} => {}", token.name(), token.to_string());
 
         debug_assert!(token.is_int_literal());

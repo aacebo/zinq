@@ -1,5 +1,5 @@
-use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Not, zinq_parse::ZinqParser};
+use zinq_parse::{Parse, Peek, Span};
+use zinq_token::Not;
 
 use crate::{
     Node, Visitor,
@@ -74,9 +74,9 @@ impl Parse for NotExpr {
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
-    use zinq_parse::{Parser, Span};
+    use zinq_parse::Span;
 
-    use crate::{expr::NotExpr, zinq_parse::ZinqParser};
+    use crate::expr::NotExpr;
 
     #[test]
     fn should_parse_not() -> Result<()> {
