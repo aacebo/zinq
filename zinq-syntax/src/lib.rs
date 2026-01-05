@@ -1,11 +1,13 @@
 pub mod expr;
 pub mod fields;
 pub mod param;
+mod parser;
 mod path;
 pub mod stmt;
 pub mod ty;
 pub mod visibility;
 
+pub use parser::*;
 pub use path::*;
 pub use visibility::*;
 

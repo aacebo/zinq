@@ -82,7 +82,9 @@ macro_rules! define_keywords {
         }
 
         $(
-            #[doc = concat!('`', $token, '`')]
+            #[doc = "`"]
+            #[doc = $token]
+            #[doc = "`"]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub struct $name {
                 span: zinq_parse::Span,

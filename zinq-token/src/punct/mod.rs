@@ -1,3 +1,9 @@
+mod cmp;
+mod logical;
+
+pub use cmp::*;
+pub use logical::*;
+
 use zinq_parse::Parser;
 
 macro_rules! define_puncts {
@@ -82,7 +88,9 @@ macro_rules! define_puncts {
         }
 
         $(
-            #[doc = concat!('`', $token, '`')]
+            #[doc = "`"]
+            #[doc = $token]
+            #[doc = "`"]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub struct $name {
                 span: zinq_parse::Span,

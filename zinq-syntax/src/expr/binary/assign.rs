@@ -3,30 +3,30 @@ use zinq_token::{Eq, TokenParser};
 
 use crate::{
     Node, Visitor,
-    expr::{Expr, GetFieldExpr},
+    expr::{BinaryExpr, Expr},
 };
 
 ///
-/// ## Set Field Expression
-/// `my_var.test = 1 + 5`
+/// ## Assign Expression
+/// `message = (...)`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SetFieldExpr {
+pub struct AssignExpr {
     pub span: Span,
-    pub field: GetFieldExpr,
+    pub left: Box<Expr>,
     pub eq: Eq,
-    pub value: Box<Expr>,
+    pub right: Box<Expr>,
 }
 
-impl From<SetFieldExpr> for Expr {
-    fn from(value: SetFieldExpr) -> Self {
-        Self::SetField(value)
+impl From<AssignExpr> for BinaryExpr {
+    fn from(value: AssignExpr) -> Self {
+        Self::Assign(value)
     }
 }
 
-impl Node for SetFieldExpr {
+impl Node for AssignExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Set::Field"
+        "Syntax::Expr::Binary::Assign"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -37,13 +37,13 @@ impl Node for SetFieldExpr {
     }
 }
 
-impl std::fmt::Display for SetFieldExpr {
+impl std::fmt::Display for AssignExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for SetFieldExpr {
+impl Peek<TokenParser> for AssignExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -55,20 +55,20 @@ impl Peek<TokenParser> for SetFieldExpr {
     }
 }
 
-impl Parse<TokenParser> for SetFieldExpr {
+impl Parse<TokenParser> for AssignExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let field = parser.parse_as::<GetFieldExpr>(cursor)?;
+        let left = parser.parse_as::<Box<Expr>>(cursor)?;
         let eq = parser.parse_as::<Eq>(cursor)?;
-        let value = parser.parse_as::<Box<Expr>>(cursor)?;
+        let right = parser.parse_as::<Box<Expr>>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(field.span(), value.span()),
-            field,
+            span: Span::from_bounds(left.span(), right.span()),
+            left,
             eq,
-            value,
+            right,
         })
     }
 
@@ -82,19 +82,17 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::{Parser, Span};
 
-    use crate::{TokenParser, expr::SetFieldExpr};
+    use crate::{TokenParser, expr::AssignExpr};
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = TokenParser;
-        let mut cursor = Span::from_bytes(b"a.message = b'h'").cursor();
-        let value = parser.parse_as::<SetFieldExpr>(&mut cursor)?;
+        let mut cursor = Span::from_bytes(b"a = b'h'").cursor();
+        let value = parser.parse_as::<AssignExpr>(&mut cursor)?;
 
-        debug_assert_eq!(value.to_string(), "a.message = b'h'");
-        debug_assert_eq!(value.field.to_string(), "a.message");
-
-        debug_assert!(value.value.is_literal());
-        debug_assert_eq!(value.value.to_string(), "b'h'");
+        debug_assert_eq!(value.to_string(), "a = b'h'");
+        debug_assert_eq!(value.left.to_string(), "a");
+        debug_assert_eq!(value.right.to_string(), "b'h'");
 
         Ok(())
     }

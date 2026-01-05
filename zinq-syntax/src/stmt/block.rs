@@ -56,11 +56,7 @@ impl Parse<TokenParser> for BlockStmt {
         let left_brace = parser.parse_as::<LBrace>(cursor)?;
         let mut stmts = vec![];
 
-        while !cursor.eof() {
-            if parser.peek_as::<RBrace>(cursor).unwrap_or(true) {
-                break;
-            }
-
+        while !cursor.eof() && !parser.peek_as::<RBrace>(cursor).unwrap_or(false) {
             stmts.push(parser.parse_as::<Stmt>(cursor)?);
         }
 

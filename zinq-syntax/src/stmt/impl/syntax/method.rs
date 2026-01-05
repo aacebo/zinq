@@ -10,7 +10,7 @@ use crate::{
 
 ///
 /// ## Impl Method Statement
-/// `fn <name>(<arg1>, <arg2>, ...) -> <return_type> { ... }`
+/// `fn <name>(<self_param>, <arg1>, <arg2>, ...) -> <return_type> { ... }`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImplMethod {
@@ -19,7 +19,7 @@ pub struct ImplMethod {
     pub keyword: Fn,
     pub name: Ident,
     pub left_paren: LParen,
-    pub self_param: SelfParam,
+    pub self_param: Option<SelfParam>,
     pub params: Punctuated<FnParam, Comma>,
     pub right_paren: RParen,
     pub return_ty: Option<Suffixed<RArrow, Type>>,
@@ -72,9 +72,9 @@ impl Parse<TokenParser> for ImplMethod {
         let keyword = parser.parse_as::<Fn>(cursor)?;
         let name = parser.parse_as::<Ident>(cursor)?;
         let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let self_param = parser.parse_as::<SelfParam>(cursor)?;
+        let self_param = parser.parse_as::<Option<SelfParam>>(cursor)?;
 
-        if parser.peek_as::<Comma>(cursor).unwrap_or(false) {
+        if self_param.is_some() && parser.peek_as::<Comma>(cursor).unwrap_or(false) {
             let _ = parser.parse_as::<Comma>(cursor)?;
         }
 
@@ -117,6 +117,17 @@ mod test {
         let ty = parser.parse_as::<ImplMethod>(&mut cursor)?;
 
         debug_assert_eq!(ty.to_string(), "fn stuff(self) { }");
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_static() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(b"fn new() -> Self { Self }").cursor();
+        let ty = parser.parse_as::<ImplMethod>(&mut cursor)?;
+
+        debug_assert_eq!(ty.to_string(), "fn new() -> Self { Self }");
 
         Ok(())
     }

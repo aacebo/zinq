@@ -1,8 +1,10 @@
-use zinq_error::BAD_ARGUMENTS;
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{AndAnd, OrOr, Punct, TokenParser};
+use zinq_token::{Punct, TokenParser};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{
+    Node, Visitor,
+    expr::{BinaryExpr, Expr},
+};
 
 ///
 /// ## Logical Expression
@@ -16,7 +18,7 @@ pub struct LogicalExpr {
     pub right: Box<Expr>,
 }
 
-impl From<LogicalExpr> for Expr {
+impl From<LogicalExpr> for BinaryExpr {
     fn from(value: LogicalExpr) -> Self {
         Self::Logical(value)
     }
@@ -24,7 +26,7 @@ impl From<LogicalExpr> for Expr {
 
 impl Node for LogicalExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Logical"
+        "Syntax::Expr::Binary::Logical"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -59,13 +61,6 @@ impl Parse<TokenParser> for LogicalExpr {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let left = parser.parse_as::<Expr>(cursor)?;
-
-        if !parser.peek_as::<AndAnd>(cursor).unwrap_or(false)
-            && !parser.peek_as::<OrOr>(cursor).unwrap_or(false)
-        {
-            return Err(cursor.error(BAD_ARGUMENTS, "expected '&&' or '||'"));
-        }
-
         let op = parser.parse_as::<Punct>(cursor)?;
         let right = parser.parse_as::<Expr>(cursor)?;
 
@@ -96,13 +91,10 @@ mod test {
         let value = parser.parse_as::<LogicalExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "a || true");
-        debug_assert!(value.left.is_get());
         debug_assert_eq!(value.left.to_string(), "a");
 
         debug_assert!(value.op.is_or_or());
         debug_assert_eq!(value.op.to_string(), "||");
-
-        debug_assert!(value.right.is_literal());
         debug_assert_eq!(value.right.to_string(), "true");
 
         Ok(())

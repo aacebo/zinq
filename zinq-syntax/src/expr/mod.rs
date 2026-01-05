@@ -1,25 +1,11 @@
-mod assign;
 mod binary;
-mod get;
-mod get_field;
-mod group;
-mod invoke;
-mod literal;
-mod logical;
-mod r#ref;
-mod set_field;
+mod postfix;
+mod primary;
 mod unary;
 
-pub use assign::*;
 pub use binary::*;
-pub use get::*;
-pub use get_field::*;
-pub use group::*;
-pub use invoke::*;
-pub use literal::*;
-pub use logical::*;
-pub use r#ref::*;
-pub use set_field::*;
+pub use postfix::*;
+pub use primary::*;
 pub use unary::*;
 
 use zinq_error::Result;
@@ -34,23 +20,16 @@ use crate::{Node, Syntax, Visitor};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expr {
-    Assign(AssignExpr),
+    Primary(PrimaryExpr),
     Binary(BinaryExpr),
-    Group(GroupExpr),
-    Invoke(InvokeExpr),
-    Literal(LiteralExpr),
-    Logical(LogicalExpr),
-    GetField(GetFieldExpr),
-    Get(GetExpr),
-    Ref(RefExpr),
-    SetField(SetFieldExpr),
+    Postfix(PostfixExpr),
     Unary(UnaryExpr),
 }
 
 impl Expr {
-    pub fn is_assign(&self) -> bool {
+    pub fn is_primary(&self) -> bool {
         match self {
-            Self::Assign(_) => true,
+            Self::Primary(_) => true,
             _ => false,
         }
     }
@@ -62,58 +41,9 @@ impl Expr {
         }
     }
 
-    pub fn is_group(&self) -> bool {
+    pub fn is_postfix(&self) -> bool {
         match self {
-            Self::Group(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_invoke(&self) -> bool {
-        match self {
-            Self::Invoke(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_literal(&self) -> bool {
-        match self {
-            Self::Literal(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_logical(&self) -> bool {
-        match self {
-            Self::Logical(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_get_field(&self) -> bool {
-        match self {
-            Self::GetField(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_get(&self) -> bool {
-        match self {
-            Self::Get(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_ref(&self) -> bool {
-        match self {
-            Self::Ref(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_set_field(&self) -> bool {
-        match self {
-            Self::SetField(_) => true,
+            Self::Postfix(_) => true,
             _ => false,
         }
     }
@@ -129,16 +59,9 @@ impl Expr {
 impl Node for Expr {
     fn name(&self) -> &str {
         match self {
-            Self::Assign(v) => v.name(),
+            Self::Primary(v) => v.name(),
             Self::Binary(v) => v.name(),
-            Self::Group(v) => v.name(),
-            Self::Invoke(v) => v.name(),
-            Self::Literal(v) => v.name(),
-            Self::Logical(v) => v.name(),
-            Self::GetField(v) => v.name(),
-            Self::Get(v) => v.name(),
-            Self::Ref(v) => v.name(),
-            Self::SetField(v) => v.name(),
+            Self::Postfix(v) => v.name(),
             Self::Unary(v) => v.name(),
         }
     }
@@ -160,16 +83,9 @@ impl From<Expr> for Syntax {
 impl std::fmt::Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Assign(v) => write!(f, "{}", v),
+            Self::Primary(v) => write!(f, "{}", v),
             Self::Binary(v) => write!(f, "{}", v),
-            Self::Group(v) => write!(f, "{}", v),
-            Self::Invoke(v) => write!(f, "{}", v),
-            Self::Literal(v) => write!(f, "{}", v),
-            Self::Logical(v) => write!(f, "{}", v),
-            Self::GetField(v) => write!(f, "{}", v),
-            Self::Get(v) => write!(f, "{}", v),
-            Self::Ref(v) => write!(f, "{}", v),
-            Self::SetField(v) => write!(f, "{}", v),
+            Self::Postfix(v) => write!(f, "{}", v),
             Self::Unary(v) => write!(f, "{}", v),
         }
     }
@@ -189,36 +105,12 @@ impl Peek<TokenParser> for Expr {
 
 impl Parse<TokenParser> for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut TokenParser) -> Result<Self> {
-        if parser.peek_as::<RefExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<RefExpr>(cursor)?.into());
+        if parser.peek_as::<PrimaryExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<PrimaryExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<GroupExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GroupExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<AssignExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<AssignExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<LiteralExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<LiteralExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<GetExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GetExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<GetFieldExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<GetFieldExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<SetFieldExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<SetFieldExpr>(cursor)?.into());
-        }
-
-        if parser.peek_as::<LogicalExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<LogicalExpr>(cursor)?.into());
+        if parser.peek_as::<PostfixExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse_as::<PostfixExpr>(cursor)?.into());
         }
 
         if parser.peek_as::<UnaryExpr>(cursor).unwrap_or(false) {
@@ -229,10 +121,6 @@ impl Parse<TokenParser> for Expr {
             return Ok(parser.parse_as::<BinaryExpr>(cursor)?.into());
         }
 
-        if parser.peek_as::<InvokeExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<InvokeExpr>(cursor)?.into());
-        }
-
         Err(cursor.error(
             zinq_error::NOT_FOUND,
             &format!("unknown tokens '{}'", cursor),
@@ -241,16 +129,9 @@ impl Parse<TokenParser> for Expr {
 
     fn span(&self) -> &zinq_parse::Span {
         match self {
-            Self::Assign(v) => v.span(),
+            Self::Primary(v) => v.span(),
             Self::Binary(v) => v.span(),
-            Self::Group(v) => v.span(),
-            Self::Invoke(v) => v.span(),
-            Self::Literal(v) => v.span(),
-            Self::Logical(v) => v.span(),
-            Self::GetField(v) => v.span(),
-            Self::Get(v) => v.span(),
-            Self::Ref(v) => v.span(),
-            Self::SetField(v) => v.span(),
+            Self::Postfix(v) => v.span(),
             Self::Unary(v) => v.span(),
         }
     }

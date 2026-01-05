@@ -1,7 +1,10 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
 use zinq_token::{LParen, RParen, TokenParser};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{
+    Node, Visitor,
+    expr::{Expr, PrimaryExpr},
+};
 
 ///
 /// ## Group Expression
@@ -11,11 +14,11 @@ use crate::{Node, Visitor, expr::Expr};
 pub struct GroupExpr {
     pub span: Span,
     pub left_paren: LParen,
-    pub exprs: Vec<Expr>,
+    pub inner: Box<Expr>,
     pub right_paren: RParen,
 }
 
-impl From<GroupExpr> for Expr {
+impl From<GroupExpr> for PrimaryExpr {
     fn from(value: GroupExpr) -> Self {
         Self::Group(value)
     }
@@ -23,7 +26,7 @@ impl From<GroupExpr> for Expr {
 
 impl Node for GroupExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Group"
+        "Syntax::Expr::Primary::Group"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -42,13 +45,7 @@ impl std::fmt::Display for GroupExpr {
 
 impl Peek<TokenParser> for GroupExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse_as::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
+        Ok(parser.peek_as::<LParen>(cursor).unwrap_or(false))
     }
 }
 
@@ -58,22 +55,13 @@ impl Parse<TokenParser> for GroupExpr {
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
         let left_paren = parser.parse_as::<LParen>(cursor)?;
-        let mut exprs = vec![];
-
-        while !cursor.eof() {
-            if parser.peek_as::<RParen>(cursor).unwrap_or(true) {
-                break;
-            }
-
-            exprs.push(parser.parse_as::<Expr>(cursor)?);
-        }
-
+        let inner = parser.parse_as::<Box<Expr>>(cursor)?;
         let right_paren = parser.parse_as::<RParen>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(left_paren.span(), right_paren.span()),
             left_paren,
-            exprs,
+            inner,
             right_paren,
         })
     }
@@ -97,7 +85,6 @@ mod test {
         let value = parser.parse_as::<GroupExpr>(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "(test 0.5 b'h')");
-
         Ok(())
     }
 }

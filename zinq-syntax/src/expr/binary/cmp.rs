@@ -1,29 +1,34 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Dot, Ident, TokenParser};
+use zinq_token::{Cmp, TokenParser};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{
+    Node, Visitor,
+    expr::{BinaryExpr, Expr},
+};
 
 ///
-/// ## Get Field Expression
-/// `my.field`
+/// ## Cmp Expression
+/// `<left> <op> <right>`
+/// ### Example
+/// `<left> >= <right>`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GetFieldExpr {
+pub struct CmpExpr {
     pub span: Span,
-    pub target: Box<Expr>,
-    pub dot: Dot,
-    pub name: Ident,
+    pub left: Box<Expr>,
+    pub op: Cmp,
+    pub right: Box<Expr>,
 }
 
-impl From<GetFieldExpr> for Expr {
-    fn from(value: GetFieldExpr) -> Self {
-        Self::GetField(value)
+impl From<CmpExpr> for BinaryExpr {
+    fn from(value: CmpExpr) -> Self {
+        Self::Cmp(value)
     }
 }
 
-impl Node for GetFieldExpr {
+impl Node for CmpExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Get::Field"
+        "Syntax::Expr::Binary::Cmp"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -34,13 +39,13 @@ impl Node for GetFieldExpr {
     }
 }
 
-impl std::fmt::Display for GetFieldExpr {
+impl std::fmt::Display for CmpExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for GetFieldExpr {
+impl Peek<TokenParser> for CmpExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -52,20 +57,20 @@ impl Peek<TokenParser> for GetFieldExpr {
     }
 }
 
-impl Parse<TokenParser> for GetFieldExpr {
+impl Parse<TokenParser> for CmpExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let target = parser.parse_as::<Expr>(cursor)?;
-        let dot = parser.parse_as::<Dot>(cursor)?;
-        let name = parser.parse_as::<Ident>(cursor)?;
+        let left = parser.parse_as::<Expr>(cursor)?;
+        let op = parser.parse_as::<Cmp>(cursor)?;
+        let right = parser.parse_as::<Expr>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(target.span(), name.span()),
-            target: Box::new(target),
-            dot,
-            name,
+            span: Span::from_bounds(left.span(), right.span()),
+            left: Box::new(left),
+            op,
+            right: Box::new(right),
         })
     }
 

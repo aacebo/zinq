@@ -119,14 +119,7 @@ impl Parse<TokenParser> for Stmt {
             return Ok(parser.parse_as::<BlockStmt>(cursor)?.into());
         }
 
-        if parser.peek_as::<ExprStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse_as::<ExprStmt>(cursor)?.into());
-        }
-
-        Err(cursor.error(
-            zinq_error::NOT_FOUND,
-            &format!("unknown tokens '{}'", cursor),
-        ))
+        Ok(parser.parse_as::<ExprStmt>(cursor)?.into())
     }
 
     fn span(&self) -> &zinq_parse::Span {

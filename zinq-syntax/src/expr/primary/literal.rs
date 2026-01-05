@@ -1,27 +1,27 @@
 use zinq_parse::{Parse, Parser, Peek, Span};
-use zinq_token::{Ident, TokenParser};
+use zinq_token::{Literal, TokenParser};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, Visitor, expr::PrimaryExpr};
 
 ///
-/// ## Get Expression
-/// `my_var`
+/// ## Literal Expression
+/// `"test"`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GetExpr {
+pub struct LiteralExpr {
     pub span: Span,
-    pub name: Ident,
+    pub value: Literal,
 }
 
-impl From<GetExpr> for Expr {
-    fn from(value: GetExpr) -> Self {
-        Self::Get(value)
+impl From<LiteralExpr> for PrimaryExpr {
+    fn from(value: LiteralExpr) -> Self {
+        Self::Literal(value)
     }
 }
 
-impl Node for GetExpr {
+impl Node for LiteralExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Get"
+        "Syntax::Expr::Primary::Literal"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -32,13 +32,13 @@ impl Node for GetExpr {
     }
 }
 
-impl std::fmt::Display for GetExpr {
+impl std::fmt::Display for LiteralExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek<TokenParser> for GetExpr {
+impl Peek<TokenParser> for LiteralExpr {
     fn peek(cursor: &zinq_parse::Cursor, parser: &TokenParser) -> zinq_error::Result<bool> {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
@@ -50,16 +50,16 @@ impl Peek<TokenParser> for GetExpr {
     }
 }
 
-impl Parse<TokenParser> for GetExpr {
+impl Parse<TokenParser> for LiteralExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut TokenParser,
     ) -> zinq_error::Result<Self> {
-        let name = parser.parse_as::<Ident>(cursor)?;
+        let value = parser.parse_as::<Literal>(cursor)?;
 
         Ok(Self {
-            span: name.span().clone(),
-            name,
+            span: value.span().clone(),
+            value,
         })
     }
 

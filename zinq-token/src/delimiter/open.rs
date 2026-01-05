@@ -89,7 +89,9 @@ macro_rules! define_open_delimiters {
         }
 
         $(
-            #[doc = concat!('`', $token, '`')]
+            #[doc = "`"]
+            #[doc = $token]
+            #[doc = "`"]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub struct $name {
                 span: zinq_parse::Span,

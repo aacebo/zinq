@@ -63,11 +63,7 @@ impl Parse<TokenParser> for ImplStmt {
         let left_brace = parser.parse_as::<LBrace>(cursor)?;
         let mut stmts = vec![];
 
-        while !cursor.eof() {
-            if parser.peek_as::<RBrace>(cursor).unwrap_or(true) {
-                break;
-            }
-
+        while parser.peek_as::<ImplSyntax>(cursor).unwrap_or(false) {
             stmts.push(parser.parse_as::<ImplSyntax>(cursor)?);
         }
 
@@ -85,5 +81,43 @@ impl Parse<TokenParser> for ImplStmt {
 
     fn span(&self) -> &Span {
         &self.span
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::{Parser, Span};
+
+    use crate::{TokenParser, stmt::ImplStmt};
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = TokenParser;
+        let mut cursor = Span::from_bytes(
+            b"impl Message {
+                pub fn new(text: string) -> Self {
+                    Self { text }
+                }
+
+                pub fn to_string(self) -> string { self.text }
+            }",
+        )
+        .cursor();
+
+        let ty = parser.parse_as::<ImplStmt>(&mut cursor)?;
+
+        debug_assert_eq!(
+            ty.to_string(),
+            "impl Message {
+                pub fn new(text: string) -> Self {
+                    Self { text }
+                }
+
+                pub fn to_string(self) -> string { self.text }
+            }"
+        );
+
+        Ok(())
     }
 }
