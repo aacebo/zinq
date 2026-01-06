@@ -87,4 +87,17 @@ mod test {
         debug_assert_eq!(value.to_string(), "(test == b'h')");
         Ok(())
     }
+
+    #[test]
+    fn should_parse_and_or() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"a != b || (b == c && c == d)").cursor();
+        let value = parser.parse_expr(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "a != b || (b == c && c == d)");
+        debug_assert!(value.is_or());
+        debug_assert!(value.as_logical().left.is_cmp());
+        debug_assert!(value.as_logical().right.is_group());
+        Ok(())
+    }
 }

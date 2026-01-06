@@ -31,6 +31,29 @@ impl LogicalExpr {
     }
 }
 
+impl Expr {
+    pub fn is_or(&self) -> bool {
+        match self {
+            Self::Logical(v) => v.op.is_or(),
+            _ => false,
+        }
+    }
+
+    pub fn is_and(&self) -> bool {
+        match self {
+            Self::Logical(v) => v.op.is_and(),
+            _ => false,
+        }
+    }
+
+    pub fn as_logical(&self) -> &LogicalExpr {
+        match self {
+            Self::Logical(v) => v,
+            other => panic!("expected logical expression, found {}", other.name()),
+        }
+    }
+}
+
 impl From<LogicalExpr> for Expr {
     fn from(value: LogicalExpr) -> Self {
         Self::Logical(value)
