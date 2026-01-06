@@ -182,13 +182,13 @@ macro_rules! define_keywords {
 }
 
 define_keywords! {
-    "crate",     pub struct Crate,      is_crate,
+    "package",   pub struct Package,    is_package,
     "mod",       pub struct Mod,        is_mod,
     "mut",       pub struct Mut,        is_mut,
     "match",     pub struct Match,      is_match,
     "where",     pub struct Where,      is_where,
     "continue",  pub struct Continue,   is_continue,
-    "iface",     pub struct IFace,      is_iface,
+    "protocol",  pub struct Protocol,   is_protocol,
     "if",        pub struct If,         is_if,
     "else",      pub struct Else,       is_else,
     "for",       pub struct For,        is_for,

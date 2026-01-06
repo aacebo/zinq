@@ -4,7 +4,9 @@ mod fn_stmt;
 mod impl_stmt;
 mod let_stmt;
 mod mod_stmt;
+mod parser;
 mod struct_stmt;
+mod use_stmt;
 
 pub use block_stmt::*;
 pub use expr_stmt::*;
@@ -12,7 +14,9 @@ pub use fn_stmt::*;
 pub use impl_stmt::*;
 pub use let_stmt::*;
 pub use mod_stmt::*;
+pub use parser::*;
 pub use struct_stmt::*;
+pub use use_stmt::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek};
