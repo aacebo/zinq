@@ -3,30 +3,30 @@ use zinq_token::{Dot, Ident};
 
 use crate::{
     Node, Visitor,
-    expr::{Expr, PrimaryExpr},
+    expr::{Expr, PostfixExpr},
 };
 
 ///
-/// ## Get Field Expression
+/// ## Member Expression
 /// `my.field`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GetFieldExpr {
+pub struct MemberExpr {
     pub span: Span,
     pub target: Box<Expr>,
     pub dot: Dot,
     pub name: Ident,
 }
 
-impl From<GetFieldExpr> for PrimaryExpr {
-    fn from(value: GetFieldExpr) -> Self {
-        Self::GetField(value)
+impl From<MemberExpr> for PostfixExpr {
+    fn from(value: MemberExpr) -> Self {
+        Self::Member(value)
     }
 }
 
-impl Node for GetFieldExpr {
+impl Node for MemberExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Primary::GetField"
+        "Syntax::Expr::Postfix::Member"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -37,13 +37,13 @@ impl Node for GetFieldExpr {
     }
 }
 
-impl std::fmt::Display for GetFieldExpr {
+impl std::fmt::Display for MemberExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek for GetFieldExpr {
+impl Peek for MemberExpr {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -58,18 +58,18 @@ impl Peek for GetFieldExpr {
     }
 }
 
-impl Parse for GetFieldExpr {
+impl Parse for MemberExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let target = parser.parse::<Expr>(cursor)?;
+        let target = parser.parse::<Box<Expr>>(cursor)?;
         let dot = parser.parse::<Dot>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
 
         Ok(Self {
             span: Span::from_bounds(target.span(), name.span()),
-            target: Box::new(target),
+            target,
             dot,
             name,
         })

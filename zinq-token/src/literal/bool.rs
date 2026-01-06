@@ -18,6 +18,14 @@ impl LBool {
     pub fn name(&self) -> &'static str {
         "LBool"
     }
+
+    pub fn is_true(&self) -> bool {
+        self.span.bytes() == b"true"
+    }
+
+    pub fn is_false(&self) -> bool {
+        self.span.bytes() == b"false"
+    }
 }
 
 impl std::fmt::Display for LBool {

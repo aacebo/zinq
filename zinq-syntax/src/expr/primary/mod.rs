@@ -1,11 +1,9 @@
-mod get;
-mod get_field;
 mod group;
+mod ident;
 mod literal;
 
-pub use get::*;
-pub use get_field::*;
 pub use group::*;
+pub use ident::*;
 pub use literal::*;
 
 use zinq_parse::{Parse, Peek};
@@ -15,8 +13,7 @@ use crate::{Node, expr::Expr};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PrimaryExpr {
     Literal(LiteralExpr),
-    Get(GetExpr),
-    GetField(GetFieldExpr),
+    Ident(IdentExpr),
     Group(GroupExpr),
 }
 
@@ -28,16 +25,9 @@ impl PrimaryExpr {
         }
     }
 
-    pub fn is_get(&self) -> bool {
+    pub fn is_ident(&self) -> bool {
         match self {
-            Self::Get(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_get_field(&self) -> bool {
-        match self {
-            Self::GetField(_) => true,
+            Self::Ident(_) => true,
             _ => false,
         }
     }
@@ -60,8 +50,7 @@ impl std::fmt::Display for PrimaryExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Literal(v) => write!(f, "{}", v),
-            Self::Get(v) => write!(f, "{}", v),
-            Self::GetField(v) => write!(f, "{}", v),
+            Self::Ident(v) => write!(f, "{}", v),
             Self::Group(v) => write!(f, "{}", v),
         }
     }
@@ -71,8 +60,7 @@ impl Node for PrimaryExpr {
     fn name(&self) -> &str {
         match self {
             Self::Literal(v) => v.name(),
-            Self::Get(v) => v.name(),
-            Self::GetField(v) => v.name(),
+            Self::Ident(v) => v.name(),
             Self::Group(v) => v.name(),
         }
     }
@@ -109,12 +97,8 @@ impl Parse for PrimaryExpr {
             return Ok(parser.parse::<LiteralExpr>(cursor)?.into());
         }
 
-        if parser.peek::<GetFieldExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<GetFieldExpr>(cursor)?.into());
-        }
-
-        if parser.peek::<GetExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<GetExpr>(cursor)?.into());
+        if parser.peek::<IdentExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<IdentExpr>(cursor)?.into());
         }
 
         if parser.peek::<GroupExpr>(cursor).unwrap_or(false) {
@@ -130,8 +114,7 @@ impl Parse for PrimaryExpr {
     fn span(&self) -> &zinq_parse::Span {
         match self {
             Self::Literal(v) => v.span(),
-            Self::Get(v) => v.span(),
-            Self::GetField(v) => v.span(),
+            Self::Ident(v) => v.span(),
             Self::Group(v) => v.span(),
         }
     }

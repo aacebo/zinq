@@ -4,24 +4,24 @@ use zinq_token::Ident;
 use crate::{Node, Visitor, expr::PrimaryExpr};
 
 ///
-/// ## Get Expression
+/// ## Ident Expression
 /// `my_var`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GetExpr {
+pub struct IdentExpr {
     pub span: Span,
     pub name: Ident,
 }
 
-impl From<GetExpr> for PrimaryExpr {
-    fn from(value: GetExpr) -> Self {
-        Self::Get(value)
+impl From<IdentExpr> for PrimaryExpr {
+    fn from(value: IdentExpr) -> Self {
+        Self::Ident(value)
     }
 }
 
-impl Node for GetExpr {
+impl Node for IdentExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Primary::Get"
+        "Syntax::Expr::Primary::Ident"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -32,13 +32,13 @@ impl Node for GetExpr {
     }
 }
 
-impl std::fmt::Display for GetExpr {
+impl std::fmt::Display for IdentExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek for GetExpr {
+impl Peek for IdentExpr {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -47,7 +47,7 @@ impl Peek for GetExpr {
     }
 }
 
-impl Parse for GetExpr {
+impl Parse for IdentExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,

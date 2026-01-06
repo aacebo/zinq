@@ -1,6 +1,8 @@
 mod call;
+mod member;
 
 pub use call::*;
+pub use member::*;
 
 use zinq_parse::{Parse, Peek};
 
@@ -9,12 +11,21 @@ use crate::{Node, expr::Expr};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PostfixExpr {
     Call(CallExpr),
+    Member(MemberExpr),
 }
 
 impl PostfixExpr {
     pub fn is_call(&self) -> bool {
         match self {
             Self::Call(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_member(&self) -> bool {
+        match self {
+            Self::Member(_) => true,
+            _ => false,
         }
     }
 }
@@ -29,6 +40,7 @@ impl std::fmt::Display for PostfixExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Call(v) => write!(f, "{}", v),
+            Self::Member(v) => write!(f, "{}", v),
         }
     }
 }
@@ -37,6 +49,7 @@ impl Node for PostfixExpr {
     fn name(&self) -> &str {
         match self {
             Self::Call(v) => v.name(),
+            Self::Member(v) => v.name(),
         }
     }
 
@@ -72,6 +85,10 @@ impl Parse for PostfixExpr {
             return Ok(parser.parse::<CallExpr>(cursor)?.into());
         }
 
+        if parser.peek::<MemberExpr>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<MemberExpr>(cursor)?.into());
+        }
+
         Err(cursor.error(
             zinq_error::NOT_FOUND,
             &format!("unknown tokens '{}'", cursor),
@@ -81,6 +98,7 @@ impl Parse for PostfixExpr {
     fn span(&self) -> &zinq_parse::Span {
         match self {
             Self::Call(v) => v.span(),
+            Self::Member(v) => v.span(),
         }
     }
 }
