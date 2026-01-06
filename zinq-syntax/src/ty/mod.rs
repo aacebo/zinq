@@ -1,12 +1,12 @@
-mod r#mut;
-mod r#ref;
-mod slice;
-mod tuple;
+mod mut_type;
+mod ref_type;
+mod slice_type;
+mod tuple_type;
 
-pub use r#mut::*;
-pub use r#ref::*;
-pub use slice::*;
-pub use tuple::*;
+pub use mut_type::*;
+pub use ref_type::*;
+pub use slice_type::*;
+pub use tuple_type::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek};

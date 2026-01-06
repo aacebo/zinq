@@ -1,18 +1,18 @@
-mod block;
-mod expr;
-mod r#fn;
-mod r#impl;
-mod r#let;
-mod module;
-mod r#struct;
+mod block_stmt;
+mod expr_stmt;
+mod fn_stmt;
+mod impl_stmt;
+mod let_stmt;
+mod mod_stmt;
+mod struct_stmt;
 
-pub use block::*;
-pub use expr::*;
-pub use r#fn::*;
-pub use r#impl::*;
-pub use r#let::*;
-pub use module::*;
-pub use r#struct::*;
+pub use block_stmt::*;
+pub use expr_stmt::*;
+pub use fn_stmt::*;
+pub use impl_stmt::*;
+pub use let_stmt::*;
+pub use mod_stmt::*;
+pub use struct_stmt::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek};

@@ -1,8 +1,8 @@
-mod binary;
-mod parser;
-mod postfix;
-mod primary;
-mod unary;
+pub mod binary;
+pub mod parser;
+pub mod postfix;
+pub mod primary;
+pub mod unary;
 
 pub use binary::*;
 pub use parser::*;
