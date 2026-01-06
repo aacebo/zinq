@@ -1,10 +1,7 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Span};
 use zinq_token::Not;
 
-use crate::{
-    Node, Visitor,
-    expr::{Expr, UnaryExpr},
-};
+use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Not Expression
@@ -17,7 +14,22 @@ pub struct NotExpr {
     pub right: Box<Expr>,
 }
 
-impl From<NotExpr> for UnaryExpr {
+impl NotExpr {
+    /// `!<right>`
+    pub fn new(not: Not, right: Expr) -> Self {
+        Self {
+            span: Span::from_bounds(not.span(), right.span()),
+            not,
+            right: Box::new(right),
+        }
+    }
+
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+}
+
+impl From<NotExpr> for Expr {
     fn from(value: NotExpr) -> Self {
         Self::Not(value)
     }
@@ -42,47 +54,18 @@ impl std::fmt::Display for NotExpr {
     }
 }
 
-impl Peek for NotExpr {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<Not>(cursor).unwrap_or(false))
-    }
-}
-
-impl Parse for NotExpr {
-    fn parse(
-        cursor: &mut zinq_parse::Cursor,
-        parser: &mut zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<Self> {
-        let not = parser.parse::<Not>(cursor)?;
-        let right = parser.parse::<Box<Expr>>(cursor)?;
-
-        Ok(Self {
-            span: Span::from_bounds(not.span(), right.span()),
-            not,
-            right,
-        })
-    }
-
-    fn span(&self) -> &Span {
-        &self.span
-    }
-}
-
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::expr::NotExpr;
+    use crate::expr::ExprParser;
 
     #[test]
     fn should_parse_not() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"!b").cursor();
-        let value = parser.parse::<NotExpr>(&mut cursor)?;
+        let value = parser.parse_expr(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "!b");
         Ok(())
@@ -92,7 +75,7 @@ mod test {
     fn should_parse_not_of_group() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"!(a)").cursor();
-        let value = parser.parse::<NotExpr>(&mut cursor)?;
+        let value = parser.parse_expr(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "!(a)");
         Ok(())

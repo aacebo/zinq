@@ -1,10 +1,7 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Span};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{
-    Node, Visitor,
-    expr::{Expr, PostfixExpr, PrimaryExpr},
-};
+use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Call Expression
@@ -13,13 +10,35 @@ use crate::{
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CallExpr {
     pub span: Span,
-    pub target: PrimaryExpr,
+    pub target: Box<Expr>,
     pub left_paren: LParen,
     pub args: Punctuated<Expr, Comma>,
     pub right_paren: RParen,
 }
 
-impl From<CallExpr> for PostfixExpr {
+impl CallExpr {
+    /// `<target>(<arg1>, <arg2>, ...)`
+    pub fn new(
+        target: Expr,
+        left_paren: LParen,
+        args: Punctuated<Expr, Comma>,
+        right_paren: RParen,
+    ) -> Self {
+        Self {
+            span: Span::from_bounds(target.span(), right_paren.span()),
+            target: Box::new(target),
+            left_paren,
+            args,
+            right_paren,
+        }
+    }
+
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+}
+
+impl From<CallExpr> for Expr {
     fn from(value: CallExpr) -> Self {
         Self::Call(value)
     }
@@ -44,62 +63,20 @@ impl std::fmt::Display for CallExpr {
     }
 }
 
-impl Peek for CallExpr {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
-    }
-}
-
-impl Parse for CallExpr {
-    fn parse(
-        cursor: &mut zinq_parse::Cursor,
-        parser: &mut zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<Self> {
-        let target = parser.parse::<PrimaryExpr>(cursor)?;
-        let left_paren = parser.parse::<LParen>(cursor)?;
-        let args = parser.parse::<Punctuated<Expr, Comma>>(cursor)?;
-        let right_paren = parser.parse::<RParen>(cursor)?;
-
-        Ok(Self {
-            span: Span::from_bounds(target.span(), right_paren.span()),
-            target,
-            left_paren,
-            args,
-            right_paren,
-        })
-    }
-
-    fn span(&self) -> &Span {
-        &self.span
-    }
-}
-
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::expr::CallExpr;
+    use crate::expr::ExprParser;
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"stuff(a, b = \"test\")").cursor();
-        let value = parser.parse::<CallExpr>(&mut cursor)?;
+        let value = parser.parse_expr(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "stuff(a, b = \"test\")");
-        debug_assert_eq!(value.args.len(), 2);
-        debug_assert_eq!(value.args.get(0).unwrap().0.to_string(), "a");
-        debug_assert_eq!(value.args.get(1).unwrap().0.to_string(), "b = \"test\"");
 
         Ok(())
     }

@@ -21,37 +21,92 @@ use crate::{Node, Syntax, Visitor};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expr {
-    Primary(PrimaryExpr),
-    Binary(BinaryExpr),
-    Postfix(PostfixExpr),
-    Unary(UnaryExpr),
+    /// ## Primary
+    Literal(LiteralExpr),
+    Ident(IdentExpr),
+    Group(GroupExpr),
+
+    /// ## Binary
+    Assign(AssignExpr),
+    Cmp(CmpExpr),
+    Logical(LogicalExpr),
+
+    /// ## Postfix
+    Call(CallExpr),
+    Member(MemberExpr),
+
+    /// ## Unary
+    Addr(AddrExpr),
+    Not(NotExpr),
 }
 
 impl Expr {
-    pub fn is_primary(&self) -> bool {
+    pub fn is_literal(&self) -> bool {
         match self {
-            Self::Primary(_) => true,
+            Self::Literal(_) => true,
             _ => false,
         }
     }
 
-    pub fn is_binary(&self) -> bool {
+    pub fn is_ident(&self) -> bool {
         match self {
-            Self::Binary(_) => true,
+            Self::Ident(_) => true,
             _ => false,
         }
     }
 
-    pub fn is_postfix(&self) -> bool {
+    pub fn is_group(&self) -> bool {
         match self {
-            Self::Postfix(_) => true,
+            Self::Group(_) => true,
             _ => false,
         }
     }
 
-    pub fn is_unary(&self) -> bool {
+    pub fn is_assign(&self) -> bool {
         match self {
-            Self::Unary(_) => true,
+            Self::Assign(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_cmp(&self) -> bool {
+        match self {
+            Self::Cmp(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_logical(&self) -> bool {
+        match self {
+            Self::Logical(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_call(&self) -> bool {
+        match self {
+            Self::Call(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_member(&self) -> bool {
+        match self {
+            Self::Member(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_addr(&self) -> bool {
+        match self {
+            Self::Addr(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_not(&self) -> bool {
+        match self {
+            Self::Not(_) => true,
             _ => false,
         }
     }
@@ -60,10 +115,16 @@ impl Expr {
 impl Node for Expr {
     fn name(&self) -> &str {
         match self {
-            Self::Primary(v) => v.name(),
-            Self::Binary(v) => v.name(),
-            Self::Postfix(v) => v.name(),
-            Self::Unary(v) => v.name(),
+            Self::Literal(v) => v.name(),
+            Self::Ident(v) => v.name(),
+            Self::Group(v) => v.name(),
+            Self::Assign(v) => v.name(),
+            Self::Cmp(v) => v.name(),
+            Self::Logical(v) => v.name(),
+            Self::Call(v) => v.name(),
+            Self::Member(v) => v.name(),
+            Self::Addr(v) => v.name(),
+            Self::Not(v) => v.name(),
         }
     }
 
@@ -84,10 +145,16 @@ impl From<Expr> for Syntax {
 impl std::fmt::Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Primary(v) => write!(f, "{}", v),
-            Self::Binary(v) => write!(f, "{}", v),
-            Self::Postfix(v) => write!(f, "{}", v),
-            Self::Unary(v) => write!(f, "{}", v),
+            Self::Literal(v) => write!(f, "{}", v),
+            Self::Ident(v) => write!(f, "{}", v),
+            Self::Group(v) => write!(f, "{}", v),
+            Self::Assign(v) => write!(f, "{}", v),
+            Self::Cmp(v) => write!(f, "{}", v),
+            Self::Logical(v) => write!(f, "{}", v),
+            Self::Call(v) => write!(f, "{}", v),
+            Self::Member(v) => write!(f, "{}", v),
+            Self::Addr(v) => write!(f, "{}", v),
+            Self::Not(v) => write!(f, "{}", v),
         }
     }
 }
@@ -106,34 +173,21 @@ impl Peek for Expr {
 
 impl Parse for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut zinq_parse::ZinqParser) -> Result<Self> {
-        if parser.peek::<PrimaryExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<PrimaryExpr>(cursor)?.into());
-        }
-
-        if parser.peek::<PostfixExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<PostfixExpr>(cursor)?.into());
-        }
-
-        if parser.peek::<UnaryExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<UnaryExpr>(cursor)?.into());
-        }
-
-        if parser.peek::<BinaryExpr>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<BinaryExpr>(cursor)?.into());
-        }
-
-        Err(cursor.error(
-            zinq_error::NOT_FOUND,
-            &format!("unknown tokens '{}'", cursor),
-        ))
+        parser.parse_expr(cursor)
     }
 
     fn span(&self) -> &zinq_parse::Span {
         match self {
-            Self::Primary(v) => v.span(),
-            Self::Binary(v) => v.span(),
-            Self::Postfix(v) => v.span(),
-            Self::Unary(v) => v.span(),
+            Self::Literal(v) => v.span(),
+            Self::Ident(v) => v.span(),
+            Self::Group(v) => v.span(),
+            Self::Assign(v) => v.span(),
+            Self::Cmp(v) => v.span(),
+            Self::Logical(v) => v.span(),
+            Self::Call(v) => v.span(),
+            Self::Member(v) => v.span(),
+            Self::Addr(v) => v.span(),
+            Self::Not(v) => v.span(),
         }
     }
 }

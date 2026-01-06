@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span};
 use zinq_token::Ident;
 
-use crate::{Node, Visitor, expr::PrimaryExpr};
+use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Ident Expression
@@ -13,7 +13,7 @@ pub struct IdentExpr {
     pub name: Ident,
 }
 
-impl From<IdentExpr> for PrimaryExpr {
+impl From<IdentExpr> for Expr {
     fn from(value: IdentExpr) -> Self {
         Self::Ident(value)
     }

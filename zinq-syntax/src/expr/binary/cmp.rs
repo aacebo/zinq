@@ -1,10 +1,7 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Span};
 use zinq_token::Cmp;
 
-use crate::{
-    Node, Visitor,
-    expr::{BinaryExpr, Expr},
-};
+use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Cmp Expression
@@ -20,7 +17,23 @@ pub struct CmpExpr {
     pub right: Box<Expr>,
 }
 
-impl From<CmpExpr> for BinaryExpr {
+impl CmpExpr {
+    /// `<left> <op> <right>`
+    pub fn new(left: Expr, op: Cmp, right: Expr) -> Self {
+        Self {
+            span: Span::from_bounds(left.span(), right.span()),
+            left: Box::new(left),
+            op,
+            right: Box::new(right),
+        }
+    }
+
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+}
+
+impl From<CmpExpr> for Expr {
     fn from(value: CmpExpr) -> Self {
         Self::Cmp(value)
     }
@@ -42,42 +55,5 @@ impl Node for CmpExpr {
 impl std::fmt::Display for CmpExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
-    }
-}
-
-impl Peek for CmpExpr {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
-    }
-}
-
-impl Parse for CmpExpr {
-    fn parse(
-        cursor: &mut zinq_parse::Cursor,
-        parser: &mut zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<Self> {
-        let left = parser.parse::<Expr>(cursor)?;
-        let op = parser.parse::<Cmp>(cursor)?;
-        let right = parser.parse::<Expr>(cursor)?;
-
-        Ok(Self {
-            span: Span::from_bounds(left.span(), right.span()),
-            left: Box::new(left),
-            op,
-            right: Box::new(right),
-        })
-    }
-
-    fn span(&self) -> &Span {
-        &self.span
     }
 }

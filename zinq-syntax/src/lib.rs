@@ -14,7 +14,7 @@ use zinq_parse::{Parse, Peek};
 
 use crate::{expr::Expr, stmt::Stmt, ty::Type};
 
-pub trait Node: Parse {
+pub trait Node {
     fn name(&self) -> &str;
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> Result<()>
     where

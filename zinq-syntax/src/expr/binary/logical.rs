@@ -1,10 +1,7 @@
-use zinq_parse::{Parse, Peek, Span};
-use zinq_token::Punct;
+use zinq_parse::{Parse, Span};
+use zinq_token::Logical;
 
-use crate::{
-    Node, Visitor,
-    expr::{BinaryExpr, Expr},
-};
+use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Logical Expression
@@ -14,11 +11,27 @@ use crate::{
 pub struct LogicalExpr {
     pub span: Span,
     pub left: Box<Expr>,
-    pub op: Punct,
+    pub op: Logical,
     pub right: Box<Expr>,
 }
 
-impl From<LogicalExpr> for BinaryExpr {
+impl LogicalExpr {
+    /// `<left> <op> <right>`
+    pub fn new(left: Expr, op: Logical, right: Expr) -> Self {
+        Self {
+            span: Span::from_bounds(left.span(), right.span()),
+            left: Box::new(left),
+            op,
+            right: Box::new(right),
+        }
+    }
+
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+}
+
+impl From<LogicalExpr> for Expr {
     fn from(value: LogicalExpr) -> Self {
         Self::Logical(value)
     }
@@ -43,63 +56,20 @@ impl std::fmt::Display for LogicalExpr {
     }
 }
 
-impl Peek for LogicalExpr {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
-    }
-}
-
-impl Parse for LogicalExpr {
-    fn parse(
-        cursor: &mut zinq_parse::Cursor,
-        parser: &mut zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<Self> {
-        let left = parser.parse::<Expr>(cursor)?;
-        let op = parser.parse::<Punct>(cursor)?;
-        let right = parser.parse::<Expr>(cursor)?;
-
-        Ok(Self {
-            span: Span::from_bounds(left.span(), right.span()),
-            left: Box::new(left),
-            op,
-            right: Box::new(right),
-        })
-    }
-
-    fn span(&self) -> &Span {
-        &self.span
-    }
-}
-
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::expr::LogicalExpr;
+    use crate::expr::ExprParser;
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"a || true").cursor();
-        let value = parser.parse::<LogicalExpr>(&mut cursor)?;
+        let value = parser.parse_expr(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "a || true");
-        debug_assert_eq!(value.left.to_string(), "a");
-
-        debug_assert!(value.op.is_or_or());
-        debug_assert_eq!(value.op.to_string(), "||");
-        debug_assert_eq!(value.right.to_string(), "true");
-
         Ok(())
     }
 }

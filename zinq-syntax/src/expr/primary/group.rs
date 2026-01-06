@@ -1,10 +1,7 @@
 use zinq_parse::{Parse, Peek, Span};
 use zinq_token::{LParen, RParen};
 
-use crate::{
-    Node, Visitor,
-    expr::{Expr, PrimaryExpr},
-};
+use crate::{Node, Visitor, expr::Expr};
 
 ///
 /// ## Group Expression
@@ -18,7 +15,7 @@ pub struct GroupExpr {
     pub right_paren: RParen,
 }
 
-impl From<GroupExpr> for PrimaryExpr {
+impl From<GroupExpr> for Expr {
     fn from(value: GroupExpr) -> Self {
         Self::Group(value)
     }
@@ -79,15 +76,15 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::expr::GroupExpr;
+    use crate::expr::ExprParser;
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
-        let mut cursor = Span::from_bytes(b"(test 0.5 b'h')").cursor();
-        let value = parser.parse::<GroupExpr>(&mut cursor)?;
+        let mut cursor = Span::from_bytes(b"(test == b'h')").cursor();
+        let value = parser.parse_expr(&mut cursor)?;
 
-        debug_assert_eq!(value.to_string(), "(test 0.5 b'h')");
+        debug_assert_eq!(value.to_string(), "(test == b'h')");
         Ok(())
     }
 }
