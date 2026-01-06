@@ -70,7 +70,7 @@ mod test {
         let value = parser.parse_expr(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "a = b'h'");
-
+        debug_assert!(value.is_assign());
         Ok(())
     }
 }

@@ -27,6 +27,7 @@ pub enum Expr {
     Group(GroupExpr),
 
     /// ## Binary
+    Arithmetic(ArithmeticExpr),
     Assign(AssignExpr),
     Cmp(CmpExpr),
     Logical(LogicalExpr),
@@ -58,6 +59,13 @@ impl Expr {
     pub fn is_group(&self) -> bool {
         match self {
             Self::Group(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_arithmetic(&self) -> bool {
+        match self {
+            Self::Arithmetic(_) => true,
             _ => false,
         }
     }
@@ -118,6 +126,7 @@ impl Node for Expr {
             Self::Literal(v) => v.name(),
             Self::Ident(v) => v.name(),
             Self::Group(v) => v.name(),
+            Self::Arithmetic(v) => v.name(),
             Self::Assign(v) => v.name(),
             Self::Cmp(v) => v.name(),
             Self::Logical(v) => v.name(),
@@ -148,6 +157,7 @@ impl std::fmt::Display for Expr {
             Self::Literal(v) => write!(f, "{}", v),
             Self::Ident(v) => write!(f, "{}", v),
             Self::Group(v) => write!(f, "{}", v),
+            Self::Arithmetic(v) => write!(f, "{}", v),
             Self::Assign(v) => write!(f, "{}", v),
             Self::Cmp(v) => write!(f, "{}", v),
             Self::Logical(v) => write!(f, "{}", v),
@@ -181,6 +191,7 @@ impl Parse for Expr {
             Self::Literal(v) => v.span(),
             Self::Ident(v) => v.span(),
             Self::Group(v) => v.span(),
+            Self::Arithmetic(v) => v.span(),
             Self::Assign(v) => v.span(),
             Self::Cmp(v) => v.span(),
             Self::Logical(v) => v.span(),

@@ -1,10 +1,13 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
-use zinq_token::{And, AndAnd, Cmp, Comma, Dot, Eq, Ident, LParen, Not, OrOr, Punctuated, RParen};
+use zinq_token::{
+    And, AndAnd, Arithmetic, Cmp, Comma, Dot, Eq, Ident, LParen, Minus, Not, OrOr, Plus,
+    Punctuated, RParen, Slash, Star,
+};
 
 use crate::expr::{
-    AddrExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, LiteralExpr, LogicalExpr,
-    MemberExpr, NotExpr,
+    AddrExpr, ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr,
+    LiteralExpr, LogicalExpr, MemberExpr, NotExpr,
 };
 
 pub trait ExprParser {
@@ -13,6 +16,8 @@ pub trait ExprParser {
     fn parse_or_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_and_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_cmp_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_term_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_factor_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_unary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_postfix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_primary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
@@ -63,13 +68,43 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_cmp_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        let mut expr = self.parse_unary_expr(cursor)?;
+        let mut expr = self.parse_term_expr(cursor)?;
 
         while self.peek::<Cmp>(cursor).unwrap_or(false) {
             let op = self.parse::<Cmp>(cursor)?;
-            let right = self.parse_unary_expr(cursor)?;
+            let right = self.parse_term_expr(cursor)?;
 
             expr = CmpExpr::new(expr, op, right).into();
+        }
+
+        Ok(expr)
+    }
+
+    fn parse_term_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        let mut expr = self.parse_factor_expr(cursor)?;
+
+        while self.peek::<Plus>(cursor).unwrap_or(false)
+            || self.peek::<Minus>(cursor).unwrap_or(false)
+        {
+            let op = self.parse::<Arithmetic>(cursor)?;
+            let right = self.parse_factor_expr(cursor)?;
+
+            expr = ArithmeticExpr::new(expr, op, right).into();
+        }
+
+        Ok(expr)
+    }
+
+    fn parse_factor_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        let mut expr = self.parse_unary_expr(cursor)?;
+
+        while self.peek::<Star>(cursor).unwrap_or(false)
+            || self.peek::<Slash>(cursor).unwrap_or(false)
+        {
+            let op = self.parse::<Arithmetic>(cursor)?;
+            let right = self.parse_unary_expr(cursor)?;
+
+            expr = ArithmeticExpr::new(expr, op, right).into();
         }
 
         Ok(expr)

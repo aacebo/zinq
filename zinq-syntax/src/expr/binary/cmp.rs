@@ -57,3 +57,22 @@ impl std::fmt::Display for CmpExpr {
         write!(f, "{}", &self.span)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::Span;
+
+    use crate::expr::ExprParser;
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"a >= b").cursor();
+        let value = parser.parse_expr(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "a >= b");
+        debug_assert!(value.is_cmp());
+        Ok(())
+    }
+}
