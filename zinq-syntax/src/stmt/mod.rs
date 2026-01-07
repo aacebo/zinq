@@ -16,8 +16,6 @@ pub use let_stmt::*;
 pub use mod_stmt::*;
 pub use parser::*;
 pub use struct_stmt::*;
-
-#[allow(unused)]
 pub use use_stmt::*;
 
 use zinq_error::Result;
@@ -40,6 +38,7 @@ pub enum Stmt {
     Struct(StructStmt),
     Fn(FnStmt),
     Impl(ImplStmt),
+    Use(UseStmt),
 }
 
 impl From<Stmt> for Syntax {
@@ -58,6 +57,7 @@ impl Node for Stmt {
             Self::Struct(v) => v.name(),
             Self::Fn(v) => v.name(),
             Self::Impl(v) => v.name(),
+            Self::Use(v) => v.name(),
         }
     }
 
@@ -79,6 +79,7 @@ impl std::fmt::Display for Stmt {
             Self::Struct(v) => write!(f, "{}", v),
             Self::Fn(v) => write!(f, "{}", v),
             Self::Impl(v) => write!(f, "{}", v),
+            Self::Use(v) => write!(f, "{}", v),
         }
     }
 }
@@ -100,6 +101,10 @@ impl Parse for Stmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
+        if parser.peek::<UseStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<UseStmt>(cursor)?.into());
+        }
+
         if parser.peek::<LetStmt>(cursor).unwrap_or(false) {
             return Ok(parser.parse::<LetStmt>(cursor)?.into());
         }
@@ -131,6 +136,7 @@ impl Parse for Stmt {
 impl Spanned for Stmt {
     fn span(&self) -> zinq_parse::Span {
         match self {
+            Self::Use(v) => v.span(),
             Self::Block(v) => v.span(),
             Self::Expr(v) => v.span(),
             Self::Let(v) => v.span(),
