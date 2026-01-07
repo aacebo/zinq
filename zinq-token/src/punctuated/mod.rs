@@ -1,6 +1,6 @@
 mod item;
 
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::punctuated::item::Item;
 
@@ -10,7 +10,6 @@ where
     T: std::fmt::Display + Parse,
     P: std::fmt::Display + Parse,
 {
-    span: Span,
     items: Vec<Item<T, P>>,
 }
 
@@ -47,7 +46,7 @@ where
     P: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -74,7 +73,6 @@ where
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let mut items = vec![];
-        let start = cursor.span().clone();
 
         while parser.peek::<Item<T, P>>(cursor).unwrap_or(false) {
             let item = parser.parse::<Item<T, P>>(cursor)?;
@@ -86,16 +84,24 @@ where
             }
         }
 
-        let end = cursor.span();
-
-        Ok(Self {
-            span: Span::from_bounds(&start, end),
-            items,
-        })
+        Ok(Self { items })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl<T, P> Spanned for Punctuated<T, P>
+where
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
+{
+    fn span(&self) -> Span {
+        if self.items.is_empty() {
+            return Span::default();
+        }
+
+        Span::join(
+            self.items.first().unwrap().span(),
+            self.items.last().unwrap().span(),
+        )
     }
 }
 

@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Span};
+use zinq_parse::{Span, Spanned};
 use zinq_token::Arithmetic;
 
 use crate::{Node, Visitor, expr::Expr};
@@ -11,7 +11,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArithmeticExpr {
-    pub span: Span,
     pub left: Box<Expr>,
     pub op: Arithmetic,
     pub right: Box<Expr>,
@@ -21,15 +20,10 @@ impl ArithmeticExpr {
     /// `<left> <op> <right>`
     pub fn new(left: Expr, op: Arithmetic, right: Expr) -> Self {
         Self {
-            span: Span::from_bounds(left.span(), right.span()),
             left: Box::new(left),
             op,
             right: Box::new(right),
         }
-    }
-
-    pub fn span(&self) -> &Span {
-        &self.span
     }
 }
 
@@ -54,7 +48,13 @@ impl Node for ArithmeticExpr {
 
 impl std::fmt::Display for ArithmeticExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Spanned for ArithmeticExpr {
+    fn span(&self) -> Span {
+        Span::join(self.left.span(), self.right.span())
     }
 }
 

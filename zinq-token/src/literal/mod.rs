@@ -11,7 +11,7 @@ pub use int::*;
 pub use string::*;
 
 use zinq_error::{NOT_FOUND, Result};
-use zinq_parse::{Cursor, Parse, Peek, Span};
+use zinq_parse::{Cursor, Parse, Peek, Span, Spanned};
 
 use crate::{ToTokens, Token, TokenMismatchError, TokenStream};
 
@@ -238,9 +238,10 @@ impl Parse for Literal {
 
         Err(cursor.error(NOT_FOUND, "not found"))
     }
+}
 
-    #[inline]
-    fn span(&self) -> &Span {
+impl Spanned for Literal {
+    fn span(&self) -> Span {
         match self {
             Self::Int(v) => v.span(),
             Self::Float(v) => v.span(),

@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{Node, Visibility};
 
@@ -60,8 +60,10 @@ impl Parse for PrivateVisibility {
             span: cursor.span().clone(),
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for PrivateVisibility {
+    fn span(&self) -> Span {
+        self.span.clone()
     }
 }

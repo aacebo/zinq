@@ -1,5 +1,5 @@
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, Peek, Span};
+use zinq_parse::{Cursor, Parse, Peek, Span, Spanned};
 
 use crate::{ToTokens, Token, TokenStream};
 
@@ -51,10 +51,11 @@ impl Parse for Ident {
             .span();
         Ok(Self { span: span.clone() })
     }
+}
 
-    #[inline]
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for Ident {
+    fn span(&self) -> Span {
+        self.span.clone()
     }
 }
 

@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Eq, Ident, Let, SemiColon, Suffixed};
 
 use crate::{Node, expr::Expr, stmt::Stmt, ty::Type};
@@ -9,7 +9,6 @@ use crate::{Node, expr::Expr, stmt::Stmt, ty::Type};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LetStmt {
-    pub span: Span,
     pub keyword: Let,
     pub name: Ident,
     pub ty: Option<Suffixed<Colon, Type>>,
@@ -38,7 +37,7 @@ impl Node for LetStmt {
 
 impl std::fmt::Display for LetStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -67,10 +66,8 @@ impl Parse for LetStmt {
         let ty = parser.parse::<Option<Suffixed<Colon, Type>>>(cursor)?;
         let init = parser.parse::<Option<Suffixed<Eq, Expr>>>(cursor)?;
         let semi = parser.parse::<SemiColon>(cursor)?;
-        let span = Span::from_bounds(keyword.span(), semi.span());
 
         Ok(Self {
-            span,
             keyword,
             name,
             ty,
@@ -78,9 +75,11 @@ impl Parse for LetStmt {
             semi,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for LetStmt {
+    fn span(&self) -> Span {
+        Span::join(self.keyword.span(), self.semi.span())
     }
 }
 

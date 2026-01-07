@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Span};
+use zinq_parse::{Span, Spanned};
 use zinq_token::And;
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AddrExpr {
-    pub span: Span,
     pub and: And,
     pub right: Box<Expr>,
 }
@@ -18,14 +17,9 @@ impl AddrExpr {
     /// `&<right>`
     pub fn new(and: And, right: Expr) -> Self {
         Self {
-            span: Span::from_bounds(and.span(), right.span()),
             and,
             right: Box::new(right),
         }
-    }
-
-    pub fn span(&self) -> &Span {
-        &self.span
     }
 }
 
@@ -50,7 +44,13 @@ impl Node for AddrExpr {
 
 impl std::fmt::Display for AddrExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Spanned for AddrExpr {
+    fn span(&self) -> Span {
+        Span::join(self.and.span(), self.right.span())
     }
 }
 

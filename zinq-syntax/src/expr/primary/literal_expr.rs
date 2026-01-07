@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Literal;
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LiteralExpr {
-    pub span: Span,
     pub value: Literal,
 }
 
@@ -34,7 +33,7 @@ impl Node for LiteralExpr {
 
 impl std::fmt::Display for LiteralExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -59,14 +58,12 @@ impl Parse for LiteralExpr {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let value = parser.parse::<Literal>(cursor)?;
-
-        Ok(Self {
-            span: value.span().clone(),
-            value,
-        })
+        Ok(Self { value })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for LiteralExpr {
+    fn span(&self) -> Span {
+        self.value.span()
     }
 }

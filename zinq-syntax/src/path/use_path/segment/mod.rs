@@ -5,7 +5,7 @@ mod ident_segment;
 pub use glob_segment::*;
 pub use group_segment::*;
 pub use ident_segment::*;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UseSegment {
@@ -105,8 +105,10 @@ impl Parse for UseSegment {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for UseSegment {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Ident(v) => v.span(),
             Self::Glob(v) => v.span(),

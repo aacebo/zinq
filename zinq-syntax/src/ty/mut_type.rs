@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Mut;
 
 use crate::{Node, ty::Type};
@@ -9,7 +9,6 @@ use crate::{Node, ty::Type};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MutType {
-    pub span: Span,
     pub keyword: Mut,
     pub ty: Box<Type>,
 }
@@ -35,7 +34,7 @@ impl Node for MutType {
 
 impl std::fmt::Display for MutType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -62,15 +61,13 @@ impl Parse for MutType {
         let keyword = parser.parse::<Mut>(cursor)?;
         let ty = parser.parse::<Box<Type>>(cursor)?;
 
-        Ok(Self {
-            span: Span::from_bounds(keyword.span(), ty.span()),
-            keyword,
-            ty,
-        })
+        Ok(Self { keyword, ty })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for MutType {
+    fn span(&self) -> Span {
+        Span::join(self.keyword.span(), self.ty.span())
     }
 }
 

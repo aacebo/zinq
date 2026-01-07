@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Enclosed<S, T, E>
@@ -7,7 +7,6 @@ where
     T: std::fmt::Display + Parse,
     E: std::fmt::Display + Parse,
 {
-    pub span: Span,
     pub start: S,
     pub end: E,
     pub inner: T,
@@ -33,7 +32,7 @@ where
     E: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", &self.span())
     }
 }
 
@@ -85,16 +84,18 @@ where
         let inner = parser.parse::<T>(cursor)?;
         let end = parser.parse::<E>(cursor)?;
 
-        Ok(Self {
-            span: Span::from_bounds(start.span(), end.span()),
-            start,
-            end,
-            inner,
-        })
+        Ok(Self { start, end, inner })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl<S, T, E> Spanned for Enclosed<S, T, E>
+where
+    S: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
+    E: std::fmt::Display + Parse,
+{
+    fn span(&self) -> Span {
+        Span::join(self.start.span(), self.end.span())
     }
 }
 

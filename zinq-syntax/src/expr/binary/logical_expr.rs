@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Span};
+use zinq_parse::{Span, Spanned};
 use zinq_token::Logical;
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LogicalExpr {
-    pub span: Span,
     pub left: Box<Expr>,
     pub op: Logical,
     pub right: Box<Expr>,
@@ -19,15 +18,10 @@ impl LogicalExpr {
     /// `<left> <op> <right>`
     pub fn new(left: Expr, op: Logical, right: Expr) -> Self {
         Self {
-            span: Span::from_bounds(left.span(), right.span()),
             left: Box::new(left),
             op,
             right: Box::new(right),
         }
-    }
-
-    pub fn span(&self) -> &Span {
-        &self.span
     }
 }
 
@@ -75,7 +69,13 @@ impl Node for LogicalExpr {
 
 impl std::fmt::Display for LogicalExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Spanned for LogicalExpr {
+    fn span(&self) -> Span {
+        Span::join(self.left.span(), self.right.span())
     }
 }
 

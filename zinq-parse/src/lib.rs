@@ -35,9 +35,8 @@ pub trait Peek {
 /// ## Parse
 /// implementers can be parsed by a `ZinqParser`
 ///
-pub trait Parse: Peek + std::fmt::Debug + Clone {
+pub trait Parse: Spanned + Peek + std::fmt::Debug + Clone {
     fn parse(cursor: &mut Cursor, parser: &mut ZinqParser) -> Result<Self>;
-    fn span(&self) -> &Span;
 }
 
 ///
@@ -93,10 +92,12 @@ impl<T: Parse> Parse for Option<T> {
 
         Ok(Some(parser.parse::<T>(cursor)?))
     }
+}
 
-    fn span(&self) -> &Span {
+impl<T: Spanned> Spanned for Option<T> {
+    fn span(&self) -> Span {
         match self {
-            None => panic!("attempted to call Parse::span on None"),
+            None => Span::default(),
             Some(v) => v.span(),
         }
     }
@@ -112,8 +113,10 @@ impl<T: Parse> Parse for Box<T> {
     fn parse(cursor: &mut Cursor, parser: &mut ZinqParser) -> Result<Self> {
         Ok(Box::new(parser.parse::<T>(cursor)?))
     }
+}
 
-    fn span(&self) -> &Span {
+impl<T: Spanned> Spanned for Box<T> {
+    fn span(&self) -> Span {
         self.as_ref().span()
     }
 }

@@ -21,7 +21,7 @@ pub use struct_stmt::*;
 pub use use_stmt::*;
 
 use zinq_error::Result;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Node, Syntax, Visitor};
 
@@ -126,8 +126,10 @@ impl Parse for Stmt {
 
         Ok(parser.parse::<ExprStmt>(cursor)?.into())
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Stmt {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Block(v) => v.span(),
             Self::Expr(v) => v.span(),

@@ -1,22 +1,18 @@
 use std::{ops::Index, str::FromStr};
 
 use zinq_error::ZinqError;
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{ToTokens, Token};
 
 #[derive(Debug, Default, Clone)]
 pub struct TokenStream {
-    span: Span,
     inner: Vec<Token>,
 }
 
 impl TokenStream {
     pub fn new() -> Self {
-        Self {
-            span: Span::default(),
-            inner: vec![],
-        }
+        Self { inner: vec![] }
     }
 }
 
@@ -67,24 +63,14 @@ impl FromStr for TokenStream {
 
 impl From<Token> for TokenStream {
     fn from(value: Token) -> Self {
-        Self {
-            span: value.span().clone(),
-            inner: vec![value],
-        }
+        Self { inner: vec![value] }
     }
 }
 
 impl FromIterator<Token> for TokenStream {
     fn from_iter<T: IntoIterator<Item = Token>>(iter: T) -> Self {
-        let tokens = iter.into_iter().collect::<Vec<Token>>();
-
-        Self {
-            span: Span::from_bounds(
-                tokens.first().unwrap().span(),
-                tokens.last().unwrap().span(),
-            ),
-            inner: tokens,
-        }
+        let inner = iter.into_iter().collect::<Vec<Token>>();
+        Self { inner }
     }
 }
 
@@ -95,13 +81,7 @@ impl FromIterator<Self> for TokenStream {
             .flat_map(|v| v.inner)
             .collect::<Vec<Token>>();
 
-        Self {
-            span: Span::from_bounds(
-                tokens.first().unwrap().span(),
-                tokens.last().unwrap().span(),
-            ),
-            inner: tokens,
-        }
+        Self { inner: tokens }
     }
 }
 
@@ -128,7 +108,7 @@ impl Extend<Self> for TokenStream {
 
 impl std::fmt::Display for TokenStream {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -175,24 +155,27 @@ impl Parse for TokenStream {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let mut tokens = vec![];
+        let mut inner = vec![];
 
         while !cursor.eof() {
             let token = parser.parse::<Token>(cursor)?;
-            tokens.push(token);
+            inner.push(token);
         }
 
-        Ok(Self {
-            span: Span::from_bounds(
-                tokens.first().unwrap().span(),
-                tokens.last().unwrap().span(),
-            ),
-            inner: tokens,
-        })
+        Ok(Self { inner: inner })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for TokenStream {
+    fn span(&self) -> Span {
+        if self.is_empty() {
+            return Span::default();
+        }
+
+        Span::join(
+            self.inner.first().unwrap().span(),
+            self.inner.last().unwrap().span(),
+        )
     }
 }
 

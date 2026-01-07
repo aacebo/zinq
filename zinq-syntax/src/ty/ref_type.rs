@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::And;
 
 use crate::{Node, ty::Type};
@@ -9,7 +9,6 @@ use crate::{Node, ty::Type};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefType {
-    pub span: Span,
     pub and: And,
     pub to: Box<Type>,
 }
@@ -35,7 +34,7 @@ impl Node for RefType {
 
 impl std::fmt::Display for RefType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -62,15 +61,13 @@ impl Parse for RefType {
         let and = parser.parse::<And>(cursor)?;
         let to = parser.parse::<Box<Type>>(cursor)?;
 
-        Ok(Self {
-            span: Span::from_bounds(and.span(), to.span()),
-            and,
-            to,
-        })
+        Ok(Self { and, to })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for RefType {
+    fn span(&self) -> Span {
+        Span::join(self.and.span(), self.to.span())
     }
 }
 

@@ -48,9 +48,10 @@ macro_rules! define_keywords {
 
                 Err(cursor.error(zinq_error::NOT_FOUND, &format!("unknown tokens '{}'", cursor)))
             }
+        }
 
-            #[inline]
-            fn span(&self) -> &zinq_parse::Span {
+        impl zinq_parse::Spanned for Keyword {
+            fn span(&self) -> zinq_parse::Span {
                 match self {
                     $(Self::$name(v) => v.span(),)*
                 }
@@ -114,10 +115,11 @@ macro_rules! define_keywords {
                         span: span.clone(),
                     })
                 }
+            }
 
-                #[inline]
-                fn span(&self) -> &zinq_parse::Span {
-                    &self.span
+            impl zinq_parse::Spanned for $name {
+                fn span(&self) -> zinq_parse::Span {
+                    self.span.clone()
                 }
             }
 

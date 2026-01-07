@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Star;
 
 use crate::path::UseSegment;
@@ -20,7 +20,7 @@ impl From<UseGlob> for UseSegment {
 
 impl std::fmt::Display for UseGlob {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.star.span())
+        write!(f, "{}", self.span())
     }
 }
 
@@ -50,8 +50,10 @@ impl Parse for UseGlob {
 
         Ok(Self { star })
     }
+}
 
-    fn span(&self) -> &Span {
+impl Spanned for UseGlob {
+    fn span(&self) -> Span {
         self.star.span()
     }
 }

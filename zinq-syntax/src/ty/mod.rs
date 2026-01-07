@@ -9,7 +9,7 @@ pub use slice_type::*;
 pub use tuple_type::*;
 
 use zinq_error::Result;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Node, Syntax, TypePath, Visitor};
 
@@ -104,8 +104,10 @@ impl Parse for Type {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Type {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Path(v) => v.span(),
             Self::Mut(v) => v.span(),

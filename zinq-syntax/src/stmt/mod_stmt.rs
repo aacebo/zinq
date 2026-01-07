@@ -1,11 +1,10 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Ident, Mod, SemiColon};
 
 use crate::{Node, Visibility, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModStmt {
-    pub span: Span,
     pub vis: Visibility,
     pub keyword: Mod,
     pub name: Ident,
@@ -33,7 +32,7 @@ impl Node for ModStmt {
 
 impl std::fmt::Display for ModStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -61,19 +60,19 @@ impl Parse for ModStmt {
         let keyword = parser.parse::<Mod>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
         let semi = parser.parse::<SemiColon>(cursor)?;
-        let span = Span::from_bounds(vis.span(), semi.span());
 
         Ok(Self {
-            span,
             vis,
             keyword,
             name,
             semi,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for ModStmt {
+    fn span(&self) -> Span {
+        Span::join(self.vis.span(), self.semi.span())
     }
 }
 

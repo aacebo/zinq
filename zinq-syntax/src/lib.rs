@@ -10,7 +10,7 @@ pub use path::*;
 pub use visibility::*;
 
 use zinq_error::Result;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{expr::Expr, stmt::Stmt, ty::Type};
 
@@ -100,8 +100,10 @@ impl Parse for Syntax {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Syntax {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Expr(v) => v.span(),
             Self::Stmt(v) => v.span(),

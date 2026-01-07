@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed};
 
 use crate::{
@@ -14,7 +14,6 @@ use crate::{
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImplMethod {
-    pub span: Span,
     pub vis: Visibility,
     pub keyword: Fn,
     pub name: Ident,
@@ -47,7 +46,7 @@ impl Node for ImplMethod {
 
 impl std::fmt::Display for ImplMethod {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -85,10 +84,8 @@ impl Parse for ImplMethod {
         let right_paren = parser.parse::<RParen>(cursor)?;
         let return_ty = parser.parse::<Option<Suffixed<RArrow, Type>>>(cursor)?;
         let block = parser.parse::<BlockStmt>(cursor)?;
-        let span = Span::from_bounds(vis.span(), block.span());
 
         Ok(Self {
-            span,
             vis,
             keyword,
             name,
@@ -100,9 +97,11 @@ impl Parse for ImplMethod {
             block,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for ImplMethod {
+    fn span(&self) -> Span {
+        Span::join(self.vis.span(), self.block.span())
     }
 }
 

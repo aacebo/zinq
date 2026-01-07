@@ -1,7 +1,7 @@
 mod segment;
 
 pub use segment::*;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::{ColonColon, Punctuated};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -51,8 +51,10 @@ impl Parse for UsePath {
         let items = parser.parse::<Punctuated<UseSegment, ColonColon>>(cursor)?;
         Ok(Self { items })
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for UsePath {
+    fn span(&self) -> zinq_parse::Span {
         self.items.span()
     }
 }

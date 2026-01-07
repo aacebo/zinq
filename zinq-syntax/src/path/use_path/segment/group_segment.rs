@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
 use crate::path::{UsePath, UseSegment};
@@ -12,7 +12,6 @@ use crate::path::{UsePath, UseSegment};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UseGroup {
-    pub span: Span,
     pub left_paren: LParen,
     pub items: Punctuated<UsePath, Comma>,
     pub right_paren: RParen,
@@ -26,7 +25,7 @@ impl From<UseGroup> for UseSegment {
 
 impl std::fmt::Display for UseGroup {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -61,17 +60,17 @@ impl Parse for UseGroup {
         let left_paren = parser.parse::<LParen>(cursor)?;
         let items = parser.parse::<Punctuated<UsePath, Comma>>(cursor)?;
         let right_paren = parser.parse::<RParen>(cursor)?;
-        let span = Span::from_bounds(left_paren.span(), right_paren.span());
 
         Ok(Self {
-            span,
             left_paren,
             items,
             right_paren,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for UseGroup {
+    fn span(&self) -> Span {
+        Span::join(self.left_paren.span(), self.right_paren.span())
     }
 }

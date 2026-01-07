@@ -1,11 +1,10 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Ident};
 
 use crate::ty::Type;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FnParam {
-    pub span: Span,
     pub name: Ident,
     pub colon: Colon,
     pub ty: Type,
@@ -13,7 +12,7 @@ pub struct FnParam {
 
 impl std::fmt::Display for FnParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -40,17 +39,13 @@ impl Parse for FnParam {
         let name = parser.parse::<Ident>(cursor)?;
         let colon = parser.parse::<Colon>(cursor)?;
         let ty = parser.parse::<Type>(cursor)?;
-        let span = Span::from_bounds(name.span(), ty.span());
 
-        Ok(Self {
-            span,
-            name,
-            colon,
-            ty,
-        })
+        Ok(Self { name, colon, ty })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for FnParam {
+    fn span(&self) -> Span {
+        Span::join(self.name.span(), self.ty.span())
     }
 }

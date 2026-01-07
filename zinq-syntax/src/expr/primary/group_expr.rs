@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LParen, RParen};
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GroupExpr {
-    pub span: Span,
     pub left_paren: LParen,
     pub inner: Box<Expr>,
     pub right_paren: RParen,
@@ -36,7 +35,7 @@ impl Node for GroupExpr {
 
 impl std::fmt::Display for GroupExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -59,15 +58,16 @@ impl Parse for GroupExpr {
         let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(left_paren.span(), right_paren.span()),
             left_paren,
             inner,
             right_paren,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for GroupExpr {
+    fn span(&self) -> Span {
+        Span::join(self.left_paren.span(), self.right_paren.span())
     }
 }
 

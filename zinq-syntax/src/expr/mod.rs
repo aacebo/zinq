@@ -11,7 +11,7 @@ pub use primary::*;
 pub use unary::*;
 
 use zinq_error::Result;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Node, Syntax, Visitor};
 
@@ -185,8 +185,10 @@ impl Parse for Expr {
     fn parse(cursor: &mut zinq_parse::Cursor, parser: &mut zinq_parse::ZinqParser) -> Result<Self> {
         parser.parse_expr(cursor)
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Expr {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Literal(v) => v.span(),
             Self::Ident(v) => v.span(),

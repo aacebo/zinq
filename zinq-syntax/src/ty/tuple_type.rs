@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
 use crate::{Node, ty::Type};
@@ -9,7 +9,6 @@ use crate::{Node, ty::Type};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TupleType {
-    pub span: Span,
     pub left_paren: LParen,
     pub items: Punctuated<Type, Comma>,
     pub right_paren: RParen,
@@ -36,7 +35,7 @@ impl Node for TupleType {
 
 impl std::fmt::Display for TupleType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -65,15 +64,16 @@ impl Parse for TupleType {
         let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(left_paren.span(), right_paren.span()),
             left_paren,
             items,
             right_paren,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for TupleType {
+    fn span(&self) -> Span {
+        Span::join(self.left_paren.span(), self.right_paren.span())
     }
 }
 

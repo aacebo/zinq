@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Suffixed<T, S>
@@ -6,7 +6,6 @@ where
     T: std::fmt::Display + Parse,
     S: std::fmt::Display + Parse,
 {
-    pub span: Span,
     pub suffix: S,
     pub inner: T,
 }
@@ -29,7 +28,7 @@ where
     S: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -73,15 +72,17 @@ where
         let inner = parser.parse::<T>(cursor)?;
         let suffix = parser.parse::<S>(cursor)?;
 
-        Ok(Self {
-            span: Span::from_bounds(inner.span(), suffix.span()),
-            suffix,
-            inner,
-        })
+        Ok(Self { suffix, inner })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl<T, S> Spanned for Suffixed<T, S>
+where
+    T: std::fmt::Display + Parse,
+    S: std::fmt::Display + Parse,
+{
+    fn span(&self) -> Span {
+        Span::join(self.inner.span(), self.suffix.span())
     }
 }
 

@@ -1,9 +1,8 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{And, Mut, SelfValue};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelfParam {
-    pub span: Span,
     pub and: Option<And>,
     pub mutable: Option<Mut>,
     pub keyword: SelfValue,
@@ -11,7 +10,7 @@ pub struct SelfParam {
 
 impl std::fmt::Display for SelfParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -38,27 +37,27 @@ impl Parse for SelfParam {
         let and = parser.parse::<Option<And>>(cursor)?;
         let mutable = parser.parse::<Option<Mut>>(cursor)?;
         let keyword = parser.parse::<SelfValue>(cursor)?;
-        let mut first = keyword.span().clone();
-
-        if let Some(v) = &mutable {
-            first = v.span().clone();
-        }
-
-        if let Some(v) = &and {
-            first = v.span().clone();
-        }
-
-        let span = Span::from_bounds(&first, keyword.span());
 
         Ok(Self {
-            span,
             and,
             mutable,
             keyword,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for SelfParam {
+    fn span(&self) -> Span {
+        let mut first = self.keyword.span().clone();
+
+        if let Some(v) = &self.mutable {
+            first = v.span().clone();
+        }
+
+        if let Some(v) = &self.and {
+            first = v.span().clone();
+        }
+
+        Span::join(first, self.keyword.span())
     }
 }

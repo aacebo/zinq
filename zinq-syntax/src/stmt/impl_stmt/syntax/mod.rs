@@ -1,7 +1,7 @@
 mod method;
 
 pub use method::*;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ImplSyntax {
@@ -53,8 +53,10 @@ impl Parse for ImplSyntax {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for ImplSyntax {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Method(v) => v.span(),
         }

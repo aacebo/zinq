@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Minus, Plus, Slash, Star};
 
@@ -122,8 +122,10 @@ impl Parse for Arithmetic {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Arithmetic {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Add(v) => v.span(),
             Self::Sub(v) => v.span(),

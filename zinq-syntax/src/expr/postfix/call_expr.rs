@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Span};
+use zinq_parse::{Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CallExpr {
-    pub span: Span,
     pub target: Box<Expr>,
     pub left_paren: LParen,
     pub args: Punctuated<Expr, Comma>,
@@ -25,16 +24,11 @@ impl CallExpr {
         right_paren: RParen,
     ) -> Self {
         Self {
-            span: Span::from_bounds(target.span(), right_paren.span()),
             target: Box::new(target),
             left_paren,
             args,
             right_paren,
         }
-    }
-
-    pub fn span(&self) -> &Span {
-        &self.span
     }
 }
 
@@ -59,7 +53,13 @@ impl Node for CallExpr {
 
 impl std::fmt::Display for CallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Spanned for CallExpr {
+    fn span(&self) -> Span {
+        Span::join(self.target.span(), self.right_paren.span())
     }
 }
 

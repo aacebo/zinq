@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{AndAnd, OrOr};
 
@@ -80,8 +80,10 @@ impl Parse for Logical {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Logical {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::And(v) => v.span(),
             Self::Or(v) => v.span(),

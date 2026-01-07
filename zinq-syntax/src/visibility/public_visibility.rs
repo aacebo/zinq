@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Pub;
 
 use crate::{Node, Visibility};
@@ -9,7 +9,6 @@ use crate::{Node, Visibility};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PublicVisibility {
-    pub span: Span,
     pub keyword: Pub,
 }
 
@@ -34,7 +33,7 @@ impl Node for PublicVisibility {
 
 impl std::fmt::Display for PublicVisibility {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -60,14 +59,13 @@ impl Parse for PublicVisibility {
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse::<Pub>(cursor)?;
 
-        Ok(Self {
-            span: keyword.span().clone(),
-            keyword,
-        })
+        Ok(Self { keyword })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for PublicVisibility {
+    fn span(&self) -> Span {
+        self.keyword.span()
     }
 }
 

@@ -8,7 +8,7 @@ pub use private_visibility::*;
 pub use public_visibility::*;
 pub use super_visibility::*;
 use zinq_error::Result;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Node, Syntax, Visitor};
 
@@ -116,8 +116,10 @@ impl Parse for Visibility {
 
         Ok(parser.parse::<PrivateVisibility>(cursor)?.into())
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Visibility {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Pub(v) => v.span(),
             Self::Mod(v) => v.span(),

@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed};
 
 use crate::{Node, Visibility};
@@ -9,7 +9,6 @@ use crate::{Node, Visibility};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModVisibility {
-    pub span: Span,
     pub keyword: Suffixed<Pub, Enclosed<LParen, Mod, RParen>>,
 }
 
@@ -34,7 +33,7 @@ impl Node for ModVisibility {
 
 impl std::fmt::Display for ModVisibility {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -59,15 +58,13 @@ impl Parse for ModVisibility {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse::<Suffixed<Pub, Enclosed<LParen, Mod, RParen>>>(cursor)?;
-
-        Ok(Self {
-            span: keyword.span().clone(),
-            keyword,
-        })
+        Ok(Self { keyword })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for ModVisibility {
+    fn span(&self) -> Span {
+        self.keyword.span()
     }
 }
 

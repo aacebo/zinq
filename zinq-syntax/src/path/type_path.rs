@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{ColonColon, Ident, Punctuated};
 
 use crate::{Node, Visitor, ty::Type};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, ty::Type};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypePath {
-    pub span: Span,
     pub path: Punctuated<Ident, ColonColon>,
 }
 
@@ -34,7 +33,7 @@ impl Node for TypePath {
 
 impl std::fmt::Display for TypePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -59,14 +58,12 @@ impl Parse for TypePath {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let path = parser.parse::<Punctuated<Ident, ColonColon>>(cursor)?;
-
-        Ok(Self {
-            span: path.span().clone(),
-            path,
-        })
+        Ok(Self { path })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for TypePath {
+    fn span(&self) -> Span {
+        self.path.span()
     }
 }

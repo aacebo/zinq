@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Span};
+use zinq_parse::{Span, Spanned};
 use zinq_token::Not;
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NotExpr {
-    pub span: Span,
     pub not: Not,
     pub right: Box<Expr>,
 }
@@ -18,14 +17,9 @@ impl NotExpr {
     /// `!<right>`
     pub fn new(not: Not, right: Expr) -> Self {
         Self {
-            span: Span::from_bounds(not.span(), right.span()),
             not,
             right: Box::new(right),
         }
-    }
-
-    pub fn span(&self) -> &Span {
-        &self.span
     }
 }
 
@@ -50,7 +44,13 @@ impl Node for NotExpr {
 
 impl std::fmt::Display for NotExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Spanned for NotExpr {
+    fn span(&self) -> Span {
+        Span::join(self.not.span(), self.right.span())
     }
 }
 

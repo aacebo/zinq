@@ -4,7 +4,7 @@ mod open;
 pub use close::*;
 pub use open::*;
 
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{ToTokens, Token};
 
@@ -104,8 +104,10 @@ impl Parse for Delim {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Delim {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Open(v) => v.span(),
             Self::Close(v) => v.span(),

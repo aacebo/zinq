@@ -24,7 +24,7 @@ pub use stream::*;
 pub use suffixed::*;
 
 use zinq_error::Result;
-use zinq_parse::{Cursor, Parse, Peek, Span};
+use zinq_parse::{Cursor, Parse, Peek, Span, Spanned};
 
 ///
 /// ## ToTokens
@@ -56,10 +56,7 @@ impl Token {
         match self {
             Self::Punct(v) => Ok(v),
             other => {
-                Err(
-                    TokenMismatchError::from_types("Punct", other.name(), other.span().clone())
-                        .into(),
-                )
+                Err(TokenMismatchError::from_types("Punct", other.name(), other.span()).into())
             }
         }
     }
@@ -75,10 +72,7 @@ impl Token {
         match self {
             Self::Literal(v) => Ok(v),
             other => {
-                Err(
-                    TokenMismatchError::from_types("Literal", other.name(), other.span().clone())
-                        .into(),
-                )
+                Err(TokenMismatchError::from_types("Literal", other.name(), other.span()).into())
             }
         }
     }
@@ -94,10 +88,7 @@ impl Token {
         match self {
             Self::Keyword(v) => Ok(v),
             other => {
-                Err(
-                    TokenMismatchError::from_types("Keyword", other.name(), other.span().clone())
-                        .into(),
-                )
+                Err(TokenMismatchError::from_types("Keyword", other.name(), other.span()).into())
             }
         }
     }
@@ -113,10 +104,7 @@ impl Token {
         match self {
             Self::Ident(v) => Ok(v),
             other => {
-                Err(
-                    TokenMismatchError::from_types("Ident", other.name(), other.span().clone())
-                        .into(),
-                )
+                Err(TokenMismatchError::from_types("Ident", other.name(), other.span()).into())
             }
         }
     }
@@ -132,10 +120,7 @@ impl Token {
         match self {
             Self::Delim(v) => Ok(v),
             other => {
-                Err(
-                    TokenMismatchError::from_types("Delim", other.name(), other.span().clone())
-                        .into(),
-                )
+                Err(TokenMismatchError::from_types("Delim", other.name(), other.span()).into())
             }
         }
     }
@@ -196,9 +181,10 @@ impl Parse for Token {
 
         Ok(parser.parse::<Ident>(cursor)?.into())
     }
+}
 
-    #[inline]
-    fn span(&self) -> &Span {
+impl Spanned for Token {
+    fn span(&self) -> Span {
         match self {
             Self::Punct(v) => v.span(),
             Self::Literal(v) => v.span(),

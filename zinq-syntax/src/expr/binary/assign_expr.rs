@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Span};
+use zinq_parse::{Span, Spanned};
 use zinq_token::Eq;
 
 use crate::{Node, Visitor, expr::Expr};
@@ -9,7 +9,6 @@ use crate::{Node, Visitor, expr::Expr};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssignExpr {
-    pub span: Span,
     pub left: Box<Expr>,
     pub eq: Eq,
     pub right: Box<Expr>,
@@ -19,15 +18,10 @@ impl AssignExpr {
     /// `<left> = <right>`
     pub fn new(left: Expr, eq: Eq, right: Expr) -> Self {
         Self {
-            span: Span::from_bounds(left.span(), right.span()),
             left: Box::new(left),
             eq,
             right: Box::new(right),
         }
-    }
-
-    pub fn span(&self) -> &Span {
-        &self.span
     }
 }
 
@@ -52,7 +46,13 @@ impl Node for AssignExpr {
 
 impl std::fmt::Display for AssignExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Spanned for AssignExpr {
+    fn span(&self) -> Span {
+        Span::join(self.left.span(), self.right.span())
     }
 }
 

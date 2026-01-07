@@ -1,10 +1,9 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{Node, expr::Expr, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExprStmt {
-    pub span: Span,
     pub expr: Expr,
 }
 
@@ -29,7 +28,7 @@ impl Node for ExprStmt {
 
 impl std::fmt::Display for ExprStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -54,14 +53,12 @@ impl Parse for ExprStmt {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let expr = parser.parse::<Expr>(cursor)?;
-
-        Ok(Self {
-            span: expr.span().clone(),
-            expr,
-        })
+        Ok(Self { expr })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for ExprStmt {
+    fn span(&self) -> Span {
+        self.expr.span()
     }
 }

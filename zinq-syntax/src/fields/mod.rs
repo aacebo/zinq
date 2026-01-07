@@ -3,7 +3,7 @@ mod named;
 
 pub use indexed::*;
 pub use named::*;
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Node, Visitor};
 
@@ -80,8 +80,10 @@ impl Parse for Fields {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Fields {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Indexed(v) => v.span(),
             Self::Named(v) => v.span(),

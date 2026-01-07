@@ -1,14 +1,13 @@
 mod syntax;
 
 pub use syntax::*;
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Impl, LBrace, RBrace};
 
 use crate::{Node, stmt::Stmt, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImplStmt {
-    pub span: Span,
     pub keyword: Impl,
     pub for_ty: Type,
     pub left_brace: LBrace,
@@ -37,7 +36,7 @@ impl Node for ImplStmt {
 
 impl std::fmt::Display for ImplStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -73,7 +72,6 @@ impl Parse for ImplStmt {
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(keyword.span(), right_brace.span()),
             keyword,
             for_ty,
             left_brace,
@@ -81,12 +79,13 @@ impl Parse for ImplStmt {
             right_brace,
         })
     }
-
-    fn span(&self) -> &Span {
-        &self.span
-    }
 }
 
+impl Spanned for ImplStmt {
+    fn span(&self) -> Span {
+        Span::join(self.keyword.span(), self.right_brace.span())
+    }
+}
 #[cfg(test)]
 mod test {
     use zinq_error::Result;

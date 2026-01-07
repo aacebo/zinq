@@ -1,11 +1,10 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Ident, Struct};
 
 use crate::{Node, Visibility, fields::Fields, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructStmt {
-    pub span: Span,
     pub vis: Visibility,
     pub keyword: Struct,
     pub name: Ident,
@@ -33,7 +32,7 @@ impl Node for StructStmt {
 
 impl std::fmt::Display for StructStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -61,19 +60,19 @@ impl Parse for StructStmt {
         let keyword = parser.parse::<Struct>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
         let fields = parser.parse::<Fields>(cursor)?;
-        let span = Span::from_bounds(vis.span(), fields.span());
 
         Ok(Self {
-            span,
             vis,
             keyword,
             name,
             fields,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for StructStmt {
+    fn span(&self) -> Span {
+        Span::join(self.vis.span(), self.fields.span())
     }
 }
 

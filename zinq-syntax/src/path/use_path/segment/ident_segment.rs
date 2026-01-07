@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Ident;
 
 use crate::path::UseSegment;
@@ -20,7 +20,7 @@ impl From<UseIdent> for UseSegment {
 
 impl std::fmt::Display for UseIdent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.ident.span())
+        write!(f, "{}", self.span())
     }
 }
 
@@ -50,8 +50,10 @@ impl Parse for UseIdent {
 
         Ok(Self { ident })
     }
+}
 
-    fn span(&self) -> &Span {
+impl Spanned for UseIdent {
+    fn span(&self) -> Span {
         self.ident.span()
     }
 }

@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek};
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{EqEq, Gt, GtEq, Lt, LtEq, NotEq};
 
@@ -164,8 +164,10 @@ impl Parse for Cmp {
             &format!("unknown tokens '{}'", cursor),
         ))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl Spanned for Cmp {
+    fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Eq(v) => v.span(),
             Self::NotEq(v) => v.span(),

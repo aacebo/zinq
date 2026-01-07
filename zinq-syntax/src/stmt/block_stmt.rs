@@ -1,11 +1,10 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LBrace, RBrace};
 
 use crate::{Node, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlockStmt {
-    pub span: Span,
     pub left_brace: LBrace,
     pub stmts: Vec<Stmt>,
     pub right_brace: RBrace,
@@ -32,7 +31,7 @@ impl Node for BlockStmt {
 
 impl std::fmt::Display for BlockStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -66,14 +65,15 @@ impl Parse for BlockStmt {
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(left_brace.span(), right_brace.span()),
             left_brace,
             stmts,
             right_brace,
         })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl Spanned for BlockStmt {
+    fn span(&self) -> Span {
+        Span::join(self.left_brace.span(), self.right_brace.span())
     }
 }

@@ -1,11 +1,10 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace};
 
 use crate::{Node, Visibility, Visitor, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedField {
-    pub span: Span,
     pub vis: Visibility,
     pub name: Ident,
     pub colon: Colon,
@@ -14,7 +13,7 @@ pub struct NamedField {
 
 impl std::fmt::Display for NamedField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -42,25 +41,24 @@ impl Parse for NamedField {
         let name = parser.parse::<Ident>(cursor)?;
         let colon = parser.parse::<Colon>(cursor)?;
         let ty = parser.parse::<Type>(cursor)?;
-        let span = Span::from_bounds(vis.span(), ty.span());
 
         Ok(Self {
-            span,
             vis,
             name,
             colon,
             ty,
         })
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
-        &self.span
+impl Spanned for NamedField {
+    fn span(&self) -> Span {
+        Span::join(self.vis.span(), self.ty.span())
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedFields {
-    pub span: Span,
     pub left_brace: LBrace,
     pub fields: Punctuated<NamedField, Comma>,
     pub right_brace: RBrace,
@@ -95,7 +93,7 @@ impl From<NamedFields> for super::Fields {
 
 impl std::fmt::Display for NamedFields {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -128,15 +126,16 @@ impl Parse for NamedFields {
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
-            span: Span::from_bounds(left_brace.span(), right_brace.span()),
             left_brace,
             fields,
             right_brace,
         })
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
-        &self.span
+impl Spanned for NamedFields {
+    fn span(&self) -> Span {
+        Span::join(self.left_brace.span(), self.right_brace.span())
     }
 }
 

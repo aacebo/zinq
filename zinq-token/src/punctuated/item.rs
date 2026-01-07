@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Item<T, P>
@@ -6,8 +6,8 @@ where
     T: std::fmt::Display + Parse,
     P: std::fmt::Display + Parse,
 {
-    Leading(Span, T, P),
-    Final(Span, T, Option<P>),
+    Leading(T, P),
+    Final(T, Option<P>),
 }
 
 impl<T, P> Item<T, P>
@@ -17,15 +17,15 @@ where
 {
     pub fn is_final(&self) -> bool {
         match self {
-            Self::Final(_, _, _) => true,
+            Self::Final(_, _) => true,
             _ => false,
         }
     }
 
     pub fn value(&self) -> &T {
         match self {
-            Self::Leading(_, v, _) => v,
-            Self::Final(_, v, _) => v,
+            Self::Leading(v, _) => v,
+            Self::Final(v, _) => v,
         }
     }
 }
@@ -36,11 +36,7 @@ where
     P: std::fmt::Display + Parse,
 {
     fn from(value: (T, P)) -> Self {
-        Self::Leading(
-            Span::from_bounds(value.0.span(), value.1.span()),
-            value.0,
-            value.1,
-        )
+        Self::Leading(value.0, value.1)
     }
 }
 
@@ -50,7 +46,7 @@ where
     P: std::fmt::Display + Parse,
 {
     fn from(value: T) -> Self {
-        Self::Final(value.span().clone(), value, None)
+        Self::Final(value, None)
     }
 }
 
@@ -60,10 +56,7 @@ where
     P: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Leading(span, _, _) => write!(f, "{}", span),
-            Self::Final(span, _, _) => write!(f, "{}", span),
-        }
+        write!(f, "{}", self.span())
     }
 }
 
@@ -93,22 +86,30 @@ where
 
         if parser.peek::<P>(cursor).unwrap_or(false) {
             let punct = parser.parse::<P>(cursor)?;
-            let span = Span::from_bounds(value.span(), punct.span());
 
             if parser.peek::<T>(cursor).unwrap_or(false) {
-                return Ok(Self::Leading(span, value, punct));
+                return Ok(Self::Leading(value, punct));
             }
 
-            return Ok(Self::Final(span, value, Some(punct)));
+            return Ok(Self::Final(value, Some(punct)));
         }
 
-        Ok(Self::Final(value.span().clone(), value, None))
+        Ok(Self::Final(value, None))
     }
+}
 
-    fn span(&self) -> &zinq_parse::Span {
+impl<T, P> Spanned for Item<T, P>
+where
+    T: std::fmt::Display + Parse,
+    P: std::fmt::Display + Parse,
+{
+    fn span(&self) -> zinq_parse::Span {
         match self {
-            Self::Leading(span, _, _) => span,
-            Self::Final(span, _, _) => span,
+            Self::Leading(v, p) => Span::join(v.span(), p.span()),
+            Self::Final(v, p) => match p {
+                None => v.span(),
+                Some(vp) => Span::join(v.span(), vp.span()),
+            },
         }
     }
 }

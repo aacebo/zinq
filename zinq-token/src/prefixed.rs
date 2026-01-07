@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prefixed<P, T>
@@ -6,7 +6,6 @@ where
     P: std::fmt::Display + Parse,
     T: std::fmt::Display + Parse,
 {
-    pub span: Span,
     pub prefix: P,
     pub inner: T,
 }
@@ -29,7 +28,7 @@ where
     T: std::fmt::Display + Parse,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.span)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -73,15 +72,17 @@ where
         let prefix = parser.parse::<P>(cursor)?;
         let inner = parser.parse::<T>(cursor)?;
 
-        Ok(Self {
-            span: Span::from_bounds(prefix.span(), inner.span()),
-            prefix,
-            inner,
-        })
+        Ok(Self { prefix, inner })
     }
+}
 
-    fn span(&self) -> &Span {
-        &self.span
+impl<P, T> Spanned for Prefixed<P, T>
+where
+    P: std::fmt::Display + Parse,
+    T: std::fmt::Display + Parse,
+{
+    fn span(&self) -> Span {
+        Span::join(self.prefix.span(), self.inner.span())
     }
 }
 
