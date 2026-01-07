@@ -1,7 +1,7 @@
 use zinq_error::Result;
 use zinq_parse::{Cursor, ZinqParser};
 
-use crate::stmt::{BlockStmt, ExprStmt, FnStmt, LetStmt, Stmt, StructStmt, UseStmt};
+use crate::stmt::{BlockStmt, ExprStmt, FnStmt, LetStmt, ReturnStmt, Stmt, StructStmt, UseStmt};
 
 pub trait StmtParser {
     fn parse_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
@@ -25,8 +25,8 @@ impl StmtParser for ZinqParser {
         todo!()
     }
 
-    fn parse_return_stmt(&mut self, _: &mut Cursor) -> Result<Stmt> {
-        todo!()
+    fn parse_return_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
+        Ok(self.parse::<ReturnStmt>(cursor)?.into())
     }
 
     fn parse_var_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {

@@ -5,6 +5,7 @@ mod impl_stmt;
 mod let_stmt;
 mod mod_stmt;
 mod parser;
+mod return_stmt;
 mod struct_stmt;
 mod use_stmt;
 
@@ -15,6 +16,7 @@ pub use impl_stmt::*;
 pub use let_stmt::*;
 pub use mod_stmt::*;
 pub use parser::*;
+pub use return_stmt::*;
 pub use struct_stmt::*;
 pub use use_stmt::*;
 
@@ -39,6 +41,7 @@ pub enum Stmt {
     Fn(FnStmt),
     Impl(ImplStmt),
     Use(UseStmt),
+    Return(ReturnStmt),
 }
 
 impl Stmt {
@@ -98,6 +101,13 @@ impl Stmt {
         }
     }
 
+    pub fn is_return(&self) -> bool {
+        match self {
+            Self::Return(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn as_block(&self) -> &BlockStmt {
         match self {
             Self::Block(v) => v,
@@ -153,6 +163,13 @@ impl Stmt {
             v => panic!("expected UseStmt, received {}", v.name()),
         }
     }
+
+    pub fn as_return(&self) -> &ReturnStmt {
+        match self {
+            Self::Return(v) => v,
+            v => panic!("expected ReturnStmt, received {}", v.name()),
+        }
+    }
 }
 
 impl From<Stmt> for Syntax {
@@ -172,6 +189,7 @@ impl Node for Stmt {
             Self::Fn(v) => v.name(),
             Self::Impl(v) => v.name(),
             Self::Use(v) => v.name(),
+            Self::Return(v) => v.name(),
         }
     }
 
@@ -194,6 +212,7 @@ impl std::fmt::Display for Stmt {
             Self::Fn(v) => write!(f, "{}", v),
             Self::Impl(v) => write!(f, "{}", v),
             Self::Use(v) => write!(f, "{}", v),
+            Self::Return(v) => write!(f, "{}", v),
         }
     }
 }
@@ -221,6 +240,10 @@ impl Parse for Stmt {
 
         if parser.peek::<LetStmt>(cursor).unwrap_or(false) {
             return Ok(parser.parse::<LetStmt>(cursor)?.into());
+        }
+
+        if parser.peek::<ReturnStmt>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<ReturnStmt>(cursor)?.into());
         }
 
         if parser.peek::<ImplStmt>(cursor).unwrap_or(false) {
@@ -258,6 +281,7 @@ impl Spanned for Stmt {
             Self::Mod(v) => v.span(),
             Self::Fn(v) => v.span(),
             Self::Impl(v) => v.span(),
+            Self::Return(v) => v.span(),
         }
     }
 }
