@@ -6,12 +6,25 @@ use zinq_token::{ColonColon, Punctuated};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UsePath {
-    pub segments: Punctuated<UseSegment, ColonColon>,
+    pub items: Punctuated<UseSegment, ColonColon>,
+}
+
+impl UsePath {
+    pub fn len(&self) -> usize {
+        self.items.len()
+    }
+
+    pub fn last(&self) -> &UseSegment {
+        self.items
+            .last()
+            .expect("must have at least one item in UsePath")
+            .value()
+    }
 }
 
 impl std::fmt::Display for UsePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.segments)
+        write!(f, "{}", &self.items)
     }
 }
 
@@ -35,12 +48,12 @@ impl Parse for UsePath {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let segments = parser.parse::<Punctuated<UseSegment, ColonColon>>(cursor)?;
-        Ok(Self { segments })
+        let items = parser.parse::<Punctuated<UseSegment, ColonColon>>(cursor)?;
+        Ok(Self { items })
     }
 
     fn span(&self) -> &zinq_parse::Span {
-        self.segments.span()
+        self.items.span()
     }
 }
 
@@ -58,8 +71,8 @@ mod test {
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(path.to_string(), "std::string::String");
-        debug_assert_eq!(path.segments.len(), 3);
-        debug_assert!(path.segments.last().unwrap().value().is_ident());
+        debug_assert_eq!(path.len(), 3);
+        debug_assert!(path.last().is_ident());
 
         Ok(())
     }
@@ -71,8 +84,8 @@ mod test {
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(path.to_string(), "std::string::*");
-        debug_assert_eq!(path.segments.len(), 3);
-        debug_assert!(path.segments.last().unwrap().value().is_glob());
+        debug_assert_eq!(path.len(), 3);
+        debug_assert!(path.last().is_glob());
 
         Ok(())
     }
@@ -84,8 +97,8 @@ mod test {
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(path.to_string(), "std::string::(String, ToString)");
-        debug_assert_eq!(path.segments.len(), 3);
-        debug_assert!(path.segments.last().unwrap().value().is_group());
+        debug_assert_eq!(path.len(), 3);
+        debug_assert!(path.last().is_group());
 
         Ok(())
     }
