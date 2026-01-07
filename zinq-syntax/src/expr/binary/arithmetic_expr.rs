@@ -1,0 +1,78 @@
+use zinq_parse::{Parse, Span};
+use zinq_token::Arithmetic;
+
+use crate::{Node, Visitor, expr::Expr};
+
+///
+/// ## Arithmetic Expression
+/// `<left> <op> <right>`
+/// ### Example
+/// `<left> + <right>`
+///
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArithmeticExpr {
+    pub span: Span,
+    pub left: Box<Expr>,
+    pub op: Arithmetic,
+    pub right: Box<Expr>,
+}
+
+impl ArithmeticExpr {
+    /// `<left> <op> <right>`
+    pub fn new(left: Expr, op: Arithmetic, right: Expr) -> Self {
+        Self {
+            span: Span::from_bounds(left.span(), right.span()),
+            left: Box::new(left),
+            op,
+            right: Box::new(right),
+        }
+    }
+
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+}
+
+impl From<ArithmeticExpr> for Expr {
+    fn from(value: ArithmeticExpr) -> Self {
+        Self::Arithmetic(value)
+    }
+}
+
+impl Node for ArithmeticExpr {
+    fn name(&self) -> &str {
+        "Syntax::Expr::Binary::Arithmetic"
+    }
+
+    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
+impl std::fmt::Display for ArithmeticExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", &self.span)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::Span;
+
+    use crate::expr::ExprParser;
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"a + 2").cursor();
+        let value = parser.parse_expr(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "a + 2");
+        debug_assert!(value.is_arithmetic());
+        Ok(())
+    }
+}
