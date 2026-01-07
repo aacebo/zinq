@@ -16,6 +16,8 @@ pub use let_stmt::*;
 pub use mod_stmt::*;
 pub use parser::*;
 pub use struct_stmt::*;
+
+#[allow(unused)]
 pub use use_stmt::*;
 
 use zinq_error::Result;

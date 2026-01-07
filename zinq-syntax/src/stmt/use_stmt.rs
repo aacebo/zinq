@@ -1,5 +1,3 @@
-pub mod path;
-
 // use zinq_parse::{Parse, Peek, Span};
 // use zinq_token::Use;
 

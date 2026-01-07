@@ -4,23 +4,24 @@ use zinq_token::{ColonColon, Ident, Punctuated};
 use crate::{Node, Visitor, ty::Type};
 
 ///
-/// ## Path
+/// ## Type Path
+/// `std::string::String`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Path {
+pub struct TypePath {
     pub span: Span,
     pub path: Punctuated<Ident, ColonColon>,
 }
 
-impl From<Path> for Type {
-    fn from(value: Path) -> Self {
+impl From<TypePath> for Type {
+    fn from(value: TypePath) -> Self {
         Self::Path(value)
     }
 }
 
-impl Node for Path {
+impl Node for TypePath {
     fn name(&self) -> &str {
-        "Path"
+        "TypePath"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -31,13 +32,13 @@ impl Node for Path {
     }
 }
 
-impl std::fmt::Display for Path {
+impl std::fmt::Display for TypePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.span)
     }
 }
 
-impl Peek for Path {
+impl Peek for TypePath {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -52,7 +53,7 @@ impl Peek for Path {
     }
 }
 
-impl Parse for Path {
+impl Parse for TypePath {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,

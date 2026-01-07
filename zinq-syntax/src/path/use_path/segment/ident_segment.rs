@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span};
 use zinq_token::Ident;
 
-use crate::stmt::path::UseSegment;
+use crate::path::UseSegment;
 
 ///
 /// ## Use Ident

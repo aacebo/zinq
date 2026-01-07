@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::stmt::path::{UsePath, UseSegment};
+use crate::path::{UsePath, UseSegment};
 
 ///
 /// ## Use Group

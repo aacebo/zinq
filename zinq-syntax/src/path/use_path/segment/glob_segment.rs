@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span};
 use zinq_token::Star;
 
-use crate::stmt::path::UseSegment;
+use crate::path::UseSegment;
 
 ///
 /// ## Use Glob
