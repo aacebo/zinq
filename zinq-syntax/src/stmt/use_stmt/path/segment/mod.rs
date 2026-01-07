@@ -14,6 +14,29 @@ pub enum UseSegment {
     Group(UseGroup),
 }
 
+impl UseSegment {
+    pub fn is_ident(&self) -> bool {
+        match self {
+            Self::Ident(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_glob(&self) -> bool {
+        match self {
+            Self::Glob(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_group(&self) -> bool {
+        match self {
+            Self::Group(_) => true,
+            _ => false,
+        }
+    }
+}
+
 impl std::fmt::Display for UseSegment {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -1,4 +1,8 @@
+mod item;
+
 use zinq_parse::{Parse, Peek, Span};
+
+use crate::punctuated::item::Item;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Punctuated<T, P>
@@ -7,7 +11,7 @@ where
     P: std::fmt::Display + Parse,
 {
     span: Span,
-    segments: Vec<(T, Option<P>)>,
+    items: Vec<Item<T, P>>,
 }
 
 impl<T, P> std::ops::Deref for Punctuated<T, P>
@@ -15,10 +19,10 @@ where
     T: std::fmt::Display + Parse,
     P: std::fmt::Display + Parse,
 {
-    type Target = [(T, Option<P>)];
+    type Target = [Item<T, P>];
 
     fn deref(&self) -> &Self::Target {
-        &self.segments
+        &self.items
     }
 }
 
@@ -28,11 +32,11 @@ where
     P: std::fmt::Display + Parse,
 {
     pub fn len(&self) -> usize {
-        self.segments.len()
+        self.items.len()
     }
 
-    pub fn push(&mut self, segment: (T, Option<P>)) -> &mut Self {
-        self.segments.push(segment);
+    pub fn push(&mut self, item: Item<T, P>) -> &mut Self {
+        self.items.push(item);
         self
     }
 }
@@ -69,29 +73,24 @@ where
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let mut segments = vec![];
+        let mut items = vec![];
         let start = cursor.span().clone();
 
-        while parser.peek::<T>(cursor).unwrap_or(false) {
-            let value = parser.parse::<T>(cursor)?;
-            let mut delim: Option<P> = None;
+        while parser.peek::<Item<T, P>>(cursor).unwrap_or(false) {
+            let item = parser.parse::<Item<T, P>>(cursor)?;
 
-            if parser.peek::<P>(cursor).unwrap_or(false) {
-                delim = Some(parser.parse::<P>(cursor)?);
-            }
+            items.push(item.clone());
 
-            segments.push((value, delim.clone()));
-
-            if let None = &delim {
+            if item.is_final() {
                 break;
             }
         }
 
-        let end = cursor.span().clone();
+        let end = cursor.span();
 
         Ok(Self {
-            span: Span::from_bounds(&start, &end),
-            segments,
+            span: Span::from_bounds(&start, end),
+            items,
         })
     }
 
@@ -105,7 +104,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::{ColonColon, Comma, LInt, Punctuated, Token};
+    use crate::{ColonColon, Comma, Ident, LInt, Punctuated, Token};
 
     #[test]
     fn should_parse_int_list() -> Result<()> {
@@ -127,6 +126,18 @@ mod test {
 
         debug_assert_eq!(stream.len(), 3);
         debug_assert_eq!(stream.to_string(), "hello::world::mod");
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_with_trailing() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"hello::world::mod::").cursor();
+        let stream = parser.parse::<Punctuated<Ident, ColonColon>>(&mut cursor)?;
+
+        debug_assert_eq!(stream.len(), 3);
+        debug_assert_eq!(stream.to_string(), "hello::world::mod::");
 
         Ok(())
     }

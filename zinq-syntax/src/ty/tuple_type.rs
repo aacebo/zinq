@@ -93,7 +93,7 @@ mod test {
         debug_assert_eq!(value.to_string(), "(u32, string, &mut hello::World)");
         debug_assert_eq!(value.items.len(), 3);
         debug_assert_eq!(
-            value.items.get(2).unwrap().0.to_string(),
+            value.items.get(2).unwrap().value().to_string(),
             "&mut hello::World"
         );
 

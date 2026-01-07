@@ -155,8 +155,8 @@ mod test {
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(fields.to_string(), "{ hello: string, world: u32 }");
-        debug_assert_eq!(fields.first().unwrap().0.to_string(), "hello: string");
-        debug_assert_eq!(fields.last().unwrap().0.to_string(), "world: u32");
+        debug_assert_eq!(fields.first().unwrap().value().to_string(), "hello: string");
+        debug_assert_eq!(fields.last().unwrap().value().to_string(), "world: u32");
 
         Ok(())
     }
@@ -173,10 +173,10 @@ mod test {
             "{ hello: std::string::string, world: u32, }"
         );
         debug_assert_eq!(
-            fields.first().unwrap().0.to_string(),
+            fields.first().unwrap().value().to_string(),
             "hello: std::string::string"
         );
-        debug_assert_eq!(fields.last().unwrap().0.to_string(), "world: u32");
+        debug_assert_eq!(fields.last().unwrap().value().to_string(), "world: u32");
 
         Ok(())
     }
@@ -202,8 +202,8 @@ mod test {
             pub world: u32,
         }"
         );
-        debug_assert_eq!(fields.first().unwrap().0.to_string(), "hello: string");
-        debug_assert_eq!(fields.last().unwrap().0.to_string(), "pub world: u32");
+        debug_assert_eq!(fields.first().unwrap().value().to_string(), "hello: string");
+        debug_assert_eq!(fields.last().unwrap().value().to_string(), "pub world: u32");
 
         Ok(())
     }

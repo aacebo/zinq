@@ -147,9 +147,12 @@ mod test {
 
         debug_assert_eq!(fields.len(), 3);
         debug_assert_eq!(fields.to_string(), "(string, uint, pub(super) bool)");
-        debug_assert_eq!(fields.first().unwrap().0.to_string(), "string");
-        debug_assert_eq!(fields.index(1).0.to_string(), "uint");
-        debug_assert_eq!(fields.last().unwrap().0.to_string(), "pub(super) bool");
+        debug_assert_eq!(fields.first().unwrap().value().to_string(), "string");
+        debug_assert_eq!(fields.index(1).value().to_string(), "uint");
+        debug_assert_eq!(
+            fields.last().unwrap().value().to_string(),
+            "pub(super) bool"
+        );
 
         Ok(())
     }
