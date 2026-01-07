@@ -24,6 +24,14 @@ impl std::fmt::Display for UseGlob {
     }
 }
 
+impl std::ops::Deref for UseGlob {
+    type Target = Star;
+
+    fn deref(&self) -> &Self::Target {
+        &self.star
+    }
+}
+
 impl Peek for UseGlob {
     fn peek(
         cursor: &zinq_parse::Cursor,

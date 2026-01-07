@@ -35,6 +35,27 @@ impl UseSegment {
             _ => false,
         }
     }
+
+    pub fn as_ident(&self) -> &UseIdent {
+        match self {
+            Self::Ident(v) => v,
+            _ => panic!("expected UseIdent"),
+        }
+    }
+
+    pub fn as_glob(&self) -> &UseGlob {
+        match self {
+            Self::Glob(v) => v,
+            _ => panic!("expected UseGlob"),
+        }
+    }
+
+    pub fn as_group(&self) -> &UseGroup {
+        match self {
+            Self::Group(v) => v,
+            _ => panic!("expected UseGroup"),
+        }
+    }
 }
 
 impl std::fmt::Display for UseSegment {

@@ -30,6 +30,14 @@ impl std::fmt::Display for UseGroup {
     }
 }
 
+impl std::ops::Deref for UseGroup {
+    type Target = Punctuated<UsePath, Comma>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.items
+    }
+}
+
 impl Peek for UseGroup {
     fn peek(
         cursor: &zinq_parse::Cursor,

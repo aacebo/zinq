@@ -24,6 +24,14 @@ impl std::fmt::Display for UseIdent {
     }
 }
 
+impl std::ops::Deref for UseIdent {
+    type Target = Ident;
+
+    fn deref(&self) -> &Self::Target {
+        &self.ident
+    }
+}
+
 impl Peek for UseIdent {
     fn peek(
         cursor: &zinq_parse::Cursor,
