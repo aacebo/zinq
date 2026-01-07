@@ -39,13 +39,6 @@ impl Expr {
             _ => false,
         }
     }
-
-    pub fn as_logical(&self) -> &LogicalExpr {
-        match self {
-            Self::Logical(v) => v,
-            other => panic!("expected logical expression, found {}", other.name()),
-        }
-    }
 }
 
 impl From<LogicalExpr> for Expr {

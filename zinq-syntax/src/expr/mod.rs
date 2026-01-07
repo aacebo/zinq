@@ -118,6 +118,83 @@ impl Expr {
             _ => false,
         }
     }
+
+    pub fn as_literal(&self) -> &LiteralExpr {
+        match self {
+            Self::Literal(v) => v,
+            v => panic!("expected LiteralExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_ident(&self) -> &IdentExpr {
+        match self {
+            Self::Ident(v) => v,
+            v => panic!("expected IdentExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_group(&self) -> &GroupExpr {
+        match self {
+            Self::Group(v) => v,
+            v => panic!("expected GroupExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_arithmetic(&self) -> &ArithmeticExpr {
+        match self {
+            Self::Arithmetic(v) => v,
+            v => panic!("expected ArithmeticExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_assign(&self) -> &AssignExpr {
+        match self {
+            Self::Assign(v) => v,
+            v => panic!("expected AssignExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_cmp(&self) -> &CmpExpr {
+        match self {
+            Self::Cmp(v) => v,
+            v => panic!("expected CmpExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_logical(&self) -> &LogicalExpr {
+        match self {
+            Self::Logical(v) => v,
+            v => panic!("expected LogicalExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_call(&self) -> &CallExpr {
+        match self {
+            Self::Call(v) => v,
+            v => panic!("expected CallExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_member(&self) -> &MemberExpr {
+        match self {
+            Self::Member(v) => v,
+            v => panic!("expected MemberExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_addr(&self) -> &AddrExpr {
+        match self {
+            Self::Addr(v) => v,
+            v => panic!("expected AddrExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_not(&self) -> &NotExpr {
+        match self {
+            Self::Not(v) => v,
+            v => panic!("expected NotExpr, received {}", v.name()),
+        }
+    }
 }
 
 impl Node for Expr {
