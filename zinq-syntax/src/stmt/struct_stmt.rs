@@ -81,7 +81,7 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::stmt::StructStmt;
+    use crate::stmt::StmtParser;
 
     #[test]
     fn should_parse_private() -> Result<()> {
@@ -94,12 +94,13 @@ mod test {
         )
         .cursor();
 
-        let ty = parser.parse::<StructStmt>(&mut cursor)?;
+        let stmt = parser.parse_stmt(&mut cursor)?;
 
-        debug_assert!(ty.vis.is_priv());
-        debug_assert_eq!(ty.fields.len(), 2);
+        debug_assert!(stmt.is_struct());
+        debug_assert!(stmt.as_struct().vis.is_priv());
+        debug_assert_eq!(stmt.as_struct().fields.len(), 2);
         debug_assert_eq!(
-            ty.to_string(),
+            stmt.to_string(),
             "struct MyStruct {
             a: i8,
             b: string,
@@ -120,12 +121,13 @@ mod test {
         )
         .cursor();
 
-        let ty = parser.parse::<StructStmt>(&mut cursor)?;
+        let stmt = parser.parse_stmt(&mut cursor)?;
 
-        debug_assert!(ty.vis.is_pub());
-        debug_assert_eq!(ty.fields.len(), 2);
+        debug_assert!(stmt.is_struct());
+        debug_assert!(stmt.as_struct().vis.is_pub());
+        debug_assert_eq!(stmt.as_struct().fields.len(), 2);
         debug_assert_eq!(
-            ty.to_string(),
+            stmt.to_string(),
             "pub struct MyStruct {
             pub a: i8,
             b: string,
@@ -139,11 +141,15 @@ mod test {
     fn should_parse_indexed() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"pub(mod) struct MyStruct(string, pub i32)").cursor();
-        let ty = parser.parse::<StructStmt>(&mut cursor)?;
+        let stmt = parser.parse_stmt(&mut cursor)?;
 
-        debug_assert!(ty.vis.is_mod());
-        debug_assert_eq!(ty.fields.len(), 2);
-        debug_assert_eq!(ty.to_string(), "pub(mod) struct MyStruct(string, pub i32)");
+        debug_assert!(stmt.is_struct());
+        debug_assert!(stmt.as_struct().vis.is_mod());
+        debug_assert_eq!(stmt.as_struct().fields.len(), 2);
+        debug_assert_eq!(
+            stmt.to_string(),
+            "pub(mod) struct MyStruct(string, pub i32)"
+        );
 
         Ok(())
     }

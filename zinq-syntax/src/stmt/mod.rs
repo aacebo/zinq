@@ -41,6 +41,120 @@ pub enum Stmt {
     Use(UseStmt),
 }
 
+impl Stmt {
+    pub fn is_block(&self) -> bool {
+        match self {
+            Self::Block(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_expr(&self) -> bool {
+        match self {
+            Self::Expr(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_let(&self) -> bool {
+        match self {
+            Self::Let(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_mod(&self) -> bool {
+        match self {
+            Self::Mod(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_struct(&self) -> bool {
+        match self {
+            Self::Struct(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_fn(&self) -> bool {
+        match self {
+            Self::Fn(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_impl(&self) -> bool {
+        match self {
+            Self::Impl(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_use(&self) -> bool {
+        match self {
+            Self::Use(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn as_block(&self) -> &BlockStmt {
+        match self {
+            Self::Block(v) => v,
+            v => panic!("expected BlockStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_expr(&self) -> &ExprStmt {
+        match self {
+            Self::Expr(v) => v,
+            v => panic!("expected ExprStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_let(&self) -> &LetStmt {
+        match self {
+            Self::Let(v) => v,
+            v => panic!("expected LetStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_mod(&self) -> &ModStmt {
+        match self {
+            Self::Mod(v) => v,
+            v => panic!("expected ModStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_struct(&self) -> &StructStmt {
+        match self {
+            Self::Struct(v) => v,
+            v => panic!("expected StructStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_fn(&self) -> &FnStmt {
+        match self {
+            Self::Fn(v) => v,
+            v => panic!("expected FnStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_impl(&self) -> &ImplStmt {
+        match self {
+            Self::Impl(v) => v,
+            v => panic!("expected ImplStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_use(&self) -> &UseStmt {
+        match self {
+            Self::Use(v) => v,
+            v => panic!("expected UseStmt, received {}", v.name()),
+        }
+    }
+}
+
 impl From<Stmt> for Syntax {
     fn from(value: Stmt) -> Self {
         Self::Stmt(value)
