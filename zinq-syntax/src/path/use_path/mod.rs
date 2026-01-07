@@ -59,6 +59,33 @@ mod test {
 
         debug_assert_eq!(path.to_string(), "std::string::String");
         debug_assert_eq!(path.segments.len(), 3);
+        debug_assert!(path.segments.last().unwrap().value().is_ident());
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_glob() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"std::string::*").cursor();
+        let path = parser.parse::<UsePath>(&mut cursor)?;
+
+        debug_assert_eq!(path.to_string(), "std::string::*");
+        debug_assert_eq!(path.segments.len(), 3);
+        debug_assert!(path.segments.last().unwrap().value().is_glob());
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_group() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"std::string::(String, ToString)").cursor();
+        let path = parser.parse::<UsePath>(&mut cursor)?;
+
+        debug_assert_eq!(path.to_string(), "std::string::(String, ToString)");
+        debug_assert_eq!(path.segments.len(), 3);
+        debug_assert!(path.segments.last().unwrap().value().is_group());
 
         Ok(())
     }
