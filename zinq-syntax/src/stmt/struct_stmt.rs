@@ -44,10 +44,11 @@ impl Peek for StructStmt {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
+        if fork_parser.peek::<Visibility>(&fork).unwrap_or(false) {
+            fork_parser.parse::<Visibility>(&mut fork)?;
         }
+
+        Ok(fork_parser.peek::<Struct>(&fork).unwrap_or(false))
     }
 }
 

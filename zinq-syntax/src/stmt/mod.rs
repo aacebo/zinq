@@ -1,6 +1,7 @@
 mod block_stmt;
 mod expr_stmt;
 mod fn_stmt;
+mod if_stmt;
 mod impl_stmt;
 mod let_stmt;
 mod mod_stmt;
@@ -12,6 +13,7 @@ mod use_stmt;
 pub use block_stmt::*;
 pub use expr_stmt::*;
 pub use fn_stmt::*;
+pub use if_stmt::*;
 pub use impl_stmt::*;
 pub use let_stmt::*;
 pub use mod_stmt::*;
@@ -42,6 +44,7 @@ pub enum Stmt {
     Impl(ImplStmt),
     Use(UseStmt),
     Return(ReturnStmt),
+    If(IfStmt),
 }
 
 impl Stmt {
@@ -108,6 +111,13 @@ impl Stmt {
         }
     }
 
+    pub fn is_if(&self) -> bool {
+        match self {
+            Self::If(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn as_block(&self) -> &BlockStmt {
         match self {
             Self::Block(v) => v,
@@ -170,6 +180,13 @@ impl Stmt {
             v => panic!("expected ReturnStmt, received {}", v.name()),
         }
     }
+
+    pub fn as_if(&self) -> &IfStmt {
+        match self {
+            Self::If(v) => v,
+            v => panic!("expected ReturIfStmtnStmt, received {}", v.name()),
+        }
+    }
 }
 
 impl From<Stmt> for Syntax {
@@ -190,6 +207,7 @@ impl Node for Stmt {
             Self::Impl(v) => v.name(),
             Self::Use(v) => v.name(),
             Self::Return(v) => v.name(),
+            Self::If(v) => v.name(),
         }
     }
 
@@ -213,6 +231,7 @@ impl std::fmt::Display for Stmt {
             Self::Impl(v) => write!(f, "{}", v),
             Self::Use(v) => write!(f, "{}", v),
             Self::Return(v) => write!(f, "{}", v),
+            Self::If(v) => write!(f, "{}", v),
         }
     }
 }
@@ -234,39 +253,7 @@ impl Parse for Stmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek::<UseStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<UseStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<LetStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<LetStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<ReturnStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<ReturnStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<ImplStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<ImplStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<StructStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<StructStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<FnStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<FnStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<ModStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<ModStmt>(cursor)?.into());
-        }
-
-        if parser.peek::<BlockStmt>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<BlockStmt>(cursor)?.into());
-        }
-
-        Ok(parser.parse::<ExprStmt>(cursor)?.into())
+        parser.parse_stmt(cursor)
     }
 }
 
@@ -282,6 +269,7 @@ impl Spanned for Stmt {
             Self::Fn(v) => v.span(),
             Self::Impl(v) => v.span(),
             Self::Return(v) => v.span(),
+            Self::If(v) => v.span(),
         }
     }
 }
