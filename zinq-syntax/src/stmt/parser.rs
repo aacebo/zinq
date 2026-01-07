@@ -5,7 +5,6 @@ use crate::stmt::{BlockStmt, ExprStmt, FnStmt, LetStmt, Stmt, StructStmt, UseStm
 
 pub trait StmtParser {
     fn parse_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
-    fn parse_declare_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_if_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_return_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_var_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
@@ -20,18 +19,6 @@ pub trait StmtParser {
 impl StmtParser for ZinqParser {
     fn parse_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
         Ok(self.parse::<Stmt>(cursor)?.into())
-    }
-
-    fn parse_declare_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
-        if self.peek::<StructStmt>(cursor).unwrap_or(false) {
-            return self.parse_struct_stmt(cursor);
-        } else if self.peek::<FnStmt>(cursor).unwrap_or(false) {
-            return self.parse_fn_stmt(cursor);
-        } else if self.peek::<LetStmt>(cursor).unwrap_or(false) {
-            return self.parse_var_stmt(cursor);
-        }
-
-        self.parse_stmt(cursor)
     }
 
     fn parse_if_stmt(&mut self, _: &mut Cursor) -> Result<Stmt> {
