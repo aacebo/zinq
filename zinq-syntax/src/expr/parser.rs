@@ -7,7 +7,7 @@ use zinq_token::{
 
 use crate::expr::{
     AddrExpr, ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr,
-    LiteralExpr, LogicalExpr, MemberExpr, NotExpr,
+    LiteralExpr, LogicalExpr, MemberExpr, NegExpr, NotExpr,
 };
 
 pub trait ExprParser {
@@ -121,6 +121,11 @@ impl ExprParser for zinq_parse::ZinqParser {
             let right = self.parse_unary_expr(cursor)?;
 
             return Ok(AddrExpr::new(and, right).into());
+        } else if self.peek::<Minus>(cursor).unwrap_or(false) {
+            let minus = self.parse::<Minus>(cursor)?;
+            let right = self.parse_unary_expr(cursor)?;
+
+            return Ok(NegExpr::new(minus, right).into());
         }
 
         self.parse_postfix_expr(cursor)

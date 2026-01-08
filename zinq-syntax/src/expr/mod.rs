@@ -39,6 +39,7 @@ pub enum Expr {
     /// ## Unary
     Addr(AddrExpr),
     Not(NotExpr),
+    Neg(NegExpr),
 }
 
 impl Expr {
@@ -119,6 +120,13 @@ impl Expr {
         }
     }
 
+    pub fn is_neg(&self) -> bool {
+        match self {
+            Self::Neg(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn as_literal(&self) -> &LiteralExpr {
         match self {
             Self::Literal(v) => v,
@@ -195,6 +203,13 @@ impl Expr {
             v => panic!("expected NotExpr, received {}", v.name()),
         }
     }
+
+    pub fn as_neg(&self) -> &NegExpr {
+        match self {
+            Self::Neg(v) => v,
+            v => panic!("expected NegExpr, received {}", v.name()),
+        }
+    }
 }
 
 impl Node for Expr {
@@ -211,6 +226,7 @@ impl Node for Expr {
             Self::Member(v) => v.name(),
             Self::Addr(v) => v.name(),
             Self::Not(v) => v.name(),
+            Self::Neg(v) => v.name(),
         }
     }
 
@@ -242,6 +258,7 @@ impl std::fmt::Display for Expr {
             Self::Member(v) => write!(f, "{}", v),
             Self::Addr(v) => write!(f, "{}", v),
             Self::Not(v) => write!(f, "{}", v),
+            Self::Neg(v) => write!(f, "{}", v),
         }
     }
 }
@@ -278,6 +295,7 @@ impl Spanned for Expr {
             Self::Member(v) => v.span(),
             Self::Addr(v) => v.span(),
             Self::Not(v) => v.span(),
+            Self::Neg(v) => v.span(),
         }
     }
 }
