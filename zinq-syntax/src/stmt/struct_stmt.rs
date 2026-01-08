@@ -179,4 +179,37 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn should_parse_fields_with_spread() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"pub struct MyStruct {
+            ..MyFirst,
+            ..MySecond,
+            pub a: i8,
+            b: string,
+        }",
+        )
+        .cursor();
+
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_struct());
+        debug_assert!(stmt.as_struct().vis.is_pub());
+        debug_assert!(stmt.as_struct().fields.is_named());
+        debug_assert_eq!(stmt.as_struct().fields.as_named().spreads.len(), 2);
+        debug_assert_eq!(stmt.as_struct().fields.len(), 2);
+        debug_assert_eq!(
+            stmt.to_string(),
+            "pub struct MyStruct {
+            ..MyFirst,
+            ..MySecond,
+            pub a: i8,
+            b: string,
+        }"
+        );
+
+        Ok(())
+    }
 }
