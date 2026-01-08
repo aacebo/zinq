@@ -67,7 +67,7 @@ impl ZinqParser {
     ///
     #[inline]
     pub fn parse<T: Parse>(&mut self, cursor: &mut Cursor) -> Result<T> {
-        if cursor.peek()?.is_ascii_whitespace() {
+        if cursor.peek().unwrap_or(&0).is_ascii_whitespace() {
             return self.parse::<T>(cursor.shift_next()?);
         }
 

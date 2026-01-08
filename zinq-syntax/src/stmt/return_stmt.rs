@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr, stmt::Stmt};
 pub struct ReturnStmt {
     pub keyword: Return,
     pub right: Expr,
-    pub semi: SemiColon,
+    pub semi: Option<SemiColon>,
 }
 
 impl From<ReturnStmt> for Stmt {
@@ -51,7 +51,7 @@ impl Parse for ReturnStmt {
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse::<Return>(cursor)?;
         let right = parser.parse::<Expr>(cursor)?;
-        let semi = parser.parse::<SemiColon>(cursor)?;
+        let semi = parser.parse::<Option<SemiColon>>(cursor)?;
 
         Ok(Self {
             keyword,
@@ -63,7 +63,11 @@ impl Parse for ReturnStmt {
 
 impl Spanned for ReturnStmt {
     fn span(&self) -> Span {
-        Span::join(self.keyword.span(), self.semi.span())
+        if let Some(semi) = &self.semi {
+            return Span::join(self.keyword.span(), semi.span());
+        }
+
+        Span::join(self.keyword.span(), self.right.span())
     }
 }
 
@@ -77,10 +81,23 @@ mod test {
     #[test]
     fn should_parse() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"return (1 + 2)").cursor();
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_return());
+        debug_assert!(stmt.as_return().semi.is_none());
+        debug_assert_eq!(stmt.to_string(), "return (1 + 2)");
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_with_semi() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(b"return (1 + 2);").cursor();
         let stmt = parser.parse_stmt(&mut cursor)?;
 
         debug_assert!(stmt.is_return());
+        debug_assert!(stmt.as_return().semi.is_some());
         debug_assert_eq!(stmt.to_string(), "return (1 + 2);");
         Ok(())
     }
