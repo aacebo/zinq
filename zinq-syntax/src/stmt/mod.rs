@@ -1,4 +1,5 @@
 mod block_stmt;
+mod enum_stmt;
 mod expr_stmt;
 mod fn_stmt;
 mod if_stmt;
@@ -11,6 +12,7 @@ mod struct_stmt;
 mod use_stmt;
 
 pub use block_stmt::*;
+pub use enum_stmt::*;
 pub use expr_stmt::*;
 pub use fn_stmt::*;
 pub use if_stmt::*;
@@ -45,6 +47,7 @@ pub enum Stmt {
     Use(UseStmt),
     Return(ReturnStmt),
     If(IfStmt),
+    Enum(EnumStmt),
 }
 
 impl Stmt {
@@ -118,6 +121,13 @@ impl Stmt {
         }
     }
 
+    pub fn is_enum(&self) -> bool {
+        match self {
+            Self::Enum(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn as_block(&self) -> &BlockStmt {
         match self {
             Self::Block(v) => v,
@@ -184,7 +194,14 @@ impl Stmt {
     pub fn as_if(&self) -> &IfStmt {
         match self {
             Self::If(v) => v,
-            v => panic!("expected ReturIfStmtnStmt, received {}", v.name()),
+            v => panic!("expected IfStmt, received {}", v.name()),
+        }
+    }
+
+    pub fn as_enum(&self) -> &EnumStmt {
+        match self {
+            Self::Enum(v) => v,
+            v => panic!("expected EnumStmt, received {}", v.name()),
         }
     }
 }
@@ -202,6 +219,7 @@ impl Node for Stmt {
             Self::Use(v) => v.name(),
             Self::Return(v) => v.name(),
             Self::If(v) => v.name(),
+            Self::Enum(v) => v.name(),
         }
     }
 
@@ -226,6 +244,7 @@ impl std::fmt::Display for Stmt {
             Self::Use(v) => write!(f, "{}", v),
             Self::Return(v) => write!(f, "{}", v),
             Self::If(v) => write!(f, "{}", v),
+            Self::Enum(v) => write!(f, "{}", v),
         }
     }
 }
@@ -258,6 +277,7 @@ impl Spanned for Stmt {
             Self::Impl(v) => v.span(),
             Self::Return(v) => v.span(),
             Self::If(v) => v.span(),
+            Self::Enum(v) => v.span(),
         }
     }
 }

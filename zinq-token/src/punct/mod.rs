@@ -89,9 +89,9 @@ macro_rules! define_puncts {
         }
 
         $(
-            #[doc = "`"]
+            #[doc = "```"]
             #[doc = $token]
-            #[doc = "`"]
+            #[doc = "```"]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub struct $name {
                 span: zinq_parse::Span,

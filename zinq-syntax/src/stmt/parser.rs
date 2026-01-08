@@ -2,7 +2,8 @@ use zinq_error::Result;
 use zinq_parse::{Cursor, ZinqParser};
 
 use crate::stmt::{
-    BlockStmt, ExprStmt, FnStmt, IfStmt, ImplStmt, LetStmt, ReturnStmt, Stmt, StructStmt, UseStmt,
+    BlockStmt, EnumStmt, ExprStmt, FnStmt, IfStmt, ImplStmt, LetStmt, ReturnStmt, Stmt, StructStmt,
+    UseStmt,
 };
 
 pub trait StmtParser {
@@ -11,6 +12,7 @@ pub trait StmtParser {
     fn parse_return_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_var_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_struct_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
+    fn parse_enum_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_impl_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_for_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
     fn parse_expr_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt>;
@@ -23,6 +25,8 @@ impl StmtParser for ZinqParser {
     fn parse_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
         if self.peek::<StructStmt>(cursor).unwrap_or(false) {
             return self.parse_struct_stmt(cursor);
+        } else if self.peek::<EnumStmt>(cursor).unwrap_or(false) {
+            return self.parse_enum_stmt(cursor);
         } else if self.peek::<FnStmt>(cursor).unwrap_or(false) {
             return self.parse_fn_stmt(cursor);
         } else if self.peek::<LetStmt>(cursor).unwrap_or(false) {
@@ -56,6 +60,10 @@ impl StmtParser for ZinqParser {
 
     fn parse_struct_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
         Ok(self.parse::<StructStmt>(cursor)?.into())
+    }
+
+    fn parse_enum_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
+        Ok(self.parse::<EnumStmt>(cursor)?.into())
     }
 
     fn parse_impl_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {

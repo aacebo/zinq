@@ -1,0 +1,126 @@
+use zinq_parse::{Parse, Peek, Span, Spanned};
+use zinq_token::{Comma, Enum, Ident, LBrace, Punctuated, RBrace};
+
+use crate::{Node, Variant, Visibility, stmt::Stmt};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnumStmt {
+    pub vis: Visibility,
+    pub keyword: Enum,
+    pub name: Ident,
+    pub left_brace: LBrace,
+    pub variants: Punctuated<Variant, Comma>,
+    pub right_brace: RBrace,
+}
+
+impl From<EnumStmt> for Stmt {
+    fn from(value: EnumStmt) -> Self {
+        Self::Enum(value)
+    }
+}
+
+impl std::fmt::Display for EnumStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.span())
+    }
+}
+
+impl Node for EnumStmt {
+    fn name(&self) -> &str {
+        "Syntax::Stmt::Enum"
+    }
+
+    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
+    where
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
+}
+
+impl Peek for EnumStmt {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        let mut fork = cursor.fork();
+        let mut fork_parser = parser.clone();
+
+        fork_parser.parse::<Visibility>(&mut fork)?;
+        Ok(fork_parser.peek::<Enum>(&fork).unwrap_or(false))
+    }
+}
+
+impl Parse for EnumStmt {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<Self> {
+        let vis = parser.parse::<Visibility>(cursor)?;
+        let keyword = parser.parse::<Enum>(cursor)?;
+        let name = parser.parse::<Ident>(cursor)?;
+        let left_brace = parser.parse::<LBrace>(cursor)?;
+        let variants = parser.parse::<Punctuated<Variant, Comma>>(cursor)?;
+        let right_brace = parser.parse::<RBrace>(cursor)?;
+
+        Ok(Self {
+            vis,
+            keyword,
+            name,
+            left_brace,
+            variants,
+            right_brace,
+        })
+    }
+}
+
+impl Spanned for EnumStmt {
+    fn span(&self) -> zinq_parse::Span {
+        Span::join(self.vis.span(), self.right_brace.span())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::ops::Index;
+
+    use zinq_error::Result;
+    use zinq_parse::Span;
+
+    use crate::stmt::StmtParser;
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"enum Status {
+            Away,
+            Online(DateTime),
+            Offline {
+                last_online_at: DateTime,
+            },
+        }",
+        )
+        .cursor();
+
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_enum());
+        debug_assert_eq!(stmt.as_enum().variants.len(), 3);
+        debug_assert!(stmt.as_enum().variants.index(0).value().fields.is_none());
+        debug_assert!(stmt.as_enum().variants.index(1).value().fields.is_indexed());
+        debug_assert!(stmt.as_enum().variants.index(2).value().fields.is_named());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "enum Status {
+            Away,
+            Online(DateTime),
+            Offline {
+                last_online_at: DateTime,
+            },
+        }"
+        );
+
+        Ok(())
+    }
+}

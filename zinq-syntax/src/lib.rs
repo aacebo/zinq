@@ -5,9 +5,11 @@ pub mod pat;
 mod path;
 pub mod stmt;
 pub mod ty;
+mod variant;
 pub mod visibility;
 
 pub use path::*;
+pub use variant::*;
 pub use visibility::*;
 
 use zinq_error::Result;
