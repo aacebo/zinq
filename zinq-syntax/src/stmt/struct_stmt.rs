@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::{Ident, Struct};
+use zinq_token::{Ident, SemiColon, Struct};
 
 use crate::{Node, Visibility, fields::Fields, stmt::Stmt};
 
@@ -9,6 +9,7 @@ pub struct StructStmt {
     pub keyword: Struct,
     pub name: Ident,
     pub fields: Fields,
+    pub semi: Option<SemiColon>,
 }
 
 impl From<StructStmt> for Stmt {
@@ -58,18 +59,28 @@ impl Parse for StructStmt {
         let keyword = parser.parse::<Struct>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
         let fields = parser.parse::<Fields>(cursor)?;
+        let mut semi = None;
+
+        if fields.is_none() || fields.is_indexed() {
+            semi = Some(parser.parse::<SemiColon>(cursor)?);
+        }
 
         Ok(Self {
             vis,
             keyword,
             name,
             fields,
+            semi,
         })
     }
 }
 
 impl Spanned for StructStmt {
     fn span(&self) -> Span {
+        if let Some(semi) = &self.semi {
+            return Span::join(self.vis.span(), semi.span());
+        }
+
         Span::join(self.vis.span(), self.fields.span())
     }
 }
@@ -96,6 +107,7 @@ mod test {
 
         debug_assert!(stmt.is_struct());
         debug_assert!(stmt.as_struct().vis.is_priv());
+        debug_assert!(stmt.as_struct().fields.is_named());
         debug_assert_eq!(stmt.as_struct().fields.len(), 2);
         debug_assert_eq!(
             stmt.to_string(),
@@ -123,6 +135,7 @@ mod test {
 
         debug_assert!(stmt.is_struct());
         debug_assert!(stmt.as_struct().vis.is_pub());
+        debug_assert!(stmt.as_struct().fields.is_named());
         debug_assert_eq!(stmt.as_struct().fields.len(), 2);
         debug_assert_eq!(
             stmt.to_string(),
@@ -138,16 +151,31 @@ mod test {
     #[test]
     fn should_parse_indexed() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
-        let mut cursor = Span::from_bytes(b"pub(mod) struct MyStruct(string, pub i32)").cursor();
+        let mut cursor = Span::from_bytes(b"pub(mod) struct MyStruct(string, pub i32);").cursor();
         let stmt = parser.parse_stmt(&mut cursor)?;
 
         debug_assert!(stmt.is_struct());
         debug_assert!(stmt.as_struct().vis.is_mod());
+        debug_assert!(stmt.as_struct().fields.is_indexed());
         debug_assert_eq!(stmt.as_struct().fields.len(), 2);
         debug_assert_eq!(
             stmt.to_string(),
-            "pub(mod) struct MyStruct(string, pub i32)"
+            "pub(mod) struct MyStruct(string, pub i32);"
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_no_fields() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"struct MyStruct;").cursor();
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_struct());
+        debug_assert!(stmt.as_struct().fields.is_none());
+        debug_assert_eq!(stmt.as_struct().fields.len(), 0);
+        debug_assert_eq!(stmt.to_string(), "struct MyStruct;");
 
         Ok(())
     }

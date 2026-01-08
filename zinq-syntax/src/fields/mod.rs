@@ -3,12 +3,13 @@ mod named;
 
 pub use indexed::*;
 pub use named::*;
-use zinq_parse::{Parse, Peek, Spanned};
+use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{Node, Visitor};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {
+    None(Span),
     Indexed(IndexedFields),
     Named(NamedFields),
 }
@@ -16,8 +17,44 @@ pub enum Fields {
 impl Fields {
     pub fn len(&self) -> usize {
         match self {
+            Self::None(_) => 0,
             Self::Indexed(v) => v.len(),
             Self::Named(v) => v.len(),
+        }
+    }
+
+    pub fn is_none(&self) -> bool {
+        match self {
+            Self::None(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_indexed(&self) -> bool {
+        match self {
+            Self::Indexed(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_named(&self) -> bool {
+        match self {
+            Self::Named(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn as_indexed(&self) -> &IndexedFields {
+        match self {
+            Self::Indexed(v) => v,
+            v => panic!("expected IndexedFields, received {}", v.name()),
+        }
+    }
+
+    pub fn as_named(&self) -> &NamedFields {
+        match self {
+            Self::Named(v) => v,
+            v => panic!("expected NamedFields, received {}", v.name()),
         }
     }
 }
@@ -25,6 +62,7 @@ impl Fields {
 impl Node for Fields {
     fn name(&self) -> &str {
         match self {
+            Self::None(_) => "Syntax::Fields::None",
             Self::Indexed(v) => v.name(),
             Self::Named(v) => v.name(),
         }
@@ -41,6 +79,7 @@ impl Node for Fields {
 impl std::fmt::Display for Fields {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::None(_) => Ok(()),
             Self::Indexed(v) => write!(f, "{}", v),
             Self::Named(v) => write!(f, "{}", v),
         }
@@ -48,17 +87,8 @@ impl std::fmt::Display for Fields {
 }
 
 impl Peek for Fields {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
+    fn peek(_: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
+        Ok(true)
     }
 }
 
@@ -75,16 +105,14 @@ impl Parse for Fields {
             return Ok(parser.parse::<NamedFields>(cursor)?.into());
         }
 
-        Err(cursor.error(
-            zinq_error::NOT_FOUND,
-            &format!("unknown tokens '{}'", cursor),
-        ))
+        Ok(Self::None(cursor.span().clone()))
     }
 }
 
 impl Spanned for Fields {
     fn span(&self) -> zinq_parse::Span {
         match self {
+            Self::None(span) => span.clone(),
             Self::Indexed(v) => v.span(),
             Self::Named(v) => v.span(),
         }
