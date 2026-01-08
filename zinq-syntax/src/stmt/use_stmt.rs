@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::Use;
+use zinq_token::{SemiColon, Use};
 
 use crate::{Node, UsePath, Visibility, stmt::Stmt};
 
@@ -8,6 +8,7 @@ pub struct UseStmt {
     pub vis: Visibility,
     pub keyword: Use,
     pub path: UsePath,
+    pub semi: SemiColon,
 }
 
 impl From<UseStmt> for Stmt {
@@ -56,14 +57,20 @@ impl Parse for UseStmt {
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Use>(cursor)?;
         let path = parser.parse::<UsePath>(cursor)?;
+        let semi = parser.parse::<SemiColon>(cursor)?;
 
-        Ok(Self { vis, keyword, path })
+        Ok(Self {
+            vis,
+            keyword,
+            path,
+            semi,
+        })
     }
 }
 
 impl Spanned for UseStmt {
     fn span(&self) -> Span {
-        Span::join(self.vis.span(), self.path.span())
+        Span::join(self.vis.span(), self.semi.span())
     }
 }
 
@@ -77,10 +84,10 @@ mod test {
     #[test]
     fn should_parse_ident() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
-        let mut cursor = Span::from_bytes(b"use std::string::String").cursor();
+        let mut cursor = Span::from_bytes(b"use std::string::String;").cursor();
         let stmt = parser.parse_stmt(&mut cursor)?;
 
-        debug_assert_eq!(stmt.to_string(), "use std::string::String");
+        debug_assert_eq!(stmt.to_string(), "use std::string::String;");
         Ok(())
     }
 }
