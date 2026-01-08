@@ -68,13 +68,6 @@ impl Span {
     }
 
     #[inline]
-    pub fn from_bounds(from: &Self, to: &Self) -> Self {
-        let mut span = from.clone();
-        span.end_mut().seek(to.end().index(), to.src());
-        span
-    }
-
-    #[inline]
     pub fn join(from: Self, to: Self) -> Self {
         let mut span = from;
         span.end_mut().seek(to.end().index(), to.src());

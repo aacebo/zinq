@@ -1,18 +1,19 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
 use zinq_token::{
-    And, AndAnd, Arithmetic, Cmp, Comma, Dot, Eq, Ident, LParen, Minus, Mut, Not, OrOr, Plus,
-    Punctuated, RParen, Slash, Star,
+    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, LParen, Minus, Mut, Not, OrOr,
+    Plus, Punctuated, Question, RParen, Slash, Star,
 };
 
 use crate::expr::{
-    ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, LiteralExpr,
+    ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr, LiteralExpr,
     LogicalExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
 };
 
 pub trait ExprParser {
     fn parse_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_assign_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_or_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_and_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_cmp_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
@@ -30,13 +31,35 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_assign_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        let expr = self.parse_or_expr(cursor)?;
+        let expr = self.parse_if_expr(cursor)?;
 
         if self.peek::<Eq>(cursor).unwrap_or(false) {
             let eq = self.parse::<Eq>(cursor)?;
             let right = self.parse_assign_expr(cursor)?;
 
             return Ok(AssignExpr::new(expr, eq, right).into());
+        }
+
+        Ok(expr)
+    }
+
+    fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        let expr = self.parse_or_expr(cursor)?;
+
+        if self.peek::<Question>(cursor).unwrap_or(false) {
+            let question = self.parse::<Question>(cursor)?;
+            let then_expr = self.parse_if_expr(cursor)?;
+            let colon = self.parse::<Colon>(cursor)?;
+            let else_expr = self.parse_if_expr(cursor)?;
+
+            return Ok(IfExpr {
+                cond: Box::new(expr),
+                question,
+                then_expr: Box::new(then_expr),
+                colon,
+                else_expr: Box::new(else_expr),
+            }
+            .into());
         }
 
         Ok(expr)

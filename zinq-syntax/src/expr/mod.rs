@@ -1,4 +1,5 @@
 pub mod binary;
+mod if_expr;
 pub mod parser;
 pub mod postfix;
 pub mod prefix;
@@ -6,6 +7,7 @@ pub mod primary;
 pub mod unary;
 
 pub use binary::*;
+pub use if_expr::*;
 pub use parser::*;
 pub use postfix::*;
 pub use prefix::*;
@@ -44,6 +46,9 @@ pub enum Expr {
 
     /// ## Prefix
     Ref(RefExpr),
+
+    /// ## Other
+    If(IfExpr),
 }
 
 impl Expr {
@@ -131,6 +136,13 @@ impl Expr {
         }
     }
 
+    pub fn is_if(&self) -> bool {
+        match self {
+            Self::If(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn as_literal(&self) -> &LiteralExpr {
         match self {
             Self::Literal(v) => v,
@@ -214,6 +226,13 @@ impl Expr {
             v => panic!("expected NegExpr, received {}", v.name()),
         }
     }
+
+    pub fn as_if(&self) -> &IfExpr {
+        match self {
+            Self::If(v) => v,
+            v => panic!("expected IfExpr, received {}", v.name()),
+        }
+    }
 }
 
 impl Node for Expr {
@@ -231,6 +250,7 @@ impl Node for Expr {
             Self::Ref(v) => v.name(),
             Self::Not(v) => v.name(),
             Self::Neg(v) => v.name(),
+            Self::If(v) => v.name(),
         }
     }
 
@@ -263,6 +283,7 @@ impl std::fmt::Display for Expr {
             Self::Ref(v) => write!(f, "{}", v),
             Self::Not(v) => write!(f, "{}", v),
             Self::Neg(v) => write!(f, "{}", v),
+            Self::If(v) => write!(f, "{}", v),
         }
     }
 }
@@ -300,6 +321,7 @@ impl Spanned for Expr {
             Self::Ref(v) => v.span(),
             Self::Not(v) => v.span(),
             Self::Neg(v) => v.span(),
+            Self::If(v) => v.span(),
         }
     }
 }
