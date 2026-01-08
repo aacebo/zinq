@@ -1,6 +1,8 @@
 mod arm;
 
-use zinq_parse::{Parse, Peek, Span, Spanned};
+pub use arm::*;
+
+use zinq_parse::{Span, Spanned};
 use zinq_token::{Comma, LBrace, Match, Punctuated, RBrace};
 
 use crate::{Node, expr::Expr};
@@ -53,36 +55,6 @@ impl Spanned for MatchExpr {
     }
 }
 
-impl Peek for MatchExpr {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<Match>(cursor).unwrap_or(false))
-    }
-}
-
-impl Parse for MatchExpr {
-    fn parse(
-        cursor: &mut zinq_parse::Cursor,
-        parser: &mut zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<Self> {
-        let keyword = parser.parse::<Match>(cursor)?;
-        let expr = parser.parse::<Box<Expr>>(cursor)?;
-        let left_brace = parser.parse::<LBrace>(cursor)?;
-        let arms = parser.parse::<Punctuated<arm::Arm, Comma>>(cursor)?;
-        let right_brace = parser.parse::<RBrace>(cursor)?;
-
-        Ok(Self {
-            keyword,
-            expr,
-            left_brace,
-            arms,
-            right_brace,
-        })
-    }
-}
-
 #[cfg(test)]
 mod test {
     use zinq_error::Result;
@@ -110,6 +82,58 @@ mod test {
             "match self {
             true => \"TRUE\",
             false => \"FALSE\",
+        }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_struct_pattern() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"match self {
+            A { a } => \"A\",
+            B { b } => \"B\",
+        }",
+        )
+        .cursor();
+
+        let expr = parser.parse_expr(&mut cursor)?;
+
+        debug_assert!(expr.is_match());
+        debug_assert_eq!(expr.as_match().arms.len(), 2);
+        debug_assert_eq!(
+            expr.to_string(),
+            "match self {
+            A { a } => \"A\",
+            B { b } => \"B\",
+        }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_type_pattern() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"match typeof(self) {
+            string => \"STRING\",
+            bool => \"BOOLEAN\",
+        }",
+        )
+        .cursor();
+
+        let expr = parser.parse_expr(&mut cursor)?;
+
+        debug_assert!(expr.is_match());
+        debug_assert_eq!(expr.as_match().arms.len(), 2);
+        debug_assert_eq!(
+            expr.to_string(),
+            "match typeof(self) {
+            string => \"STRING\",
+            bool => \"BOOLEAN\",
         }"
         );
 

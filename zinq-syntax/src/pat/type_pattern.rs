@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{TypePath, pat::Pattern};
+use crate::{pat::Pattern, ty::Type};
 
 ///
 /// ## Type Pattern
@@ -9,20 +9,20 @@ use crate::{TypePath, pat::Pattern};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypePattern {
-    pub path: TypePath,
+    pub ty: Type,
 }
 
 impl std::ops::Deref for TypePattern {
-    type Target = TypePath;
+    type Target = Type;
 
     fn deref(&self) -> &Self::Target {
-        &self.path
+        &self.ty
     }
 }
 
-impl From<TypePath> for TypePattern {
-    fn from(value: TypePath) -> Self {
-        Self { path: value }
+impl From<Type> for TypePattern {
+    fn from(value: Type) -> Self {
+        Self { ty: value }
     }
 }
 
@@ -40,7 +40,7 @@ impl std::fmt::Display for TypePattern {
 
 impl Spanned for TypePattern {
     fn span(&self) -> zinq_parse::Span {
-        self.path.span()
+        self.ty.span()
     }
 }
 
@@ -49,7 +49,7 @@ impl Peek for TypePattern {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<TypePath>(cursor).unwrap_or(false))
+        Ok(parser.peek::<Type>(cursor).unwrap_or(false))
     }
 }
 
@@ -58,7 +58,7 @@ impl Parse for TypePattern {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse::<TypePath>(cursor)?;
-        Ok(Self { path })
+        let ty = parser.parse::<Type>(cursor)?;
+        Ok(Self { ty })
     }
 }

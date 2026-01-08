@@ -1,7 +1,10 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::EqArrow;
 
-use crate::{expr::Expr, pat::Pattern};
+use crate::{
+    expr::{Expr, ExprParser},
+    pat::Pattern,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Arm {
@@ -38,12 +41,12 @@ impl Parse for Arm {
     ) -> zinq_error::Result<Self> {
         let pattern = parser.parse::<Pattern>(cursor)?;
         let arrow = parser.parse::<EqArrow>(cursor)?;
-        let body = parser.parse::<Box<Expr>>(cursor)?;
+        let body = parser.parse_expr(cursor)?;
 
         Ok(Self {
             pattern,
             arrow,
-            body,
+            body: Box::new(body),
         })
     }
 }

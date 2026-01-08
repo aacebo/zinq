@@ -1,13 +1,13 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
 use zinq_token::{
-    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, LParen, Minus, Mut, Not, OrOr,
-    Plus, Punctuated, Question, RParen, Slash, Star,
+    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, LBrace, LParen, Match, Minus, Mut,
+    Not, OrOr, Plus, Punctuated, Question, RBrace, RParen, Slash, Star,
 };
 
 use crate::expr::{
-    ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr, LiteralExpr,
-    LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
+    ArithmeticExpr, Arm, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr,
+    LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
 };
 
 pub trait ExprParser {
@@ -45,8 +45,21 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_match_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        if self.peek::<MatchExpr>(cursor).unwrap_or(false) {
-            return Ok(self.parse::<MatchExpr>(cursor)?.into());
+        if self.peek::<Match>(cursor).unwrap_or(false) {
+            let keyword = self.parse::<Match>(cursor)?;
+            let expr = self.parse_match_expr(cursor)?;
+            let left_brace = self.parse::<LBrace>(cursor)?;
+            let arms = self.parse::<Punctuated<Arm, Comma>>(cursor)?;
+            let right_brace = self.parse::<RBrace>(cursor)?;
+
+            return Ok(MatchExpr {
+                keyword,
+                expr: Box::new(expr),
+                left_brace,
+                arms,
+                right_brace,
+            }
+            .into());
         }
 
         Ok(self.parse_if_expr(cursor)?)

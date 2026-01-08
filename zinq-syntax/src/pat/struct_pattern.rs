@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::{Comma, DotDot, Ident, LBrace, Punctuated, RBrace};
+use zinq_token::{Comma, DotDot, Ident, LBrace, Punctuated, RBrace, Suffixed};
 
 use crate::{TypePath, pat::Pattern};
 
@@ -39,7 +39,9 @@ impl Peek for StructPattern {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<TypePath>(cursor).unwrap_or(false))
+        Ok(parser
+            .peek::<Suffixed<TypePath, LBrace>>(cursor)
+            .unwrap_or(false))
     }
 }
 

@@ -44,13 +44,7 @@ impl Peek for TupleType {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
+        Ok(parser.peek::<LParen>(cursor).unwrap_or(false))
     }
 }
 
