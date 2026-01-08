@@ -1,13 +1,13 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
 use zinq_token::{
-    And, AndAnd, Arithmetic, Cmp, Comma, Dot, Eq, Ident, LParen, Minus, Not, OrOr, Plus,
+    And, AndAnd, Arithmetic, Cmp, Comma, Dot, Eq, Ident, LParen, Minus, Mut, Not, OrOr, Plus,
     Punctuated, RParen, Slash, Star,
 };
 
 use crate::expr::{
-    AddrExpr, ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr,
-    LiteralExpr, LogicalExpr, MemberExpr, NegExpr, NotExpr,
+    ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, LiteralExpr,
+    LogicalExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
 };
 
 pub trait ExprParser {
@@ -19,6 +19,7 @@ pub trait ExprParser {
     fn parse_term_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_factor_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_unary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_prefix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_postfix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_primary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
 }
@@ -116,16 +117,27 @@ impl ExprParser for zinq_parse::ZinqParser {
             let right = self.parse_unary_expr(cursor)?;
 
             return Ok(NotExpr::new(not, right).into());
-        } else if self.peek::<And>(cursor).unwrap_or(false) {
-            let and = self.parse::<And>(cursor)?;
-            let right = self.parse_unary_expr(cursor)?;
-
-            return Ok(AddrExpr::new(and, right).into());
         } else if self.peek::<Minus>(cursor).unwrap_or(false) {
             let minus = self.parse::<Minus>(cursor)?;
             let right = self.parse_unary_expr(cursor)?;
 
             return Ok(NegExpr::new(minus, right).into());
+        }
+
+        self.parse_prefix_expr(cursor)
+    }
+
+    fn parse_prefix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        if self.peek::<And>(cursor).unwrap_or(false) {
+            let and = self.parse::<And>(cursor)?;
+            let mut mutable = None;
+
+            if self.peek::<Mut>(cursor).unwrap_or(false) {
+                mutable = Some(self.parse::<Mut>(cursor)?);
+            }
+
+            let right = self.parse_unary_expr(cursor)?;
+            return Ok(RefExpr::new(and, mutable, right).into());
         }
 
         self.parse_postfix_expr(cursor)

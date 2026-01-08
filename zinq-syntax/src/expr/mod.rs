@@ -1,12 +1,14 @@
 pub mod binary;
 pub mod parser;
 pub mod postfix;
+pub mod prefix;
 pub mod primary;
 pub mod unary;
 
 pub use binary::*;
 pub use parser::*;
 pub use postfix::*;
+pub use prefix::*;
 pub use primary::*;
 pub use unary::*;
 
@@ -37,9 +39,11 @@ pub enum Expr {
     Member(MemberExpr),
 
     /// ## Unary
-    Addr(AddrExpr),
     Not(NotExpr),
     Neg(NegExpr),
+
+    /// ## Prefix
+    Ref(RefExpr),
 }
 
 impl Expr {
@@ -106,9 +110,9 @@ impl Expr {
         }
     }
 
-    pub fn is_addr(&self) -> bool {
+    pub fn is_ref(&self) -> bool {
         match self {
-            Self::Addr(_) => true,
+            Self::Ref(_) => true,
             _ => false,
         }
     }
@@ -190,10 +194,10 @@ impl Expr {
         }
     }
 
-    pub fn as_addr(&self) -> &AddrExpr {
+    pub fn as_ref(&self) -> &RefExpr {
         match self {
-            Self::Addr(v) => v,
-            v => panic!("expected AddrExpr, received {}", v.name()),
+            Self::Ref(v) => v,
+            v => panic!("expected RefExpr, received {}", v.name()),
         }
     }
 
@@ -224,7 +228,7 @@ impl Node for Expr {
             Self::Logical(v) => v.name(),
             Self::Call(v) => v.name(),
             Self::Member(v) => v.name(),
-            Self::Addr(v) => v.name(),
+            Self::Ref(v) => v.name(),
             Self::Not(v) => v.name(),
             Self::Neg(v) => v.name(),
         }
@@ -256,7 +260,7 @@ impl std::fmt::Display for Expr {
             Self::Logical(v) => write!(f, "{}", v),
             Self::Call(v) => write!(f, "{}", v),
             Self::Member(v) => write!(f, "{}", v),
-            Self::Addr(v) => write!(f, "{}", v),
+            Self::Ref(v) => write!(f, "{}", v),
             Self::Not(v) => write!(f, "{}", v),
             Self::Neg(v) => write!(f, "{}", v),
         }
@@ -293,7 +297,7 @@ impl Spanned for Expr {
             Self::Logical(v) => v.span(),
             Self::Call(v) => v.span(),
             Self::Member(v) => v.span(),
-            Self::Addr(v) => v.span(),
+            Self::Ref(v) => v.span(),
             Self::Not(v) => v.span(),
             Self::Neg(v) => v.span(),
         }

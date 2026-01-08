@@ -1,37 +1,39 @@
 use zinq_parse::{Span, Spanned};
-use zinq_token::And;
+use zinq_token::{And, Mut};
 
 use crate::{Node, Visitor, expr::Expr};
 
 ///
-/// ## Addr Expression
-/// `&var`
+/// ## Reference Expression
+/// `&<expr>` or `&mut <expr>`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AddrExpr {
+pub struct RefExpr {
     pub and: And,
+    pub mutable: Option<Mut>,
     pub right: Box<Expr>,
 }
 
-impl AddrExpr {
+impl RefExpr {
     /// `&<right>`
-    pub fn new(and: And, right: Expr) -> Self {
+    pub fn new(and: And, mutable: Option<Mut>, right: Expr) -> Self {
         Self {
             and,
+            mutable,
             right: Box::new(right),
         }
     }
 }
 
-impl From<AddrExpr> for Expr {
-    fn from(value: AddrExpr) -> Self {
-        Self::Addr(value)
+impl From<RefExpr> for Expr {
+    fn from(value: RefExpr) -> Self {
+        Self::Ref(value)
     }
 }
 
-impl Node for AddrExpr {
+impl Node for RefExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Unary::Addr"
+        "Syntax::Expr::Prefix::Ref"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -42,13 +44,13 @@ impl Node for AddrExpr {
     }
 }
 
-impl std::fmt::Display for AddrExpr {
+impl std::fmt::Display for RefExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Spanned for AddrExpr {
+impl Spanned for RefExpr {
     fn span(&self) -> Span {
         Span::join(self.and.span(), self.right.span())
     }
@@ -78,6 +80,16 @@ mod test {
         let value = parser.parse_expr(&mut cursor)?;
 
         debug_assert_eq!(value.to_string(), "&(a)");
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_mut_ref() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"&mut a").cursor();
+        let value = parser.parse_expr(&mut cursor)?;
+
+        debug_assert_eq!(value.to_string(), "&mut a");
         Ok(())
     }
 }
