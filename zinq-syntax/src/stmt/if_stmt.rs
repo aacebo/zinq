@@ -122,4 +122,24 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn should_parse_block_with_else_if() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"if 1 < 5 { return 1; } else if (i < 10) { return 0; } else { return -1; }",
+        )
+        .cursor();
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_if());
+        debug_assert!(stmt.as_if().else_stmt.is_some());
+        debug_assert!(stmt.as_if().else_stmt.as_ref().unwrap().1.is_if());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "if 1 < 5 { return 1; } else if (i < 10) { return 0; } else { return -1; }"
+        );
+
+        Ok(())
+    }
 }
