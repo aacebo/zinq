@@ -3,10 +3,11 @@ pub mod fields;
 pub mod param;
 pub mod pat;
 mod path;
+pub mod spread;
 pub mod stmt;
 pub mod ty;
 mod variant;
-pub mod visibility;
+mod visibility;
 
 pub use path::*;
 pub use variant::*;

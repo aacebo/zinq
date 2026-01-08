@@ -8,4 +8,5 @@ documentation.workspace = true
 homepage.workspace = true
 repository.workspace = true
 
-[dependencies]
+[lib]
+doctest = false

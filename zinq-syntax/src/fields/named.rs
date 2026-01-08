@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace};
 
-use crate::{Node, Visibility, Visitor, ty::Type};
+use crate::{Node, Visibility, Visitor, spread::TypeSpread, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedField {
@@ -60,6 +60,7 @@ impl Spanned for NamedField {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedFields {
     pub left_brace: LBrace,
+    pub spreads: Punctuated<TypeSpread, Comma>,
     pub fields: Punctuated<NamedField, Comma>,
     pub right_brace: RBrace,
 }
@@ -122,11 +123,13 @@ impl Parse for NamedFields {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let left_brace = parser.parse::<LBrace>(cursor)?;
+        let spreads = parser.parse::<Punctuated<TypeSpread, Comma>>(cursor)?;
         let fields = parser.parse::<Punctuated<NamedField, Comma>>(cursor)?;
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
             left_brace,
+            spreads,
             fields,
             right_brace,
         })
@@ -148,12 +151,17 @@ mod test {
 
     #[test]
     fn should_parse() -> Result<()> {
-        let mut cursor = Span::from_bytes(b"{ hello: string, world: u32 }").cursor();
+        let mut cursor =
+            Span::from_bytes(b"{ ..std::string::String, hello: string, world: u32 }").cursor();
         let mut parser = zinq_parse::ZinqParser;
         let fields = parser.parse::<NamedFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
-        debug_assert_eq!(fields.to_string(), "{ hello: string, world: u32 }");
+        debug_assert_eq!(fields.spreads.len(), 1);
+        debug_assert_eq!(
+            fields.to_string(),
+            "{ ..std::string::String, hello: string, world: u32 }"
+        );
         debug_assert_eq!(fields.first().unwrap().value().to_string(), "hello: string");
         debug_assert_eq!(fields.last().unwrap().value().to_string(), "world: u32");
 
