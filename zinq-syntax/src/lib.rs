@@ -5,6 +5,7 @@ mod path;
 pub mod stmt;
 pub mod ty;
 pub mod visibility;
+pub mod pat;
 
 pub use path::*;
 pub use visibility::*;

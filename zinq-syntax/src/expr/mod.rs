@@ -5,6 +5,7 @@ pub mod postfix;
 pub mod prefix;
 pub mod primary;
 pub mod unary;
+mod match_expr;
 
 pub use binary::*;
 pub use if_expr::*;
@@ -13,6 +14,7 @@ pub use postfix::*;
 pub use prefix::*;
 pub use primary::*;
 pub use unary::*;
+pub use match_expr::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
