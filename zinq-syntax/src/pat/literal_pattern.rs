@@ -1,4 +1,4 @@
-use zinq_parse::Spanned;
+use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::Literal;
 
 use crate::pat::Pattern;
@@ -42,5 +42,24 @@ impl std::fmt::Display for LiteralPattern {
 impl Spanned for LiteralPattern {
     fn span(&self) -> zinq_parse::Span {
         self.literal.span()
+    }
+}
+
+impl Peek for LiteralPattern {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<Literal>(cursor).unwrap_or(false))
+    }
+}
+
+impl Parse for LiteralPattern {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<Self> {
+        let literal = parser.parse::<Literal>(cursor)?;
+        Ok(Self { literal })
     }
 }

@@ -1,4 +1,4 @@
-use zinq_parse::Spanned;
+use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{TypePath, pat::Pattern};
 
@@ -41,5 +41,24 @@ impl std::fmt::Display for TypePattern {
 impl Spanned for TypePattern {
     fn span(&self) -> zinq_parse::Span {
         self.path.span()
+    }
+}
+
+impl Peek for TypePattern {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<TypePath>(cursor).unwrap_or(false))
+    }
+}
+
+impl Parse for TypePattern {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<Self> {
+        let path = parser.parse::<TypePath>(cursor)?;
+        Ok(Self { path })
     }
 }

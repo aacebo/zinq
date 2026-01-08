@@ -1,4 +1,4 @@
-use zinq_parse::Spanned;
+use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::Underscore;
 
 use crate::pat::Pattern;
@@ -42,5 +42,24 @@ impl std::fmt::Display for AnyPattern {
 impl Spanned for AnyPattern {
     fn span(&self) -> zinq_parse::Span {
         self.underscore.span()
+    }
+}
+
+impl Peek for AnyPattern {
+    fn peek(
+        cursor: &zinq_parse::Cursor,
+        parser: &zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<bool> {
+        Ok(parser.peek::<Underscore>(cursor).unwrap_or(false))
+    }
+}
+
+impl Parse for AnyPattern {
+    fn parse(
+        cursor: &mut zinq_parse::Cursor,
+        parser: &mut zinq_parse::ZinqParser,
+    ) -> zinq_error::Result<Self> {
+        let underscore = parser.parse::<Underscore>(cursor)?;
+        Ok(Self { underscore })
     }
 }

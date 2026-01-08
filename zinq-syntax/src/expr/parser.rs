@@ -7,12 +7,13 @@ use zinq_token::{
 
 use crate::expr::{
     ArithmeticExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr, LiteralExpr,
-    LogicalExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
+    LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
 };
 
 pub trait ExprParser {
     fn parse_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_assign_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_match_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_or_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_and_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
@@ -31,7 +32,7 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_assign_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        let expr = self.parse_if_expr(cursor)?;
+        let expr = self.parse_match_expr(cursor)?;
 
         if self.peek::<Eq>(cursor).unwrap_or(false) {
             let eq = self.parse::<Eq>(cursor)?;
@@ -41,6 +42,14 @@ impl ExprParser for zinq_parse::ZinqParser {
         }
 
         Ok(expr)
+    }
+
+    fn parse_match_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        if self.peek::<MatchExpr>(cursor).unwrap_or(false) {
+            return Ok(self.parse::<MatchExpr>(cursor)?.into());
+        }
+
+        Ok(self.parse_if_expr(cursor)?)
     }
 
     fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
