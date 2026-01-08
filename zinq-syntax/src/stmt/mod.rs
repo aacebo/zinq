@@ -25,7 +25,7 @@ pub use use_stmt::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Syntax, Visitor};
+use crate::{Node, Visitor};
 
 ///
 /// ## Statement
@@ -186,12 +186,6 @@ impl Stmt {
             Self::If(v) => v,
             v => panic!("expected ReturIfStmtnStmt, received {}", v.name()),
         }
-    }
-}
-
-impl From<Stmt> for Syntax {
-    fn from(value: Stmt) -> Self {
-        Self::Stmt(value)
     }
 }
 

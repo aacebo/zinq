@@ -1,6 +1,6 @@
 use zinq_token::{LBrace, Match, RBrace};
 
-use crate::{expr::Expr};
+use crate::expr::Expr;
 
 ///
 /// ## Match Expression

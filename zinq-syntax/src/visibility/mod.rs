@@ -10,7 +10,7 @@ pub use super_visibility::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Syntax, Visitor};
+use crate::{Node, Visitor};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Visibility {
@@ -47,12 +47,6 @@ impl Visibility {
             Self::Priv(_) => true,
             _ => false,
         }
-    }
-}
-
-impl From<Visibility> for Syntax {
-    fn from(value: Visibility) -> Self {
-        Self::Visibility(value)
     }
 }
 

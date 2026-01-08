@@ -11,7 +11,7 @@ pub use tuple_type::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Syntax, TypePath, Visitor};
+use crate::{Node, TypePath, Visitor};
 
 ///
 /// ## Type
@@ -23,12 +23,6 @@ pub enum Type {
     Ref(RefType),
     Slice(SliceType),
     Tuple(TupleType),
-}
-
-impl From<Type> for Syntax {
-    fn from(value: Type) -> Self {
-        Self::Type(value)
-    }
 }
 
 impl Node for Type {

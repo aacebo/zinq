@@ -1,25 +1,25 @@
 pub mod binary;
 mod if_expr;
+mod match_expr;
 pub mod parser;
 pub mod postfix;
 pub mod prefix;
 pub mod primary;
 pub mod unary;
-mod match_expr;
 
 pub use binary::*;
 pub use if_expr::*;
+pub use match_expr::*;
 pub use parser::*;
 pub use postfix::*;
 pub use prefix::*;
 pub use primary::*;
 pub use unary::*;
-pub use match_expr::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Syntax, Visitor};
+use crate::{Node, Visitor};
 
 ///
 /// ## Expression
@@ -261,12 +261,6 @@ impl Node for Expr {
         Self: Sized,
     {
         visitor.visit(self)
-    }
-}
-
-impl From<Expr> for Syntax {
-    fn from(value: Expr) -> Self {
-        Self::Expr(value)
     }
 }
 
