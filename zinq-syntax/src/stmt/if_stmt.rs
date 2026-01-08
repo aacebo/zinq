@@ -1,14 +1,18 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::If;
+use zinq_token::{Else, If};
 
-use crate::{Node, expr::Expr, stmt::Stmt};
+use crate::{
+    Node,
+    expr::Expr,
+    stmt::{BlockStmt, Stmt, StmtParser},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IfStmt {
     pub keyword: If,
     pub cond: Expr,
-    pub then_stmt: Box<Stmt>,
-    pub else_stmt: Option<Box<Stmt>>,
+    pub then_stmt: BlockStmt,
+    pub else_stmt: Option<(Else, Box<Stmt>)>,
 }
 
 impl From<IfStmt> for Stmt {
@@ -52,22 +56,33 @@ impl Parse for IfStmt {
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse::<If>(cursor)?;
         let cond = parser.parse::<Expr>(cursor)?;
-        let then_stmt = parser.parse::<Box<Stmt>>(cursor)?;
-        let else_stmt = parser.parse::<Option<Box<Stmt>>>(cursor)?;
+        let then_stmt = parser.parse::<BlockStmt>(cursor)?;
+
+        if parser.peek::<Else>(cursor).unwrap_or(false) {
+            let else_token = parser.parse::<Else>(cursor)?;
+            let else_stmt = parser.parse_stmt(cursor)?;
+
+            return Ok(Self {
+                keyword,
+                cond,
+                then_stmt,
+                else_stmt: Some((else_token, Box::new(else_stmt))),
+            });
+        }
 
         Ok(Self {
             keyword,
             cond,
             then_stmt,
-            else_stmt,
+            else_stmt: None,
         })
     }
 }
 
 impl Spanned for IfStmt {
     fn span(&self) -> Span {
-        if let Some(else_stmt) = &self.else_stmt {
-            return Span::join(self.keyword.span(), else_stmt.span());
+        if let Some((_, stmt)) = &self.else_stmt {
+            return Span::join(self.keyword.span(), stmt.span());
         }
 
         Span::join(self.keyword.span(), self.then_stmt.span())
@@ -87,8 +102,24 @@ mod test {
         let mut cursor = Span::from_bytes(b"if 1 < 5 { return 1; }").cursor();
         let stmt = parser.parse_stmt(&mut cursor)?;
 
-        // debug_assert!(stmt.is_if());
+        debug_assert!(stmt.is_if());
         debug_assert_eq!(stmt.to_string(), "if 1 < 5 { return 1; }");
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_block_with_else() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"if 1 < 5 { return 1; } else { return 2; }").cursor();
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_if());
+        debug_assert!(stmt.as_if().else_stmt.is_some());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "if 1 < 5 { return 1; } else { return 2; }"
+        );
+
         Ok(())
     }
 }

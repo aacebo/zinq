@@ -237,14 +237,8 @@ impl std::fmt::Display for Stmt {
 }
 
 impl Peek for Stmt {
-    fn peek(cursor: &zinq_parse::Cursor, parser: &zinq_parse::ZinqParser) -> Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
+    fn peek(_: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> Result<bool> {
+        Ok(true)
     }
 }
 

@@ -105,7 +105,7 @@ impl<T: Spanned> Spanned for Option<T> {
 
 impl<T: Peek> Peek for Box<T> {
     fn peek(cursor: &Cursor, parser: &ZinqParser) -> Result<bool> {
-        parser.peek::<T>(cursor)
+        Ok(parser.peek::<T>(cursor).unwrap_or(false))
     }
 }
 
