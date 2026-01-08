@@ -1,10 +1,12 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
+use zinq_token::SemiColon;
 
 use crate::{Node, expr::Expr, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExprStmt {
     pub expr: Expr,
+    pub semi: Option<SemiColon>,
 }
 
 impl From<ExprStmt> for Stmt {
@@ -44,12 +46,18 @@ impl Parse for ExprStmt {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let expr = parser.parse::<Expr>(cursor)?;
-        Ok(Self { expr })
+        let semi = parser.parse::<Option<SemiColon>>(cursor)?;
+
+        Ok(Self { expr, semi })
     }
 }
 
 impl Spanned for ExprStmt {
     fn span(&self) -> Span {
+        if let Some(semi) = &self.semi {
+            return Span::join(self.expr.span(), semi.span());
+        }
+
         self.expr.span()
     }
 }
