@@ -58,10 +58,8 @@ impl Peek for ImplMethod {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
+        fork_parser.parse::<Visibility>(&mut fork)?;
+        Ok(fork_parser.peek::<Fn>(&fork).unwrap_or(false))
     }
 }
 
