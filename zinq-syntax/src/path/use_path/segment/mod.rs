@@ -1,15 +1,15 @@
 mod glob_segment;
 mod group_segment;
-mod ident_segment;
 
 pub use glob_segment::*;
 pub use group_segment::*;
-pub use ident_segment::*;
+
 use zinq_parse::{Parse, Peek, Spanned};
+use zinq_token::Ident;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UseSegment {
-    Ident(UseIdent),
+    Ident(Ident),
     Glob(UseGlob),
     Group(UseGroup),
 }
@@ -36,10 +36,10 @@ impl UseSegment {
         }
     }
 
-    pub fn as_ident(&self) -> &UseIdent {
+    pub fn as_ident(&self) -> &Ident {
         match self {
             Self::Ident(v) => v,
-            _ => panic!("expected UseIdent"),
+            _ => panic!("expected Ident"),
         }
     }
 
@@ -88,8 +88,8 @@ impl Parse for UseSegment {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek::<UseIdent>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<UseIdent>(cursor)?.into());
+        if parser.peek::<Ident>(cursor).unwrap_or(false) {
+            return Ok(Self::Ident(parser.parse::<Ident>(cursor)?));
         }
 
         if parser.peek::<UseGlob>(cursor).unwrap_or(false) {

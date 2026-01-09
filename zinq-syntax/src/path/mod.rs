@@ -13,7 +13,15 @@ use zinq_token::{ColonColon, Ident, Punctuated};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Path {
-    pub path: Punctuated<Ident, ColonColon>,
+    pub items: Punctuated<Ident, ColonColon>,
+}
+
+impl std::ops::Deref for Path {
+    type Target = Punctuated<Ident, ColonColon>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.items
+    }
 }
 
 impl std::fmt::Display for Path {
@@ -36,13 +44,13 @@ impl Parse for Path {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse::<Punctuated<Ident, ColonColon>>(cursor)?;
-        Ok(Self { path })
+        let items = parser.parse::<Punctuated<Ident, ColonColon>>(cursor)?;
+        Ok(Self { items })
     }
 }
 
 impl Spanned for Path {
     fn span(&self) -> Span {
-        self.path.span()
+        self.items.span()
     }
 }

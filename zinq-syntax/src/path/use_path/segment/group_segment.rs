@@ -8,7 +8,7 @@ use crate::path::{UsePath, UseSegment};
 /// a comma delimited list of
 /// sub paths
 /// ### Example
-/// `use std::string::{String, ToString};`
+/// `use std::string::(String, ToString);`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UseGroup {

@@ -1,30 +1,42 @@
 mod segment;
 
 pub use segment::*;
-use zinq_parse::{Parse, Peek, Spanned};
-use zinq_token::{ColonColon, Punctuated};
+use zinq_parse::{Parse, Peek, Span, Spanned};
+
+use crate::Path;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UsePath {
-    pub items: Punctuated<UseSegment, ColonColon>,
+    pub path: Path,
+    pub end: Option<UseSegment>,
 }
 
 impl UsePath {
     pub fn len(&self) -> usize {
-        self.items.len()
+        if let Some(_) = &self.end {
+            return self.path.len() + 1;
+        }
+
+        self.path.len()
     }
 
-    pub fn last(&self) -> &UseSegment {
-        self.items
-            .last()
-            .expect("must have at least one item in UsePath")
-            .value()
+    pub fn last(&self) -> UseSegment {
+        match &self.end {
+            None => UseSegment::Ident(
+                self.path
+                    .last()
+                    .expect("expected end of path")
+                    .value()
+                    .clone(),
+            ),
+            Some(v) => v.clone(),
+        }
     }
 }
 
 impl std::fmt::Display for UsePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", &self.items)
+        write!(f, "{}", self.span())
     }
 }
 
@@ -48,14 +60,16 @@ impl Parse for UsePath {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let items = parser.parse::<Punctuated<UseSegment, ColonColon>>(cursor)?;
-        Ok(Self { items })
+        let path = parser.parse::<Path>(cursor)?;
+        let end = parser.parse::<Option<UseSegment>>(cursor)?;
+
+        Ok(Self { path, end })
     }
 }
 
 impl Spanned for UsePath {
     fn span(&self) -> zinq_parse::Span {
-        self.items.span()
+        Span::join(self.path.span(), self.last().span())
     }
 }
 
