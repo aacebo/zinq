@@ -196,6 +196,7 @@ define_keywords! {
     "for",       pub struct For,        is_for,
     "in",        pub struct In,         is_in,
     "as",        pub struct As,         is_as,
+    "is",        pub struct Is,         is_is,
     "let",       pub struct Let,        is_let,
     "const",     pub struct Const,      is_const,
     "enum",      pub struct Enum,       is_enum,

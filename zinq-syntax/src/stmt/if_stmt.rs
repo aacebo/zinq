@@ -142,4 +142,26 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn should_parse_is() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"if a is string {
+                println(a);
+            }",
+        )
+        .cursor();
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_if());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "if a is string {
+                println(a);
+            }",
+        );
+
+        Ok(())
+    }
 }

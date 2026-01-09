@@ -1,13 +1,16 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
 use zinq_token::{
-    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, LBrace, LParen, Match, Minus, Mut,
-    Not, OrOr, Plus, Punctuated, Question, RBrace, RParen, Slash, Star,
+    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, Is, LBrace, LParen, Match, Minus,
+    Mut, Not, OrOr, Plus, Punctuated, Question, RBrace, RParen, Slash, Star,
 };
 
-use crate::expr::{
-    ArithmeticExpr, Arm, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr,
-    LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
+use crate::{
+    expr::{
+        ArithmeticExpr, Arm, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr,
+        IsExpr, LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
+    },
+    ty::Type,
 };
 
 pub trait ExprParser {
@@ -17,6 +20,7 @@ pub trait ExprParser {
     fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_or_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_and_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_is_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_cmp_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_term_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_factor_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
@@ -101,13 +105,26 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_and_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        let mut expr = self.parse_cmp_expr(cursor)?;
+        let mut expr = self.parse_is_expr(cursor)?;
 
         while self.peek::<AndAnd>(cursor).unwrap_or(false) {
             let op = self.parse::<AndAnd>(cursor)?;
-            let right = self.parse_cmp_expr(cursor)?;
+            let right = self.parse_is_expr(cursor)?;
 
             expr = LogicalExpr::new(expr, op.into(), right).into();
+        }
+
+        Ok(expr)
+    }
+
+    fn parse_is_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        let mut expr = self.parse_cmp_expr(cursor)?;
+
+        while self.peek::<Is>(cursor).unwrap_or(false) {
+            let keyword = self.parse::<Is>(cursor)?;
+            let ty = self.parse::<Type>(cursor)?;
+
+            expr = IsExpr::new(expr, keyword, ty).into();
         }
 
         Ok(expr)

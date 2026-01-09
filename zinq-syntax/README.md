@@ -9,7 +9,7 @@ Abstract syntax tree implementation for Zinq.
 | `for`                 | [Link](../docs/LOOPS.md)            | ⌛    |
 | `continue`            |                                     | ⌛    |
 | `break`               |                                     | ⌛    |
-| `is`                  |                                     | ⌛    |
+| `is`                  | [Link](../docs/CONDITIONS.md)       | ✅    |
 | `in`                  |                                     | ⌛    |
 | `protocol`            |                                     | ⌛    |
 | `as`                  |                                     | ⌛    |
@@ -17,7 +17,7 @@ Abstract syntax tree implementation for Zinq.
 | `await`               |                                     | ⌛    |
 | `package`             |                                     | ⌛    |
 | `type`                |                                     | ⌛    |
-| `<T>`                 |                                     | ⌛    |
+| `<T>`                 |                                     | ✅    |
 | `where`               |                                     | ⌛    |
 | `super`               |                                     | ✅    |
 | `mut`                 |                                     | ✅    |
@@ -34,7 +34,7 @@ Abstract syntax tree implementation for Zinq.
 | `use`                 | [Link](../docs/IMPORTS.md)          | ✅    |
 | `match`               |                                     | ✅    |
 | `impl`                | [Link](../docs/IMPL.md)             | ✅    |
-| `typeof`              |                                     | ⌛    |
+| `typeof!`             |                                     | ⌛    |
 | `macro`               | [Link](../docs/MACROS.md)           | ⌛    |
 | `union`               |                                     | ⌛    |
 | `"a {var}"`           | [Link](../docs/STRINGS.md)          | ⌛    |

@@ -34,6 +34,7 @@ pub enum Expr {
     Arithmetic(ArithmeticExpr),
     Assign(AssignExpr),
     Cmp(CmpExpr),
+    Is(IsExpr),
     Logical(LogicalExpr),
 
     /// ## Postfix
@@ -91,6 +92,13 @@ impl Expr {
     pub fn is_cmp(&self) -> bool {
         match self {
             Self::Cmp(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_is(&self) -> bool {
+        match self {
+            Self::Is(_) => true,
             _ => false,
         }
     }
@@ -193,6 +201,13 @@ impl Expr {
         }
     }
 
+    pub fn as_is(&self) -> &IsExpr {
+        match self {
+            Self::Is(v) => v,
+            v => panic!("expected IsExpr, received {}", v.name()),
+        }
+    }
+
     pub fn as_logical(&self) -> &LogicalExpr {
         match self {
             Self::Logical(v) => v,
@@ -259,6 +274,7 @@ impl Node for Expr {
             Self::Arithmetic(v) => v.name(),
             Self::Assign(v) => v.name(),
             Self::Cmp(v) => v.name(),
+            Self::Is(v) => v.name(),
             Self::Logical(v) => v.name(),
             Self::Call(v) => v.name(),
             Self::Member(v) => v.name(),
@@ -287,6 +303,7 @@ impl std::fmt::Display for Expr {
             Self::Arithmetic(v) => write!(f, "{}", v),
             Self::Assign(v) => write!(f, "{}", v),
             Self::Cmp(v) => write!(f, "{}", v),
+            Self::Is(v) => write!(f, "{}", v),
             Self::Logical(v) => write!(f, "{}", v),
             Self::Call(v) => write!(f, "{}", v),
             Self::Member(v) => write!(f, "{}", v),
@@ -326,6 +343,7 @@ impl Spanned for Expr {
             Self::Arithmetic(v) => v.span(),
             Self::Assign(v) => v.span(),
             Self::Cmp(v) => v.span(),
+            Self::Is(v) => v.span(),
             Self::Logical(v) => v.span(),
             Self::Call(v) => v.span(),
             Self::Member(v) => v.span(),
