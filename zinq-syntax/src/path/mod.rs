@@ -13,7 +13,18 @@ use zinq_token::{ColonColon, Ident, Punctuated};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Path {
-    pub items: Punctuated<Ident, ColonColon>,
+    items: Punctuated<Ident, ColonColon>,
+}
+
+impl Path {
+    /// check if is a len of 1 with no arguments
+    pub fn is_ident(&self) -> bool {
+        self.items.len() == 1
+    }
+
+    pub fn as_ident(&self) -> &Ident {
+        self.items.last().expect("expected non empty path").value()
+    }
 }
 
 impl std::ops::Deref for Path {

@@ -1,50 +1,50 @@
 use zinq_parse::{Parse, Peek, Spanned};
-use zinq_token::Ident;
 
-use crate::pat::Pattern;
+use crate::{Path, pat::Pattern};
 
 ///
-/// ## Ident Pattern
-/// `a`
+/// ## Path Pattern
+/// - `a`
+/// - `std::string::String`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IdentPattern {
-    pub ident: Ident,
+pub struct PathPattern {
+    pub path: Path,
 }
 
-impl From<IdentPattern> for Pattern {
-    fn from(value: IdentPattern) -> Self {
-        Self::Ident(value)
+impl From<PathPattern> for Pattern {
+    fn from(value: PathPattern) -> Self {
+        Self::Path(value)
     }
 }
 
-impl std::fmt::Display for IdentPattern {
+impl std::fmt::Display for PathPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Spanned for IdentPattern {
+impl Spanned for PathPattern {
     fn span(&self) -> zinq_parse::Span {
-        self.ident.span()
+        self.path.span()
     }
 }
 
-impl Peek for IdentPattern {
+impl Peek for PathPattern {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<Ident>(cursor).unwrap_or(false))
+        Ok(parser.peek::<Path>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse for IdentPattern {
+impl Parse for PathPattern {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let ident = parser.parse::<Ident>(cursor)?;
-        Ok(Self { ident })
+        let path = parser.parse::<Path>(cursor)?;
+        Ok(Self { path })
     }
 }

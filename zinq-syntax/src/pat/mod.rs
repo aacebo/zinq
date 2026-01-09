@@ -1,6 +1,6 @@
-mod ident_pattern;
 mod literal_pattern;
 mod parser;
+mod path_pattern;
 mod ref_pattern;
 mod spread_pattern;
 mod struct_pattern;
@@ -8,9 +8,9 @@ mod tuple_pattern;
 mod type_pattern;
 mod wild_pattern;
 
-pub use ident_pattern::*;
 pub use literal_pattern::*;
 pub use parser::*;
+pub use path_pattern::*;
 pub use ref_pattern::*;
 pub use spread_pattern::*;
 pub use struct_pattern::*;
@@ -23,7 +23,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Pattern {
     Wild(WildPattern),
-    Ident(IdentPattern),
+    Path(PathPattern),
     Literal(LiteralPattern),
     Ref(RefPattern),
     Spread(SpreadPattern),
@@ -36,7 +36,7 @@ impl std::fmt::Display for Pattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Wild(v) => write!(f, "{}", v),
-            Self::Ident(v) => write!(f, "{}", v),
+            Self::Path(v) => write!(f, "{}", v),
             Self::Literal(v) => write!(f, "{}", v),
             Self::Ref(v) => write!(f, "{}", v),
             Self::Spread(v) => write!(f, "{}", v),
@@ -51,7 +51,7 @@ impl Spanned for Pattern {
     fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Wild(v) => v.span(),
-            Self::Ident(v) => v.span(),
+            Self::Path(v) => v.span(),
             Self::Literal(v) => v.span(),
             Self::Ref(v) => v.span(),
             Self::Spread(v) => v.span(),

@@ -48,8 +48,8 @@ impl PatternParser for ZinqParser {
             return Ok(self.parse::<LiteralPattern>(cursor)?.into());
         }
 
-        if self.peek::<IdentPattern>(cursor).unwrap_or(false) {
-            return Ok(self.parse::<IdentPattern>(cursor)?.into());
+        if self.peek::<PathPattern>(cursor).unwrap_or(false) {
+            return Ok(self.parse::<PathPattern>(cursor)?.into());
         }
 
         if self.peek::<TypePattern>(cursor).unwrap_or(false) {

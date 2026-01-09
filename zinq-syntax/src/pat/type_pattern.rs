@@ -4,8 +4,8 @@ use crate::{pat::Pattern, ty::Type};
 
 ///
 /// ## Type Pattern
-/// `std::string::String => ..` <br>
-/// `u8 => ..`
+/// - `std::string::String => ..`
+/// - `u8 => ..`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypePattern {

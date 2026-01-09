@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{Node, Visibility, Visitor, ty::Type};
+use crate::{Node, Visibility, Visitor, spread::TypeSpread, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedField {
@@ -51,6 +51,7 @@ impl Spanned for IndexedField {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedFields {
     pub left_paren: LParen,
+    pub spreads: Punctuated<TypeSpread, Comma>,
     pub fields: Punctuated<IndexedField, Comma>,
     pub right_paren: RParen,
 }
@@ -113,11 +114,13 @@ impl Parse for IndexedFields {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let left_paren = parser.parse::<LParen>(cursor)?;
+        let spreads = parser.parse::<Punctuated<TypeSpread, Comma>>(cursor)?;
         let fields = parser.parse::<Punctuated<IndexedField, Comma>>(cursor)?;
         let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
             left_paren,
+            spreads,
             fields,
             right_paren,
         })

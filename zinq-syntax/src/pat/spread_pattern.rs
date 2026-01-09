@@ -5,8 +5,7 @@ use crate::pat::Pattern;
 
 ///
 /// ## Spread Pattern
-/// `_ => ..` <br>
-/// `fn test(_: &str)`
+/// `..`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpreadPattern {
