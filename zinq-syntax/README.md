@@ -33,9 +33,10 @@ Abstract syntax tree implementation for Zinq.
 | `return`              |                                     | ✅    |
 | `use`                 | [Link](../docs/IMPORTS.md)          | ✅    |
 | `match`               |                                     | ✅    |
-| `impl`                |                                     | ✅    |
+| `impl`                | [Link](../docs/IMPL.md)             | ✅    |
 | `typeof`              |                                     | ⌛    |
 | `macro`               | [Link](../docs/MACROS.md)           | ⌛    |
 | `union`               |                                     | ⌛    |
 | `fork`                |                                     | ⌛    |
 | `merge`               |                                     | ⌛    |
+| `"a {var}"`           | [Link](../docs/STRINGS.md)          | ⌛    |
