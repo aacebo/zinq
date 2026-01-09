@@ -1,11 +1,13 @@
 mod any_pattern;
 mod literal_pattern;
 mod struct_pattern;
+mod tuple_pattern;
 mod type_pattern;
 
 pub use any_pattern::*;
 pub use literal_pattern::*;
 pub use struct_pattern::*;
+pub use tuple_pattern::*;
 pub use type_pattern::*;
 
 use zinq_parse::{Parse, Peek, Spanned};
@@ -15,6 +17,7 @@ pub enum Pattern {
     Any(AnyPattern),
     Literal(LiteralPattern),
     Struct(StructPattern),
+    Tuple(TuplePattern),
     Type(TypePattern),
 }
 
@@ -24,6 +27,7 @@ impl std::fmt::Display for Pattern {
             Self::Any(v) => write!(f, "{}", v),
             Self::Literal(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
+            Self::Tuple(v) => write!(f, "{}", v),
             Self::Type(v) => write!(f, "{}", v),
         }
     }
@@ -35,6 +39,7 @@ impl Spanned for Pattern {
             Self::Any(v) => v.span(),
             Self::Literal(v) => v.span(),
             Self::Struct(v) => v.span(),
+            Self::Tuple(v) => v.span(),
             Self::Type(v) => v.span(),
         }
     }
@@ -66,6 +71,10 @@ impl Parse for Pattern {
 
         if parser.peek::<LiteralPattern>(cursor).unwrap_or(false) {
             return Ok(parser.parse::<LiteralPattern>(cursor)?.into());
+        }
+
+        if parser.peek::<TuplePattern>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<TuplePattern>(cursor)?.into());
         }
 
         if parser.peek::<StructPattern>(cursor).unwrap_or(false) {
