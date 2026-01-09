@@ -48,7 +48,7 @@ impl Parse for SelfParam {
 
 impl Spanned for SelfParam {
     fn span(&self) -> Span {
-        let mut first = self.keyword.span().clone();
+        let mut first = self.keyword.span();
 
         if let Some(v) = &self.mutable {
             first = v.span().clone();

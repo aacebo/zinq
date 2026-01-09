@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed};
 
 use crate::{
-    Node, Visibility,
+    Generics, Node, Visibility,
     param::FnParam,
     stmt::{BlockStmt, Stmt},
     ty::Type,
@@ -17,6 +17,7 @@ pub struct FnStmt {
     pub vis: Visibility,
     pub keyword: Fn,
     pub name: Ident,
+    pub generics: Option<Generics>,
     pub left_paren: LParen,
     pub params: Punctuated<FnParam, Comma>,
     pub right_paren: RParen,
@@ -70,6 +71,7 @@ impl Parse for FnStmt {
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Fn>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
+        let generics = parser.parse::<Option<Generics>>(cursor)?;
         let left_paren = parser.parse::<LParen>(cursor)?;
         let params = parser.parse::<Punctuated<FnParam, Comma>>(cursor)?;
         let right_paren = parser.parse::<RParen>(cursor)?;
@@ -80,6 +82,7 @@ impl Parse for FnStmt {
             vis,
             keyword,
             name,
+            generics,
             left_paren,
             params,
             right_paren,

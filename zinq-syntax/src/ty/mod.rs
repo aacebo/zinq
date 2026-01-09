@@ -28,7 +28,7 @@ pub enum Type {
 impl Node for Type {
     fn name(&self) -> &str {
         match self {
-            Self::Path(v) => v.name(),
+            Self::Path(_) => "Type::Path",
             Self::Mut(v) => v.name(),
             Self::Ref(v) => v.name(),
             Self::Slice(v) => v.name(),

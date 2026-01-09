@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::{Comma, DotDot, Ident, LBrace, Punctuated, RBrace, Suffixed};
+use zinq_token::{Comma, LBrace, Punctuated, RBrace, Suffixed};
 
 use crate::{TypePath, pat::Pattern};
 
@@ -11,8 +11,7 @@ use crate::{TypePath, pat::Pattern};
 pub struct StructPattern {
     pub path: TypePath,
     pub left_brace: LBrace,
-    pub fields: Punctuated<Ident, Comma>,
-    pub spread: Option<DotDot>,
+    pub fields: Punctuated<Pattern, Comma>,
     pub right_brace: RBrace,
 }
 
@@ -52,15 +51,13 @@ impl Parse for StructPattern {
     ) -> zinq_error::Result<Self> {
         let path = parser.parse::<TypePath>(cursor)?;
         let left_brace = parser.parse::<LBrace>(cursor)?;
-        let fields = parser.parse::<Punctuated<Ident, Comma>>(cursor)?;
-        let spread = parser.parse::<Option<DotDot>>(cursor)?;
+        let fields = parser.parse::<Punctuated<Pattern, Comma>>(cursor)?;
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
             path,
             left_brace,
             fields,
-            spread,
             right_brace,
         })
     }

@@ -1,13 +1,14 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Enum, Ident, LBrace, Punctuated, RBrace};
 
-use crate::{Node, Variant, Visibility, stmt::Stmt};
+use crate::{Generics, Node, Variant, Visibility, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumStmt {
     pub vis: Visibility,
     pub keyword: Enum,
     pub name: Ident,
+    pub generics: Option<Generics>,
     pub left_brace: LBrace,
     pub variants: Punctuated<Variant, Comma>,
     pub right_brace: RBrace,
@@ -59,6 +60,7 @@ impl Parse for EnumStmt {
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Enum>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
+        let generics = parser.parse::<Option<Generics>>(cursor)?;
         let left_brace = parser.parse::<LBrace>(cursor)?;
         let variants = parser.parse::<Punctuated<Variant, Comma>>(cursor)?;
         let right_brace = parser.parse::<RBrace>(cursor)?;
@@ -67,6 +69,7 @@ impl Parse for EnumStmt {
             vis,
             keyword,
             name,
+            generics,
             left_brace,
             variants,
             right_brace,

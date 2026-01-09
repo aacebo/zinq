@@ -4,11 +4,12 @@ pub use syntax::*;
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Impl, LBrace, RBrace};
 
-use crate::{Node, stmt::Stmt, ty::Type};
+use crate::{Generics, Node, stmt::Stmt, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImplStmt {
     pub keyword: Impl,
+    pub generics: Option<Generics>,
     pub for_ty: Type,
     pub left_brace: LBrace,
     pub stmts: Vec<ImplSyntax>,
@@ -55,6 +56,7 @@ impl Parse for ImplStmt {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let keyword = parser.parse::<Impl>(cursor)?;
+        let generics = parser.parse::<Option<Generics>>(cursor)?;
         let for_ty = parser.parse::<Type>(cursor)?;
         let left_brace = parser.parse::<LBrace>(cursor)?;
         let mut stmts = vec![];
@@ -67,6 +69,7 @@ impl Parse for ImplStmt {
 
         Ok(Self {
             keyword,
+            generics,
             for_ty,
             left_brace,
             stmts,

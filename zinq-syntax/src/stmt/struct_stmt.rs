@@ -1,13 +1,14 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Ident, SemiColon, Struct};
 
-use crate::{Node, Visibility, fields::Fields, stmt::Stmt};
+use crate::{Generics, Node, Visibility, fields::Fields, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructStmt {
     pub vis: Visibility,
     pub keyword: Struct,
     pub name: Ident,
+    pub generics: Option<Generics>,
     pub fields: Fields,
     pub semi: Option<SemiColon>,
 }
@@ -58,6 +59,7 @@ impl Parse for StructStmt {
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Struct>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
+        let generics = parser.parse::<Option<Generics>>(cursor)?;
         let fields = parser.parse::<Fields>(cursor)?;
         let mut semi = None;
 
@@ -69,6 +71,7 @@ impl Parse for StructStmt {
             vis,
             keyword,
             name,
+            generics,
             fields,
             semi,
         })
@@ -207,6 +210,31 @@ mod test {
             ..MySecond,
             pub a: i8,
             b: string,
+        }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_with_generics() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"struct MyStruct<T> {
+            a: T,
+        }",
+        )
+        .cursor();
+
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_struct());
+        debug_assert_eq!(stmt.as_struct().fields.len(), 1);
+        debug_assert!(stmt.as_struct().generics.is_some());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "struct MyStruct<T> {
+            a: T,
         }"
         );
 

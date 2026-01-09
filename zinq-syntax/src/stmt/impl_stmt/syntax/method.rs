@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed};
 
 use crate::{
-    Node, Visibility,
+    Generics, Node, Visibility,
     param::{FnParam, SelfParam},
     stmt::{BlockStmt, ImplSyntax},
     ty::Type,
@@ -17,6 +17,7 @@ pub struct ImplMethod {
     pub vis: Visibility,
     pub keyword: Fn,
     pub name: Ident,
+    pub generics: Option<Generics>,
     pub left_paren: LParen,
     pub self_param: Option<SelfParam>,
     pub params: Punctuated<FnParam, Comma>,
@@ -71,6 +72,7 @@ impl Parse for ImplMethod {
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Fn>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
+        let generics = parser.parse::<Option<Generics>>(cursor)?;
         let left_paren = parser.parse::<LParen>(cursor)?;
         let self_param = parser.parse::<Option<SelfParam>>(cursor)?;
 
@@ -87,6 +89,7 @@ impl Parse for ImplMethod {
             vis,
             keyword,
             name,
+            generics,
             left_paren,
             self_param,
             params,

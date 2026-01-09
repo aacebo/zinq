@@ -1,31 +1,21 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Ident;
 
-use crate::{Generics, Path, ty::Type};
+use crate::Bounds;
 
-///
-/// ## TypePath
-/// `my::pkg::MyType<T>`
-///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TypePath {
-    pub path: Path,
-    pub generics: Option<Generics>,
+pub struct TypeParam {
+    pub ident: Ident,
+    pub bounds: Option<Bounds>,
 }
 
-impl From<TypePath> for Type {
-    fn from(value: TypePath) -> Self {
-        Self::Path(value)
-    }
-}
-
-impl std::fmt::Display for TypePath {
+impl std::fmt::Display for TypeParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Peek for TypePath {
+impl Peek for TypeParam {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -34,20 +24,24 @@ impl Peek for TypePath {
     }
 }
 
-impl Parse for TypePath {
+impl Parse for TypeParam {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse::<Path>(cursor)?;
-        let generics = parser.parse::<Option<Generics>>(cursor)?;
+        let ident = parser.parse::<Ident>(cursor)?;
+        let bounds = parser.parse::<Option<Bounds>>(cursor)?;
 
-        Ok(Self { path, generics })
+        Ok(Self { ident, bounds })
     }
 }
 
-impl Spanned for TypePath {
+impl Spanned for TypeParam {
     fn span(&self) -> Span {
-        self.path.span()
+        if let Some(bounds) = &self.bounds {
+            return Span::join(self.ident.span(), bounds.span());
+        }
+
+        self.ident.span()
     }
 }

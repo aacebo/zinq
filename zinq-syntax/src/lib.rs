@@ -1,5 +1,7 @@
+mod bounds;
 pub mod expr;
 pub mod fields;
+mod generics;
 pub mod param;
 pub mod pat;
 mod path;
@@ -9,6 +11,8 @@ pub mod ty;
 mod variant;
 mod visibility;
 
+pub use bounds::*;
+pub use generics::*;
 pub use path::*;
 pub use variant::*;
 pub use visibility::*;

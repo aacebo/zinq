@@ -47,7 +47,7 @@ impl ExprParser for zinq_parse::ZinqParser {
     fn parse_match_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
         if self.peek::<Match>(cursor).unwrap_or(false) {
             let keyword = self.parse::<Match>(cursor)?;
-            let expr = self.parse_match_expr(cursor)?;
+            let expr = self.parse_assign_expr(cursor)?;
             let left_brace = self.parse::<LBrace>(cursor)?;
             let arms = self.parse::<Punctuated<Arm, Comma>>(cursor)?;
             let right_brace = self.parse::<RBrace>(cursor)?;
@@ -70,9 +70,9 @@ impl ExprParser for zinq_parse::ZinqParser {
 
         if self.peek::<Question>(cursor).unwrap_or(false) {
             let question = self.parse::<Question>(cursor)?;
-            let then_expr = self.parse_if_expr(cursor)?;
+            let then_expr = self.parse_assign_expr(cursor)?;
             let colon = self.parse::<Colon>(cursor)?;
-            let else_expr = self.parse_if_expr(cursor)?;
+            let else_expr = self.parse_assign_expr(cursor)?;
 
             return Ok(IfExpr {
                 cond: Box::new(expr),
