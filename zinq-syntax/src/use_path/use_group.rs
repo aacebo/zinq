@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::{Comma, LParen, Punctuated, RParen};
+use zinq_token::{Comma, Ident, LParen, Punctuated, RParen, Suffixed};
 
 use crate::use_path::UseSection;
 
@@ -8,10 +8,11 @@ use crate::use_path::UseSection;
 /// a comma delimited list of
 /// sub paths
 /// ### Example
-/// `use std::string::(String, ToString);`
+/// `std::string(String, ToString);`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UseGroup {
+    pub ident: Ident,
     pub left_paren: LParen,
     pub items: Punctuated<UseSection, Comma>,
     pub right_paren: RParen,
@@ -42,7 +43,9 @@ impl Peek for UseGroup {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<LParen>(cursor).unwrap_or(false))
+        Ok(parser
+            .peek::<Suffixed<Ident, LParen>>(cursor)
+            .unwrap_or(false))
     }
 }
 
@@ -51,11 +54,13 @@ impl Parse for UseGroup {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
+        let ident = parser.parse::<Ident>(cursor)?;
         let left_paren = parser.parse::<LParen>(cursor)?;
         let items = parser.parse::<Punctuated<UseSection, Comma>>(cursor)?;
         let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {
+            ident,
             left_paren,
             items,
             right_paren,
@@ -65,6 +70,6 @@ impl Parse for UseGroup {
 
 impl Spanned for UseGroup {
     fn span(&self) -> Span {
-        Span::join(self.left_paren.span(), self.right_paren.span())
+        Span::join(self.ident.span(), self.right_paren.span())
     }
 }

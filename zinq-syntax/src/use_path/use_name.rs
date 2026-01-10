@@ -5,7 +5,7 @@ use crate::use_path::UseSection;
 
 ///
 /// ## Use Name
-/// `use std::string::String;`
+/// - `use std::string::String`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UseName {

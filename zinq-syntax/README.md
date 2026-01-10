@@ -19,6 +19,7 @@ Abstract syntax tree implementation for Zinq.
 | `type`                |                                     | ⌛    |
 | `<T>`                 |                                     | ✅    |
 | `where`               |                                     | ⌛    |
+| `?`                   |                                     | ⌛    |
 | `super`               |                                     | ✅    |
 | `mut`                 |                                     | ✅    |
 | `pub`                 |                                     | ✅    |

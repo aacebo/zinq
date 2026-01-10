@@ -90,10 +90,10 @@ mod test {
     #[test]
     fn should_parse_group() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
-        let mut cursor = Span::from_bytes(b"std::string::(String, ToString)").cursor();
+        let mut cursor = Span::from_bytes(b"std::string(String, ToString)").cursor();
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
-        debug_assert_eq!(path.to_string(), "std::string::(String, ToString)");
+        debug_assert_eq!(path.to_string(), "std::string(String, ToString)");
         Ok(())
     }
 
@@ -101,13 +101,13 @@ mod test {
     fn should_parse_sub_group() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor =
-            Span::from_bytes(b"std::string::(parse::Parser, print::*, tokens::(Token, ToTokens))")
+            Span::from_bytes(b"std::string(parse::Parser, print::*, tokens(Token, ToTokens))")
                 .cursor();
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(
             path.to_string(),
-            "std::string::(parse::Parser, print::*, tokens::(Token, ToTokens))"
+            "std::string(parse::Parser, print::*, tokens(Token, ToTokens))"
         );
 
         Ok(())
