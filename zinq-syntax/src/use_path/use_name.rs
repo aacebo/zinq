@@ -1,31 +1,38 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Ident;
 
-use crate::{Generics, Path, ty::Type};
+use crate::use_path::UseSection;
 
 ///
-/// ## TypePath
-/// `my::pkg::MyType<T>`
+/// ## Use Name
+/// `use std::string::String;`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TypePath {
-    pub path: Path,
-    pub generics: Option<Generics>,
+pub struct UseName {
+    pub ident: Ident,
 }
 
-impl From<TypePath> for Type {
-    fn from(value: TypePath) -> Self {
-        Self::Path(value)
+impl From<UseName> for UseSection {
+    fn from(value: UseName) -> Self {
+        Self::Name(value)
     }
 }
 
-impl std::fmt::Display for TypePath {
+impl std::fmt::Display for UseName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Peek for TypePath {
+impl std::ops::Deref for UseName {
+    type Target = Ident;
+
+    fn deref(&self) -> &Self::Target {
+        &self.ident
+    }
+}
+
+impl Peek for UseName {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -34,20 +41,19 @@ impl Peek for TypePath {
     }
 }
 
-impl Parse for TypePath {
+impl Parse for UseName {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse::<Path>(cursor)?;
-        let generics = parser.parse::<Option<Generics>>(cursor)?;
+        let ident = parser.parse::<Ident>(cursor)?;
 
-        Ok(Self { path, generics })
+        Ok(Self { ident })
     }
 }
 
-impl Spanned for TypePath {
+impl Spanned for UseName {
     fn span(&self) -> Span {
-        self.path.span()
+        self.ident.span()
     }
 }

@@ -1,37 +1,21 @@
-mod segment;
+mod use_glob;
+mod use_group;
+mod use_name;
+mod use_section;
 
-pub use segment::*;
+pub use use_glob::*;
+pub use use_group::*;
+pub use use_name::*;
+pub use use_section::*;
+
 use zinq_parse::{Parse, Peek, Span, Spanned};
-
-use crate::Path;
+use zinq_token::{ColonColon, Ident};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UsePath {
-    pub path: Path,
-    pub end: Option<UseSegment>,
-}
-
-impl UsePath {
-    pub fn len(&self) -> usize {
-        if let Some(_) = &self.end {
-            return self.path.len() + 1;
-        }
-
-        self.path.len()
-    }
-
-    pub fn last(&self) -> UseSegment {
-        match &self.end {
-            None => UseSegment::Ident(
-                self.path
-                    .last()
-                    .expect("expected end of path")
-                    .value()
-                    .clone(),
-            ),
-            Some(v) => v.clone(),
-        }
-    }
+    pub ident: Ident,
+    pub delim: ColonColon,
+    pub next: Box<UseSection>,
 }
 
 impl std::fmt::Display for UsePath {
@@ -48,10 +32,12 @@ impl Peek for UsePath {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
+        if !fork_parser.peek::<Ident>(&fork).unwrap_or(false) {
+            return Ok(false);
         }
+
+        fork_parser.parse::<Ident>(&mut fork)?;
+        Ok(fork_parser.peek::<ColonColon>(&fork).unwrap_or(false))
     }
 }
 
@@ -60,16 +46,17 @@ impl Parse for UsePath {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let path = parser.parse::<Path>(cursor)?;
-        let end = parser.parse::<Option<UseSegment>>(cursor)?;
+        let ident = parser.parse::<Ident>(cursor)?;
+        let delim = parser.parse::<ColonColon>(cursor)?;
+        let next = parser.parse::<Box<UseSection>>(cursor)?;
 
-        Ok(Self { path, end })
+        Ok(Self { ident, delim, next })
     }
 }
 
 impl Spanned for UsePath {
     fn span(&self) -> zinq_parse::Span {
-        Span::join(self.path.span(), self.last().span())
+        Span::join(self.ident.span(), self.next.span())
     }
 }
 
@@ -87,9 +74,6 @@ mod test {
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(path.to_string(), "std::string::String");
-        debug_assert_eq!(path.len(), 3);
-        debug_assert!(path.last().is_ident());
-
         Ok(())
     }
 
@@ -100,9 +84,6 @@ mod test {
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(path.to_string(), "std::string::*");
-        debug_assert_eq!(path.len(), 3);
-        debug_assert!(path.last().is_glob());
-
         Ok(())
     }
 
@@ -113,9 +94,6 @@ mod test {
         let path = parser.parse::<UsePath>(&mut cursor)?;
 
         debug_assert_eq!(path.to_string(), "std::string::(String, ToString)");
-        debug_assert_eq!(path.len(), 3);
-        debug_assert!(path.last().is_group());
-
         Ok(())
     }
 
@@ -130,20 +108,6 @@ mod test {
         debug_assert_eq!(
             path.to_string(),
             "std::string::(parse::Parser, print::*, tokens::(Token, ToTokens))"
-        );
-        debug_assert_eq!(path.len(), 3);
-        debug_assert!(path.last().is_group());
-        debug_assert_eq!(path.last().as_group().len(), 3);
-        debug_assert_eq!(
-            path.last()
-                .as_group()
-                .last()
-                .unwrap()
-                .value()
-                .last()
-                .as_group()
-                .len(),
-            2
         );
 
         Ok(())

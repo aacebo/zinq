@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Star;
 
-use crate::path::UseSegment;
+use crate::use_path::UseSection;
 
 ///
 /// ## Use Glob
@@ -12,7 +12,7 @@ pub struct UseGlob {
     pub star: Star,
 }
 
-impl From<UseGlob> for UseSegment {
+impl From<UseGlob> for UseSection {
     fn from(value: UseGlob) -> Self {
         Self::Glob(value)
     }

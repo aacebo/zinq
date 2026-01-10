@@ -1,8 +1,5 @@
-mod type_path;
-mod use_path;
-
-pub use type_path::*;
-pub use use_path::*;
+mod section;
+pub use section::*;
 
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{ColonColon, Ident, Punctuated};
@@ -13,7 +10,7 @@ use zinq_token::{ColonColon, Ident, Punctuated};
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Path {
-    items: Punctuated<Ident, ColonColon>,
+    items: Punctuated<PathSection, ColonColon>,
 }
 
 impl Path {
@@ -22,13 +19,13 @@ impl Path {
         self.items.len() == 1
     }
 
-    pub fn as_ident(&self) -> &Ident {
+    pub fn as_ident(&self) -> &PathSection {
         self.items.last().expect("expected non empty path").value()
     }
 }
 
 impl std::ops::Deref for Path {
-    type Target = Punctuated<Ident, ColonColon>;
+    type Target = Punctuated<PathSection, ColonColon>;
 
     fn deref(&self) -> &Self::Target {
         &self.items
@@ -55,7 +52,7 @@ impl Parse for Path {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let items = parser.parse::<Punctuated<Ident, ColonColon>>(cursor)?;
+        let items = parser.parse::<Punctuated<PathSection, ColonColon>>(cursor)?;
         Ok(Self { items })
     }
 }

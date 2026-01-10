@@ -11,18 +11,24 @@ pub use tuple_type::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, TypePath, Visitor};
+use crate::{Node, Path, Visitor};
 
 ///
 /// ## Type
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
-    Path(TypePath),
+    Path(Path),
     Mut(MutType),
     Ref(RefType),
     Slice(SliceType),
     Tuple(TupleType),
+}
+
+impl From<Path> for Type {
+    fn from(value: Path) -> Self {
+        Self::Path(value)
+    }
 }
 
 impl Node for Type {
@@ -81,8 +87,8 @@ impl Parse for Type {
             return Ok(parser.parse::<MutType>(cursor)?.into());
         }
 
-        if parser.peek::<TypePath>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<TypePath>(cursor)?.into());
+        if parser.peek::<Path>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<Path>(cursor)?.into());
         }
 
         if parser.peek::<SliceType>(cursor).unwrap_or(false) {

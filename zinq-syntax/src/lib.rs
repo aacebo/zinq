@@ -8,12 +8,14 @@ mod path;
 pub mod spread;
 pub mod stmt;
 pub mod ty;
+mod use_path;
 mod variant;
 mod visibility;
 
 pub use bounds::*;
 pub use generics::*;
 pub use path::*;
+pub use use_path::*;
 pub use variant::*;
 pub use visibility::*;
 

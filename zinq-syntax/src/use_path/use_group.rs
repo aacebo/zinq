@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::path::{UsePath, UseSegment};
+use crate::use_path::UseSection;
 
 ///
 /// ## Use Group
@@ -13,11 +13,11 @@ use crate::path::{UsePath, UseSegment};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UseGroup {
     pub left_paren: LParen,
-    pub items: Punctuated<UsePath, Comma>,
+    pub items: Punctuated<UseSection, Comma>,
     pub right_paren: RParen,
 }
 
-impl From<UseGroup> for UseSegment {
+impl From<UseGroup> for UseSection {
     fn from(value: UseGroup) -> Self {
         Self::Group(value)
     }
@@ -30,7 +30,7 @@ impl std::fmt::Display for UseGroup {
 }
 
 impl std::ops::Deref for UseGroup {
-    type Target = Punctuated<UsePath, Comma>;
+    type Target = Punctuated<UseSection, Comma>;
 
     fn deref(&self) -> &Self::Target {
         &self.items
@@ -42,13 +42,7 @@ impl Peek for UseGroup {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        let mut fork = cursor.fork();
-        let mut fork_parser = parser.clone();
-
-        match fork_parser.parse::<Self>(&mut fork) {
-            Err(_) => Ok(false),
-            Ok(_) => Ok(true),
-        }
+        Ok(parser.peek::<LParen>(cursor).unwrap_or(false))
     }
 }
 
@@ -58,7 +52,7 @@ impl Parse for UseGroup {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let left_paren = parser.parse::<LParen>(cursor)?;
-        let items = parser.parse::<Punctuated<UsePath, Comma>>(cursor)?;
+        let items = parser.parse::<Punctuated<UseSection, Comma>>(cursor)?;
         let right_paren = parser.parse::<RParen>(cursor)?;
 
         Ok(Self {

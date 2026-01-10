@@ -1,23 +1,26 @@
-mod glob_segment;
-mod group_segment;
-
-pub use glob_segment::*;
-pub use group_segment::*;
-
 use zinq_parse::{Parse, Peek, Spanned};
-use zinq_token::Ident;
+
+use crate::{UseGlob, UseGroup, UseName, UsePath};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UseSegment {
-    Ident(Ident),
+pub enum UseSection {
+    Path(UsePath),
+    Name(UseName),
     Glob(UseGlob),
     Group(UseGroup),
 }
 
-impl UseSegment {
-    pub fn is_ident(&self) -> bool {
+impl UseSection {
+    pub fn is_path(&self) -> bool {
         match self {
-            Self::Ident(_) => true,
+            Self::Path(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_name(&self) -> bool {
+        match self {
+            Self::Name(_) => true,
             _ => false,
         }
     }
@@ -36,10 +39,17 @@ impl UseSegment {
         }
     }
 
-    pub fn as_ident(&self) -> &Ident {
+    pub fn as_path(&self) -> &UsePath {
         match self {
-            Self::Ident(v) => v,
-            _ => panic!("expected Ident"),
+            Self::Path(v) => v,
+            _ => panic!("expected UsePath"),
+        }
+    }
+
+    pub fn as_name(&self) -> &UseName {
+        match self {
+            Self::Name(v) => v,
+            _ => panic!("expected UseName"),
         }
     }
 
@@ -58,17 +68,24 @@ impl UseSegment {
     }
 }
 
-impl std::fmt::Display for UseSegment {
+impl From<UsePath> for UseSection {
+    fn from(value: UsePath) -> Self {
+        Self::Path(value)
+    }
+}
+
+impl std::fmt::Display for UseSection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Ident(v) => write!(f, "{}", v),
+            Self::Path(v) => write!(f, "{}", v),
+            Self::Name(v) => write!(f, "{}", v),
             Self::Glob(v) => write!(f, "{}", v),
             Self::Group(v) => write!(f, "{}", v),
         }
     }
 }
 
-impl Peek for UseSegment {
+impl Peek for UseSection {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -83,21 +100,25 @@ impl Peek for UseSegment {
     }
 }
 
-impl Parse for UseSegment {
+impl Parse for UseSection {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek::<Ident>(cursor).unwrap_or(false) {
-            return Ok(Self::Ident(parser.parse::<Ident>(cursor)?));
-        }
-
         if parser.peek::<UseGlob>(cursor).unwrap_or(false) {
             return Ok(parser.parse::<UseGlob>(cursor)?.into());
         }
 
         if parser.peek::<UseGroup>(cursor).unwrap_or(false) {
             return Ok(parser.parse::<UseGroup>(cursor)?.into());
+        }
+
+        if parser.peek::<UsePath>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<UsePath>(cursor)?.into());
+        }
+
+        if parser.peek::<UseName>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<UseName>(cursor)?.into());
         }
 
         Err(cursor.error(
@@ -107,10 +128,11 @@ impl Parse for UseSegment {
     }
 }
 
-impl Spanned for UseSegment {
+impl Spanned for UseSection {
     fn span(&self) -> zinq_parse::Span {
         match self {
-            Self::Ident(v) => v.span(),
+            Self::Path(v) => v.span(),
+            Self::Name(v) => v.span(),
             Self::Glob(v) => v.span(),
             Self::Group(v) => v.span(),
         }

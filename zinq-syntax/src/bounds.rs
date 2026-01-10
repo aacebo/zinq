@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Plus, Punctuated};
 
-use crate::TypePath;
+use crate::Path;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Bounds {
     pub colon: Colon,
-    pub items: Punctuated<TypePath, Plus>,
+    pub items: Punctuated<Path, Plus>,
 }
 
 impl std::fmt::Display for Bounds {
@@ -36,7 +36,7 @@ impl Parse for Bounds {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let colon = parser.parse::<Colon>(cursor)?;
-        let items = parser.parse::<Punctuated<TypePath, Plus>>(cursor)?;
+        let items = parser.parse::<Punctuated<Path, Plus>>(cursor)?;
 
         Ok(Self { colon, items })
     }
