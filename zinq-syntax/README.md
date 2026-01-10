@@ -38,4 +38,3 @@ Abstract syntax tree implementation for Zinq.
 | `typeof!`             |                                     | ⌛    |
 | `macro`               | [Link](../docs/MACROS.md)           | ⌛    |
 | `union`               |                                     | ⌛    |
-| `"a {var}"`           | [Link](../docs/STRINGS.md)          | ⌛    |
