@@ -119,7 +119,7 @@ mod test {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(
             b"match typeof(self) {
-            string => \"STRING\",
+            std::string::String => \"STRING\",
             bool => \"BOOLEAN\",
         }",
         )
@@ -132,7 +132,7 @@ mod test {
         debug_assert_eq!(
             expr.to_string(),
             "match typeof(self) {
-            string => \"STRING\",
+            std::string::String => \"STRING\",
             bool => \"BOOLEAN\",
         }"
         );

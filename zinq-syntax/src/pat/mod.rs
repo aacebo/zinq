@@ -5,7 +5,6 @@ mod ref_pattern;
 mod spread_pattern;
 mod struct_pattern;
 mod tuple_pattern;
-mod type_pattern;
 mod wild_pattern;
 
 pub use literal_pattern::*;
@@ -15,7 +14,6 @@ pub use ref_pattern::*;
 pub use spread_pattern::*;
 pub use struct_pattern::*;
 pub use tuple_pattern::*;
-pub use type_pattern::*;
 pub use wild_pattern::*;
 
 use zinq_parse::{Parse, Peek, Spanned};
@@ -29,7 +27,6 @@ pub enum Pattern {
     Spread(SpreadPattern),
     Struct(StructPattern),
     Tuple(TuplePattern),
-    Type(TypePattern),
 }
 
 impl std::fmt::Display for Pattern {
@@ -42,7 +39,6 @@ impl std::fmt::Display for Pattern {
             Self::Spread(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
             Self::Tuple(v) => write!(f, "{}", v),
-            Self::Type(v) => write!(f, "{}", v),
         }
     }
 }
@@ -57,7 +53,6 @@ impl Spanned for Pattern {
             Self::Spread(v) => v.span(),
             Self::Struct(v) => v.span(),
             Self::Tuple(v) => v.span(),
-            Self::Type(v) => v.span(),
         }
     }
 }

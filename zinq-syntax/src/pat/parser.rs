@@ -52,10 +52,6 @@ impl PatternParser for ZinqParser {
             return Ok(self.parse::<PathPattern>(cursor)?.into());
         }
 
-        if self.peek::<TypePattern>(cursor).unwrap_or(false) {
-            return Ok(self.parse::<TypePattern>(cursor)?.into());
-        }
-
         Err(cursor.error(
             zinq_error::NOT_FOUND,
             &format!("unknown tokens '{}'", cursor),
