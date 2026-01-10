@@ -139,4 +139,70 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn should_parse_group_pattern() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"match typeof(self) {
+            (std::string::String | bool) => \"STRING OR BOOL\",
+        }",
+        )
+        .cursor();
+
+        let expr = parser.parse_expr(&mut cursor)?;
+
+        debug_assert!(expr.is_match());
+        debug_assert_eq!(expr.as_match().arms.len(), 1);
+        debug_assert!(
+            expr.as_match()
+                .arms
+                .first()
+                .unwrap()
+                .value()
+                .pattern
+                .is_group()
+        );
+        debug_assert_eq!(
+            expr.to_string(),
+            "match typeof(self) {
+            (std::string::String | bool) => \"STRING OR BOOL\",
+        }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_tuple_pattern() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"match &value {
+            (a, b, c) => \"TUPLE\",
+        }",
+        )
+        .cursor();
+
+        let expr = parser.parse_expr(&mut cursor)?;
+
+        debug_assert!(expr.is_match());
+        debug_assert_eq!(expr.as_match().arms.len(), 1);
+        debug_assert!(
+            expr.as_match()
+                .arms
+                .first()
+                .unwrap()
+                .value()
+                .pattern
+                .is_tuple()
+        );
+        debug_assert_eq!(
+            expr.to_string(),
+            "match &value {
+            (a, b, c) => \"TUPLE\",
+        }"
+        );
+
+        Ok(())
+    }
 }

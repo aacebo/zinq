@@ -1,4 +1,4 @@
-use zinq_parse::{Parse, Peek, Span, Spanned};
+use zinq_parse::{Span, Spanned};
 use zinq_token::{And, Mut};
 
 use crate::pat::Pattern;
@@ -30,31 +30,5 @@ impl std::fmt::Display for RefPattern {
 impl Spanned for RefPattern {
     fn span(&self) -> zinq_parse::Span {
         Span::join(self.and.span(), self.inner.span())
-    }
-}
-
-impl Peek for RefPattern {
-    fn peek(
-        cursor: &zinq_parse::Cursor,
-        parser: &zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<And>(cursor).unwrap_or(false))
-    }
-}
-
-impl Parse for RefPattern {
-    fn parse(
-        cursor: &mut zinq_parse::Cursor,
-        parser: &mut zinq_parse::ZinqParser,
-    ) -> zinq_error::Result<Self> {
-        let and = parser.parse::<And>(cursor)?;
-        let mutable = parser.parse::<Option<Mut>>(cursor)?;
-        let inner = parser.parse::<Box<Pattern>>(cursor)?;
-
-        Ok(Self {
-            and,
-            mutable,
-            inner,
-        })
     }
 }
