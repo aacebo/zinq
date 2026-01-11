@@ -30,6 +30,7 @@ pub enum Expr {
     Path(PathExpr),
     Group(GroupExpr),
     Struct(StructExpr),
+    Tuple(TupleExpr),
 
     /// ## Binary
     Arithmetic(ArithmeticExpr),
@@ -79,6 +80,13 @@ impl Expr {
     pub fn is_struct(&self) -> bool {
         match self {
             Self::Struct(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_tuple(&self) -> bool {
+        match self {
+            Self::Tuple(_) => true,
             _ => false,
         }
     }
@@ -195,6 +203,13 @@ impl Expr {
         }
     }
 
+    pub fn as_tuple(&self) -> &TupleExpr {
+        match self {
+            Self::Tuple(v) => v,
+            v => panic!("expected TupleExpr, received {}", v.name()),
+        }
+    }
+
     pub fn as_arithmetic(&self) -> &ArithmeticExpr {
         match self {
             Self::Arithmetic(v) => v,
@@ -287,6 +302,7 @@ impl Node for Expr {
             Self::Path(v) => v.name(),
             Self::Group(v) => v.name(),
             Self::Struct(v) => v.name(),
+            Self::Tuple(v) => v.name(),
             Self::Arithmetic(v) => v.name(),
             Self::Assign(v) => v.name(),
             Self::Cmp(v) => v.name(),
@@ -317,6 +333,7 @@ impl std::fmt::Display for Expr {
             Self::Path(v) => write!(f, "{}", v),
             Self::Group(v) => write!(f, "{}", v),
             Self::Struct(v) => write!(f, "{}", v),
+            Self::Tuple(v) => write!(f, "{}", v),
             Self::Arithmetic(v) => write!(f, "{}", v),
             Self::Assign(v) => write!(f, "{}", v),
             Self::Cmp(v) => write!(f, "{}", v),
@@ -358,6 +375,7 @@ impl Spanned for Expr {
             Self::Path(v) => v.span(),
             Self::Group(v) => v.span(),
             Self::Struct(v) => v.span(),
+            Self::Tuple(v) => v.span(),
             Self::Arithmetic(v) => v.span(),
             Self::Assign(v) => v.span(),
             Self::Cmp(v) => v.span(),
