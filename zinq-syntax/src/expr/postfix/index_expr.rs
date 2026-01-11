@@ -62,7 +62,7 @@ mod test {
         debug_assert!(value.is_index());
         debug_assert_eq!(value.to_string(), "a.b[3]");
         debug_assert_eq!(value.as_index().index.to_string(), "3");
-        
+
         Ok(())
     }
 }
