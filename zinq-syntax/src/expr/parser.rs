@@ -1,15 +1,16 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
 use zinq_token::{
-    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, Is, LBrace, LParen, Match, Minus,
-    Mut, Not, OrOr, Plus, Punctuated, Question, RBrace, RParen, Slash, Star,
+    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, Is, LBrace, LBracket, LParen,
+    Match, Minus, Mut, Not, OrOr, Plus, Punctuated, Question, RBrace, RBracket, RParen, Slash,
+    Star,
 };
 
 use crate::{
     expr::{
         ArithmeticExpr, Arm, ArrayExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IfExpr,
-        IsExpr, LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, PathExpr,
-        RefExpr, StructExpr, TupleExpr,
+        IndexExpr, IsExpr, LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr,
+        PathExpr, RefExpr, StructExpr, TupleExpr,
     },
     ty::Type,
 };
@@ -221,6 +222,18 @@ impl ExprParser for zinq_parse::ZinqParser {
                 let name = self.parse::<Ident>(cursor)?;
 
                 expr = MemberExpr::new(expr, dot, name).into();
+            } else if self.peek::<LBracket>(cursor).unwrap_or(false) {
+                let left_bracket = self.parse::<LBracket>(cursor)?;
+                let index = self.parse::<Box<Expr>>(cursor)?;
+                let right_bracket = self.parse::<RBracket>(cursor)?;
+
+                expr = IndexExpr {
+                    target: Box::new(expr),
+                    left_bracket,
+                    index,
+                    right_bracket,
+                }
+                .into();
             } else {
                 break;
             }

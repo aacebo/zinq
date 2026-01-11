@@ -42,6 +42,7 @@ pub enum Expr {
 
     /// ## Postfix
     Call(CallExpr),
+    Index(IndexExpr),
     Member(MemberExpr),
 
     /// ## Unary
@@ -137,6 +138,13 @@ impl Expr {
     pub fn is_call(&self) -> bool {
         match self {
             Self::Call(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_index(&self) -> bool {
+        match self {
+            Self::Index(_) => true,
             _ => false,
         }
     }
@@ -267,6 +275,13 @@ impl Expr {
         }
     }
 
+    pub fn as_index(&self) -> &IndexExpr {
+        match self {
+            Self::Index(v) => v,
+            v => panic!("expected IndexExpr, received {}", v.name()),
+        }
+    }
+
     pub fn as_member(&self) -> &MemberExpr {
         match self {
             Self::Member(v) => v,
@@ -325,6 +340,7 @@ impl Node for Expr {
             Self::Is(v) => v.name(),
             Self::Logical(v) => v.name(),
             Self::Call(v) => v.name(),
+            Self::Index(v) => v.name(),
             Self::Member(v) => v.name(),
             Self::Ref(v) => v.name(),
             Self::Not(v) => v.name(),
@@ -357,6 +373,7 @@ impl std::fmt::Display for Expr {
             Self::Is(v) => write!(f, "{}", v),
             Self::Logical(v) => write!(f, "{}", v),
             Self::Call(v) => write!(f, "{}", v),
+            Self::Index(v) => write!(f, "{}", v),
             Self::Member(v) => write!(f, "{}", v),
             Self::Ref(v) => write!(f, "{}", v),
             Self::Not(v) => write!(f, "{}", v),
@@ -400,6 +417,7 @@ impl Spanned for Expr {
             Self::Is(v) => v.span(),
             Self::Logical(v) => v.span(),
             Self::Call(v) => v.span(),
+            Self::Index(v) => v.span(),
             Self::Member(v) => v.span(),
             Self::Ref(v) => v.span(),
             Self::Not(v) => v.span(),
