@@ -7,9 +7,9 @@ use zinq_token::{
 
 use crate::{
     expr::{
-        ArithmeticExpr, Arm, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IfExpr, IsExpr,
-        LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, PathExpr, RefExpr,
-        StructExpr, TupleExpr,
+        ArithmeticExpr, Arm, ArrayExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IfExpr,
+        IsExpr, LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, PathExpr,
+        RefExpr, StructExpr, TupleExpr,
     },
     ty::Type,
 };
@@ -232,6 +232,10 @@ impl ExprParser for zinq_parse::ZinqParser {
     fn parse_primary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
         if self.peek::<LiteralExpr>(cursor).unwrap_or(false) {
             return Ok(self.parse::<LiteralExpr>(cursor)?.into());
+        }
+
+        if self.peek::<ArrayExpr>(cursor).unwrap_or(false) {
+            return Ok(self.parse::<ArrayExpr>(cursor)?.into());
         }
 
         if self.peek::<TupleExpr>(cursor).unwrap_or(false) {
