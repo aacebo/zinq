@@ -3,6 +3,7 @@ use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed}
 
 use crate::{
     Generics, Node, Visibility,
+    meta::Meta,
     param::FnParam,
     stmt::{BlockStmt, Stmt},
     ty::Type,
@@ -14,6 +15,7 @@ use crate::{
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FnStmt {
+    pub meta: Option<Meta>,
     pub vis: Visibility,
     pub keyword: Fn,
     pub name: Ident,
@@ -58,6 +60,7 @@ impl Peek for FnStmt {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
+        fork_parser.parse::<Option<Meta>>(&mut fork)?;
         fork_parser.parse::<Visibility>(&mut fork)?;
         Ok(fork_parser.peek::<Fn>(&fork).unwrap_or(false))
     }
@@ -68,6 +71,7 @@ impl Parse for FnStmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
+        let meta = parser.parse::<Option<Meta>>(cursor)?;
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Fn>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
@@ -79,6 +83,7 @@ impl Parse for FnStmt {
         let block = parser.parse::<BlockStmt>(cursor)?;
 
         Ok(Self {
+            meta,
             vis,
             keyword,
             name,
@@ -94,6 +99,10 @@ impl Parse for FnStmt {
 
 impl Spanned for FnStmt {
     fn span(&self) -> Span {
+        if let Some(meta) = &self.meta {
+            return Span::join(meta.span(), self.block.span());
+        }
+
         Span::join(self.vis.span(), self.block.span())
     }
 }
@@ -146,6 +155,28 @@ mod test {
 
         debug_assert_eq!(ty.to_string(), "fn stuff(a: string, b: u32) { }");
         debug_assert_eq!(ty.params.len(), 2);
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_with_meta() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"#[get(\"/users\")]
+            fn get_users() { }",
+        )
+        .cursor();
+
+        let ty = parser.parse::<FnStmt>(&mut cursor)?;
+
+        debug_assert_eq!(
+            ty.to_string(),
+            "#[get(\"/users\")]
+            fn get_users() { }"
+        );
+        debug_assert!(ty.meta.is_some());
+        debug_assert!(ty.params.is_empty());
 
         Ok(())
     }

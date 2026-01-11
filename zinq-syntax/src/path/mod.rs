@@ -2,7 +2,7 @@ mod section;
 pub use section::*;
 
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::{ColonColon, Ident, Punctuated};
+use zinq_token::{ColonColon, Punctuated};
 
 ///
 /// ## Path
@@ -19,7 +19,7 @@ impl Path {
         self.items.len() == 1
     }
 
-    pub fn as_ident(&self) -> &PathSection {
+    pub fn last(&self) -> &PathSection {
         self.items.last().expect("expected non empty path").value()
     }
 }
@@ -43,7 +43,7 @@ impl Peek for Path {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<Ident>(cursor).unwrap_or(false))
+        Ok(parser.peek::<PathSection>(cursor).unwrap_or(false))
     }
 }
 

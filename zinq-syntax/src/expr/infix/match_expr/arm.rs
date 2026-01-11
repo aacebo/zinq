@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::EqArrow;
+use zinq_token::{EqArrow, Suffixed};
 
 use crate::{
     expr::{Expr, ExprParser},
@@ -30,7 +30,9 @@ impl Peek for Arm {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<Pattern>(cursor).unwrap_or(false))
+        Ok(parser
+            .peek::<Suffixed<Pattern, EqArrow>>(cursor)
+            .unwrap_or(false))
     }
 }
 

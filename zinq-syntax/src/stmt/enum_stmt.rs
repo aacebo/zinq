@@ -1,10 +1,11 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Enum, Ident, LBrace, Punctuated, RBrace};
 
-use crate::{Generics, Node, Variant, Visibility, stmt::Stmt};
+use crate::{Generics, Node, Variant, Visibility, meta::Meta, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumStmt {
+    pub meta: Option<Meta>,
     pub vis: Visibility,
     pub keyword: Enum,
     pub name: Ident,
@@ -47,6 +48,7 @@ impl Peek for EnumStmt {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
+        fork_parser.parse::<Option<Meta>>(&mut fork)?;
         fork_parser.parse::<Visibility>(&mut fork)?;
         Ok(fork_parser.peek::<Enum>(&fork).unwrap_or(false))
     }
@@ -57,6 +59,7 @@ impl Parse for EnumStmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
+        let meta = parser.parse::<Option<Meta>>(cursor)?;
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Enum>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
@@ -66,6 +69,7 @@ impl Parse for EnumStmt {
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
+            meta,
             vis,
             keyword,
             name,
@@ -79,6 +83,10 @@ impl Parse for EnumStmt {
 
 impl Spanned for EnumStmt {
     fn span(&self) -> zinq_parse::Span {
+        if let Some(meta) = &self.meta {
+            return Span::join(meta.span(), self.right_brace.span());
+        }
+
         Span::join(self.vis.span(), self.right_brace.span())
     }
 }
@@ -116,6 +124,43 @@ mod test {
         debug_assert_eq!(
             stmt.to_string(),
             "enum Status {
+            Away,
+            Online(DateTime),
+            Offline {
+                last_online_at: DateTime,
+            },
+        }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_with_meta() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"#[Debug]
+            enum Status {
+            Away,
+            Online(DateTime),
+            Offline {
+                last_online_at: DateTime,
+            },
+        }",
+        )
+        .cursor();
+
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_enum());
+        debug_assert_eq!(stmt.as_enum().variants.len(), 3);
+        debug_assert!(stmt.as_enum().variants.index(0).value().fields.is_none());
+        debug_assert!(stmt.as_enum().variants.index(1).value().fields.is_indexed());
+        debug_assert!(stmt.as_enum().variants.index(2).value().fields.is_named());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "#[Debug]
+            enum Status {
             Away,
             Online(DateTime),
             Offline {

@@ -7,8 +7,9 @@ use zinq_token::{
 
 use crate::{
     expr::{
-        ArithmeticExpr, Arm, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IdentExpr, IfExpr,
-        IsExpr, LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, RefExpr,
+        ArithmeticExpr, Arm, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IfExpr, IsExpr,
+        LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr, PathExpr, RefExpr,
+        StructExpr,
     },
     ty::Type,
 };
@@ -206,7 +207,7 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_postfix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        let mut expr = self.parse_primary_expr(cursor)?.into();
+        let mut expr = self.parse_primary_expr(cursor)?;
 
         while !cursor.eof() {
             if self.peek::<LParen>(cursor).unwrap_or(false) {
@@ -233,8 +234,12 @@ impl ExprParser for zinq_parse::ZinqParser {
             return Ok(self.parse::<LiteralExpr>(cursor)?.into());
         }
 
-        if self.peek::<IdentExpr>(cursor).unwrap_or(false) {
-            return Ok(self.parse::<IdentExpr>(cursor)?.into());
+        if self.peek::<StructExpr>(cursor).unwrap_or(false) {
+            return Ok(self.parse::<StructExpr>(cursor)?.into());
+        }
+
+        if self.peek::<PathExpr>(cursor).unwrap_or(false) {
+            return Ok(self.parse::<PathExpr>(cursor)?.into());
         }
 
         if self.peek::<GroupExpr>(cursor).unwrap_or(false) {

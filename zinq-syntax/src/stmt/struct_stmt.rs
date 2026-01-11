@@ -1,10 +1,11 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Ident, SemiColon, Struct};
 
-use crate::{Generics, Node, Visibility, fields::Fields, stmt::Stmt};
+use crate::{Generics, Node, Visibility, fields::Fields, meta::Meta, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StructStmt {
+    pub meta: Option<Meta>,
     pub vis: Visibility,
     pub keyword: Struct,
     pub name: Ident,
@@ -46,6 +47,7 @@ impl Peek for StructStmt {
         let mut fork = cursor.fork();
         let mut fork_parser = parser.clone();
 
+        fork_parser.parse::<Option<Meta>>(&mut fork)?;
         fork_parser.parse::<Visibility>(&mut fork)?;
         Ok(fork_parser.peek::<Struct>(&fork).unwrap_or(false))
     }
@@ -56,6 +58,7 @@ impl Parse for StructStmt {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
+        let meta = parser.parse::<Option<Meta>>(cursor)?;
         let vis = parser.parse::<Visibility>(cursor)?;
         let keyword = parser.parse::<Struct>(cursor)?;
         let name = parser.parse::<Ident>(cursor)?;
@@ -68,6 +71,7 @@ impl Parse for StructStmt {
         }
 
         Ok(Self {
+            meta,
             vis,
             keyword,
             name,
@@ -80,11 +84,18 @@ impl Parse for StructStmt {
 
 impl Spanned for StructStmt {
     fn span(&self) -> Span {
+        let mut start = self.vis.span();
+        let mut end = self.fields.span();
+
         if let Some(semi) = &self.semi {
-            return Span::join(self.vis.span(), semi.span());
+            end = semi.span();
         }
 
-        Span::join(self.vis.span(), self.fields.span())
+        if let Some(meta) = &self.meta {
+            start = meta.span();
+        }
+
+        Span::join(start, end)
     }
 }
 
@@ -234,6 +245,34 @@ mod test {
         debug_assert_eq!(
             stmt.to_string(),
             "struct MyStruct<T> {
+            a: T,
+        }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_with_meta() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"#[Clone]
+            struct MyStruct<T> {
+            a: T,
+        }",
+        )
+        .cursor();
+
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_struct());
+        debug_assert!(stmt.as_struct().meta.is_some());
+        debug_assert_eq!(stmt.as_struct().fields.len(), 1);
+        debug_assert!(stmt.as_struct().generics.is_some());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "#[Clone]
+            struct MyStruct<T> {
             a: T,
         }"
         );

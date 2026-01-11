@@ -1,26 +1,25 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::Ident;
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, Path, Visitor, expr::Expr};
 
 ///
-/// ## Ident Expression
+/// ## Path Expression
 /// `my_var`
 ///
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IdentExpr {
-    pub name: Ident,
+pub struct PathExpr {
+    pub path: Path,
 }
 
-impl From<IdentExpr> for Expr {
-    fn from(value: IdentExpr) -> Self {
-        Self::Ident(value)
+impl From<PathExpr> for Expr {
+    fn from(value: PathExpr) -> Self {
+        Self::Path(value)
     }
 }
 
-impl Node for IdentExpr {
+impl Node for PathExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Primary::Ident"
+        "Syntax::Expr::Primary::Path"
     }
 
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
@@ -31,33 +30,33 @@ impl Node for IdentExpr {
     }
 }
 
-impl std::fmt::Display for IdentExpr {
+impl std::fmt::Display for PathExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Peek for IdentExpr {
+impl Peek for PathExpr {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser.peek::<Ident>(cursor).unwrap_or(false))
+        Ok(parser.peek::<Path>(cursor).unwrap_or(false))
     }
 }
 
-impl Parse for IdentExpr {
+impl Parse for PathExpr {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        let name = parser.parse::<Ident>(cursor)?;
-        Ok(Self { name })
+        let path = parser.parse::<Path>(cursor)?;
+        Ok(Self { path })
     }
 }
 
-impl Spanned for IdentExpr {
+impl Spanned for PathExpr {
     fn span(&self) -> Span {
-        self.name.span()
+        self.path.span()
     }
 }

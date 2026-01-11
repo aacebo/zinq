@@ -4,20 +4,20 @@ use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace};
 use crate::{Node, Visibility, Visitor, spread::TypeSpread, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NamedField {
+pub struct NameField {
     pub vis: Visibility,
     pub name: Ident,
     pub colon: Colon,
     pub ty: Type,
 }
 
-impl std::fmt::Display for NamedField {
+impl std::fmt::Display for NameField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Peek for NamedField {
+impl Peek for NameField {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -32,7 +32,7 @@ impl Peek for NamedField {
     }
 }
 
-impl Parse for NamedField {
+impl Parse for NameField {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
@@ -51,21 +51,21 @@ impl Parse for NamedField {
     }
 }
 
-impl Spanned for NamedField {
+impl Spanned for NameField {
     fn span(&self) -> Span {
         Span::join(self.vis.span(), self.ty.span())
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NamedFields {
+pub struct NameFields {
     pub left_brace: LBrace,
     pub spreads: Punctuated<TypeSpread, Comma>,
-    pub fields: Punctuated<NamedField, Comma>,
+    pub fields: Punctuated<NameField, Comma>,
     pub right_brace: RBrace,
 }
 
-impl Node for NamedFields {
+impl Node for NameFields {
     fn name(&self) -> &str {
         "Syntax::Fields::Named"
     }
@@ -78,27 +78,27 @@ impl Node for NamedFields {
     }
 }
 
-impl std::ops::Deref for NamedFields {
-    type Target = Punctuated<NamedField, Comma>;
+impl std::ops::Deref for NameFields {
+    type Target = Punctuated<NameField, Comma>;
 
     fn deref(&self) -> &Self::Target {
         &self.fields
     }
 }
 
-impl From<NamedFields> for super::Fields {
-    fn from(value: NamedFields) -> Self {
+impl From<NameFields> for super::Fields {
+    fn from(value: NameFields) -> Self {
         super::Fields::Named(value)
     }
 }
 
-impl std::fmt::Display for NamedFields {
+impl std::fmt::Display for NameFields {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.span())
     }
 }
 
-impl Peek for NamedFields {
+impl Peek for NameFields {
     fn peek(
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
@@ -117,14 +117,14 @@ impl Peek for NamedFields {
     }
 }
 
-impl Parse for NamedFields {
+impl Parse for NameFields {
     fn parse(
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let left_brace = parser.parse::<LBrace>(cursor)?;
         let spreads = parser.parse::<Punctuated<TypeSpread, Comma>>(cursor)?;
-        let fields = parser.parse::<Punctuated<NamedField, Comma>>(cursor)?;
+        let fields = parser.parse::<Punctuated<NameField, Comma>>(cursor)?;
         let right_brace = parser.parse::<RBrace>(cursor)?;
 
         Ok(Self {
@@ -136,7 +136,7 @@ impl Parse for NamedFields {
     }
 }
 
-impl Spanned for NamedFields {
+impl Spanned for NameFields {
     fn span(&self) -> Span {
         Span::join(self.left_brace.span(), self.right_brace.span())
     }
@@ -147,14 +147,14 @@ mod test {
     use zinq_error::Result;
     use zinq_parse::Span;
 
-    use crate::fields::NamedFields;
+    use crate::fields::NameFields;
 
     #[test]
     fn should_parse() -> Result<()> {
         let mut cursor =
             Span::from_bytes(b"{ ..std::string::String, hello: string, world: u32 }").cursor();
         let mut parser = zinq_parse::ZinqParser;
-        let fields = parser.parse::<NamedFields>(&mut cursor)?;
+        let fields = parser.parse::<NameFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(fields.spreads.len(), 1);
@@ -172,7 +172,7 @@ mod test {
     fn should_parse_trailing_comma() -> Result<()> {
         let mut cursor = Span::from_bytes(b"{ hello: std::string::string, world: u32, }").cursor();
         let mut parser = zinq_parse::ZinqParser;
-        let fields = parser.parse::<NamedFields>(&mut cursor)?;
+        let fields = parser.parse::<NameFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(
@@ -199,7 +199,7 @@ mod test {
         .cursor();
 
         let mut parser = zinq_parse::ZinqParser;
-        let fields = parser.parse::<NamedFields>(&mut cursor)?;
+        let fields = parser.parse::<NameFields>(&mut cursor)?;
 
         debug_assert_eq!(fields.len(), 2);
         debug_assert_eq!(

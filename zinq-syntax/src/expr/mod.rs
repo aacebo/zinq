@@ -27,8 +27,9 @@ use crate::{Node, Visitor};
 pub enum Expr {
     /// ## Primary
     Literal(LiteralExpr),
-    Ident(IdentExpr),
+    Path(PathExpr),
     Group(GroupExpr),
+    Struct(StructExpr),
 
     /// ## Binary
     Arithmetic(ArithmeticExpr),
@@ -61,9 +62,9 @@ impl Expr {
         }
     }
 
-    pub fn is_ident(&self) -> bool {
+    pub fn is_path(&self) -> bool {
         match self {
-            Self::Ident(_) => true,
+            Self::Path(_) => true,
             _ => false,
         }
     }
@@ -71,6 +72,13 @@ impl Expr {
     pub fn is_group(&self) -> bool {
         match self {
             Self::Group(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_struct(&self) -> bool {
+        match self {
+            Self::Struct(_) => true,
             _ => false,
         }
     }
@@ -166,10 +174,10 @@ impl Expr {
         }
     }
 
-    pub fn as_ident(&self) -> &IdentExpr {
+    pub fn as_path(&self) -> &PathExpr {
         match self {
-            Self::Ident(v) => v,
-            v => panic!("expected IdentExpr, received {}", v.name()),
+            Self::Path(v) => v,
+            v => panic!("expected PathExpr, received {}", v.name()),
         }
     }
 
@@ -177,6 +185,13 @@ impl Expr {
         match self {
             Self::Group(v) => v,
             v => panic!("expected GroupExpr, received {}", v.name()),
+        }
+    }
+
+    pub fn as_struct(&self) -> &StructExpr {
+        match self {
+            Self::Struct(v) => v,
+            v => panic!("expected StructExpr, received {}", v.name()),
         }
     }
 
@@ -269,8 +284,9 @@ impl Node for Expr {
     fn name(&self) -> &str {
         match self {
             Self::Literal(v) => v.name(),
-            Self::Ident(v) => v.name(),
+            Self::Path(v) => v.name(),
             Self::Group(v) => v.name(),
+            Self::Struct(v) => v.name(),
             Self::Arithmetic(v) => v.name(),
             Self::Assign(v) => v.name(),
             Self::Cmp(v) => v.name(),
@@ -298,8 +314,9 @@ impl std::fmt::Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Literal(v) => write!(f, "{}", v),
-            Self::Ident(v) => write!(f, "{}", v),
+            Self::Path(v) => write!(f, "{}", v),
             Self::Group(v) => write!(f, "{}", v),
+            Self::Struct(v) => write!(f, "{}", v),
             Self::Arithmetic(v) => write!(f, "{}", v),
             Self::Assign(v) => write!(f, "{}", v),
             Self::Cmp(v) => write!(f, "{}", v),
@@ -338,8 +355,9 @@ impl Spanned for Expr {
     fn span(&self) -> zinq_parse::Span {
         match self {
             Self::Literal(v) => v.span(),
-            Self::Ident(v) => v.span(),
+            Self::Path(v) => v.span(),
             Self::Group(v) => v.span(),
+            Self::Struct(v) => v.span(),
             Self::Arithmetic(v) => v.span(),
             Self::Assign(v) => v.span(),
             Self::Cmp(v) => v.span(),

@@ -1,8 +1,8 @@
-mod indexed;
-mod named;
+mod index_fields;
+mod name_fields;
 
-pub use indexed::*;
-pub use named::*;
+pub use index_fields::*;
+pub use name_fields::*;
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{Node, Visitor};
@@ -10,8 +10,8 @@ use crate::{Node, Visitor};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {
     None(Span),
-    Indexed(IndexedFields),
-    Named(NamedFields),
+    Indexed(IndexFields),
+    Named(NameFields),
 }
 
 impl Fields {
@@ -44,17 +44,17 @@ impl Fields {
         }
     }
 
-    pub fn as_indexed(&self) -> &IndexedFields {
+    pub fn as_indexed(&self) -> &IndexFields {
         match self {
             Self::Indexed(v) => v,
-            v => panic!("expected IndexedFields, received {}", v.name()),
+            v => panic!("expected IndexFields, received {}", v.name()),
         }
     }
 
-    pub fn as_named(&self) -> &NamedFields {
+    pub fn as_named(&self) -> &NameFields {
         match self {
             Self::Named(v) => v,
-            v => panic!("expected NamedFields, received {}", v.name()),
+            v => panic!("expected NameFields, received {}", v.name()),
         }
     }
 }
@@ -97,12 +97,12 @@ impl Parse for Fields {
         cursor: &mut zinq_parse::Cursor,
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
-        if parser.peek::<IndexedFields>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<IndexedFields>(cursor)?.into());
+        if parser.peek::<IndexFields>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<IndexFields>(cursor)?.into());
         }
 
-        if parser.peek::<NamedFields>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<NamedFields>(cursor)?.into());
+        if parser.peek::<NameFields>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<NameFields>(cursor)?.into());
         }
 
         Ok(Self::None(cursor.span().clone()))

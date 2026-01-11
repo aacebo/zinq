@@ -1,12 +1,12 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::Ident;
+use zinq_token::{ColonColon, Ident, Suffixed};
 
 use crate::Generics;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PathSection {
     pub ident: Ident,
-    pub generics: Option<Generics>,
+    pub generics: Option<Suffixed<ColonColon, Generics>>,
 }
 
 impl std::fmt::Display for PathSection {
@@ -40,7 +40,7 @@ impl Parse for PathSection {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         let ident = parser.parse::<Ident>(cursor)?;
-        let generics = parser.parse::<Option<Generics>>(cursor)?;
+        let generics = parser.parse::<Option<Suffixed<ColonColon, Generics>>>(cursor)?;
 
         Ok(Self { ident, generics })
     }
