@@ -2,6 +2,7 @@ mod block_stmt;
 mod enum_stmt;
 mod expr_stmt;
 mod fn_stmt;
+mod for_stmt;
 mod if_stmt;
 mod impl_stmt;
 mod let_stmt;
@@ -15,6 +16,7 @@ pub use block_stmt::*;
 pub use enum_stmt::*;
 pub use expr_stmt::*;
 pub use fn_stmt::*;
+pub use for_stmt::*;
 pub use if_stmt::*;
 pub use impl_stmt::*;
 pub use let_stmt::*;
@@ -48,6 +50,7 @@ pub enum Stmt {
     Return(ReturnStmt),
     If(IfStmt),
     Enum(EnumStmt),
+    For(ForStmt),
 }
 
 impl Stmt {
@@ -128,6 +131,13 @@ impl Stmt {
         }
     }
 
+    pub fn is_for(&self) -> bool {
+        match self {
+            Self::For(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn as_block(&self) -> &BlockStmt {
         match self {
             Self::Block(v) => v,
@@ -204,6 +214,13 @@ impl Stmt {
             v => panic!("expected EnumStmt, received {}", v.name()),
         }
     }
+
+    pub fn as_for(&self) -> &ForStmt {
+        match self {
+            Self::For(v) => v,
+            v => panic!("expected ForStmt, received {}", v.name()),
+        }
+    }
 }
 
 impl Node for Stmt {
@@ -220,6 +237,7 @@ impl Node for Stmt {
             Self::Return(v) => v.name(),
             Self::If(v) => v.name(),
             Self::Enum(v) => v.name(),
+            Self::For(v) => v.name(),
         }
     }
 
@@ -245,6 +263,7 @@ impl std::fmt::Display for Stmt {
             Self::Return(v) => write!(f, "{}", v),
             Self::If(v) => write!(f, "{}", v),
             Self::Enum(v) => write!(f, "{}", v),
+            Self::For(v) => write!(f, "{}", v),
         }
     }
 }
@@ -278,6 +297,7 @@ impl Spanned for Stmt {
             Self::Return(v) => v.span(),
             Self::If(v) => v.span(),
             Self::Enum(v) => v.span(),
+            Self::For(v) => v.span(),
         }
     }
 }

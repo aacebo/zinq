@@ -2,8 +2,8 @@ use zinq_error::Result;
 use zinq_parse::{Cursor, ZinqParser};
 
 use crate::stmt::{
-    BlockStmt, EnumStmt, ExprStmt, FnStmt, IfStmt, ImplStmt, LetStmt, ReturnStmt, Stmt, StructStmt,
-    UseStmt,
+    BlockStmt, EnumStmt, ExprStmt, FnStmt, ForStmt, IfStmt, ImplStmt, LetStmt, ReturnStmt, Stmt,
+    StructStmt, UseStmt,
 };
 
 pub trait StmtParser {
@@ -35,6 +35,8 @@ impl StmtParser for ZinqParser {
             return self.parse_use_stmt(cursor);
         } else if self.peek::<ImplStmt>(cursor).unwrap_or(false) {
             return self.parse_impl_stmt(cursor);
+        } else if self.peek::<ForStmt>(cursor).unwrap_or(false) {
+            return self.parse_for_stmt(cursor);
         } else if self.peek::<IfStmt>(cursor).unwrap_or(false) {
             return self.parse_if_stmt(cursor);
         } else if self.peek::<ReturnStmt>(cursor).unwrap_or(false) {
@@ -70,8 +72,8 @@ impl StmtParser for ZinqParser {
         Ok(self.parse::<ImplStmt>(cursor)?.into())
     }
 
-    fn parse_for_stmt(&mut self, _: &mut Cursor) -> Result<Stmt> {
-        todo!()
+    fn parse_for_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
+        Ok(self.parse::<ForStmt>(cursor)?.into())
     }
 
     fn parse_expr_stmt(&mut self, cursor: &mut Cursor) -> Result<Stmt> {
