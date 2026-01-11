@@ -55,3 +55,23 @@ impl Spanned for MemberExpr {
         Span::join(self.target.span(), self.name.span())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use zinq_error::Result;
+    use zinq_parse::Span;
+
+    use crate::expr::ExprParser;
+
+    #[test]
+    fn should_parse() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(b"a.test().b").cursor();
+        let value = parser.parse_expr(&mut cursor)?;
+
+        debug_assert!(value.is_member());
+        debug_assert_eq!(value.as_member().name.to_string(), "b");
+        debug_assert_eq!(value.to_string(), "a.test().b");
+        Ok(())
+    }
+}
