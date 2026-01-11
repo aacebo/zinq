@@ -1,6 +1,6 @@
 use std::{ops::Index, str::FromStr};
 
-use zinq_error::ZinqError;
+use zinq_error::{Result, ZinqError};
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{ToTokens, Token};
@@ -14,12 +14,26 @@ impl TokenStream {
     pub fn new() -> Self {
         Self { inner: vec![] }
     }
+
+    pub fn push<T: ToTokens>(&mut self, tokens: &T) -> Result<&mut Self> {
+        self.inner.extend(tokens.to_tokens()?);
+        Ok(self)
+    }
+}
+
+impl ToTokens for Span {
+    fn to_tokens(&self) -> Result<TokenStream> {
+        let mut cursor = self.cursor();
+        let mut parser = zinq_parse::ZinqParser::new();
+
+        parser.parse::<TokenStream>(&mut cursor)
+    }
 }
 
 impl TryFrom<&[u8]> for TokenStream {
     type Error = ZinqError;
 
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(value: &[u8]) -> Result<Self> {
         if value.is_empty() {
             return Ok(Self::new());
         }
@@ -34,7 +48,7 @@ impl TryFrom<&[u8]> for TokenStream {
 impl<const N: usize> TryFrom<&[u8; N]> for TokenStream {
     type Error = ZinqError;
 
-    fn try_from(value: &[u8; N]) -> Result<Self, Self::Error> {
+    fn try_from(value: &[u8; N]) -> Result<Self> {
         if value.is_empty() {
             return Ok(Self::new());
         }
@@ -49,7 +63,7 @@ impl<const N: usize> TryFrom<&[u8; N]> for TokenStream {
 impl FromStr for TokenStream {
     type Err = ZinqError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         if s.is_empty() {
             return Ok(Self::new());
         }
@@ -145,8 +159,8 @@ impl ToTokens for TokenStream {
 }
 
 impl Peek for TokenStream {
-    fn peek(_: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
-        Ok(true)
+    fn peek(cursor: &zinq_parse::Cursor, _: &zinq_parse::ZinqParser) -> zinq_error::Result<bool> {
+        Ok(cursor.eof())
     }
 }
 
@@ -162,7 +176,7 @@ impl Parse for TokenStream {
             inner.push(token);
         }
 
-        Ok(Self { inner: inner })
+        Ok(Self { inner })
     }
 }
 

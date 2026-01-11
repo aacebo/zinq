@@ -2,6 +2,7 @@ mod bounds;
 pub mod expr;
 pub mod fields;
 mod generics;
+pub mod meta;
 pub mod param;
 pub mod pat;
 mod path;

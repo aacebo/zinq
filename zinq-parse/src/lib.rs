@@ -29,6 +29,12 @@ use zinq_error::Result;
 ///
 pub trait Peek {
     fn peek(cursor: &Cursor, parser: &ZinqParser) -> Result<bool>;
+
+    fn peek_span(span: Span) -> Result<bool> {
+        let cursor = span.cursor();
+        let parser = ZinqParser::new();
+        Self::peek(&cursor, &parser)
+    }
 }
 
 ///
@@ -37,6 +43,12 @@ pub trait Peek {
 ///
 pub trait Parse: Spanned + Peek + std::fmt::Debug + Clone {
     fn parse(cursor: &mut Cursor, parser: &mut ZinqParser) -> Result<Self>;
+
+    fn parse_span(span: Span) -> Result<Self> {
+        let mut cursor = span.cursor();
+        let mut parser = ZinqParser::new();
+        parser.parse::<Self>(&mut cursor)
+    }
 }
 
 ///
@@ -44,10 +56,14 @@ pub trait Parse: Spanned + Peek + std::fmt::Debug + Clone {
 /// a convenient way to conditionally
 /// traverse/parse a sequence of data
 ///
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct ZinqParser;
 
 impl ZinqParser {
+    pub fn new() -> Self {
+        Self
+    }
+
     ///
     /// ## peek
     /// peek a type without moving the cursor
