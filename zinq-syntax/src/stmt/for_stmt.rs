@@ -86,7 +86,7 @@ mod test {
     use crate::stmt::StmtParser;
 
     #[test]
-    fn should_parse_basic() -> Result<()> {
+    fn should_parse_iter() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
         let mut cursor = Span::from_bytes(
             b"for user in users {
@@ -102,6 +102,29 @@ mod test {
             stmt.to_string(),
             "for user in users {
                 println(\"{user}\");
+            }"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_parse_range() -> Result<()> {
+        let mut parser = zinq_parse::ZinqParser;
+        let mut cursor = Span::from_bytes(
+            b"for i in [0..10] {
+                println(\"{i}\");
+            }",
+        )
+        .cursor();
+
+        let stmt = parser.parse_stmt(&mut cursor)?;
+
+        debug_assert!(stmt.is_for());
+        debug_assert_eq!(
+            stmt.to_string(),
+            "for i in [0..10] {
+                println(\"{i}\");
             }"
         );
 

@@ -1,5 +1,5 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
-use zinq_token::{Comma, LBracket, Punctuated, RBracket, Suffixed};
+use zinq_token::{Comma, LBracket, Punctuated, RBracket};
 
 use crate::{Node, expr::Expr};
 
@@ -45,9 +45,7 @@ impl Peek for ArrayExpr {
         cursor: &zinq_parse::Cursor,
         parser: &zinq_parse::ZinqParser,
     ) -> zinq_error::Result<bool> {
-        Ok(parser
-            .peek::<Suffixed<Suffixed<LBracket, Expr>, Comma>>(cursor)
-            .unwrap_or(false))
+        Ok(parser.peek::<LBracket>(cursor).unwrap_or(false))
     }
 }
 
