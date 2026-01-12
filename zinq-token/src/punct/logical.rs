@@ -77,7 +77,7 @@ impl Parse for Logical {
 
         Err(cursor.error(
             zinq_error::NOT_FOUND,
-            &format!("unknown tokens '{}'", cursor),
+            &format!("unexpected token '{}'", *cursor.peek()? as char),
         ))
     }
 }

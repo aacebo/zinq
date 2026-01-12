@@ -54,7 +54,7 @@ macro_rules! define_puncts {
                     }
                 )*
 
-                Err(cursor.error(zinq_error::NOT_FOUND, &format!("unknown tokens '{}'", cursor)))
+                Err(cursor.error(zinq_error::NOT_FOUND, &format!("unexpected token '{}'", *cursor.peek()? as char)))
             }
         }
 

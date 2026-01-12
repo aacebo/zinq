@@ -46,7 +46,7 @@ macro_rules! define_keywords {
                     }
                 )*
 
-                Err(cursor.error(zinq_error::NOT_FOUND, &format!("unknown tokens '{}'", cursor)))
+                Err(cursor.error(zinq_error::NOT_FOUND, &format!("unexpected token '{}'", *cursor.peek()? as char)))
             }
         }
 

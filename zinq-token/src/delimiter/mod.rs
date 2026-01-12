@@ -101,7 +101,7 @@ impl Parse for Delim {
 
         Err(cursor.error(
             zinq_error::NOT_FOUND,
-            &format!("unknown tokens '{}'", cursor),
+            &format!("unexpected token '{}'", *cursor.peek()? as char),
         ))
     }
 }
