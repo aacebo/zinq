@@ -18,3 +18,5 @@ zinq-syntax = { path = "./zinq-syntax", version = "0.0.1" }
 zinq-error = { path = "./zinq-error", version = "0.0.1" }
 zinq-token = { path = "./zinq-token", version = "0.0.1" }
 zinq-parse = { path = "./zinq-parse", version = "0.0.1" }
+zinq-sema = { path = "./zinq-sema", version = "0.0.1" }
+zinq-types = { path = "./zinq-types", version = "0.0.1" }

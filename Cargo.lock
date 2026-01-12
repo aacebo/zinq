@@ -23,6 +23,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "zinq-sema"
+version = "0.0.1"
+
+[[package]]
 name = "zinq-syntax"
 version = "0.0.1"
 dependencies = [
@@ -38,3 +42,7 @@ dependencies = [
  "zinq-error",
  "zinq-parse",
 ]
+
+[[package]]
+name = "zinq-types"
+version = "0.0.1"
