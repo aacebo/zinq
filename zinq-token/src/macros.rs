@@ -6,7 +6,7 @@ macro_rules! Stream {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use zinq_error::Result;
 
     #[test]

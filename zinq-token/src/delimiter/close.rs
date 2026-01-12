@@ -182,7 +182,7 @@ macro_rules! define_close_delimiters {
         )*
 
         #[cfg(test)]
-        mod test {
+        mod tests {
             use zinq_error::Result;
             use zinq_parse::Span;
 

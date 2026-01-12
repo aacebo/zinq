@@ -5,7 +5,7 @@ use crate::{Node, Visibility};
 
 ///
 /// ## Mod Visibility
-/// `pub mod test: string`
+/// `pub mod tests: string`
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModVisibility {
@@ -69,7 +69,7 @@ impl Spanned for ModVisibility {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use zinq_error::Result;
     use zinq_parse::Span;
 

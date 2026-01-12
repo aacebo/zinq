@@ -197,7 +197,7 @@ impl<const N: usize> PartialEq<&[u8; N]> for Span {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::{Bytes, Span};
 
     #[test]

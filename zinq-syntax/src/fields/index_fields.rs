@@ -127,7 +127,7 @@ impl Spanned for IndexFields {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::ops::Index;
 
     use zinq_error::Result;

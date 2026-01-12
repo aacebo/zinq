@@ -95,7 +95,7 @@ impl PartialEq for Error {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     #[derive(Debug)]
     struct CustomError(String);
 

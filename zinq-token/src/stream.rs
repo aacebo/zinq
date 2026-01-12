@@ -194,7 +194,7 @@ impl Spanned for TokenStream {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::str::FromStr;
 
     use zinq_error::Result;

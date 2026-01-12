@@ -75,7 +75,7 @@ impl Spanned for ModStmt {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use zinq_error::Result;
     use zinq_parse::Span;
 
@@ -84,12 +84,12 @@ mod test {
     #[test]
     fn should_parse_private() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
-        let mut cursor = Span::from_bytes(b"mod test;").cursor();
+        let mut cursor = Span::from_bytes(b"mod tests;").cursor();
 
         let ty = parser.parse::<ModStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_priv());
-        debug_assert_eq!(ty.to_string(), "mod test;");
+        debug_assert_eq!(ty.to_string(), "mod tests;");
 
         Ok(())
     }
@@ -97,12 +97,12 @@ mod test {
     #[test]
     fn should_parse_public() -> Result<()> {
         let mut parser = zinq_parse::ZinqParser;
-        let mut cursor = Span::from_bytes(b"pub mod test;").cursor();
+        let mut cursor = Span::from_bytes(b"pub mod tests;").cursor();
 
         let ty = parser.parse::<ModStmt>(&mut cursor)?;
 
         debug_assert!(ty.vis.is_pub());
-        debug_assert_eq!(ty.to_string(), "pub mod test;");
+        debug_assert_eq!(ty.to_string(), "pub mod tests;");
 
         Ok(())
     }

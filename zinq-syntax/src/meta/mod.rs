@@ -69,7 +69,7 @@ impl Parse for Meta {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::ops::Index;
 
     use zinq_error::Result;

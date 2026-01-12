@@ -91,7 +91,7 @@ impl std::fmt::Display for Bytes {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::{Bytes, Location};
 
     #[test]

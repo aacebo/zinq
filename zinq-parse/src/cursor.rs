@@ -317,7 +317,7 @@ impl std::fmt::Display for Cursor {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use zinq_error::Result;
 
     use crate::{Bytes, Span};

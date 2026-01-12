@@ -106,7 +106,7 @@ where
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use zinq_error::Result;
     use zinq_parse::Span;
 
