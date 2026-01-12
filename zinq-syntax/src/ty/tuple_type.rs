@@ -22,7 +22,7 @@ impl From<TupleType> for Type {
 
 impl Node for TupleType {
     fn name(&self) -> &str {
-        "Syntax::Type::Tuple"
+        "Type::Tuple"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

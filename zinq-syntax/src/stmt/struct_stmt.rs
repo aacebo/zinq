@@ -22,7 +22,7 @@ impl From<StructStmt> for Stmt {
 
 impl Node for StructStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Struct"
+        "Stmt::Struct"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

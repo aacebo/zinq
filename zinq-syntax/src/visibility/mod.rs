@@ -10,7 +10,7 @@ pub use super_visibility::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Visitor};
+use crate::Node;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Visibility {
@@ -58,13 +58,6 @@ impl Node for Visibility {
             Self::Super(v) => v.name(),
             Self::Priv(v) => v.name(),
         }
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
     }
 }
 

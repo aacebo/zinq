@@ -1,5 +1,7 @@
 mod if_expr;
 mod match_expr;
+mod range_expr;
 
 pub use if_expr::*;
 pub use match_expr::*;
+pub use range_expr::*;

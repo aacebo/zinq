@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Not;
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Not Expression
@@ -31,14 +31,7 @@ impl From<NotExpr> for Expr {
 
 impl Node for NotExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Unary::Not"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Unary::Not"
     }
 }
 

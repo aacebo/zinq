@@ -11,7 +11,7 @@ pub use tuple_type::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Path, Visitor};
+use crate::{Node, Path};
 
 ///
 /// ## Type
@@ -40,13 +40,6 @@ impl Node for Type {
             Self::Slice(v) => v.name(),
             Self::Tuple(v) => v.name(),
         }
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
     }
 }
 

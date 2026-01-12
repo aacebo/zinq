@@ -22,7 +22,7 @@ impl From<SliceType> for Type {
 
 impl Node for SliceType {
     fn name(&self) -> &str {
-        "Syntax::Type::Slice"
+        "Type::Slice"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace};
 
-use crate::{Node, Visibility, Visitor, spread::TypeSpread, ty::Type};
+use crate::{Node, Visibility, spread::TypeSpread, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NameField {
@@ -67,14 +67,7 @@ pub struct NameFields {
 
 impl Node for NameFields {
     fn name(&self) -> &str {
-        "Syntax::Fields::Named"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Fields::Named"
     }
 }
 

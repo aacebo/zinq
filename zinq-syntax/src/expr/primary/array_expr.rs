@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LBracket, Punctuated, RBracket, Suffixed};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Array Expression
@@ -24,14 +24,7 @@ impl From<ArrayExpr> for Expr {
 
 impl Node for ArrayExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Primary::Array"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Primary::Array"
     }
 }
 

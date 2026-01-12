@@ -17,7 +17,7 @@ pub use unary::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Visitor};
+use crate::Node;
 
 ///
 /// ## Expression
@@ -364,13 +364,6 @@ impl Node for Expr {
             Self::If(v) => v.name(),
             Self::Match(v) => v.name(),
         }
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
     }
 }
 

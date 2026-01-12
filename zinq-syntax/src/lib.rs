@@ -25,9 +25,13 @@ use zinq_error::Result;
 
 pub trait Node {
     fn name(&self) -> &str;
+
     fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> Result<()>
     where
-        Self: Sized;
+        Self: Sized,
+    {
+        visitor.visit(self)
+    }
 }
 
 pub trait Visitor<N: Node> {

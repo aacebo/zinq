@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Dot, Ident};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Member Expression
@@ -33,14 +33,7 @@ impl From<MemberExpr> for Expr {
 
 impl Node for MemberExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Postfix::Member"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Postfix::Member"
     }
 }
 

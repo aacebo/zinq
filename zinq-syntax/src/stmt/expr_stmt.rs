@@ -17,7 +17,7 @@ impl From<ExprStmt> for Stmt {
 
 impl Node for ExprStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Expr"
+        "Stmt::Expr"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

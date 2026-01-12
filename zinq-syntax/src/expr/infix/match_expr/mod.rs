@@ -32,7 +32,7 @@ impl From<MatchExpr> for Expr {
 
 impl Node for MatchExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Match"
+        "Expr::Match"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

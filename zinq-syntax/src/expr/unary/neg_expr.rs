@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Minus;
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Negative Expression
@@ -31,14 +31,7 @@ impl From<NegExpr> for Expr {
 
 impl Node for NegExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Unary::Neg"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Unary::Neg"
     }
 }
 

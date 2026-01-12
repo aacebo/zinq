@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Cmp;
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Cmp Expression
@@ -35,14 +35,7 @@ impl From<CmpExpr> for Expr {
 
 impl Node for CmpExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Binary::Cmp"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Binary::Cmp"
     }
 }
 

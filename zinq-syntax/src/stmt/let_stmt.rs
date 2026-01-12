@@ -24,7 +24,7 @@ impl From<LetStmt> for Stmt {
 
 impl Node for LetStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Let"
+        "Stmt::Let"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

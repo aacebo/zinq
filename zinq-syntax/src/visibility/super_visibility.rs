@@ -20,7 +20,7 @@ impl From<SuperVisibility> for Visibility {
 
 impl Node for SuperVisibility {
     fn name(&self) -> &str {
-        "Syntax::Visibility::Super"
+        "Visibility::Super"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

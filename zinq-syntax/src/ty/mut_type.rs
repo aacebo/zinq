@@ -21,7 +21,7 @@ impl From<MutType> for Type {
 
 impl Node for MutType {
     fn name(&self) -> &str {
-        "Syntax::Type::Mut"
+        "Type::Mut"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

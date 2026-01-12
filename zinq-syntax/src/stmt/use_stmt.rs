@@ -19,7 +19,7 @@ impl From<UseStmt> for Stmt {
 
 impl Node for UseStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Use"
+        "Stmt::Use"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

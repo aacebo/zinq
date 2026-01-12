@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen, Suffixed};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Tuple Expression
@@ -24,14 +24,7 @@ impl From<TupleExpr> for Expr {
 
 impl Node for TupleExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Primary::Tuple"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Primary::Tuple"
     }
 }
 

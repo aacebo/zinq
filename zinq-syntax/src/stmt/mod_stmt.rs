@@ -19,7 +19,7 @@ impl From<ModStmt> for Stmt {
 
 impl Node for ModStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Mod"
+        "Stmt::Mod"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

@@ -20,7 +20,7 @@ impl From<ModVisibility> for Visibility {
 
 impl Node for ModVisibility {
     fn name(&self) -> &str {
-        "Syntax::Visibility::Mod"
+        "Visibility::Mod"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

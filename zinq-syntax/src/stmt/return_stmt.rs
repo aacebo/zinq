@@ -18,7 +18,7 @@ impl From<ReturnStmt> for Stmt {
 
 impl Node for ReturnStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Return"
+        "Stmt::Return"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

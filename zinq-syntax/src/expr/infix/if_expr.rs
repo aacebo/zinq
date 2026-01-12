@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Colon, Question};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## If Expression
@@ -24,14 +24,7 @@ impl From<IfExpr> for Expr {
 
 impl Node for IfExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::If"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::If"
     }
 }
 

@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{LBracket, RBracket};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Index Expression
@@ -23,14 +23,7 @@ impl From<IndexExpr> for Expr {
 
 impl Node for IndexExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Postfix::Index"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Postfix::Index"
     }
 }
 

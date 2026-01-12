@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Call Expression
@@ -40,14 +40,7 @@ impl From<CallExpr> for Expr {
 
 impl Node for CallExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Postfix::Call"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Postfix::Call"
     }
 }
 

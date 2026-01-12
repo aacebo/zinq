@@ -18,7 +18,7 @@ impl From<BlockStmt> for Stmt {
 
 impl Node for BlockStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Block"
+        "Stmt::Block"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

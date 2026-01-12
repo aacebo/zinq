@@ -35,7 +35,7 @@ impl From<FnStmt> for Stmt {
 
 impl Node for FnStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Fn"
+        "Stmt::Fn"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

@@ -5,7 +5,7 @@ pub use index_fields::*;
 pub use name_fields::*;
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::{Node, Visitor};
+use crate::Node;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fields {
@@ -62,17 +62,10 @@ impl Fields {
 impl Node for Fields {
     fn name(&self) -> &str {
         match self {
-            Self::None(_) => "Syntax::Fields::None",
+            Self::None(_) => "Fields::None",
             Self::Indexed(v) => v.name(),
             Self::Named(v) => v.name(),
         }
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
     }
 }
 

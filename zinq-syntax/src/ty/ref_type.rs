@@ -21,7 +21,7 @@ impl From<RefType> for Type {
 
 impl Node for RefType {
     fn name(&self) -> &str {
-        "Syntax::Type::Ref"
+        "Type::Ref"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Logical;
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Logical Expression
@@ -49,14 +49,7 @@ impl From<LogicalExpr> for Expr {
 
 impl Node for LogicalExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Binary::Logical"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Binary::Logical"
     }
 }
 

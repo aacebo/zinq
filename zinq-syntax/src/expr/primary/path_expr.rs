@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::{Node, Path, Visitor, expr::Expr};
+use crate::{Node, Path, expr::Expr};
 
 ///
 /// ## Path Expression
@@ -19,14 +19,7 @@ impl From<PathExpr> for Expr {
 
 impl Node for PathExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Primary::Path"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Primary::Path"
     }
 }
 

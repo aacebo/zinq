@@ -36,7 +36,7 @@ impl From<ImplMethod> for ImplSyntax {
 
 impl Node for ImplMethod {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Impl::Method"
+        "Stmt::Impl::Method"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

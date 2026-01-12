@@ -23,7 +23,7 @@ impl From<IfStmt> for Stmt {
 
 impl Node for IfStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::If"
+        "Stmt::If"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

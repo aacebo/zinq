@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Is;
 
-use crate::{Node, Visitor, expr::Expr, ty::Type};
+use crate::{Node, expr::Expr, ty::Type};
 
 ///
 /// ## Is Expression
@@ -37,14 +37,7 @@ impl From<IsExpr> for Expr {
 
 impl Node for IsExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Binary::Is"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Binary::Is"
     }
 }
 

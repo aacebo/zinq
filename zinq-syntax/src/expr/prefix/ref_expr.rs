@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{And, Mut};
 
-use crate::{Node, Visitor, expr::Expr};
+use crate::{Node, expr::Expr};
 
 ///
 /// ## Reference Expression
@@ -33,14 +33,7 @@ impl From<RefExpr> for Expr {
 
 impl Node for RefExpr {
     fn name(&self) -> &str {
-        "Syntax::Expr::Prefix::Ref"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Expr::Prefix::Ref"
     }
 }
 

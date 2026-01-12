@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{Node, Visibility, Visitor, spread::TypeSpread, ty::Type};
+use crate::{Node, Visibility, spread::TypeSpread, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexField {
@@ -58,14 +58,7 @@ pub struct IndexFields {
 
 impl Node for IndexFields {
     fn name(&self) -> &str {
-        "Syntax::Fields::Indexed"
-    }
-
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
+        "Fields::Indexed"
     }
 }
 

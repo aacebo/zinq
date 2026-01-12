@@ -20,7 +20,7 @@ impl From<PublicVisibility> for Visibility {
 
 impl Node for PublicVisibility {
     fn name(&self) -> &str {
-        "Syntax::Visibility::Public"
+        "Visibility::Public"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

@@ -1,9 +1,9 @@
 use zinq_error::Result;
 use zinq_parse::Cursor;
 use zinq_token::{
-    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, Eq, Ident, Is, LBrace, LBracket, LParen,
-    Match, Minus, Mut, Not, OrOr, Plus, Punctuated, Question, RBrace, RBracket, RParen, Slash,
-    Star,
+    And, AndAnd, Arithmetic, Cmp, Colon, Comma, Dot, DotDot, Eq, Ident, Is, LBrace, LBracket,
+    LParen, Match, Minus, Mut, Not, OrOr, Plus, Punctuated, Question, RBrace, RBracket, RParen,
+    Slash, Star,
 };
 
 use crate::{
@@ -20,6 +20,7 @@ pub trait ExprParser {
     fn parse_assign_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_match_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
+    fn parse_range_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_or_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_and_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_is_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
@@ -27,7 +28,6 @@ pub trait ExprParser {
     fn parse_term_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_factor_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_unary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
-    fn parse_prefix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_postfix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
     fn parse_primary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr>;
 }
@@ -72,7 +72,7 @@ impl ExprParser for zinq_parse::ZinqParser {
     }
 
     fn parse_if_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        let expr = self.parse_or_expr(cursor)?;
+        let expr = self.parse_range_expr(cursor)?;
 
         if self.peek::<Question>(cursor).unwrap_or(false) {
             let question = self.parse::<Question>(cursor)?;
@@ -86,6 +86,28 @@ impl ExprParser for zinq_parse::ZinqParser {
                 then_expr: Box::new(then_expr),
                 colon,
                 else_expr: Box::new(else_expr),
+            }
+            .into());
+        }
+
+        Ok(expr)
+    }
+
+    fn parse_range_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
+        let expr = self.parse_or_expr(cursor)?;
+
+        if self.peek::<DotDot>(cursor).unwrap_or(false) {
+            let dots = self.parse::<DotDot>(cursor)?;
+            let mut end = None;
+
+            if self.peek::<Expr>(cursor).unwrap_or(false) {
+                end = Some(Box::new(self.parse_or_expr(cursor)?));
+            }
+
+            return Ok(RangeExpr {
+                start: Some(Box::new(expr)),
+                dots,
+                end,
             }
             .into());
         }
@@ -186,13 +208,7 @@ impl ExprParser for zinq_parse::ZinqParser {
             let right = self.parse_unary_expr(cursor)?;
 
             return Ok(NegExpr::new(minus, right).into());
-        }
-
-        self.parse_prefix_expr(cursor)
-    }
-
-    fn parse_prefix_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
-        if self.peek::<And>(cursor).unwrap_or(false) {
+        } else if self.peek::<And>(cursor).unwrap_or(false) {
             let and = self.parse::<And>(cursor)?;
             let mut mutable = None;
 
@@ -202,6 +218,19 @@ impl ExprParser for zinq_parse::ZinqParser {
 
             let right = self.parse_unary_expr(cursor)?;
             return Ok(RefExpr::new(and, mutable, right).into());
+        } else if self.peek::<DotDot>(cursor).unwrap_or(false) {
+            let dots = self.parse::<DotDot>(cursor)?;
+            let end = match self.parse_unary_expr(cursor) {
+                Err(_) => None,
+                Ok(v) => Some(Box::new(v)),
+            };
+
+            return Ok(RangeExpr {
+                start: None,
+                dots,
+                end,
+            }
+            .into());
         }
 
         self.parse_postfix_expr(cursor)
@@ -217,7 +246,9 @@ impl ExprParser for zinq_parse::ZinqParser {
                 let right_paren = self.parse::<RParen>(cursor)?;
 
                 expr = CallExpr::new(expr, left_paren, args, right_paren).into();
-            } else if self.peek::<Dot>(cursor).unwrap_or(false) {
+            } else if self.peek::<Dot>(cursor).unwrap_or(false)
+                && !self.peek::<DotDot>(cursor).unwrap_or(false)
+            {
                 let dot = self.parse::<Dot>(cursor)?;
                 let name = self.parse::<Ident>(cursor)?;
 
@@ -245,10 +276,6 @@ impl ExprParser for zinq_parse::ZinqParser {
     fn parse_primary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
         if self.peek::<LiteralExpr>(cursor).unwrap_or(false) {
             return Ok(self.parse::<LiteralExpr>(cursor)?.into());
-        }
-
-        if self.peek::<RangeExpr>(cursor).unwrap_or(false) {
-            return Ok(self.parse::<RangeExpr>(cursor)?.into());
         }
 
         if self.peek::<ArrayExpr>(cursor).unwrap_or(false) {

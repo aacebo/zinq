@@ -29,7 +29,7 @@ impl std::fmt::Display for EnumStmt {
 
 impl Node for EnumStmt {
     fn name(&self) -> &str {
-        "Syntax::Stmt::Enum"
+        "Stmt::Enum"
     }
 
     fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>

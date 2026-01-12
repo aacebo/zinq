@@ -21,7 +21,7 @@ pub trait Spanned {
 /// an immutable slice of bytes bound by a start and
 /// end location.
 ///
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Clone, PartialEq, Eq, Hash)]
 pub struct Span {
     start: Location,
     end: Location,
@@ -166,6 +166,12 @@ impl std::fmt::Display for Span {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let value = str::from_utf8(self.bytes()).expect("utf8 source reading failed");
         write!(f, "{}", &value)
+    }
+}
+
+impl std::fmt::Debug for Span {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_string())
     }
 }
 
