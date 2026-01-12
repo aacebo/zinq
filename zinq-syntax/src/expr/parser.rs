@@ -10,7 +10,7 @@ use crate::{
     expr::{
         ArithmeticExpr, Arm, ArrayExpr, AssignExpr, CallExpr, CmpExpr, Expr, GroupExpr, IfExpr,
         IndexExpr, IsExpr, LiteralExpr, LogicalExpr, MatchExpr, MemberExpr, NegExpr, NotExpr,
-        PathExpr, RefExpr, StructExpr, TupleExpr,
+        PathExpr, RangeExpr, RefExpr, StructExpr, TupleExpr,
     },
     ty::Type,
 };
@@ -245,6 +245,10 @@ impl ExprParser for zinq_parse::ZinqParser {
     fn parse_primary_expr(&mut self, cursor: &mut Cursor) -> Result<Expr> {
         if self.peek::<LiteralExpr>(cursor).unwrap_or(false) {
             return Ok(self.parse::<LiteralExpr>(cursor)?.into());
+        }
+
+        if self.peek::<RangeExpr>(cursor).unwrap_or(false) {
+            return Ok(self.parse::<RangeExpr>(cursor)?.into());
         }
 
         if self.peek::<ArrayExpr>(cursor).unwrap_or(false) {
