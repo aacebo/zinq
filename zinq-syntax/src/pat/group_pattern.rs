@@ -7,7 +7,7 @@ use crate::pat::Pattern;
 /// ## Group Pattern
 /// `(...)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GroupPattern {
     pub left_paren: LParen,
     pub inner: Box<Pattern>,

@@ -7,7 +7,7 @@ use crate::use_path::UseSection;
 /// ## Use Glob
 /// `use std::string::*;`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UseGlob {
     pub star: Star,
 }

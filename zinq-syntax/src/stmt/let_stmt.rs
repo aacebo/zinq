@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr, stmt::Stmt, ty::Type};
 /// ## Let Statement
 /// `let <var>: <type> = <init>;`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LetStmt {
     pub keyword: Let,
     pub name: Ident,

@@ -1,6 +1,6 @@
 macro_rules! define_close_delimiters {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
-        #[derive(Debug, Clone, PartialEq, Eq)]
+        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub enum CloseDelim {
             $($name($name),)*
         }
@@ -91,7 +91,7 @@ macro_rules! define_close_delimiters {
             #[doc = "`"]
             #[doc = $token]
             #[doc = "`"]
-            #[derive(Debug, Clone, PartialEq, Eq)]
+            #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub struct $name {
                 span: zinq_parse::Span,
             }

@@ -3,7 +3,7 @@ use zinq_token::{LBrace, RBrace};
 
 use crate::{Node, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BlockStmt {
     pub left_brace: LBrace,
     pub stmts: Vec<Stmt>,

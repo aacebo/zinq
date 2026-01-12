@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Index Expression
 /// `arr[0]`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IndexExpr {
     pub target: Box<Expr>,
     pub left_bracket: LBracket,

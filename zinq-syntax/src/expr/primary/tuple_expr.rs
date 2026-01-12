@@ -9,7 +9,7 @@ use crate::{Node, expr::Expr};
 /// (a, b, c)
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleExpr {
     pub left_paren: LParen,
     pub items: Punctuated<Expr, Comma>,

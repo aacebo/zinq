@@ -3,7 +3,7 @@ use zinq_token::{ColonColon, Ident, Suffixed};
 
 use crate::Generics;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathSection {
     pub ident: Ident,
     pub generics: Option<Suffixed<ColonColon, Generics>>,

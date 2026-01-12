@@ -3,7 +3,7 @@ use zinq_token::{Return, SemiColon};
 
 use crate::{Node, expr::Expr, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ReturnStmt {
     pub keyword: Return,
     pub right: Expr,

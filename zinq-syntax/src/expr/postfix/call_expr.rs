@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Call Expression
 /// `do_stuff(arg1, arg2 = "test", ...)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CallExpr {
     pub target: Box<Expr>,
     pub left_paren: LParen,

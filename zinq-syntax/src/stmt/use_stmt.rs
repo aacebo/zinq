@@ -3,7 +3,7 @@ use zinq_token::{SemiColon, Use};
 
 use crate::{Node, UsePath, Visibility, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UseStmt {
     pub vis: Visibility,
     pub keyword: Use,

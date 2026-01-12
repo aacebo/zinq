@@ -11,7 +11,7 @@ pub use use_section::*;
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{ColonColon, Ident};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UsePath {
     pub ident: Ident,
     pub delim: ColonColon,

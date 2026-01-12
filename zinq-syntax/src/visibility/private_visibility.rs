@@ -6,7 +6,7 @@ use crate::{Node, Visibility};
 /// ## Private Visibility
 /// `test: string`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PrivateVisibility {
     pub span: Span,
 }

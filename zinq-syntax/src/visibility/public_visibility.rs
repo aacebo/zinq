@@ -7,7 +7,7 @@ use crate::{Node, Visibility};
 /// ## Public Visibility
 /// `pub hello: string`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PublicVisibility {
     pub keyword: Pub,
 }

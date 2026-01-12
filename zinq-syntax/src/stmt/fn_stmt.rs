@@ -13,7 +13,7 @@ use crate::{
 /// ## Fn Statement
 /// `fn <name>(<arg1>, <arg2>, ...) -> <return_type> { ... }`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnStmt {
     pub meta: Option<Meta>,
     pub vis: Visibility,

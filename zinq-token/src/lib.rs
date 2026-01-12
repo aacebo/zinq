@@ -35,7 +35,7 @@ pub trait ToTokens {
     fn to_tokens(&self) -> Result<TokenStream>;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Token {
     Punct(Punct),
     Literal(Literal),

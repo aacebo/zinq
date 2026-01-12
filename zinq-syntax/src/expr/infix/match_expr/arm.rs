@@ -6,7 +6,7 @@ use crate::{
     pat::Pattern,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Arm {
     pub pattern: Pattern,
     pub arrow: EqArrow,

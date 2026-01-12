@@ -3,7 +3,7 @@ use zinq_token::{Comma, Enum, Ident, LBrace, Punctuated, RBrace};
 
 use crate::{Generics, Node, Variant, Visibility, meta::Meta, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnumStmt {
     pub meta: Option<Meta>,
     pub vis: Visibility,

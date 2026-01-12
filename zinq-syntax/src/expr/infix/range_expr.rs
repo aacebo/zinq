@@ -9,7 +9,7 @@ use crate::{Node, expr::Expr};
 /// - `<start>..`
 /// - `<start>..<end>`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RangeExpr {
     pub start: Option<Box<Expr>>,
     pub dots: DotDot,

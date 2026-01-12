@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Reference Expression
 /// `&<expr>` or `&mut <expr>`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefExpr {
     pub and: And,
     pub mutable: Option<Mut>,

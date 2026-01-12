@@ -6,7 +6,7 @@ use zinq_token::{Impl, LBrace, RBrace};
 
 use crate::{Generics, Node, stmt::Stmt, ty::Type};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ImplStmt {
     pub keyword: Impl,
     pub generics: Option<Generics>,

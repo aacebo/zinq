@@ -23,7 +23,7 @@ use crate::Node;
 /// ## Expression
 /// Something that can be evaluated, usually to a value (even if that value is `()`).
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Expr {
     /// ## Primary
     Literal(LiteralExpr),

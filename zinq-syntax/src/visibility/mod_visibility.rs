@@ -7,7 +7,7 @@ use crate::{Node, Visibility};
 /// ## Mod Visibility
 /// `pub mod test: string`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModVisibility {
     pub keyword: Suffixed<Pub, Enclosed<LParen, Mod, RParen>>,
 }

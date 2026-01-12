@@ -7,7 +7,7 @@ use crate::{Path, pat::Pattern};
 /// - `a`
 /// - `std::string::String`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathPattern {
     pub path: Path,
 }

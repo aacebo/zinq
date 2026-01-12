@@ -9,7 +9,7 @@ use crate::{Node, expr::Expr};
 /// [a, b, c]
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayExpr {
     pub left_bracket: LBracket,
     pub items: Punctuated<Expr, Comma>,

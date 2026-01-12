@@ -7,7 +7,7 @@ use crate::{Node, ty::Type};
 /// ## Slice Type
 /// `[T]`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SliceType {
     pub left_bracket: LBracket,
     pub item_ty: Box<Type>,

@@ -8,7 +8,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{ToTokens, Token};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Delim {
     Open(OpenDelim),
     Close(CloseDelim),

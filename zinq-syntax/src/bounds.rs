@@ -3,7 +3,7 @@ use zinq_token::{Colon, Plus, Punctuated};
 
 use crate::Path;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Bounds {
     pub colon: Colon,
     pub items: Punctuated<Path, Plus>,

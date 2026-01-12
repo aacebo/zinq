@@ -8,7 +8,7 @@ use crate::pat::Pattern;
 /// `0 => ..` <br>
 /// `"test" => ..`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LiteralPattern {
     pub literal: Literal,
 }

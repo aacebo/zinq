@@ -8,7 +8,7 @@ use zinq_token::{ColonColon, Punctuated};
 /// ## Path
 /// `std::string::String`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Path {
     items: Punctuated<PathSection, ColonColon>,
 }

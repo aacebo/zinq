@@ -3,7 +3,7 @@ use zinq_token::Ident;
 
 use crate::Bounds;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeParam {
     pub ident: Ident,
     pub bounds: Option<Bounds>,

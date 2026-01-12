@@ -1,6 +1,6 @@
 macro_rules! define_open_delimiters {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
-        #[derive(Debug, Clone, PartialEq, Eq)]
+        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub enum OpenDelim {
             $($name($name),)*
         }
@@ -91,7 +91,7 @@ macro_rules! define_open_delimiters {
             #[doc = "`"]
             #[doc = $token]
             #[doc = "`"]
-            #[derive(Debug, Clone, PartialEq, Eq)]
+            #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub struct $name {
                 span: zinq_parse::Span,
             }

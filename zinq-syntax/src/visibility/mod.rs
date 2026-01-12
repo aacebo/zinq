@@ -12,7 +12,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::Node;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Visibility {
     Pub(PublicVisibility),
     Super(SuperVisibility),

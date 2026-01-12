@@ -3,7 +3,7 @@ use zinq_token::{Colon, Comma, Ident, LBrace, Punctuated, RBrace};
 
 use crate::{Node, Visibility, spread::TypeSpread, ty::Type};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NameField {
     pub vis: Visibility,
     pub name: Ident,
@@ -57,7 +57,7 @@ impl Spanned for NameField {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NameFields {
     pub left_brace: LBrace,
     pub spreads: Punctuated<TypeSpread, Comma>,

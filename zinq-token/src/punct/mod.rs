@@ -8,7 +8,7 @@ pub use logical::*;
 
 macro_rules! define_puncts {
     ($($token:literal, pub struct $name:ident, $is_method:ident),*) => {
-        #[derive(Debug, Clone, PartialEq, Eq)]
+        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub enum Punct {
             $($name($name),)*
         }
@@ -92,7 +92,7 @@ macro_rules! define_puncts {
             #[doc = "```"]
             #[doc = $token]
             #[doc = "```"]
-            #[derive(Debug, Clone, PartialEq, Eq)]
+            #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub struct $name {
                 span: zinq_parse::Span,
             }

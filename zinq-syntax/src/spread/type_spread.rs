@@ -16,7 +16,7 @@ use crate::ty::Type;
 /// }
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeSpread {
     pub op: DotDot,
     pub ty: Type,

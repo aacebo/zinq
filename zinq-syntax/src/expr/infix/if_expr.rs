@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## If Expression
 /// `<cond> ? <then> : <else>`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IfExpr {
     pub cond: Box<Expr>,
     pub question: Question,

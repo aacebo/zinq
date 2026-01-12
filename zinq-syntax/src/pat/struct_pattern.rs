@@ -7,7 +7,7 @@ use crate::{Path, pat::Pattern};
 /// ## Struct Pattern
 /// `MyStruct { a, b, .. }`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StructPattern {
     pub path: Path,
     pub left_brace: LBrace,

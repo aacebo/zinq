@@ -7,7 +7,7 @@ use crate::{Node, ty::Type};
 /// ## Tuple Type
 /// `(u32, string, bool)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleType {
     pub left_paren: LParen,
     pub items: Punctuated<Type, Comma>,

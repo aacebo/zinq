@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Suffixed<T, S>
 where
     T: std::fmt::Display + Parse,

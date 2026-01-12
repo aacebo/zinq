@@ -7,7 +7,7 @@ use crate::{Node, Visibility};
 /// ## Super Visibility
 /// `pub super hello: string`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SuperVisibility {
     pub keyword: Suffixed<Pub, Enclosed<LParen, Super, RParen>>,
 }

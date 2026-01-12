@@ -9,7 +9,7 @@ use crate::{Node, Path, expr::Expr, members::MemberValue};
 /// Struct { a: 1, b: 2 }
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StructExpr {
     pub path: Path,
     pub left_brace: LBrace,

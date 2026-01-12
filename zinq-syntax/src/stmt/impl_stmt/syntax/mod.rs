@@ -3,7 +3,7 @@ mod method;
 pub use method::*;
 use zinq_parse::{Parse, Peek, Spanned};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ImplSyntax {
     Method(ImplMethod),
 }

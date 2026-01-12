@@ -7,7 +7,7 @@ use crate::pat::Pattern;
 /// ## Or Pattern
 /// `A | B`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrPattern {
     pub left: Box<Pattern>,
     pub or: Or,

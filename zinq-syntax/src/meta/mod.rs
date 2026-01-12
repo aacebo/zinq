@@ -18,7 +18,7 @@ use zinq_token::{Comma, LBracket, Pound, Punctuated, RBracket, Suffixed};
 /// }
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Meta {
     pub pound: Pound,
     pub left_bracket: LBracket,

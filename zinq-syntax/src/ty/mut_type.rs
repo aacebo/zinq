@@ -7,7 +7,7 @@ use crate::{Node, ty::Type};
 /// ## Mut Type
 /// `mut T`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MutType {
     pub keyword: Mut,
     pub ty: Box<Type>,

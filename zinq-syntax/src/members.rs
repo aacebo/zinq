@@ -3,7 +3,7 @@ use zinq_token::{Colon, Ident, LInt};
 
 use crate::expr::Expr;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Member {
     Index(LInt),
     Name(Ident),
@@ -57,7 +57,7 @@ impl Parse for Member {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MemberValue {
     pub member: Member,
     pub colon: Option<Colon>,

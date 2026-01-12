@@ -3,7 +3,7 @@ use zinq_token::SemiColon;
 
 use crate::{Node, expr::Expr, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExprStmt {
     pub expr: Expr,
     pub semi: Option<SemiColon>,

@@ -7,7 +7,7 @@ use crate::{
     stmt::{BlockStmt, Stmt, StmtParser},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IfStmt {
     pub keyword: If,
     pub cond: Expr,

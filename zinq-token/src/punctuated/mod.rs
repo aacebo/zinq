@@ -4,7 +4,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::punctuated::item::Item;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Punctuated<T, P>
 where
     T: std::fmt::Display + Parse,

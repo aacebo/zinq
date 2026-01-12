@@ -7,7 +7,7 @@ use crate::pat::Pattern;
 /// ## Tuple Pattern
 /// `(a, b)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TuplePattern {
     pub left_paren: LParen,
     pub items: Punctuated<Pattern, Comma>,

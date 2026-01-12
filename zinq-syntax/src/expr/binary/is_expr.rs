@@ -11,7 +11,7 @@ use crate::{Node, expr::Expr, ty::Type};
 /// }
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsExpr {
     pub left: Box<Expr>,
     pub keyword: Is,

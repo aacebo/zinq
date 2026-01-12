@@ -10,7 +10,7 @@ use crate::use_path::UseSection;
 /// ### Example
 /// `std::string(String, ToString);`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UseGroup {
     pub ident: Ident,
     pub left_paren: LParen,

@@ -37,7 +37,7 @@ use crate::Node;
 /// and doesn’t itself produce a value you can use in
 /// a larger expression.
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Stmt {
     Block(BlockStmt),
     Expr(ExprStmt),

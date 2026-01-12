@@ -13,7 +13,7 @@ use crate::{
 /// ## Impl Method Statement
 /// `fn <name>(<self_param>, <arg1>, <arg2>, ...) -> <return_type> { ... }`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ImplMethod {
     pub meta: Option<Meta>,
     pub vis: Visibility,

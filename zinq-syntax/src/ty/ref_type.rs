@@ -7,7 +7,7 @@ use crate::{Node, ty::Type};
 /// ## Reference Type
 /// `&T`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefType {
     pub and: And,
     pub to: Box<Type>,

@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{UseGlob, UseGroup, UseName, UsePath};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UseSection {
     Path(UsePath),
     Name(UseName),

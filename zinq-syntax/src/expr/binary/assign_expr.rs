@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Assign Expression
 /// `message = (...)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssignExpr {
     pub left: Box<Expr>,
     pub eq: Eq,

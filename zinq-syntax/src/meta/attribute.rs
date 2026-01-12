@@ -3,7 +3,7 @@ use zinq_token::{Enclosed, LParen, RParen, Token, TokenStream};
 
 use crate::Path;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Attribute {
     pub path: Path,
     pub args: Option<Enclosed<LParen, TokenStream, RParen>>,

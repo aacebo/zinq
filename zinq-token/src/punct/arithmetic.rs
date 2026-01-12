@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{Minus, Plus, Slash, Star};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Arithmetic {
     Add(Plus),
     Sub(Minus),

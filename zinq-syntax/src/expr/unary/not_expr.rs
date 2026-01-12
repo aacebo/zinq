@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Not Expression
 /// `!(a == true)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NotExpr {
     pub not: Not,
     pub right: Box<Expr>,

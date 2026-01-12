@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Member Expression
 /// `<target>.<name>`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MemberExpr {
     pub target: Box<Expr>,
     pub dot: Dot,

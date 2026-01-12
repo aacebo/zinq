@@ -5,7 +5,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::{ToTokens, Token};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Hash)]
 pub struct TokenStream {
     inner: Vec<Token>,
 }

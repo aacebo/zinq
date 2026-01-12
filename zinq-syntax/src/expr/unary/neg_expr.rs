@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Negative Expression
 /// `-100`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NegExpr {
     pub minus: Minus,
     pub right: Box<Expr>,

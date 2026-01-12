@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Group Expression
 /// `(...)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GroupExpr {
     pub left_paren: LParen,
     pub inner: Box<Expr>,

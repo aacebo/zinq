@@ -3,7 +3,7 @@ use zinq_token::{Comma, Gt, Lt, Punctuated};
 
 use crate::param::TypeParam;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Generics {
     pub lt: Lt,
     pub params: Punctuated<TypeParam, Comma>,

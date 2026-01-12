@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{And, Mut, SelfValue};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
     pub and: Option<And>,
     pub mutable: Option<Mut>,

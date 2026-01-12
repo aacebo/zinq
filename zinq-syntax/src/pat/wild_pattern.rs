@@ -8,7 +8,7 @@ use crate::pat::Pattern;
 /// `_ => ..` <br>
 /// `fn test(_: &str)`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WildPattern {
     pub underscore: Underscore,
 }

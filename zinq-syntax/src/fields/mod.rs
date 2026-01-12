@@ -7,7 +7,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::Node;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Fields {
     None(Span),
     Indexed(IndexFields),

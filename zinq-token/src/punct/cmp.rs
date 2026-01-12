@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{EqEq, Gt, GtEq, Lt, LtEq, NotEq};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Cmp {
     Eq(EqEq),
     NotEq(NotEq),

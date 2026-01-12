@@ -3,7 +3,7 @@ use zinq_token::{Colon, Ident};
 
 use crate::ty::Type;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnParam {
     pub name: Ident,
     pub colon: Colon,

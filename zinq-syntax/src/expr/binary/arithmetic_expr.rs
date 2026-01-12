@@ -9,7 +9,7 @@ use crate::{Node, expr::Expr};
 /// ### Example
 /// `<left> + <right>`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArithmeticExpr {
     pub left: Box<Expr>,
     pub op: Arithmetic,

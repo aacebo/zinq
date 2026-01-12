@@ -8,7 +8,7 @@ use crate::pat::Pattern;
 /// - `&a`
 /// - `&mut a`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefPattern {
     pub and: And,
     pub mutable: Option<Mut>,

@@ -24,7 +24,7 @@ pub use wild_pattern::*;
 
 use zinq_parse::{Parse, Peek, Spanned};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pattern {
     Wild(WildPattern),
     Path(PathPattern),

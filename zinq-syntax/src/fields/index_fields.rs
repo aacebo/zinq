@@ -3,7 +3,7 @@ use zinq_token::{Comma, LParen, Punctuated, RParen};
 
 use crate::{Node, Visibility, spread::TypeSpread, ty::Type};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IndexField {
     pub vis: Visibility,
     pub ty: Type,
@@ -48,7 +48,7 @@ impl Spanned for IndexField {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IndexFields {
     pub left_paren: LParen,
     pub spreads: Punctuated<TypeSpread, Comma>,

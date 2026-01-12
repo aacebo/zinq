@@ -15,7 +15,7 @@ use crate::{Node, expr::Expr};
 /// }
 /// ```
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchExpr {
     pub keyword: Match,
     pub expr: Box<Expr>,

@@ -3,7 +3,7 @@ use zinq_token::{Ident, Mod, SemiColon};
 
 use crate::{Node, Visibility, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModStmt {
     pub vis: Visibility,
     pub keyword: Mod,

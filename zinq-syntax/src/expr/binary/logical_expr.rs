@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Logical Expression
 /// `&&` or `||`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LogicalExpr {
     pub left: Box<Expr>,
     pub op: Logical,

@@ -7,7 +7,7 @@ use crate::{Node, expr::Expr};
 /// ## Literal Expression
 /// `"test"`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LiteralExpr {
     pub value: Literal,
 }

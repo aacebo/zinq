@@ -8,7 +8,7 @@ use crate::{
     stmt::{BlockStmt, Stmt},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForStmt {
     pub keyword: For,
     pub pattern: Pattern,

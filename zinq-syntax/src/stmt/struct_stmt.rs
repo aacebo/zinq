@@ -3,7 +3,7 @@ use zinq_token::{Ident, SemiColon, Struct};
 
 use crate::{Generics, Node, Visibility, fields::Fields, meta::Meta, stmt::Stmt};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StructStmt {
     pub meta: Option<Meta>,
     pub vis: Visibility,

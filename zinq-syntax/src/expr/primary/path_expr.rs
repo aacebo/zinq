@@ -6,7 +6,7 @@ use crate::{Node, Path, expr::Expr};
 /// ## Path Expression
 /// `my_var`
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathExpr {
     pub path: Path,
 }

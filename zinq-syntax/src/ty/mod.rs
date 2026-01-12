@@ -16,7 +16,7 @@ use crate::{Node, Path};
 ///
 /// ## Type
 ///
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Type {
     Path(Path),
     Mut(MutType),

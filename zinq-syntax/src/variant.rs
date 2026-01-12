@@ -3,7 +3,7 @@ use zinq_token::{Eq, Ident};
 
 use crate::{expr::Expr, fields::Fields};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Variant {
     pub name: Ident,
     pub fields: Fields,
