@@ -27,13 +27,6 @@ impl Node for ForStmt {
     fn name(&self) -> &str {
         "Stmt::For"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for ForStmt {

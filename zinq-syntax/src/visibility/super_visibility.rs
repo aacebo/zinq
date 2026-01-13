@@ -22,13 +22,6 @@ impl Node for SuperVisibility {
     fn name(&self) -> &str {
         "Visibility::Super"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for SuperVisibility {

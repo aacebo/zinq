@@ -38,13 +38,6 @@ impl Node for ImplMethod {
     fn name(&self) -> &str {
         "Stmt::Impl::Method"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for ImplMethod {

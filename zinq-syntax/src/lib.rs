@@ -21,19 +21,13 @@ pub use use_path::*;
 pub use variant::*;
 pub use visibility::*;
 
-use zinq_error::Result;
+use crate::expr::ExprVisitor;
 
 pub trait Node {
     fn name(&self) -> &str;
 
-    fn accept<V: Visitor<Self>>(&self, visitor: &mut V) -> Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
+    #[allow(unused)]
+    fn accept<V: Visitor>(&self, visitor: &mut V) {}
 }
 
-pub trait Visitor<N: Node> {
-    fn visit(&mut self, node: &N) -> Result<()>;
-}
+pub trait Visitor: ExprVisitor {}

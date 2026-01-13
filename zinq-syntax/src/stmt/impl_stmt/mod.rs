@@ -26,13 +26,6 @@ impl Node for ImplStmt {
     fn name(&self) -> &str {
         "Stmt::Impl"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for ImplStmt {

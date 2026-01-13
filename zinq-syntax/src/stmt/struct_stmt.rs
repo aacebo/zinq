@@ -24,13 +24,6 @@ impl Node for StructStmt {
     fn name(&self) -> &str {
         "Stmt::Struct"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for StructStmt {

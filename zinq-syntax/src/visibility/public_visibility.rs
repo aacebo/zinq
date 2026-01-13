@@ -22,13 +22,6 @@ impl Node for PublicVisibility {
     fn name(&self) -> &str {
         "Visibility::Public"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for PublicVisibility {

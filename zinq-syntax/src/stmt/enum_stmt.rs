@@ -31,13 +31,6 @@ impl Node for EnumStmt {
     fn name(&self) -> &str {
         "Stmt::Enum"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl Peek for EnumStmt {

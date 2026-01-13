@@ -23,13 +23,6 @@ impl Node for MutType {
     fn name(&self) -> &str {
         "Type::Mut"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for MutType {

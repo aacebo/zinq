@@ -21,13 +21,6 @@ impl Node for ModStmt {
     fn name(&self) -> &str {
         "Stmt::Mod"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for ModStmt {

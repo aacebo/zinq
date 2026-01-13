@@ -34,13 +34,6 @@ impl Node for MatchExpr {
     fn name(&self) -> &str {
         "Expr::Match"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for MatchExpr {

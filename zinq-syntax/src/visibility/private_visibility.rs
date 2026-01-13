@@ -21,13 +21,6 @@ impl Node for PrivateVisibility {
     fn name(&self) -> &str {
         "Visibility::Private"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for PrivateVisibility {

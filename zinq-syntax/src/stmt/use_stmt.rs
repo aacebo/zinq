@@ -21,13 +21,6 @@ impl Node for UseStmt {
     fn name(&self) -> &str {
         "Stmt::Use"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for UseStmt {

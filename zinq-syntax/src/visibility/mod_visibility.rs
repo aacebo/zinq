@@ -22,13 +22,6 @@ impl Node for ModVisibility {
     fn name(&self) -> &str {
         "Visibility::Mod"
     }
-
-    fn accept<V: crate::Visitor<Self>>(&self, visitor: &mut V) -> zinq_error::Result<()>
-    where
-        Self: Sized,
-    {
-        visitor.visit(self)
-    }
 }
 
 impl std::fmt::Display for ModVisibility {
