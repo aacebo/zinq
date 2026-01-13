@@ -5,6 +5,7 @@ pub mod postfix;
 pub mod prefix;
 pub mod primary;
 pub mod unary;
+mod visitor;
 
 pub use binary::*;
 pub use infix::*;
@@ -13,6 +14,7 @@ pub use postfix::*;
 pub use prefix::*;
 pub use primary::*;
 pub use unary::*;
+pub use visitor::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
