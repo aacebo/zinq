@@ -38,6 +38,10 @@ impl Node for MatchExpr {
     fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
         visitor.visit_match_expr(self);
         self.expr.accept(visitor);
+
+        for arm in self.arms.iter() {
+            arm.value().accept(visitor);
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::DotDot;
 
-use crate::pat::Pattern;
+use crate::{Node, pat::Pattern};
 
 ///
 /// ## Spread Pattern
@@ -60,5 +60,15 @@ impl Parse for SpreadPattern {
     ) -> zinq_error::Result<Self> {
         let dots = parser.parse::<DotDot>(cursor)?;
         Ok(Self { dots })
+    }
+}
+
+impl Node for SpreadPattern {
+    fn name(&self) -> &str {
+        "Pattern::Spread"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_spread_pattern(self);
     }
 }

@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{And, Mut};
 
-use crate::pat::Pattern;
+use crate::{Node, pat::Pattern};
 
 ///
 /// ## Reference Pattern
@@ -30,5 +30,16 @@ impl std::fmt::Display for RefPattern {
 impl Spanned for RefPattern {
     fn span(&self) -> zinq_parse::Span {
         Span::join(self.and.span(), self.inner.span())
+    }
+}
+
+impl Node for RefPattern {
+    fn name(&self) -> &str {
+        "Pattern::Ref"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_ref_pattern(self);
+        self.inner.accept(visitor);
     }
 }

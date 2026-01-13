@@ -2,7 +2,7 @@
 
 use super::*;
 
-pub trait ExprVisitor {
+pub trait ExprVisitor: MatchVisitor {
     fn visit_expr(&mut self, node: &Expr) {}
 
     fn visit_arithmetic_expr(&mut self, node: &ArithmeticExpr) {}

@@ -1,6 +1,8 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{And, Mut, SelfValue};
 
+use crate::Node;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
     pub and: Option<And>,
@@ -59,5 +61,15 @@ impl Spanned for SelfParam {
         }
 
         Span::join(first, self.keyword.span())
+    }
+}
+
+impl Node for SelfParam {
+    fn name(&self) -> &str {
+        "Param::Self"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_self_param(self);
     }
 }

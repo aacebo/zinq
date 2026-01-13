@@ -42,7 +42,7 @@ impl Node for FnStmt {
         visitor.visit_fn_stmt(self);
 
         for param in self.params.iter() {
-            param.value().ty.accept(visitor);
+            param.value().accept(visitor);
         }
 
         self.block.accept(visitor);

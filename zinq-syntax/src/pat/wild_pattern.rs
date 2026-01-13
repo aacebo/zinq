@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::Underscore;
 
-use crate::pat::Pattern;
+use crate::{Node, pat::Pattern};
 
 ///
 /// ## Wild Pattern
@@ -61,5 +61,15 @@ impl Parse for WildPattern {
     ) -> zinq_error::Result<Self> {
         let underscore = parser.parse::<Underscore>(cursor)?;
         Ok(Self { underscore })
+    }
+}
+
+impl Node for WildPattern {
+    fn name(&self) -> &str {
+        "Pattern::Wild"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_wild_pattern(self);
     }
 }

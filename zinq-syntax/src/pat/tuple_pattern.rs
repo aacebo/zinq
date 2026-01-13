@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::pat::Pattern;
+use crate::{Node, pat::Pattern};
 
 ///
 /// ## Tuple Pattern
@@ -55,5 +55,19 @@ impl Parse for TuplePattern {
             items,
             right_paren,
         })
+    }
+}
+
+impl Node for TuplePattern {
+    fn name(&self) -> &str {
+        "Pattern::Tuple"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_tuple_pattern(self);
+
+        for item in self.items.iter() {
+            item.value().accept(visitor);
+        }
     }
 }

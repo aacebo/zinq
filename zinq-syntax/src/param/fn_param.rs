@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Ident};
 
-use crate::ty::Type;
+use crate::{Node, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnParam {
@@ -47,5 +47,16 @@ impl Parse for FnParam {
 impl Spanned for FnParam {
     fn span(&self) -> Span {
         Span::join(self.name.span(), self.ty.span())
+    }
+}
+
+impl Node for FnParam {
+    fn name(&self) -> &str {
+        "Param::Fn"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_fn_param(self);
+        self.ty.accept(visitor);
     }
 }

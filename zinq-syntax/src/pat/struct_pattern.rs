@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LBrace, Punctuated, RBrace, Suffixed};
 
-use crate::{Path, pat::Pattern};
+use crate::{Node, Path, pat::Pattern};
 
 ///
 /// ## Struct Pattern
@@ -60,5 +60,19 @@ impl Parse for StructPattern {
             fields,
             right_brace,
         })
+    }
+}
+
+impl Node for StructPattern {
+    fn name(&self) -> &str {
+        "Pattern::Struct"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_struct_pattern(self);
+
+        for field in self.fields.iter() {
+            field.value().accept(visitor);
+        }
     }
 }

@@ -7,6 +7,7 @@ mod ref_pattern;
 mod spread_pattern;
 mod struct_pattern;
 mod tuple_pattern;
+mod visitor;
 mod wild_pattern;
 
 use std::any::type_name_of_val;
@@ -20,9 +21,12 @@ pub use ref_pattern::*;
 pub use spread_pattern::*;
 pub use struct_pattern::*;
 pub use tuple_pattern::*;
+pub use visitor::*;
 pub use wild_pattern::*;
 
 use zinq_parse::{Parse, Peek, Spanned};
+
+use crate::Node;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pattern {
@@ -218,5 +222,37 @@ impl Parse for Pattern {
         parser: &mut zinq_parse::ZinqParser,
     ) -> zinq_error::Result<Self> {
         parser.parse_pattern(cursor)
+    }
+}
+
+impl Node for Pattern {
+    fn name(&self) -> &str {
+        match self {
+            Self::Group(v) => v.name(),
+            Self::Literal(v) => v.name(),
+            Self::Or(v) => v.name(),
+            Self::Path(v) => v.name(),
+            Self::Ref(v) => v.name(),
+            Self::Spread(v) => v.name(),
+            Self::Struct(v) => v.name(),
+            Self::Tuple(v) => v.name(),
+            Self::Wild(v) => v.name(),
+        }
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_pattern(self);
+
+        match self {
+            Self::Group(v) => v.accept(visitor),
+            Self::Literal(v) => v.accept(visitor),
+            Self::Or(v) => v.accept(visitor),
+            Self::Path(v) => v.accept(visitor),
+            Self::Ref(v) => v.accept(visitor),
+            Self::Spread(v) => v.accept(visitor),
+            Self::Struct(v) => v.accept(visitor),
+            Self::Tuple(v) => v.accept(visitor),
+            Self::Wild(v) => v.accept(visitor),
+        }
     }
 }

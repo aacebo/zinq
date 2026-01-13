@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LParen, RParen};
 
-use crate::pat::Pattern;
+use crate::{Node, pat::Pattern};
 
 ///
 /// ## Group Pattern
@@ -55,5 +55,16 @@ impl Parse for GroupPattern {
             inner,
             right_paren,
         })
+    }
+}
+
+impl Node for GroupPattern {
+    fn name(&self) -> &str {
+        "Pattern::Group"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_group_pattern(self);
+        self.inner.accept(visitor);
     }
 }

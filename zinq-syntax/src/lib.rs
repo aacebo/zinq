@@ -21,8 +21,6 @@ pub use use_path::*;
 pub use variant::*;
 pub use visibility::*;
 
-use crate::{expr::ExprVisitor, stmt::StmtVisitor, ty::TypeVisitor};
-
 pub trait Node {
     fn name(&self) -> &str;
 
@@ -30,4 +28,7 @@ pub trait Node {
     fn accept<V: Visitor>(&self, visitor: &mut V) {}
 }
 
-pub trait Visitor: TypeVisitor + StmtVisitor + ExprVisitor {}
+pub trait Visitor:
+    ty::TypeVisitor + stmt::StmtVisitor + expr::ExprVisitor + pat::PatternVisitor + param::ParamVisitor
+{
+}

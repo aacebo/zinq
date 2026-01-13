@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::Literal;
 
-use crate::pat::Pattern;
+use crate::{Node, pat::Pattern};
 
 ///
 /// ## Literal Pattern
@@ -61,5 +61,15 @@ impl Parse for LiteralPattern {
     ) -> zinq_error::Result<Self> {
         let literal = parser.parse::<Literal>(cursor)?;
         Ok(Self { literal })
+    }
+}
+
+impl Node for LiteralPattern {
+    fn name(&self) -> &str {
+        "Pattern::Literal"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_literal_pattern(self);
     }
 }

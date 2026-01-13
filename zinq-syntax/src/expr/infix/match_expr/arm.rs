@@ -2,6 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{EqArrow, Suffixed};
 
 use crate::{
+    Node,
     expr::{Expr, ExprParser},
     pat::Pattern,
 };
@@ -11,6 +12,17 @@ pub struct Arm {
     pub pattern: Pattern,
     pub arrow: EqArrow,
     pub body: Box<Expr>,
+}
+
+impl Node for Arm {
+    fn name(&self) -> &str {
+        "Expr::Match::Arm"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_match_arm(self);
+        self.body.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for Arm {

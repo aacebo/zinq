@@ -30,6 +30,7 @@ impl Node for ForStmt {
 
     fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
         visitor.visit_for_stmt(self);
+        self.pattern.accept(visitor);
         self.expr.accept(visitor);
         self.body.accept(visitor);
     }

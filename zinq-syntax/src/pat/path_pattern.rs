@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Path, pat::Pattern};
+use crate::{Node, Path, pat::Pattern};
 
 ///
 /// ## Path Pattern
@@ -46,5 +46,15 @@ impl Parse for PathPattern {
     ) -> zinq_error::Result<Self> {
         let path = parser.parse::<Path>(cursor)?;
         Ok(Self { path })
+    }
+}
+
+impl Node for PathPattern {
+    fn name(&self) -> &str {
+        "Pattern::Path"
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_path_pattern(self);
     }
 }
