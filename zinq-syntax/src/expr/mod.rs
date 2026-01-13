@@ -367,6 +367,33 @@ impl Node for Expr {
             Self::Match(v) => v.name(),
         }
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_expr(self);
+
+        match self {
+            Self::Arithmetic(v) => v.accept(visitor),
+            Self::Array(v) => v.accept(visitor),
+            Self::Assign(v) => v.accept(visitor),
+            Self::Call(v) => v.accept(visitor),
+            Self::Cmp(v) => v.accept(visitor),
+            Self::Group(v) => v.accept(visitor),
+            Self::If(v) => v.accept(visitor),
+            Self::Index(v) => v.accept(visitor),
+            Self::Is(v) => v.accept(visitor),
+            Self::Literal(v) => v.accept(visitor),
+            Self::Logical(v) => v.accept(visitor),
+            Self::Match(v) => v.accept(visitor),
+            Self::Member(v) => v.accept(visitor),
+            Self::Neg(v) => v.accept(visitor),
+            Self::Not(v) => v.accept(visitor),
+            Self::Path(v) => v.accept(visitor),
+            Self::Range(v) => v.accept(visitor),
+            Self::Ref(v) => v.accept(visitor),
+            Self::Struct(v) => v.accept(visitor),
+            Self::Tuple(v) => v.accept(visitor),
+        }
+    }
 }
 
 impl std::fmt::Display for Expr {

@@ -20,6 +20,11 @@ impl Node for ReturnStmt {
     fn name(&self) -> &str {
         "Stmt::Return"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_return_stmt(self);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for ReturnStmt {

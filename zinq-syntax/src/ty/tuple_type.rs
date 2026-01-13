@@ -24,6 +24,14 @@ impl Node for TupleType {
     fn name(&self) -> &str {
         "Type::Tuple"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_tuple_type(self);
+
+        for item in self.items.iter() {
+            item.value().accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for TupleType {

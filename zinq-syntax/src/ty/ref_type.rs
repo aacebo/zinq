@@ -23,6 +23,11 @@ impl Node for RefType {
     fn name(&self) -> &str {
         "Type::Ref"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_ref_type(self);
+        self.to.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for RefType {

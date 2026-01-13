@@ -19,6 +19,11 @@ impl Node for ExprStmt {
     fn name(&self) -> &str {
         "Stmt::Expr"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_expr_stmt(self);
+        self.expr.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for ExprStmt {

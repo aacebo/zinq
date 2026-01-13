@@ -37,6 +37,16 @@ impl Node for FnStmt {
     fn name(&self) -> &str {
         "Stmt::Fn"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_fn_stmt(self);
+
+        for param in self.params.iter() {
+            param.value().ty.accept(visitor);
+        }
+
+        self.block.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for FnStmt {

@@ -39,6 +39,12 @@ impl Node for IsExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Is"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_is_expr(self);
+        self.left.accept(visitor);
+        self.ty.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for IsExpr {

@@ -24,6 +24,10 @@ impl Node for StructStmt {
     fn name(&self) -> &str {
         "Stmt::Struct"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_struct_stmt(self);
+    }
 }
 
 impl std::fmt::Display for StructStmt {

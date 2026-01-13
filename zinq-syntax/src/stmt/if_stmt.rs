@@ -25,6 +25,16 @@ impl Node for IfStmt {
     fn name(&self) -> &str {
         "Stmt::If"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_if_stmt(self);
+        self.cond.accept(visitor);
+        self.then_stmt.accept(visitor);
+
+        if let Some(else_stmt) = &self.else_stmt {
+            else_stmt.1.accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for IfStmt {

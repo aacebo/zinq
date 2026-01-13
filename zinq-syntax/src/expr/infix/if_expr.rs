@@ -26,6 +26,13 @@ impl Node for IfExpr {
     fn name(&self) -> &str {
         "Expr::If"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_if_expr(self);
+        self.cond.accept(visitor);
+        self.then_expr.accept(visitor);
+        self.else_expr.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for IfExpr {

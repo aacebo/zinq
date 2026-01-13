@@ -21,6 +21,10 @@ impl Node for UseStmt {
     fn name(&self) -> &str {
         "Stmt::Use"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_use_stmt(self);
+    }
 }
 
 impl std::fmt::Display for UseStmt {

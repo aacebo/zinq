@@ -26,6 +26,14 @@ impl Node for TupleExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Tuple"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_tuple_expr(self);
+
+        for item in self.items.iter() {
+            item.value().accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for TupleExpr {

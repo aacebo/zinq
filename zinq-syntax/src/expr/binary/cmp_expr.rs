@@ -37,6 +37,12 @@ impl Node for CmpExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Cmp"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_cmp_expr(self);
+        self.left.accept(visitor);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for CmpExpr {

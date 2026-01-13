@@ -42,6 +42,15 @@ impl Node for CallExpr {
     fn name(&self) -> &str {
         "Expr::Postfix::Call"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_call_expr(self);
+        self.target.accept(visitor);
+
+        for arg in self.args.iter() {
+            arg.value().accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for CallExpr {

@@ -35,6 +35,11 @@ impl Node for RefExpr {
     fn name(&self) -> &str {
         "Expr::Prefix::Ref"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_ref_expr(self);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for RefExpr {

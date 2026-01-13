@@ -33,6 +33,11 @@ impl Node for NotExpr {
     fn name(&self) -> &str {
         "Expr::Unary::Not"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_not_expr(self);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for NotExpr {

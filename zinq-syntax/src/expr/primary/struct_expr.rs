@@ -27,6 +27,10 @@ impl Node for StructExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Struct"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_struct_expr(self);
+    }
 }
 
 impl std::fmt::Display for StructExpr {

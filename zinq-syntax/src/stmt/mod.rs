@@ -11,6 +11,7 @@ mod parser;
 mod return_stmt;
 mod struct_stmt;
 mod use_stmt;
+mod visitor;
 
 pub use block_stmt::*;
 pub use enum_stmt::*;
@@ -25,6 +26,7 @@ pub use parser::*;
 pub use return_stmt::*;
 pub use struct_stmt::*;
 pub use use_stmt::*;
+pub use visitor::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
@@ -238,6 +240,25 @@ impl Node for Stmt {
             Self::If(v) => v.name(),
             Self::Enum(v) => v.name(),
             Self::For(v) => v.name(),
+        }
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_stmt(self);
+
+        match self {
+            Self::Block(v) => v.accept(visitor),
+            Self::Enum(v) => v.accept(visitor),
+            Self::Expr(v) => v.accept(visitor),
+            Self::Fn(v) => v.accept(visitor),
+            Self::For(v) => v.accept(visitor),
+            Self::If(v) => v.accept(visitor),
+            Self::Impl(v) => v.accept(visitor),
+            Self::Let(v) => v.accept(visitor),
+            Self::Mod(v) => v.accept(visitor),
+            Self::Return(v) => v.accept(visitor),
+            Self::Struct(v) => v.accept(visitor),
+            Self::Use(v) => v.accept(visitor),
         }
     }
 }

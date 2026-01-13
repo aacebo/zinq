@@ -35,6 +35,11 @@ impl Node for MemberExpr {
     fn name(&self) -> &str {
         "Expr::Postfix::Member"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_member_expr(self);
+        self.target.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for MemberExpr {

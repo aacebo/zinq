@@ -27,6 +27,12 @@ impl Node for ForStmt {
     fn name(&self) -> &str {
         "Stmt::For"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_for_stmt(self);
+        self.expr.accept(visitor);
+        self.body.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for ForStmt {

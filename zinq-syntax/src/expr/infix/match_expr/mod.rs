@@ -34,6 +34,11 @@ impl Node for MatchExpr {
     fn name(&self) -> &str {
         "Expr::Match"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_match_expr(self);
+        self.expr.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for MatchExpr {

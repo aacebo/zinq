@@ -25,6 +25,12 @@ impl Node for IndexExpr {
     fn name(&self) -> &str {
         "Expr::Postfix::Index"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_index_expr(self);
+        self.target.accept(visitor);
+        self.index.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for IndexExpr {

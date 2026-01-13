@@ -1,44 +1,54 @@
 mod mut_type;
+mod path_type;
 mod ref_type;
 mod slice_type;
 mod tuple_type;
+mod visitor;
 
 pub use mut_type::*;
+pub use path_type::*;
 pub use ref_type::*;
 pub use slice_type::*;
 pub use tuple_type::*;
+pub use visitor::*;
 
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Path};
+use crate::Node;
 
 ///
 /// ## Type
 ///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Type {
-    Path(Path),
+    Path(PathType),
     Mut(MutType),
     Ref(RefType),
     Slice(SliceType),
     Tuple(TupleType),
 }
 
-impl From<Path> for Type {
-    fn from(value: Path) -> Self {
-        Self::Path(value)
-    }
-}
-
 impl Node for Type {
     fn name(&self) -> &str {
         match self {
-            Self::Path(_) => "Type::Path",
+            Self::Path(v) => v.name(),
             Self::Mut(v) => v.name(),
             Self::Ref(v) => v.name(),
             Self::Slice(v) => v.name(),
             Self::Tuple(v) => v.name(),
+        }
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_type(self);
+
+        match self {
+            Self::Mut(v) => v.accept(visitor),
+            Self::Path(v) => v.accept(visitor),
+            Self::Ref(v) => v.accept(visitor),
+            Self::Slice(v) => v.accept(visitor),
+            Self::Tuple(v) => v.accept(visitor),
         }
     }
 }
@@ -80,8 +90,8 @@ impl Parse for Type {
             return Ok(parser.parse::<MutType>(cursor)?.into());
         }
 
-        if parser.peek::<Path>(cursor).unwrap_or(false) {
-            return Ok(parser.parse::<Path>(cursor)?.into());
+        if parser.peek::<PathType>(cursor).unwrap_or(false) {
+            return Ok(parser.parse::<PathType>(cursor)?.into());
         }
 
         if parser.peek::<SliceType>(cursor).unwrap_or(false) {

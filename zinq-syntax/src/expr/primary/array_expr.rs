@@ -26,6 +26,14 @@ impl Node for ArrayExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Array"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_array_expr(self);
+
+        for item in self.items.iter() {
+            item.value().accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for ArrayExpr {

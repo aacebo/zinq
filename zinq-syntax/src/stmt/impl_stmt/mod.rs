@@ -26,6 +26,11 @@ impl Node for ImplStmt {
     fn name(&self) -> &str {
         "Stmt::Impl"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_impl_stmt(self);
+        self.for_ty.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for ImplStmt {

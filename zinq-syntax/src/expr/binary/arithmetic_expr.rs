@@ -37,6 +37,12 @@ impl Node for ArithmeticExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Arithmetic"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_arithmetic_expr(self);
+        self.left.accept(visitor);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for ArithmeticExpr {

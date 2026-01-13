@@ -26,6 +26,18 @@ impl Node for RangeExpr {
     fn name(&self) -> &str {
         "Expr::Infix::Range"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_range_expr(self);
+
+        if let Some(start) = &self.start {
+            start.accept(visitor);
+        }
+
+        if let Some(end) = &self.end {
+            end.accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for RangeExpr {

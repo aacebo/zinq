@@ -35,6 +35,12 @@ impl Node for AssignExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Assign"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_assign_expr(self);
+        self.left.accept(visitor);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for AssignExpr {

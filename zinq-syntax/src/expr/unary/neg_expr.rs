@@ -33,6 +33,11 @@ impl Node for NegExpr {
     fn name(&self) -> &str {
         "Expr::Unary::Neg"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_neg_expr(self);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for NegExpr {

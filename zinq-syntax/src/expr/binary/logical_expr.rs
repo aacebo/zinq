@@ -51,6 +51,12 @@ impl Node for LogicalExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Logical"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_logical_expr(self);
+        self.left.accept(visitor);
+        self.right.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for LogicalExpr {

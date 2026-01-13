@@ -24,6 +24,11 @@ impl Node for SliceType {
     fn name(&self) -> &str {
         "Type::Slice"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_slice_type(self);
+        self.item_ty.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for SliceType {

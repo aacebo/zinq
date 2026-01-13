@@ -24,6 +24,11 @@ impl Node for GroupExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Group"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_group_expr(self);
+        self.inner.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for GroupExpr {

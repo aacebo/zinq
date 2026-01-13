@@ -31,6 +31,10 @@ impl Node for EnumStmt {
     fn name(&self) -> &str {
         "Stmt::Enum"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_enum_stmt(self);
+    }
 }
 
 impl Peek for EnumStmt {

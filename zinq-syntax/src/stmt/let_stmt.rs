@@ -26,6 +26,18 @@ impl Node for LetStmt {
     fn name(&self) -> &str {
         "Stmt::Let"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_let_stmt(self);
+
+        if let Some(ty) = &self.ty {
+            ty.suffix.accept(visitor);
+        }
+
+        if let Some(init) = &self.init {
+            init.suffix.accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for LetStmt {

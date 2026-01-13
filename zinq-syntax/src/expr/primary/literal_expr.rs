@@ -22,6 +22,10 @@ impl Node for LiteralExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Literal"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_literal_expr(self);
+    }
 }
 
 impl std::fmt::Display for LiteralExpr {

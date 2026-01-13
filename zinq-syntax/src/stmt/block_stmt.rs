@@ -20,6 +20,14 @@ impl Node for BlockStmt {
     fn name(&self) -> &str {
         "Stmt::Block"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_block_stmt(self);
+
+        for stmt in self.stmts.iter() {
+            stmt.accept(visitor);
+        }
+    }
 }
 
 impl std::fmt::Display for BlockStmt {

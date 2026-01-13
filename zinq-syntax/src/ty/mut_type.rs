@@ -23,6 +23,11 @@ impl Node for MutType {
     fn name(&self) -> &str {
         "Type::Mut"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        visitor.visit_mut_type(self);
+        self.ty.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for MutType {
