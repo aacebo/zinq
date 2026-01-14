@@ -1,12 +1,17 @@
+mod arena;
+mod context;
 pub mod expr;
 pub mod scope;
 pub mod stmt;
+
+pub use arena::*;
+pub use context::*;
 
 use std::hash::{Hash, Hasher};
 
 macro_rules! define_id {
     ($name:ident => $src:path) => {
-        #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+        #[derive(Debug, Default, Clone, Copy, PartialOrd, Ord, PartialEq, Eq, Hash)]
         pub struct $name(u64);
 
         impl From<u64> for $name {

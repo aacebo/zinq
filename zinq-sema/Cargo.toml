@@ -13,3 +13,4 @@ doctest = false
 
 [dependencies]
 zinq-syntax = { workspace = true }
+zinq-parse = { workspace = true }
