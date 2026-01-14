@@ -1,6 +1,14 @@
-use crate::{Arena, ExprId, expr::Expr};
+use crate::{Arena, ExprId, expr::SemaExpr};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
-pub struct SemanticContext {
-    exprs: Arena<ExprId, Expr>,
+#[derive(Clone, PartialEq, Eq)]
+pub struct Context {
+    pub exprs: Arena<ExprId, SemaExpr>,
+}
+
+impl Context {
+    pub fn new() -> Self {
+        Self {
+            exprs: Arena::new(),
+        }
+    }
 }

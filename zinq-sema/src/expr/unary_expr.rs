@@ -1,7 +1,7 @@
 use crate::ExprId;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnaryExpr {
+pub struct SemaUnaryExpr {
     pub op: UnaryOp,
     pub right: ExprId,
 }

@@ -1,6 +1,6 @@
 use crate::ExprId;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RefExpr {
+pub struct SemaRefExpr {
     pub inner: ExprId,
 }
