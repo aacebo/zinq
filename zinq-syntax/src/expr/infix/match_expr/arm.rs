@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{EqArrow, Suffixed};
 
 use crate::{
-    Node,
+    Syntax,
     expr::{Expr, ExprParser},
     pat::Pattern,
 };
@@ -14,7 +14,7 @@ pub struct Arm {
     pub body: Box<Expr>,
 }
 
-impl Node for Arm {
+impl Syntax for Arm {
     fn name(&self) -> &str {
         "Expr::Match::Arm"
     }

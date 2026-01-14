@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Ident};
 
-use crate::{Node, ty::Type};
+use crate::{Syntax, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnParam {
@@ -50,7 +50,7 @@ impl Spanned for FnParam {
     }
 }
 
-impl Node for FnParam {
+impl Syntax for FnParam {
     fn name(&self) -> &str {
         "Param::Fn"
     }

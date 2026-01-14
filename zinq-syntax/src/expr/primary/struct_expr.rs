@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LBrace, Punctuated, RBrace};
 
-use crate::{Node, Path, expr::Expr, members::MemberValue};
+use crate::{Path, Syntax, expr::Expr, members::MemberValue};
 
 ///
 /// ## Struct Expression
@@ -23,7 +23,7 @@ impl From<StructExpr> for Expr {
     }
 }
 
-impl Node for StructExpr {
+impl Syntax for StructExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Struct"
     }

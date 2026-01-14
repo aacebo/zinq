@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen, Suffixed};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Tuple Expression
@@ -22,7 +22,7 @@ impl From<TupleExpr> for Expr {
     }
 }
 
-impl Node for TupleExpr {
+impl Syntax for TupleExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Tuple"
     }

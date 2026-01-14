@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::Literal;
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Literal Pattern
@@ -64,7 +64,7 @@ impl Parse for LiteralPattern {
     }
 }
 
-impl Node for LiteralPattern {
+impl Syntax for LiteralPattern {
     fn name(&self) -> &str {
         "Pattern::Literal"
     }

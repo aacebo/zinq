@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LBrace, RBrace};
 
-use crate::{Node, stmt::Stmt};
+use crate::{Syntax, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BlockStmt {
@@ -16,7 +16,7 @@ impl From<BlockStmt> for Stmt {
     }
 }
 
-impl Node for BlockStmt {
+impl Syntax for BlockStmt {
     fn name(&self) -> &str {
         "Stmt::Block"
     }

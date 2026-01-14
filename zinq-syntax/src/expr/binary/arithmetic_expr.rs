@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Arithmetic;
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Arithmetic Expression
@@ -33,7 +33,7 @@ impl From<ArithmeticExpr> for Expr {
     }
 }
 
-impl Node for ArithmeticExpr {
+impl Syntax for ArithmeticExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Arithmetic"
     }

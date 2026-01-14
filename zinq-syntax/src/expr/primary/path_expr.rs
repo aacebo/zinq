@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::{Node, Path, expr::Expr};
+use crate::{Path, Syntax, expr::Expr};
 
 ///
 /// ## Path Expression
@@ -17,7 +17,7 @@ impl From<PathExpr> for Expr {
     }
 }
 
-impl Node for PathExpr {
+impl Syntax for PathExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Path"
     }

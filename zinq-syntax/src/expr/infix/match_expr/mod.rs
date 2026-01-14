@@ -5,7 +5,7 @@ pub use arm::*;
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Comma, LBrace, Match, Punctuated, RBrace};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Match Expression
@@ -30,7 +30,7 @@ impl From<MatchExpr> for Expr {
     }
 }
 
-impl Node for MatchExpr {
+impl Syntax for MatchExpr {
     fn name(&self) -> &str {
         "Expr::Match"
     }

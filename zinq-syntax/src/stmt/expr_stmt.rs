@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::SemiColon;
 
-use crate::{Node, expr::Expr, stmt::Stmt};
+use crate::{Syntax, expr::Expr, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExprStmt {
@@ -15,7 +15,7 @@ impl From<ExprStmt> for Stmt {
     }
 }
 
-impl Node for ExprStmt {
+impl Syntax for ExprStmt {
     fn name(&self) -> &str {
         "Stmt::Expr"
     }

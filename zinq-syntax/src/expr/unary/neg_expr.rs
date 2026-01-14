@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Minus;
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Negative Expression
@@ -29,7 +29,7 @@ impl From<NegExpr> for Expr {
     }
 }
 
-impl Node for NegExpr {
+impl Syntax for NegExpr {
     fn name(&self) -> &str {
         "Expr::Unary::Neg"
     }

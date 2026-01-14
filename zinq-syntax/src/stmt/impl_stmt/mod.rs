@@ -4,7 +4,7 @@ pub use syntax::*;
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Impl, LBrace, RBrace};
 
-use crate::{Generics, Node, stmt::Stmt, ty::Type};
+use crate::{Generics, Syntax, stmt::Stmt, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ImplStmt {
@@ -22,7 +22,7 @@ impl From<ImplStmt> for Stmt {
     }
 }
 
-impl Node for ImplStmt {
+impl Syntax for ImplStmt {
     fn name(&self) -> &str {
         "Stmt::Impl"
     }

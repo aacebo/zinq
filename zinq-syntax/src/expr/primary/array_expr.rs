@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LBracket, Punctuated, RBracket};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Array Expression
@@ -22,7 +22,7 @@ impl From<ArrayExpr> for Expr {
     }
 }
 
-impl Node for ArrayExpr {
+impl Syntax for ArrayExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Array"
     }

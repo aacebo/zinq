@@ -26,7 +26,7 @@ pub use wild_pattern::*;
 
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::Node;
+use crate::Syntax;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pattern {
@@ -225,7 +225,7 @@ impl Parse for Pattern {
     }
 }
 
-impl Node for Pattern {
+impl Syntax for Pattern {
     fn name(&self) -> &str {
         match self {
             Self::Group(v) => v.name(),

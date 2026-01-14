@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::And;
 
-use crate::{Node, ty::Type};
+use crate::{Syntax, ty::Type};
 
 ///
 /// ## Reference Type
@@ -19,7 +19,7 @@ impl From<RefType> for Type {
     }
 }
 
-impl Node for RefType {
+impl Syntax for RefType {
     fn name(&self) -> &str {
         "Type::Ref"
     }

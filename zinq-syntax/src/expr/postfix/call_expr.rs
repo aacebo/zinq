@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Call Expression
@@ -38,7 +38,7 @@ impl From<CallExpr> for Expr {
     }
 }
 
-impl Node for CallExpr {
+impl Syntax for CallExpr {
     fn name(&self) -> &str {
         "Expr::Postfix::Call"
     }

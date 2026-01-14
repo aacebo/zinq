@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{And, Mut};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Reference Expression
@@ -31,7 +31,7 @@ impl From<RefExpr> for Expr {
     }
 }
 
-impl Node for RefExpr {
+impl Syntax for RefExpr {
     fn name(&self) -> &str {
         "Expr::Prefix::Ref"
     }

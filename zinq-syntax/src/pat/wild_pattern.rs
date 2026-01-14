@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::Underscore;
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Wild Pattern
@@ -64,7 +64,7 @@ impl Parse for WildPattern {
     }
 }
 
-impl Node for WildPattern {
+impl Syntax for WildPattern {
     fn name(&self) -> &str {
         "Pattern::Wild"
     }

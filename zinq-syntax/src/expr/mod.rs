@@ -19,7 +19,7 @@ pub use visitor::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::Node;
+use crate::Syntax;
 
 ///
 /// ## Expression
@@ -342,7 +342,7 @@ impl Expr {
     }
 }
 
-impl Node for Expr {
+impl Syntax for Expr {
     fn name(&self) -> &str {
         match self {
             Self::Literal(v) => v.name(),

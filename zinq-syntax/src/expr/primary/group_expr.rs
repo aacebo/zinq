@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LParen, RParen};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Group Expression
@@ -20,7 +20,7 @@ impl From<GroupExpr> for Expr {
     }
 }
 
-impl Node for GroupExpr {
+impl Syntax for GroupExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Group"
     }

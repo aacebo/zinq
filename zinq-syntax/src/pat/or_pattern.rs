@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Or;
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Or Pattern
@@ -32,7 +32,7 @@ impl Spanned for OrPattern {
     }
 }
 
-impl Node for OrPattern {
+impl Syntax for OrPattern {
     fn name(&self) -> &str {
         "Pattern::Or"
     }

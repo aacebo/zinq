@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Mut;
 
-use crate::{Node, ty::Type};
+use crate::{Syntax, ty::Type};
 
 ///
 /// ## Mut Type
@@ -19,7 +19,7 @@ impl From<MutType> for Type {
     }
 }
 
-impl Node for MutType {
+impl Syntax for MutType {
     fn name(&self) -> &str {
         "Type::Mut"
     }

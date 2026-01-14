@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::{Node, Path, ty::Type};
+use crate::{Path, Syntax, ty::Type};
 
 ///
 /// ## Path Type
@@ -17,7 +17,7 @@ impl From<PathType> for Type {
     }
 }
 
-impl Node for PathType {
+impl Syntax for PathType {
     fn name(&self) -> &str {
         "Type::Path"
     }

@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Enclosed, LParen, Mod, Pub, RParen, Suffixed};
 
-use crate::{Node, Visibility};
+use crate::{Syntax, Visibility};
 
 ///
 /// ## Mod Visibility
@@ -18,7 +18,7 @@ impl From<ModVisibility> for Visibility {
     }
 }
 
-impl Node for ModVisibility {
+impl Syntax for ModVisibility {
     fn name(&self) -> &str {
         "Visibility::Mod"
     }

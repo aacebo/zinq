@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Spanned};
 use zinq_token::DotDot;
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Spread Pattern
@@ -63,7 +63,7 @@ impl Parse for SpreadPattern {
     }
 }
 
-impl Node for SpreadPattern {
+impl Syntax for SpreadPattern {
     fn name(&self) -> &str {
         "Pattern::Spread"
     }

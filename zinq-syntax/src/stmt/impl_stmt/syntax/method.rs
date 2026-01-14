@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed};
 
 use crate::{
-    Generics, Node, Visibility,
+    Generics, Syntax, Visibility,
     meta::Meta,
     param::{FnParam, SelfParam},
     stmt::{BlockStmt, ImplSyntax},
@@ -34,7 +34,7 @@ impl From<ImplMethod> for ImplSyntax {
     }
 }
 
-impl Node for ImplMethod {
+impl Syntax for ImplMethod {
     fn name(&self) -> &str {
         "Stmt::Impl::Method"
     }

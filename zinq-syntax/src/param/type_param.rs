@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Ident;
 
-use crate::{Bounds, Node};
+use crate::{Bounds, Syntax};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeParam {
@@ -46,7 +46,7 @@ impl Spanned for TypeParam {
     }
 }
 
-impl Node for TypeParam {
+impl Syntax for TypeParam {
     fn name(&self) -> &str {
         "Param::Type"
     }

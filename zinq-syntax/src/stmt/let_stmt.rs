@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Colon, Eq, Ident, Let, SemiColon, Suffixed};
 
-use crate::{Node, expr::Expr, stmt::Stmt, ty::Type};
+use crate::{Syntax, expr::Expr, stmt::Stmt, ty::Type};
 
 ///
 /// ## Let Statement
@@ -22,7 +22,7 @@ impl From<LetStmt> for Stmt {
     }
 }
 
-impl Node for LetStmt {
+impl Syntax for LetStmt {
     fn name(&self) -> &str {
         "Stmt::Let"
     }

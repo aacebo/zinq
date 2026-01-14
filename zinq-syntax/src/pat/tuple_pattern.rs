@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Tuple Pattern
@@ -58,7 +58,7 @@ impl Parse for TuplePattern {
     }
 }
 
-impl Node for TuplePattern {
+impl Syntax for TuplePattern {
     fn name(&self) -> &str {
         "Pattern::Tuple"
     }

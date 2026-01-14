@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LParen, Punctuated, RParen};
 
-use crate::{Node, ty::Type};
+use crate::{Syntax, ty::Type};
 
 ///
 /// ## Tuple Type
@@ -20,7 +20,7 @@ impl From<TupleType> for Type {
     }
 }
 
-impl Node for TupleType {
+impl Syntax for TupleType {
     fn name(&self) -> &str {
         "Type::Tuple"
     }

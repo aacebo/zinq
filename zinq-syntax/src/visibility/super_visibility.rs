@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Enclosed, LParen, Pub, RParen, Suffixed, Super};
 
-use crate::{Node, Visibility};
+use crate::{Syntax, Visibility};
 
 ///
 /// ## Super Visibility
@@ -18,7 +18,7 @@ impl From<SuperVisibility> for Visibility {
     }
 }
 
-impl Node for SuperVisibility {
+impl Syntax for SuperVisibility {
     fn name(&self) -> &str {
         "Visibility::Super"
     }

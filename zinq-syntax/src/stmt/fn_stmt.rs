@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Fn, Ident, LParen, Punctuated, RArrow, RParen, Suffixed};
 
 use crate::{
-    Generics, Node, Visibility,
+    Generics, Syntax, Visibility,
     meta::Meta,
     param::FnParam,
     stmt::{BlockStmt, Stmt},
@@ -33,7 +33,7 @@ impl From<FnStmt> for Stmt {
     }
 }
 
-impl Node for FnStmt {
+impl Syntax for FnStmt {
     fn name(&self) -> &str {
         "Stmt::Fn"
     }

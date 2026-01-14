@@ -31,7 +31,7 @@ pub use visitor::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::Node;
+use crate::Syntax;
 
 ///
 /// ## Statement
@@ -225,7 +225,7 @@ impl Stmt {
     }
 }
 
-impl Node for Stmt {
+impl Syntax for Stmt {
     fn name(&self) -> &str {
         match self {
             Self::Block(v) => v.name(),

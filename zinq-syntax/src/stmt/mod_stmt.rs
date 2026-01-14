@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Ident, Mod, SemiColon};
 
-use crate::{Node, Visibility, stmt::Stmt};
+use crate::{Syntax, Visibility, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModStmt {
@@ -17,7 +17,7 @@ impl From<ModStmt> for Stmt {
     }
 }
 
-impl Node for ModStmt {
+impl Syntax for ModStmt {
     fn name(&self) -> &str {
         "Stmt::Mod"
     }

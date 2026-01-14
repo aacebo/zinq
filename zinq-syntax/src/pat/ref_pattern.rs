@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{And, Mut};
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Reference Pattern
@@ -33,7 +33,7 @@ impl Spanned for RefPattern {
     }
 }
 
-impl Node for RefPattern {
+impl Syntax for RefPattern {
     fn name(&self) -> &str {
         "Pattern::Ref"
     }

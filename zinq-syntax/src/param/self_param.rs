@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{And, Mut, SelfValue};
 
-use crate::Node;
+use crate::Syntax;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
@@ -64,7 +64,7 @@ impl Spanned for SelfParam {
     }
 }
 
-impl Node for SelfParam {
+impl Syntax for SelfParam {
     fn name(&self) -> &str {
         "Param::Self"
     }

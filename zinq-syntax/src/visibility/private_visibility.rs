@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::{Node, Visibility};
+use crate::{Syntax, Visibility};
 
 ///
 /// ## Private Visibility
@@ -17,7 +17,7 @@ impl From<PrivateVisibility> for Visibility {
     }
 }
 
-impl Node for PrivateVisibility {
+impl Syntax for PrivateVisibility {
     fn name(&self) -> &str {
         "Visibility::Private"
     }

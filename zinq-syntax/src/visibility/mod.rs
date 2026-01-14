@@ -10,7 +10,7 @@ pub use super_visibility::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::Node;
+use crate::Syntax;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Visibility {
@@ -50,7 +50,7 @@ impl Visibility {
     }
 }
 
-impl Node for Visibility {
+impl Syntax for Visibility {
     fn name(&self) -> &str {
         match self {
             Self::Pub(v) => v.name(),

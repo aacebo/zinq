@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::DotDot;
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Range Expression
@@ -22,7 +22,7 @@ impl From<RangeExpr> for Expr {
     }
 }
 
-impl Node for RangeExpr {
+impl Syntax for RangeExpr {
     fn name(&self) -> &str {
         "Expr::Infix::Range"
     }

@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Else, If};
 
 use crate::{
-    Node,
+    Syntax,
     expr::Expr,
     stmt::{BlockStmt, Stmt, StmtParser},
 };
@@ -21,7 +21,7 @@ impl From<IfStmt> for Stmt {
     }
 }
 
-impl Node for IfStmt {
+impl Syntax for IfStmt {
     fn name(&self) -> &str {
         "Stmt::If"
     }

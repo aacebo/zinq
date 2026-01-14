@@ -15,7 +15,7 @@ pub use visitor::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::Node;
+use crate::Syntax;
 
 ///
 /// ## Type
@@ -29,7 +29,7 @@ pub enum Type {
     Tuple(TupleType),
 }
 
-impl Node for Type {
+impl Syntax for Type {
     fn name(&self) -> &str {
         match self {
             Self::Path(v) => v.name(),

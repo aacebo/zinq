@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, Enum, Ident, LBrace, Punctuated, RBrace};
 
-use crate::{Generics, Node, Variant, Visibility, meta::Meta, stmt::Stmt};
+use crate::{Generics, Syntax, Variant, Visibility, meta::Meta, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnumStmt {
@@ -27,7 +27,7 @@ impl std::fmt::Display for EnumStmt {
     }
 }
 
-impl Node for EnumStmt {
+impl Syntax for EnumStmt {
     fn name(&self) -> &str {
         "Stmt::Enum"
     }

@@ -5,7 +5,7 @@ pub use index_fields::*;
 pub use name_fields::*;
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::Node;
+use crate::Syntax;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Fields {
@@ -59,7 +59,7 @@ impl Fields {
     }
 }
 
-impl Node for Fields {
+impl Syntax for Fields {
     fn name(&self) -> &str {
         match self {
             Self::None(_) => "Fields::None",

@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Dot, Ident};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Member Expression
@@ -31,7 +31,7 @@ impl From<MemberExpr> for Expr {
     }
 }
 
-impl Node for MemberExpr {
+impl Syntax for MemberExpr {
     fn name(&self) -> &str {
         "Expr::Postfix::Member"
     }

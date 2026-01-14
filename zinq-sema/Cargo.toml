@@ -12,3 +12,4 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
+zinq-syntax = { workspace = true }

@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Logical;
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Logical Expression
@@ -47,7 +47,7 @@ impl From<LogicalExpr> for Expr {
     }
 }
 
-impl Node for LogicalExpr {
+impl Syntax for LogicalExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Logical"
     }

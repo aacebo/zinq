@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Comma, LBrace, Punctuated, RBrace, Suffixed};
 
-use crate::{Node, Path, pat::Pattern};
+use crate::{Path, Syntax, pat::Pattern};
 
 ///
 /// ## Struct Pattern
@@ -63,7 +63,7 @@ impl Parse for StructPattern {
     }
 }
 
-impl Node for StructPattern {
+impl Syntax for StructPattern {
     fn name(&self) -> &str {
         "Pattern::Struct"
     }

@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LBracket, RBracket};
 
-use crate::{Node, ty::Type};
+use crate::{Syntax, ty::Type};
 
 ///
 /// ## Slice Type
@@ -20,7 +20,7 @@ impl From<SliceType> for Type {
     }
 }
 
-impl Node for SliceType {
+impl Syntax for SliceType {
     fn name(&self) -> &str {
         "Type::Slice"
     }

@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::{Node, Path, pat::Pattern};
+use crate::{Path, Syntax, pat::Pattern};
 
 ///
 /// ## Path Pattern
@@ -49,7 +49,7 @@ impl Parse for PathPattern {
     }
 }
 
-impl Node for PathPattern {
+impl Syntax for PathPattern {
     fn name(&self) -> &str {
         "Pattern::Path"
     }

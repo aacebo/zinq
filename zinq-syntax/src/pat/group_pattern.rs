@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{LParen, RParen};
 
-use crate::{Node, pat::Pattern};
+use crate::{Syntax, pat::Pattern};
 
 ///
 /// ## Group Pattern
@@ -58,7 +58,7 @@ impl Parse for GroupPattern {
     }
 }
 
-impl Node for GroupPattern {
+impl Syntax for GroupPattern {
     fn name(&self) -> &str {
         "Pattern::Group"
     }

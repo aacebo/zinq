@@ -2,7 +2,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{For, In};
 
 use crate::{
-    Node,
+    Syntax,
     expr::Expr,
     pat::Pattern,
     stmt::{BlockStmt, Stmt},
@@ -23,7 +23,7 @@ impl From<ForStmt> for Stmt {
     }
 }
 
-impl Node for ForStmt {
+impl Syntax for ForStmt {
     fn name(&self) -> &str {
         "Stmt::For"
     }

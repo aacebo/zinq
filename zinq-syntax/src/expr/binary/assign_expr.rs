@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::Eq;
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Assign Expression
@@ -31,7 +31,7 @@ impl From<AssignExpr> for Expr {
     }
 }
 
-impl Node for AssignExpr {
+impl Syntax for AssignExpr {
     fn name(&self) -> &str {
         "Expr::Binary::Assign"
     }

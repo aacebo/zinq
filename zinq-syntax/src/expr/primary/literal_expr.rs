@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Literal;
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## Literal Expression
@@ -18,7 +18,7 @@ impl From<LiteralExpr> for Expr {
     }
 }
 
-impl Node for LiteralExpr {
+impl Syntax for LiteralExpr {
     fn name(&self) -> &str {
         "Expr::Primary::Literal"
     }

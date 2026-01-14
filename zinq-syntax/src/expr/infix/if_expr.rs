@@ -1,7 +1,7 @@
 use zinq_parse::{Span, Spanned};
 use zinq_token::{Colon, Question};
 
-use crate::{Node, expr::Expr};
+use crate::{Syntax, expr::Expr};
 
 ///
 /// ## If Expression
@@ -22,7 +22,7 @@ impl From<IfExpr> for Expr {
     }
 }
 
-impl Node for IfExpr {
+impl Syntax for IfExpr {
     fn name(&self) -> &str {
         "Expr::If"
     }

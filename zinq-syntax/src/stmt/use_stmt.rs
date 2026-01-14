@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{SemiColon, Use};
 
-use crate::{Node, UsePath, Visibility, stmt::Stmt};
+use crate::{Syntax, UsePath, Visibility, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UseStmt {
@@ -17,7 +17,7 @@ impl From<UseStmt> for Stmt {
     }
 }
 
-impl Node for UseStmt {
+impl Syntax for UseStmt {
     fn name(&self) -> &str {
         "Stmt::Use"
     }

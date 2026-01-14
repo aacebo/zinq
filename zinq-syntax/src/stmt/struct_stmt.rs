@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::{Ident, SemiColon, Struct};
 
-use crate::{Generics, Node, Visibility, fields::Fields, meta::Meta, stmt::Stmt};
+use crate::{Generics, Syntax, Visibility, fields::Fields, meta::Meta, stmt::Stmt};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StructStmt {
@@ -20,7 +20,7 @@ impl From<StructStmt> for Stmt {
     }
 }
 
-impl Node for StructStmt {
+impl Syntax for StructStmt {
     fn name(&self) -> &str {
         "Stmt::Struct"
     }
