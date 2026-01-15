@@ -38,6 +38,18 @@ impl Syntax for ImplMethod {
     fn name(&self) -> &str {
         "Stmt::Impl::Method"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        for item in self.params.iter() {
+            item.value().ty.accept(visitor);
+        }
+
+        if let Some(ty) = &self.return_ty {
+            ty.suffix.accept(visitor);
+        }
+
+        self.block.accept(visitor);
+    }
 }
 
 impl std::fmt::Display for ImplMethod {

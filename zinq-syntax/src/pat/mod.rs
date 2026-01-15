@@ -28,6 +28,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::Syntax;
 
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pattern {
     Wild(WildPattern),

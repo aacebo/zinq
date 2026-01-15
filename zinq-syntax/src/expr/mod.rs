@@ -25,6 +25,7 @@ use crate::Syntax;
 /// ## Expression
 /// Something that can be evaluated, usually to a value (even if that value is `()`).
 ///
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Expr {
     /// ## Primary

@@ -16,3 +16,4 @@ zinq-error = { workspace = true }
 zinq-syntax = { workspace = true }
 zinq-token = { workspace = true }
 zinq-parse = { workspace = true }
+blake3 = { workspace = true }

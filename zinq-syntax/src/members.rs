@@ -3,6 +3,7 @@ use zinq_token::{Colon, Ident, LInt};
 
 use crate::expr::Expr;
 
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Member {
     Index(LInt),

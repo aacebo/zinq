@@ -7,6 +7,7 @@ use zinq_parse::{Parse, Peek, Span, Spanned};
 
 use crate::Syntax;
 
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Fields {
     None(Span),
@@ -65,6 +66,14 @@ impl Syntax for Fields {
             Self::None(_) => "Fields::None",
             Self::Indexed(v) => v.name(),
             Self::Named(v) => v.name(),
+        }
+    }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        match self {
+            Self::None(_) => {}
+            Self::Indexed(v) => v.accept(visitor),
+            Self::Named(v) => v.accept(visitor),
         }
     }
 }

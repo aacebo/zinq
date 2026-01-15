@@ -16,12 +16,6 @@ impl From<SemaBinaryExpr> for SemaExpr {
     }
 }
 
-impl From<&SemaBinaryExpr> for SemaExpr {
-    fn from(value: &SemaBinaryExpr) -> Self {
-        Self::Binary(value.clone())
-    }
-}
-
 impl Build for zinq_syntax::expr::ArithmeticExpr {
     type Output = ExprId;
 

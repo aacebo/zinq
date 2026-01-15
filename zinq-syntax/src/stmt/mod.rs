@@ -39,6 +39,7 @@ use crate::Syntax;
 /// and doesn’t itself produce a value you can use in
 /// a larger expression.
 ///
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Stmt {
     Block(BlockStmt),

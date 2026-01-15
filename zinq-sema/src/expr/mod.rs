@@ -8,6 +8,7 @@ pub use unary_expr::*;
 
 use crate::{Build, ExprId};
 
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SemaExpr {
     Binary(SemaBinaryExpr),

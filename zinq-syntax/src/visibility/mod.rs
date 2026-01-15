@@ -10,8 +10,7 @@ pub use super_visibility::*;
 use zinq_error::Result;
 use zinq_parse::{Parse, Peek, Spanned};
 
-use crate::Syntax;
-
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Visibility {
     Pub(PublicVisibility),
@@ -46,17 +45,6 @@ impl Visibility {
         match self {
             Self::Priv(_) => true,
             _ => false,
-        }
-    }
-}
-
-impl Syntax for Visibility {
-    fn name(&self) -> &str {
-        match self {
-            Self::Pub(v) => v.name(),
-            Self::Mod(v) => v.name(),
-            Self::Super(v) => v.name(),
-            Self::Priv(v) => v.name(),
         }
     }
 }

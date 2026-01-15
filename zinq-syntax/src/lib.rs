@@ -21,13 +21,9 @@ pub use use_path::*;
 pub use variant::*;
 pub use visibility::*;
 
-pub trait Syntax: std::hash::Hash {
+pub trait Syntax {
     fn name(&self) -> &str;
-
-    #[allow(unused)]
-    fn accept<V: Visitor>(&self, visitor: &mut V) {
-        unimplemented!()
-    }
+    fn accept<V: Visitor>(&self, visitor: &mut V);
 }
 
 pub trait Visitor:

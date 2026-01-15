@@ -20,6 +20,7 @@ use crate::Syntax;
 ///
 /// ## Type
 ///
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Type {
     Path(PathType),

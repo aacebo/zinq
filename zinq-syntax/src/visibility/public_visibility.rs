@@ -1,7 +1,7 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 use zinq_token::Pub;
 
-use crate::{Syntax, Visibility};
+use crate::Visibility;
 
 ///
 /// ## Public Visibility
@@ -15,12 +15,6 @@ pub struct PublicVisibility {
 impl From<PublicVisibility> for Visibility {
     fn from(value: PublicVisibility) -> Self {
         Self::Pub(value)
-    }
-}
-
-impl Syntax for PublicVisibility {
-    fn name(&self) -> &str {
-        "Visibility::Public"
     }
 }
 

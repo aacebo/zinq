@@ -60,6 +60,16 @@ impl Syntax for IndexFields {
     fn name(&self) -> &str {
         "Fields::Indexed"
     }
+
+    fn accept<V: crate::Visitor>(&self, visitor: &mut V) {
+        for item in self.spreads.iter() {
+            item.value().ty.accept(visitor);
+        }
+
+        for item in self.fields.iter() {
+            item.value().ty.accept(visitor);
+        }
+    }
 }
 
 impl std::ops::Deref for IndexFields {

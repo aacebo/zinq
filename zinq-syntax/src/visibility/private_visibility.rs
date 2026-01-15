@@ -1,6 +1,6 @@
 use zinq_parse::{Parse, Peek, Span, Spanned};
 
-use crate::{Syntax, Visibility};
+use crate::Visibility;
 
 ///
 /// ## Private Visibility
@@ -14,12 +14,6 @@ pub struct PrivateVisibility {
 impl From<PrivateVisibility> for Visibility {
     fn from(value: PrivateVisibility) -> Self {
         Self::Priv(value)
-    }
-}
-
-impl Syntax for PrivateVisibility {
-    fn name(&self) -> &str {
-        "Visibility::Private"
     }
 }
 
