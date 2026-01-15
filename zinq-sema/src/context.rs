@@ -1,4 +1,4 @@
-use crate::{Arena, ExprId, expr::SemaExpr};
+use crate::{Arena, expr::SemaExpr, id::ExprId};
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct Context {

@@ -2,6 +2,7 @@ use zinq_parse::{Parse, Peek, Spanned};
 
 use crate::{AndAnd, OrOr};
 
+#[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Logical {
     And(AndAnd),

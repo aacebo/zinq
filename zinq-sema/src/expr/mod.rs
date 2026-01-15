@@ -1,18 +1,18 @@
 mod binary_expr;
-mod ref_expr;
+mod literal_expr;
 mod unary_expr;
 
 pub use binary_expr::*;
-pub use ref_expr::*;
+pub use literal_expr::*;
 pub use unary_expr::*;
 
-use crate::{Build, ExprId};
+use crate::{Build, id::ExprId};
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SemaExpr {
     Binary(SemaBinaryExpr),
-    Ref(SemaRefExpr),
+    Literal(SemaLiteralExpr),
     Unary(SemaUnaryExpr),
 }
 

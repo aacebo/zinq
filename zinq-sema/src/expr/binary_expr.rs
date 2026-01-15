@@ -1,7 +1,8 @@
 use zinq_parse::Spanned;
+use zinq_syntax::Syntax;
 use zinq_token::{Arithmetic, Cmp, Logical};
 
-use crate::{Build, ExprId, expr::SemaExpr};
+use crate::{Build, expr::SemaExpr, id::ExprId};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SemaBinaryExpr {
@@ -22,23 +23,22 @@ impl Build for zinq_syntax::expr::ArithmeticExpr {
     fn build(&self, ctx: &mut crate::Context) -> zinq_error::Result<Self::Output> {
         let left = self.left.build(ctx)?;
         let right = self.right.build(ctx)?;
-        let id = zinq_syntax::expr::Expr::from(self.clone()).into();
+        let op = BinaryOp::from(self.op.clone());
+        let id = ExprId::new(self.name())
+            .field("left", left.to_string().into())
+            .field("op", (op as u8).into())
+            .field("right", right.to_string().into())
+            .build()
+            .into();
 
-        ctx.exprs.add(
-            id,
-            SemaBinaryExpr {
-                left,
-                op: self.op.clone().into(),
-                right,
-            }
-            .into(),
-            self.span(),
-        );
+        ctx.exprs
+            .add(id, SemaBinaryExpr { left, op, right }.into(), self.span());
 
         Ok(id)
     }
 }
 
+#[repr(u8)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum BinaryOp {
     // Arithmetic
@@ -92,3 +92,28 @@ impl From<Logical> for BinaryOp {
         }
     }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use zinq_error::Result;
+//     use zinq_parse::Span;
+//     use zinq_syntax::expr::ExprParser;
+
+//     use crate::{Build, Context};
+
+//     #[test]
+//     fn should_build_context() -> Result<()> {
+//         let mut parser = zinq_parse::ZinqParser;
+//         let mut cursor = Span::from_bytes(b"a + 2").cursor();
+//         let expr = parser.parse_expr(&mut cursor)?;
+
+//         debug_assert_eq!(expr.to_string(), "a + 2");
+//         debug_assert!(expr.is_arithmetic());
+
+//         let mut ctx = Context::new();
+//         let id = expr.build(&mut ctx)?;
+
+//         debug_assert_eq!(id.to_string(), "V1::Expr::Binary::Arithmetic");
+//         Ok(())
+//     }
+// }

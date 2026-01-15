@@ -1,4 +1,4 @@
-use crate::ExprId;
+use crate::id::ExprId;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SemaUnaryExpr {

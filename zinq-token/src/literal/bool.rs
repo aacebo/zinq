@@ -26,6 +26,10 @@ impl LBool {
     pub fn is_false(&self) -> bool {
         self.span.bytes() == b"false"
     }
+
+    pub fn to_bool(&self) -> bool {
+        self.span.to_string().parse().expect("expected boolean")
+    }
 }
 
 impl std::fmt::Display for LBool {
