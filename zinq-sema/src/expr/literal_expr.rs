@@ -1,9 +1,7 @@
-use crate::{expr::SemaExpr, id::ExprId};
+use crate::expr::SemaExpr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SemaLiteralExpr {
-    pub inner: ExprId,
-}
+pub enum SemaLiteralExpr {}
 
 impl From<SemaLiteralExpr> for SemaExpr {
     fn from(value: SemaLiteralExpr) -> Self {

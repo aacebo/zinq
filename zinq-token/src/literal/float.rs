@@ -27,6 +27,14 @@ impl LFloat {
         self.span.bytes().ends_with(b"f64")
     }
 
+    pub fn to_f32(&self) -> Result<f32> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_f64(&self) -> Result<f64> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
     pub fn digits(&self) -> &[u8] {
         if self.is_f32() || self.is_f64() {
             return &self.span.bytes()[0..self.span.len() - 3];
@@ -162,6 +170,7 @@ mod tests {
         debug_assert!(token.is_float_literal());
         debug_assert_eq!(token.to_string(), "103.63f64");
         debug_assert_eq!(token.try_to_literal()?.try_to_float()?.suffix(), b"f64");
+        debug_assert_eq!(token.try_to_literal()?.try_to_float()?.to_f64()?, 103.63);
 
         Ok(())
     }

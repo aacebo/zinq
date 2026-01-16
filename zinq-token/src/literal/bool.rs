@@ -27,8 +27,8 @@ impl LBool {
         self.span.bytes() == b"false"
     }
 
-    pub fn to_bool(&self) -> bool {
-        self.span.to_string().parse().expect("expected boolean")
+    pub fn to_bool(&self) -> Result<bool> {
+        Ok(self.span.to_string().parse()?)
     }
 }
 
@@ -105,6 +105,7 @@ mod tests {
 
         debug_assert!(token.is_bool_literal());
         debug_assert_eq!(token.to_string(), "false");
+        debug_assert_eq!(token.try_to_literal()?.try_to_bool()?.to_bool()?, false);
 
         Ok(())
     }

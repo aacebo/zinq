@@ -18,6 +18,10 @@ impl LByte {
     pub fn name(&self) -> &'static str {
         "LByte"
     }
+
+    pub fn to_byte(&self) -> u8 {
+        self.span.bytes()[2]
+    }
 }
 
 impl std::fmt::Display for LByte {
@@ -87,6 +91,7 @@ mod tests {
 
         debug_assert!(token.is_byte_literal());
         debug_assert_eq!(token.to_string(), "b'p'");
+        debug_assert_eq!(token.try_to_literal()?.try_to_byte()?.to_byte(), b'p');
         debug_assert_eq!(cursor.bytes(), b"");
 
         Ok(())

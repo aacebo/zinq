@@ -51,6 +51,38 @@ impl LInt {
         self.span.bytes().ends_with(b"i64")
     }
 
+    pub fn to_u8(&self) -> Result<u8> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_i8(&self) -> Result<u8> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_u16(&self) -> Result<u16> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_i16(&self) -> Result<i16> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_u32(&self) -> Result<u32> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_i32(&self) -> Result<i32> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_u64(&self) -> Result<u64> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
+    pub fn to_i64(&self) -> Result<i64> {
+        Ok(str::from_utf8(self.digits())?.parse()?)
+    }
+
     pub fn digits(&self) -> &[u8] {
         if self.is_u8() || self.is_i8() {
             return &self.span.bytes()[0..self.span.len() - 2];
@@ -268,10 +300,10 @@ mod tests {
         let mut parser = zinq_parse::ZinqParser;
 
         let mut token = parser.parse::<Token>(&mut cursor)?;
-        println!("{} => {}", token.name(), token.to_string());
 
         debug_assert!(token.is_int_literal());
         debug_assert_eq!(token.to_string(), "103");
+        debug_assert_eq!(token.try_to_literal()?.try_to_int()?.to_u8()?, 103);
         debug_assert_eq!(cursor.bytes(), b"");
 
         cursor = Span::from_bytes(b"103u16").cursor();
@@ -280,6 +312,7 @@ mod tests {
         debug_assert!(token.is_int_literal());
         debug_assert_eq!(token.to_string(), "103u16");
         debug_assert_eq!(token.try_to_literal()?.try_to_int()?.digits(), b"103");
+        debug_assert_eq!(token.try_to_literal()?.try_to_int()?.to_u16()?, 103);
         debug_assert_eq!(token.try_to_literal()?.try_to_int()?.suffix(), b"u16");
 
         Ok(())
