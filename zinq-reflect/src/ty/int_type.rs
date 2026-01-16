@@ -1,3 +1,5 @@
+use crate::{Path, Size, ty::ZinqType};
+
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IntType {
@@ -7,13 +9,28 @@ pub enum IntType {
     I64,
 }
 
+impl ZinqType for IntType {
+    fn path(&self) -> Path {
+        match self {
+            Self::I8 => "i8".into(),
+            Self::I16 => "i16".into(),
+            Self::I32 => "i32".into(),
+            Self::I64 => "i64".into(),
+        }
+    }
+
+    fn size(&self) -> Size {
+        match self {
+            Self::I8 => Size::Static(1),
+            Self::I16 => Size::Static(2),
+            Self::I32 => Size::Static(4),
+            Self::I64 => Size::Static(8),
+        }
+    }
+}
+
 impl std::fmt::Display for IntType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::I8 => write!(f, "Type::I8"),
-            Self::I16 => write!(f, "Type::I16"),
-            Self::I32 => write!(f, "Type::I32"),
-            Self::I64 => write!(f, "Type::I64"),
-        }
+        write!(f, "{}", self.path())
     }
 }
