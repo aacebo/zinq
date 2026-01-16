@@ -98,6 +98,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "zinq-reflect"
+version = "0.0.1"
+dependencies = [
+ "zinq-error",
+]
+
+[[package]]
 name = "zinq-sema"
 version = "0.0.1"
 dependencies = [
