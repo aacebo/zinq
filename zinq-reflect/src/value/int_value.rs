@@ -1,5 +1,3 @@
-use crate::value::UIntValue;
-
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IntValue {
@@ -7,7 +5,6 @@ pub enum IntValue {
     I16(i16),
     I32(i32),
     I64(i64),
-    UInt(UIntValue),
 }
 
 impl From<i8> for IntValue {

@@ -1,13 +1,16 @@
-use crate::{Path, Size, ty::ZinqType};
+use crate::{
+    Path, Size,
+    ty::{Type, ZinqType},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PtrType {
-    pub inner: Path,
+    pub ty: Box<Type>,
 }
 
 impl ZinqType for PtrType {
     fn path(&self) -> Path {
-        format!("ptr<{}>", &self.inner).into()
+        format!("ptr<{}>", &self.ty).into()
     }
 
     fn size(&self) -> Size {
