@@ -1,12 +1,12 @@
 use crate::{
     ty::{StringType, Type},
-    value::{Value, ZinqValue},
+    value::{ObjectValue, ZinqValue},
 };
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StringValue(String);
 
-impl From<StringValue> for Value {
+impl From<StringValue> for ObjectValue {
     fn from(value: StringValue) -> Self {
         Self::String(value)
     }
