@@ -1,5 +1,5 @@
 use crate::{
-    Path, Size,
+    Size,
     ty::{Type, ZinqType},
 };
 
@@ -10,8 +10,8 @@ pub struct ArrayType {
 }
 
 impl ZinqType for ArrayType {
-    fn path(&self) -> Path {
-        format!("[{}; {}]", &self.item, &self.length).into()
+    fn name(&self) -> String {
+        format!("[{}; {}]", &self.item, &self.length)
     }
 
     fn size(&self) -> Size {
@@ -22,8 +22,14 @@ impl ZinqType for ArrayType {
     }
 }
 
+impl From<ArrayType> for Type {
+    fn from(value: ArrayType) -> Self {
+        Self::Array(value)
+    }
+}
+
 impl std::fmt::Display for ArrayType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.path())
+        write!(f, "{}", self.name())
     }
 }

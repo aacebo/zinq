@@ -1,5 +1,5 @@
 use crate::{
-    Path, Size,
+    Size,
     ty::{Type, ZinqType},
 };
 
@@ -9,8 +9,8 @@ pub struct PtrType {
 }
 
 impl ZinqType for PtrType {
-    fn path(&self) -> Path {
-        format!("ptr<{}>", &self.ty).into()
+    fn name(&self) -> String {
+        format!("&{}", &self.ty).into()
     }
 
     fn size(&self) -> Size {
@@ -24,8 +24,14 @@ impl ZinqType for PtrType {
     }
 }
 
+impl From<PtrType> for Type {
+    fn from(value: PtrType) -> Self {
+        Self::Ptr(value)
+    }
+}
+
 impl std::fmt::Display for PtrType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.path())
+        write!(f, "{}", self.name())
     }
 }

@@ -1,10 +1,13 @@
-use crate::{Path, Size, ty::ZinqType};
+use crate::{
+    Size,
+    ty::{Type, ZinqType},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StringType;
 
 impl ZinqType for StringType {
-    fn path(&self) -> Path {
+    fn name(&self) -> String {
         "string".into()
     }
 
@@ -13,8 +16,14 @@ impl ZinqType for StringType {
     }
 }
 
+impl From<StringType> for Type {
+    fn from(value: StringType) -> Self {
+        Self::String(value)
+    }
+}
+
 impl std::fmt::Display for StringType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.path())
+        write!(f, "{}", self.name())
     }
 }

@@ -15,6 +15,14 @@ impl Path {
     }
 }
 
+impl From<&[&str]> for Path {
+    fn from(value: &[&str]) -> Self {
+        Self {
+            items: value.iter().map(|v| v.to_string()).collect::<Vec<_>>(),
+        }
+    }
+}
+
 impl FromStr for Path {
     type Err = ZinqError;
 

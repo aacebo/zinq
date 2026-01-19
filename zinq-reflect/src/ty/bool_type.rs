@@ -1,10 +1,13 @@
-use crate::{Path, Size, ty::ZinqType};
+use crate::{
+    Size,
+    ty::{Type, ZinqType},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BoolType;
 
 impl ZinqType for BoolType {
-    fn path(&self) -> Path {
+    fn name(&self) -> String {
         "bool".into()
     }
 
@@ -13,8 +16,14 @@ impl ZinqType for BoolType {
     }
 }
 
+impl From<BoolType> for Type {
+    fn from(value: BoolType) -> Self {
+        Self::Bool(value)
+    }
+}
+
 impl std::fmt::Display for BoolType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.path())
+        write!(f, "{}", self.name())
     }
 }

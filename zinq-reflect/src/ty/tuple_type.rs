@@ -1,5 +1,5 @@
 use crate::{
-    Path, Size,
+    Size,
     ty::{Type, ZinqType},
 };
 
@@ -7,7 +7,7 @@ use crate::{
 pub struct TupleType(Vec<Type>);
 
 impl ZinqType for TupleType {
-    fn path(&self) -> Path {
+    fn name(&self) -> String {
         format!(
             "({})",
             self.0
@@ -33,8 +33,14 @@ impl ZinqType for TupleType {
     }
 }
 
+impl From<TupleType> for Type {
+    fn from(value: TupleType) -> Self {
+        Self::Tuple(value)
+    }
+}
+
 impl std::fmt::Display for TupleType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.path())
+        write!(f, "{}", self.name())
     }
 }

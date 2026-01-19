@@ -1,4 +1,7 @@
-use crate::{Path, Size, ty::ZinqType};
+use crate::{
+    Size,
+    ty::{Type, ZinqType},
+};
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -10,7 +13,7 @@ pub enum IntType {
 }
 
 impl ZinqType for IntType {
-    fn path(&self) -> Path {
+    fn name(&self) -> String {
         match self {
             Self::I8 => "i8".into(),
             Self::I16 => "i16".into(),
@@ -29,8 +32,14 @@ impl ZinqType for IntType {
     }
 }
 
+impl From<IntType> for Type {
+    fn from(value: IntType) -> Self {
+        Self::Int(value)
+    }
+}
+
 impl std::fmt::Display for IntType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.path())
+        write!(f, "{}", self.name())
     }
 }
