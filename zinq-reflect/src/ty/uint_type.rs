@@ -12,6 +12,36 @@ pub enum UIntType {
     U64,
 }
 
+impl UIntType {
+    pub fn is_u8(&self) -> bool {
+        match self {
+            Self::U8 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_u16(&self) -> bool {
+        match self {
+            Self::U16 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_u32(&self) -> bool {
+        match self {
+            Self::U32 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_u64(&self) -> bool {
+        match self {
+            Self::U64 => true,
+            _ => false,
+        }
+    }
+}
+
 impl ZinqType for UIntType {
     fn name(&self) -> String {
         match self {

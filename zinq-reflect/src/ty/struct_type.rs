@@ -1,5 +1,5 @@
 use crate::{
-    Field, Path, Size, TypePath,
+    Field, Impl, Path, Size, TypePath,
     ty::{Type, ZinqType},
 };
 
@@ -7,6 +7,7 @@ use crate::{
 pub struct StructType {
     pub path: TypePath,
     pub fields: Vec<Field>,
+    pub impls: Vec<Impl>,
 }
 
 impl StructType {

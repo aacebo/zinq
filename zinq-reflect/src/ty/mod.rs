@@ -54,6 +54,190 @@ pub enum Type {
     Enum(EnumType),
 }
 
+impl Type {
+    pub fn is_alias(&self) -> bool {
+        match self {
+            Self::Alias(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_array(&self) -> bool {
+        match self {
+            Self::Array(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_bool(&self) -> bool {
+        match self {
+            Self::Bool(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_enum(&self) -> bool {
+        match self {
+            Self::Enum(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_float(&self) -> bool {
+        match self {
+            Self::Float(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_fn(&self) -> bool {
+        match self {
+            Self::Fn(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_int(&self) -> bool {
+        match self {
+            Self::Int(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_mod(&self) -> bool {
+        match self {
+            Self::Mod(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_ptr(&self) -> bool {
+        match self {
+            Self::Ptr(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_string(&self) -> bool {
+        match self {
+            Self::String(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_struct(&self) -> bool {
+        match self {
+            Self::Struct(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_tuple(&self) -> bool {
+        match self {
+            Self::Tuple(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_uint(&self) -> bool {
+        match self {
+            Self::UInt(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn as_alias(&self) -> &AliasType {
+        match self {
+            Self::Alias(v) => v,
+            v => panic!("{}", format!("expected AliasType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_array(&self) -> &ArrayType {
+        match self {
+            Self::Array(v) => v,
+            v => panic!("{}", format!("expected ArrayType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_bool(&self) -> &BoolType {
+        match self {
+            Self::Bool(v) => v,
+            v => panic!("{}", format!("expected BoolType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_enum(&self) -> &EnumType {
+        match self {
+            Self::Enum(v) => v,
+            v => panic!("{}", format!("expected EnumType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_float(&self) -> &FloatType {
+        match self {
+            Self::Float(v) => v,
+            v => panic!("{}", format!("expected FloatType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_fn(&self) -> &FnType {
+        match self {
+            Self::Fn(v) => v,
+            v => panic!("{}", format!("expected FnType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_int(&self) -> &IntType {
+        match self {
+            Self::Int(v) => v,
+            v => panic!("{}", format!("expected IntType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_mod(&self) -> &ModType {
+        match self {
+            Self::Mod(v) => v,
+            v => panic!("{}", format!("expected ModType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_ptr(&self) -> &PtrType {
+        match self {
+            Self::Ptr(v) => v,
+            v => panic!("{}", format!("expected PtrType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_string(&self) -> &StringType {
+        match self {
+            Self::String(v) => v,
+            v => panic!("{}", format!("expected StringType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_struct(&self) -> &StructType {
+        match self {
+            Self::Struct(v) => v,
+            v => panic!("{}", format!("expected StructType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_tuple(&self) -> &TupleType {
+        match self {
+            Self::Tuple(v) => v,
+            v => panic!("{}", format!("expected TupleType, received {}", v.name())),
+        }
+    }
+
+    pub fn as_uint(&self) -> &UIntType {
+        match self {
+            Self::UInt(v) => v,
+            v => panic!("{}", format!("expected UIntType, received {}", v.name())),
+        }
+    }
+}
+
 impl ZinqType for Type {
     fn name(&self) -> String {
         match self {

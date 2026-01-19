@@ -10,6 +10,22 @@ pub enum FloatType {
     F64,
 }
 
+impl FloatType {
+    pub fn is_f32(&self) -> bool {
+        match self {
+            Self::F32 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_f64(&self) -> bool {
+        match self {
+            Self::F64 => true,
+            _ => false,
+        }
+    }
+}
+
 impl ZinqType for FloatType {
     fn name(&self) -> String {
         match self {

@@ -12,6 +12,36 @@ pub enum IntType {
     I64,
 }
 
+impl IntType {
+    pub fn is_i8(&self) -> bool {
+        match self {
+            Self::I8 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_i16(&self) -> bool {
+        match self {
+            Self::I16 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_i32(&self) -> bool {
+        match self {
+            Self::I32 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_i64(&self) -> bool {
+        match self {
+            Self::I64 => true,
+            _ => false,
+        }
+    }
+}
+
 impl ZinqType for IntType {
     fn name(&self) -> String {
         match self {

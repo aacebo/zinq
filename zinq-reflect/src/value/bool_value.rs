@@ -7,10 +7,6 @@ use crate::{
 pub struct BoolValue(bool);
 
 impl BoolValue {
-    pub fn as_bool(&self) -> &bool {
-        &self.0
-    }
-
     pub fn to_bool(&self) -> bool {
         self.0
     }
@@ -25,6 +21,14 @@ impl From<BoolValue> for Value {
 impl From<bool> for BoolValue {
     fn from(value: bool) -> Self {
         Self(value)
+    }
+}
+
+impl std::ops::Deref for BoolValue {
+    type Target = bool;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 

@@ -6,13 +6,27 @@ use crate::{
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleType(Vec<Type>);
 
+impl TupleType {
+    pub fn new(types: Vec<Type>) -> Self {
+        Self(types)
+    }
+}
+
+impl std::ops::Deref for TupleType {
+    type Target = [Type];
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl ZinqType for TupleType {
     fn name(&self) -> String {
         format!(
             "({})",
             self.0
                 .iter()
-                .map(|p| p.to_string())
+                .map(|t| t.to_string())
                 .collect::<Vec<_>>()
                 .join(", ")
         )
