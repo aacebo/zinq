@@ -1,8 +1,8 @@
-use crate::{Size, TypePtr, ZinqType, ty::Type};
+use crate::{TypeId, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayType {
-    pub item: TypePtr,
+    pub item: TypeId,
     pub length: usize,
 }
 
@@ -11,14 +11,7 @@ impl ZinqType for ArrayType {
         format!("[{}; {}]", &self.item, &self.length)
     }
 
-    fn size(&self) -> Size {
-        match self.item.size {
-            Size::Dynamic => Size::Dynamic,
-            Size::Static(v) => Size::Static(v * self.length),
-        }
-    }
-
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         Box::new([self.item.clone()])
     }
 }

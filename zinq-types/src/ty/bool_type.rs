@@ -9,7 +9,7 @@ impl ZinqType for BoolType {
     }
 
     fn size(&self) -> Size {
-        Size::Static(1)
+        Size::Known(1)
     }
 }
 

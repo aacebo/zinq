@@ -1,16 +1,16 @@
-use crate::{Size, TypePtr, ZinqType, ty::Type};
+use crate::{TypeId, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TupleType(Vec<TypePtr>);
+pub struct TupleType(Vec<TypeId>);
 
 impl TupleType {
-    pub fn new(types: Vec<TypePtr>) -> Self {
+    pub fn new(types: Vec<TypeId>) -> Self {
         Self(types)
     }
 }
 
 impl std::ops::Deref for TupleType {
-    type Target = [TypePtr];
+    type Target = [TypeId];
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -30,20 +30,7 @@ impl ZinqType for TupleType {
         .into()
     }
 
-    fn size(&self) -> Size {
-        let mut size = 0;
-
-        for ty in self.0.iter() {
-            size += match ty.size {
-                Size::Dynamic => return Size::Dynamic,
-                Size::Static(v) => v,
-            };
-        }
-
-        Size::Static(size)
-    }
-
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         self.0.clone().into_boxed_slice()
     }
 }

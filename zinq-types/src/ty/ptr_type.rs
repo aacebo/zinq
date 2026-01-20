@@ -1,8 +1,8 @@
-use crate::{Size, TypePtr, ZinqType, ty::Type};
+use crate::{Size, TypeId, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PtrType {
-    pub ty: TypePtr,
+    pub ty: TypeId,
 }
 
 impl ZinqType for PtrType {
@@ -11,29 +11,24 @@ impl ZinqType for PtrType {
     }
 
     fn size(&self) -> Size {
-        // 32 bit
-        if cfg!(target_arch = "x86") {
-            return Size::Static(4);
-        }
-
-        // 64 bit
-        Size::Static(8)
+        // x86 = 4, x64 = 8
+        Size::Known(size_of::<usize>())
     }
 
-    fn refs(&self) -> Box<[TypePtr]> {
-        vec![self.ty.clone()].into_boxed_slice()
+    fn refs(&self) -> Box<[TypeId]> {
+        vec![self.ty].into_boxed_slice()
     }
 }
 
-impl From<TypePtr> for PtrType {
-    fn from(ty: TypePtr) -> Self {
+impl From<TypeId> for PtrType {
+    fn from(ty: TypeId) -> Self {
         Self { ty }
     }
 }
 
 impl From<Type> for PtrType {
     fn from(value: Type) -> Self {
-        Self { ty: value.ptr() }
+        Self { ty: value.id() }
     }
 }
 

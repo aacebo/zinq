@@ -1,9 +1,9 @@
-use crate::{Path, Size, TypePath, TypePtr, ZinqType, ty::Type};
+use crate::{Path, TypeId, TypePath, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AliasType {
     pub path: TypePath,
-    pub ty: TypePtr,
+    pub ty: TypeId,
 }
 
 impl ZinqType for AliasType {
@@ -15,11 +15,7 @@ impl ZinqType for AliasType {
         Some(self.path.module.clone())
     }
 
-    fn size(&self) -> Size {
-        self.ty.size
-    }
-
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         Box::new([self.ty.clone()])
     }
 }

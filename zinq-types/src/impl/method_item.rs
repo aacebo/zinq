@@ -1,14 +1,14 @@
-use crate::{ImplItem, Param, TypePtr};
+use crate::{ImplItem, Param, TypeId};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MethodItem {
     pub name: String,
     pub params: Vec<Param>,
-    pub return_ty: Option<TypePtr>,
+    pub return_ty: Option<TypeId>,
 }
 
 impl MethodItem {
-    pub fn refs(&self) -> Box<[TypePtr]> {
+    pub fn refs(&self) -> Box<[TypeId]> {
         let params = self.params.iter().map(|p| p.ty.clone()).collect::<Vec<_>>();
 
         if let Some(ty) = &self.return_ty {

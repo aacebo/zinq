@@ -1,4 +1,4 @@
-use crate::{Size, ZinqType, ty::Type};
+use crate::{ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StringType;
@@ -6,10 +6,6 @@ pub struct StringType;
 impl ZinqType for StringType {
     fn name(&self) -> String {
         "string".into()
-    }
-
-    fn size(&self) -> Size {
-        Size::Dynamic
     }
 }
 

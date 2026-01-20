@@ -91,6 +91,13 @@ name = "zinq-error"
 version = "0.0.1"
 
 [[package]]
+name = "zinq-gc"
+version = "0.0.1"
+dependencies = [
+ "zinq-types",
+]
+
+[[package]]
 name = "zinq-hash"
 version = "0.0.1"
 dependencies = [

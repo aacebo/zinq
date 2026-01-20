@@ -1,9 +1,9 @@
-use crate::{Path, Size, TypePath, TypePtr, ZinqType, ty::Type};
+use crate::{Path, TypeId, TypePath, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModType {
     pub path: TypePath,
-    pub types: Vec<TypePtr>,
+    pub types: Vec<TypeId>,
 }
 
 impl ZinqType for ModType {
@@ -15,20 +15,7 @@ impl ZinqType for ModType {
         Some(self.path.module.clone())
     }
 
-    fn size(&self) -> Size {
-        let mut size = 0;
-
-        for ty in self.types.iter() {
-            size += match ty.size {
-                Size::Dynamic => return Size::Dynamic,
-                Size::Static(v) => v,
-            };
-        }
-
-        Size::Static(size)
-    }
-
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         self.types.clone().into_boxed_slice()
     }
 }

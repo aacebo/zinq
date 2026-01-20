@@ -51,10 +51,10 @@ impl ZinqType for IntType {
 
     fn size(&self) -> Size {
         match self {
-            Self::I8 => Size::Static(1),
-            Self::I16 => Size::Static(2),
-            Self::I32 => Size::Static(4),
-            Self::I64 => Size::Static(8),
+            Self::I8 => Size::Known(1),
+            Self::I16 => Size::Known(2),
+            Self::I32 => Size::Known(4),
+            Self::I64 => Size::Known(8),
         }
     }
 }

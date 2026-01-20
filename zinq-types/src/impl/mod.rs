@@ -2,17 +2,17 @@ mod method_item;
 
 pub use method_item::*;
 
-use crate::{Path, TypePtr};
+use crate::{Path, TypeId};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Impl {
     pub module: Path,
-    pub for_ty: TypePtr,
+    pub for_ty: TypeId,
     pub items: Vec<ImplItem>,
 }
 
 impl Impl {
-    pub fn refs(&self) -> Box<[TypePtr]> {
+    pub fn refs(&self) -> Box<[TypeId]> {
         let items = self.items.iter().flat_map(|i| i.refs()).collect::<Vec<_>>();
         vec![vec![self.for_ty.clone()], items]
             .concat()
@@ -33,7 +33,7 @@ pub enum ImplItem {
 }
 
 impl ImplItem {
-    pub fn refs(&self) -> Box<[TypePtr]> {
+    pub fn refs(&self) -> Box<[TypeId]> {
         match self {
             Self::Method(v) => v.refs(),
         }

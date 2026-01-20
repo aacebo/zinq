@@ -1,4 +1,4 @@
-use crate::{Impl, Path, Size, TypePath, TypePtr, Variant, ZinqType, ty::Type};
+use crate::{Impl, Path, TypeId, TypePath, Variant, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnumType {
@@ -26,22 +26,7 @@ impl ZinqType for EnumType {
         Some(self.path.module.clone())
     }
 
-    fn size(&self) -> Size {
-        let mut size = 0;
-
-        for variant in self.variants.iter() {
-            for field in &variant.fields {
-                size += match field.ty.size {
-                    Size::Dynamic => return Size::Dynamic,
-                    Size::Static(v) => v,
-                };
-            }
-        }
-
-        Size::Static(size)
-    }
-
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         let variants = self
             .variants
             .iter()

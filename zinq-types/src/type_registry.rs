@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Index};
 
 use crate::{
-    TypeId, ZinqType,
+    Layout, Size, TypeId, ZinqType,
     ty::{BoolType, FloatType, IntType, PtrType, StringType, Type, UIntType},
 };
 use zinq_error::{Error, Result};
@@ -71,17 +71,17 @@ impl TypeRegistry {
             return Ok(self);
         }
 
-        for ptr in ty.refs() {
-            let edge = match self.items.get_mut(&ptr.id) {
+        for id in &ty.refs() {
+            let cell = match self.items.get_mut(&id) {
                 None => {
-                    return Err(Error::from_str(&format!("type {} not found", &ptr))
+                    return Err(Error::from_str(&format!("type {} not found", &id))
                         .build()
                         .into());
                 }
                 Some(v) => v,
             };
 
-            edge.inc_refs();
+            cell.inc_refs();
         }
 
         let ptr_ty: Type = Type::from(PtrType::from(ty.clone()));
@@ -89,6 +89,42 @@ impl TypeRegistry {
         self.items.insert(ty.id(), TypeCell::from(ty));
         self.items.insert(ptr_ty.id(), TypeCell::from(ptr_ty));
         Ok(self)
+    }
+
+    pub fn layout(&self, id: &TypeId) -> Result<&Layout> {
+        if !self.exists(id) {
+            return Err(Error::from_str(&format!("type {} not found", &id))
+                .build()
+                .into());
+        }
+
+        let cell = self.items.index(id);
+
+        if let Some(layout) = &cell.layout {
+            return Ok(layout);
+        }
+
+        // calc type layout
+        Err(Error::from_str(&format!("type {} not found", &id))
+            .build()
+            .into())
+    }
+
+    pub fn size(&self, id: &TypeId) -> Result<Size> {
+        let cell = self.index(id);
+        let mut total = 0;
+
+        for ref_id in &cell.ty.refs() {
+            total += match self.size(ref_id) {
+                Err(err) => return Err(err),
+                Ok(size) => match size {
+                    Size::Opache => return Ok(size),
+                    Size::Known(v) => v,
+                },
+            };
+        }
+
+        Ok(Size::Known(total))
     }
 }
 
@@ -117,7 +153,7 @@ mod tests {
             path: TypePath::from("main::A"),
             fields: vec![Field {
                 name: "empty".to_string(),
-                ty: BoolType.ptr(),
+                ty: BoolType.id(),
             }],
             impls: vec![],
         };
@@ -128,7 +164,7 @@ mod tests {
                 path: TypePath::from("main::B::Main"),
                 fields: vec![Field {
                     name: "a".to_string(),
-                    ty: a.ptr(),
+                    ty: a.id(),
                 }],
             }],
             impls: vec![],

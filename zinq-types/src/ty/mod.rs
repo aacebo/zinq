@@ -26,7 +26,7 @@ pub use struct_type::*;
 pub use tuple_type::*;
 pub use uint_type::*;
 
-use crate::{Path, Size, TypePtr, ZinqType};
+use crate::{Path, Size, TypeId, ZinqType};
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -285,7 +285,7 @@ impl ZinqType for Type {
         }
     }
 
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         match self {
             Self::Alias(v) => v.refs(),
             Self::Array(v) => v.refs(),

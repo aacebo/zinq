@@ -1,31 +1,36 @@
-#[repr(u8)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Size {
-    Static(usize), // stack
-    Dynamic,       // heap
+    Known(usize),
+    Opache,
 }
 
 impl Size {
-    pub fn is_static(&self) -> bool {
+    pub fn is_known(&self) -> bool {
         match self {
-            Self::Static(_) => true,
+            Self::Known(_) => true,
             _ => false,
         }
     }
 
-    pub fn is_dynamic(&self) -> bool {
+    pub fn is_opache(&self) -> bool {
         match self {
-            Self::Dynamic => true,
+            Self::Opache => true,
             _ => false,
         }
+    }
+}
+
+impl Default for Size {
+    fn default() -> Self {
+        Self::Opache
     }
 }
 
 impl std::fmt::Display for Size {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Static(v) => write!(f, "Size::Static({})", v),
-            Self::Dynamic => write!(f, "Size::Dynamic"),
+            Self::Known(v) => write!(f, "Size::Known({})", v),
+            Self::Opache => write!(f, "Size::Opache"),
         }
     }
 }

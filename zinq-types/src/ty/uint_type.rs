@@ -51,10 +51,10 @@ impl ZinqType for UIntType {
 
     fn size(&self) -> Size {
         match self {
-            Self::U8 => Size::Static(1),
-            Self::U16 => Size::Static(2),
-            Self::U32 => Size::Static(4),
-            Self::U64 => Size::Static(8),
+            Self::U8 => Size::Known(1),
+            Self::U16 => Size::Known(2),
+            Self::U32 => Size::Known(4),
+            Self::U64 => Size::Known(8),
         }
     }
 }

@@ -1,10 +1,11 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::ty::Type;
+use crate::{Layout, ty::Type};
 
 #[derive(Debug)]
 pub struct TypeCell {
     pub ty: Type,
+    pub layout: Option<Layout>,
     pub ref_c: AtomicUsize,
 }
 
@@ -34,6 +35,7 @@ impl From<Type> for TypeCell {
     fn from(ty: Type) -> Self {
         Self {
             ty,
+            layout: None,
             ref_c: AtomicUsize::new(0),
         }
     }

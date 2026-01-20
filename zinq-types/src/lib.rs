@@ -1,24 +1,24 @@
 pub mod error;
 mod field;
 mod r#impl;
+mod layout;
 mod param;
 mod path;
 mod size;
 pub mod ty;
 mod type_cell;
 mod type_path;
-mod type_ptr;
 mod type_registry;
 mod variant;
 
 pub use field::*;
 pub use r#impl::*;
+pub use layout::*;
 pub use param::*;
 pub use path::*;
 pub use size::*;
 pub use type_cell::*;
 pub use type_path::*;
-pub use type_ptr::*;
 pub use type_registry::*;
 pub use variant::*;
 
@@ -28,11 +28,11 @@ pub trait Resolve {
     fn resolve(self, registry: &TypeRegistry) -> zinq_error::Result<&Self::Output>;
 }
 
-impl Resolve for TypePtr {
+impl Resolve for TypeId {
     type Output = ty::Type;
 
     fn resolve(self, registry: &TypeRegistry) -> zinq_error::Result<&'_ Self::Output> {
-        registry.get_or_err(&self.id)
+        registry.get_or_err(&self)
     }
 }
 
@@ -47,16 +47,16 @@ impl std::fmt::Display for TypeId {
 
 pub trait ZinqType {
     fn name(&self) -> String;
-    fn size(&self) -> Size;
-    fn refs(&self) -> Box<[TypePtr]> {
-        Box::new([])
+    fn module(&self) -> Option<Path> {
+        None
     }
 
-    fn ptr(&self) -> TypePtr
-    where
-        Self: Sized,
-    {
-        TypePtr::from(self)
+    fn size(&self) -> Size {
+        Size::Opache
+    }
+
+    fn refs(&self) -> Box<[TypeId]> {
+        Box::new([])
     }
 
     fn id(&self) -> TypeId {
@@ -68,9 +68,5 @@ pub trait ZinqType {
 
         hasher.push_str(&self.name());
         TypeId(hasher.build())
-    }
-
-    fn module(&self) -> Option<Path> {
-        None
     }
 }

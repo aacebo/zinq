@@ -1,10 +1,10 @@
-use crate::{Param, Path, Size, TypePath, TypePtr, ZinqType, ty::Type};
+use crate::{Param, Path, Size, TypeId, TypePath, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnType {
     pub path: TypePath,
     pub params: Vec<Param>,
-    pub return_ty: Option<TypePtr>,
+    pub return_ty: Option<TypeId>,
 }
 
 impl ZinqType for FnType {
@@ -17,10 +17,10 @@ impl ZinqType for FnType {
     }
 
     fn size(&self) -> Size {
-        Size::Static(0)
+        Size::Known(0)
     }
 
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         let params = self.params.iter().map(|p| p.ty.clone()).collect::<Vec<_>>();
 
         if let Some(ty) = &self.return_ty {

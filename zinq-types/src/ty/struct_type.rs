@@ -1,4 +1,4 @@
-use crate::{Field, Impl, Path, Size, TypePath, TypePtr, ZinqType, ty::Type};
+use crate::{Field, Impl, Path, TypeId, TypePath, ZinqType, ty::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StructType {
@@ -26,20 +26,7 @@ impl ZinqType for StructType {
         Some(self.path.module.clone())
     }
 
-    fn size(&self) -> Size {
-        let mut size = 0;
-
-        for field in self.fields.iter() {
-            size += match field.ty.size {
-                Size::Dynamic => return Size::Dynamic,
-                Size::Static(v) => v,
-            };
-        }
-
-        Size::Static(size)
-    }
-
-    fn refs(&self) -> Box<[TypePtr]> {
+    fn refs(&self) -> Box<[TypeId]> {
         let fields = self.fields.iter().map(|f| f.ty.clone()).collect::<Vec<_>>();
         let impls = self
             .impls

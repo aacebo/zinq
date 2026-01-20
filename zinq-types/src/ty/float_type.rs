@@ -33,8 +33,8 @@ impl ZinqType for FloatType {
 
     fn size(&self) -> Size {
         match self {
-            Self::F32 => Size::Static(4),
-            Self::F64 => Size::Static(8),
+            Self::F32 => Size::Known(4),
+            Self::F64 => Size::Known(8),
         }
     }
 }
