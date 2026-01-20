@@ -1,5 +1,5 @@
 use crate::{
-    ty::Type,
+    TypePtr,
     value::{StringValue, Value, ZinqValue},
 };
 
@@ -16,7 +16,7 @@ impl From<ObjectValue> for Value {
 }
 
 impl ZinqValue for ObjectValue {
-    fn ty(&self) -> Type {
+    fn ty(&self) -> TypePtr {
         match self {
             Self::String(v) => v.ty(),
         }

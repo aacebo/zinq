@@ -1,5 +1,6 @@
 use crate::{
-    ty::{Type, UIntType, ZinqType},
+    TypePtr,
+    ty::{UIntType, ZinqType},
     value::{Value, ZinqValue},
 };
 
@@ -44,39 +45,39 @@ impl UIntValue {
     pub fn to_u8(&self) -> u8 {
         match self {
             Self::U8(v) => *v,
-            v => panic!("{}", format!("expected u8, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected u8, received {}", v.ty())),
         }
     }
 
     pub fn to_u16(&self) -> u16 {
         match self {
             Self::U16(v) => *v,
-            v => panic!("{}", format!("expected u16, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected u16, received {}", v.ty())),
         }
     }
 
     pub fn to_u32(&self) -> u32 {
         match self {
             Self::U32(v) => *v,
-            v => panic!("{}", format!("expected u32, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected u32, received {}", v.ty())),
         }
     }
 
     pub fn to_u64(&self) -> u64 {
         match self {
             Self::U64(v) => *v,
-            v => panic!("{}", format!("expected u64, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected u64, received {}", v.ty())),
         }
     }
 }
 
 impl ZinqValue for UIntValue {
-    fn ty(&self) -> Type {
+    fn ty(&self) -> TypePtr {
         match self {
-            Self::U8(_) => UIntType::U8.into(),
-            Self::U16(_) => UIntType::U16.into(),
-            Self::U32(_) => UIntType::U32.into(),
-            Self::U64(_) => UIntType::U64.into(),
+            Self::U8(_) => UIntType::U8.ptr(),
+            Self::U16(_) => UIntType::U16.ptr(),
+            Self::U32(_) => UIntType::U32.ptr(),
+            Self::U64(_) => UIntType::U64.ptr(),
         }
     }
 }

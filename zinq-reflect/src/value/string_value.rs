@@ -1,5 +1,6 @@
 use crate::{
-    ty::{StringType, Type},
+    TypePtr,
+    ty::{StringType, ZinqType},
     value::{ObjectValue, ZinqValue},
 };
 
@@ -39,7 +40,7 @@ impl std::fmt::Display for StringValue {
 }
 
 impl ZinqValue for StringValue {
-    fn ty(&self) -> Type {
-        StringType.into()
+    fn ty(&self) -> TypePtr {
+        StringType.ptr()
     }
 }

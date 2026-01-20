@@ -1,5 +1,6 @@
 use crate::{
-    ty::{BoolType, Type},
+    TypePtr,
+    ty::{BoolType, ZinqType},
     value::{Value, ZinqValue},
 };
 
@@ -39,7 +40,7 @@ impl std::fmt::Display for BoolValue {
 }
 
 impl ZinqValue for BoolValue {
-    fn ty(&self) -> Type {
-        BoolType.into()
+    fn ty(&self) -> TypePtr {
+        BoolType.ptr()
     }
 }

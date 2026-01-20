@@ -1,5 +1,6 @@
 use crate::{
-    ty::{FloatType, Type, ZinqType},
+    TypePtr,
+    ty::{FloatType, ZinqType},
     value::{Value, ZinqValue},
 };
 
@@ -28,23 +29,23 @@ impl FloatValue {
     pub fn to_f32(&self) -> f32 {
         match self {
             Self::F32(v) => *v,
-            v => panic!("{}", format!("expected f32, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected f32, received {}", v.ty())),
         }
     }
 
     pub fn to_f64(&self) -> f64 {
         match self {
             Self::F64(v) => *v,
-            v => panic!("{}", format!("expected f64, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected f64, received {}", v.ty())),
         }
     }
 }
 
 impl ZinqValue for FloatValue {
-    fn ty(&self) -> Type {
+    fn ty(&self) -> TypePtr {
         match self {
-            Self::F32(_) => FloatType::F32.into(),
-            Self::F64(_) => FloatType::F64.into(),
+            Self::F32(_) => FloatType::F32.ptr(),
+            Self::F64(_) => FloatType::F64.ptr(),
         }
     }
 }

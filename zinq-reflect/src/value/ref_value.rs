@@ -1,6 +1,6 @@
 use crate::{
     TypePtr,
-    ty::{PtrType, Type},
+    ty::{PtrType, ZinqType},
     value::{Value, ValueId, ZinqValue},
 };
 
@@ -23,10 +23,10 @@ impl std::fmt::Display for RefValue {
 }
 
 impl ZinqValue for RefValue {
-    fn ty(&self) -> Type {
+    fn ty(&self) -> TypePtr {
         PtrType {
             ty: self.ty.clone(),
         }
-        .into()
+        .ptr()
     }
 }

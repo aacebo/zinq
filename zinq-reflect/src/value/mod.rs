@@ -16,10 +16,10 @@ pub use string_value::*;
 pub use tuple_value::*;
 pub use uint_value::*;
 
-use crate::ty::Type;
+use crate::TypePtr;
 
 pub trait ZinqValue {
-    fn ty(&self) -> Type;
+    fn ty(&self) -> TypePtr;
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -34,7 +34,7 @@ pub enum Value {
 }
 
 impl ZinqValue for Value {
-    fn ty(&self) -> Type {
+    fn ty(&self) -> TypePtr {
         match self {
             Self::Bool(v) => v.ty(),
             Self::Float(v) => v.ty(),

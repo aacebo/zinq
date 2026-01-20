@@ -1,5 +1,6 @@
 use crate::{
-    ty::{IntType, Type, ZinqType},
+    TypePtr,
+    ty::{IntType, ZinqType},
     value::{Value, ZinqValue},
 };
 
@@ -44,39 +45,39 @@ impl IntValue {
     pub fn to_i8(&self) -> i8 {
         match self {
             Self::I8(v) => *v,
-            v => panic!("{}", format!("expected i8, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected i8, received {}", v.ty())),
         }
     }
 
     pub fn to_i16(&self) -> i16 {
         match self {
             Self::I16(v) => *v,
-            v => panic!("{}", format!("expected i16, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected i16, received {}", v.ty())),
         }
     }
 
     pub fn to_i32(&self) -> i32 {
         match self {
             Self::I32(v) => *v,
-            v => panic!("{}", format!("expected i32, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected i32, received {}", v.ty())),
         }
     }
 
     pub fn to_i64(&self) -> i64 {
         match self {
             Self::I64(v) => *v,
-            v => panic!("{}", format!("expected i64, received {}", v.ty().name())),
+            v => panic!("{}", format!("expected i64, received {}", v.ty())),
         }
     }
 }
 
 impl ZinqValue for IntValue {
-    fn ty(&self) -> Type {
+    fn ty(&self) -> TypePtr {
         match self {
-            Self::I8(_) => IntType::I8.into(),
-            Self::I16(_) => IntType::I16.into(),
-            Self::I32(_) => IntType::I32.into(),
-            Self::I64(_) => IntType::I64.into(),
+            Self::I8(_) => IntType::I8.ptr(),
+            Self::I16(_) => IntType::I16.ptr(),
+            Self::I32(_) => IntType::I32.ptr(),
+            Self::I64(_) => IntType::I64.ptr(),
         }
     }
 }
