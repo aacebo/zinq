@@ -28,6 +28,18 @@ impl ZinqType for PtrType {
     }
 }
 
+impl From<TypePtr> for PtrType {
+    fn from(ty: TypePtr) -> Self {
+        Self { ty }
+    }
+}
+
+impl From<Type> for PtrType {
+    fn from(value: Type) -> Self {
+        Self { ty: value.ptr() }
+    }
+}
+
 impl From<PtrType> for Type {
     fn from(value: PtrType) -> Self {
         Self::Ptr(value)

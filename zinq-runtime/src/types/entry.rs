@@ -9,6 +9,14 @@ pub struct TypeEntry {
 }
 
 impl TypeEntry {
+    pub fn as_type(&self) -> &Type {
+        &self.ty
+    }
+
+    pub fn to_type(&self) -> Type {
+        self.ty.clone()
+    }
+
     pub fn inc_refs(&mut self) {
         self.ref_c.fetch_add(1, Ordering::SeqCst);
     }

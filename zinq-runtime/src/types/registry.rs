@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 use zinq_error::{Error, Result};
-use zinq_reflect::ty::{Type, TypeId, ZinqType};
+use zinq_reflect::ty::{
+    BoolType, FloatType, IntType, PtrType, StringType, Type, TypeId, UIntType, ZinqType,
+};
 
 use crate::types::TypeEntry;
 
@@ -12,17 +14,31 @@ pub struct TypeRegistry {
 
 impl TypeRegistry {
     pub fn new() -> Self {
-        Self {
+        let mut value = Self {
             items: HashMap::new(),
-        }
+        };
+
+        value.add(BoolType.into()).unwrap();
+        value.add(FloatType::F32.into()).unwrap();
+        value.add(FloatType::F64.into()).unwrap();
+        value.add(IntType::I8.into()).unwrap();
+        value.add(IntType::I16.into()).unwrap();
+        value.add(IntType::I32.into()).unwrap();
+        value.add(IntType::I64.into()).unwrap();
+        value.add(UIntType::U8.into()).unwrap();
+        value.add(UIntType::U16.into()).unwrap();
+        value.add(UIntType::U32.into()).unwrap();
+        value.add(UIntType::U64.into()).unwrap();
+        value.add(StringType.into()).unwrap();
+        value
     }
 
     pub fn len(&self) -> usize {
         self.items.len()
     }
 
-    pub fn exists(&self, ty: Type) -> bool {
-        self.items.contains_key(&ty.id())
+    pub fn exists(&self, id: &TypeId) -> bool {
+        self.items.contains_key(id)
     }
 
     pub fn get(&self, id: &TypeId) -> Option<&Type> {
@@ -50,6 +66,10 @@ impl TypeRegistry {
     }
 
     pub fn add(&mut self, ty: Type) -> Result<&mut Self> {
+        if self.exists(&ty.id()) {
+            return Ok(self);
+        }
+
         for ptr in ty.refs() {
             let edge = match self.items.get_mut(&ptr.id) {
                 None => {
@@ -63,7 +83,54 @@ impl TypeRegistry {
             edge.inc_refs();
         }
 
+        let ptr_ty: Type = Type::from(PtrType::from(ty.clone()));
+
         self.items.insert(ty.id(), TypeEntry::from(ty));
+        self.items.insert(ptr_ty.id(), TypeEntry::from(ptr_ty));
         Ok(self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use zinq_error::Result;
+    use zinq_reflect::{
+        Field, TypePath, Variant,
+        ty::{BoolType, EnumType, StructType, ZinqType},
+    };
+
+    use crate::types::TypeRegistry;
+
+    #[test]
+    fn should_have_refs() -> Result<()> {
+        let mut registry = TypeRegistry::new();
+        let a = StructType {
+            path: TypePath::from("main::A"),
+            fields: vec![Field {
+                name: "empty".to_string(),
+                ty: BoolType.ptr(),
+            }],
+            impls: vec![],
+        };
+
+        registry.add(a.clone().into()).unwrap();
+        registry
+            .add(
+                EnumType {
+                    path: TypePath::from("main::B"),
+                    variants: vec![Variant {
+                        path: TypePath::from("Main"),
+                        fields: vec![Field {
+                            name: "a".to_string(),
+                            ty: a.ptr(),
+                        }],
+                    }],
+                }
+                .into(),
+            )
+            .unwrap();
+
+        debug_assert_eq!(registry.len(), 28, "{:#?}", &registry);
+        Ok(())
     }
 }
