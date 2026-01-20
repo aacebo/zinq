@@ -7,6 +7,18 @@ pub struct MethodItem {
     pub return_ty: Option<TypePtr>,
 }
 
+impl MethodItem {
+    pub fn refs(&self) -> Box<[TypePtr]> {
+        let params = self.params.iter().map(|p| p.ty.clone()).collect::<Vec<_>>();
+
+        if let Some(ty) = &self.return_ty {
+            return [params, vec![ty.clone()]].concat().into_boxed_slice();
+        }
+
+        params.into_boxed_slice()
+    }
+}
+
 impl From<MethodItem> for ImplItem {
     fn from(value: MethodItem) -> Self {
         Self::Method(value)

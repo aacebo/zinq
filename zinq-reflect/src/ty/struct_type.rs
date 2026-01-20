@@ -1,5 +1,5 @@
 use crate::{
-    Field, Impl, Path, Size, TypePath,
+    Field, Impl, Path, Size, TypePath, TypePtr,
     ty::{Type, ZinqType},
 };
 
@@ -40,6 +40,16 @@ impl ZinqType for StructType {
         }
 
         Size::Static(size)
+    }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        let fields = self.fields.iter().map(|f| f.ty.clone()).collect::<Vec<_>>();
+        let impls = self
+            .impls
+            .iter()
+            .flat_map(|im| im.refs())
+            .collect::<Vec<_>>();
+        vec![fields, impls].concat().into_boxed_slice()
     }
 }
 

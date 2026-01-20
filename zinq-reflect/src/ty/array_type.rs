@@ -20,6 +20,10 @@ impl ZinqType for ArrayType {
             Size::Static(v) => Size::Static(v * self.length),
         }
     }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        Box::new([self.item.clone()])
+    }
 }
 
 impl From<ArrayType> for Type {

@@ -45,6 +45,10 @@ impl ZinqType for TupleType {
 
         Size::Static(size)
     }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        self.0.clone().into_boxed_slice()
+    }
 }
 
 impl From<TupleType> for Type {

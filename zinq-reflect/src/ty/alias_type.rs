@@ -21,6 +21,10 @@ impl ZinqType for AliasType {
     fn size(&self) -> Size {
         self.ty.size
     }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        Box::new([self.ty.clone()])
+    }
 }
 
 impl From<AliasType> for Type {

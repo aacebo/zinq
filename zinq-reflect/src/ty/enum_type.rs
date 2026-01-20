@@ -1,5 +1,5 @@
 use crate::{
-    Path, Size, TypePath, Variant,
+    Path, Size, TypePath, TypePtr, Variant,
     ty::{Type, ZinqType},
 };
 
@@ -41,6 +41,15 @@ impl ZinqType for EnumType {
         }
 
         Size::Static(size)
+    }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        let variants = self
+            .variants
+            .iter()
+            .flat_map(|v| v.fields.iter().map(|f| f.ty.clone()))
+            .collect::<Vec<_>>();
+        variants.into_boxed_slice()
     }
 }
 

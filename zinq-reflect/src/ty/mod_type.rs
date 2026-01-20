@@ -30,6 +30,10 @@ impl ZinqType for ModType {
 
         Size::Static(size)
     }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        self.types.clone().into_boxed_slice()
+    }
 }
 
 impl From<ModType> for Type {

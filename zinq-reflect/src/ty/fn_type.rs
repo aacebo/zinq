@@ -22,6 +22,16 @@ impl ZinqType for FnType {
     fn size(&self) -> Size {
         Size::Static(0)
     }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        let params = self.params.iter().map(|p| p.ty.clone()).collect::<Vec<_>>();
+
+        if let Some(ty) = &self.return_ty {
+            return [params, vec![ty.clone()]].concat().into_boxed_slice();
+        }
+
+        params.into_boxed_slice()
+    }
 }
 
 impl From<FnType> for Type {

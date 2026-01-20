@@ -22,6 +22,10 @@ impl ZinqType for PtrType {
         // 64 bit
         Size::Static(8)
     }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        vec![self.ty.clone()].into_boxed_slice()
+    }
 }
 
 impl From<PtrType> for Type {

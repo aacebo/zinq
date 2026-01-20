@@ -1,18 +1,28 @@
-use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use zinq_reflect::ty::Type;
 
 #[derive(Debug)]
 pub struct TypeEntry {
     pub ty: Type,
-    pub ref_count: AtomicUsize,
+    pub ref_c: AtomicUsize,
+}
+
+impl TypeEntry {
+    pub fn inc_refs(&mut self) {
+        self.ref_c.fetch_add(1, Ordering::SeqCst);
+    }
+
+    pub fn dec_refs(&mut self) {
+        self.ref_c.fetch_min(1, Ordering::SeqCst);
+    }
 }
 
 impl From<Type> for TypeEntry {
     fn from(ty: Type) -> Self {
         Self {
             ty,
-            ref_count: AtomicUsize::new(0),
+            ref_c: AtomicUsize::new(0),
         }
     }
 }

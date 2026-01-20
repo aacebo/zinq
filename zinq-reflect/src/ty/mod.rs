@@ -40,6 +40,10 @@ impl std::fmt::Display for TypeId {
 pub trait ZinqType {
     fn name(&self) -> String;
     fn size(&self) -> Size;
+    fn refs(&self) -> Box<[TypePtr]> {
+        Box::new([])
+    }
+
     fn ptr(&self) -> TypePtr
     where
         Self: Sized,
@@ -48,7 +52,7 @@ pub trait ZinqType {
     }
 
     fn id(&self) -> TypeId {
-        let mut hasher = zinq_hash::Hasher::v1();
+        let mut hasher = zinq_hash::Hasher::new();
 
         if let Some(module) = &self.module() {
             hasher.push(&module);
@@ -317,6 +321,24 @@ impl ZinqType for Type {
             Self::Mod(v) => v.size(),
             Self::Fn(v) => v.size(),
             Self::Enum(v) => v.size(),
+        }
+    }
+
+    fn refs(&self) -> Box<[TypePtr]> {
+        match self {
+            Self::Alias(v) => v.refs(),
+            Self::Array(v) => v.refs(),
+            Self::Bool(v) => v.refs(),
+            Self::String(v) => v.refs(),
+            Self::Int(v) => v.refs(),
+            Self::UInt(v) => v.refs(),
+            Self::Float(v) => v.refs(),
+            Self::Ptr(v) => v.refs(),
+            Self::Tuple(v) => v.refs(),
+            Self::Struct(v) => v.refs(),
+            Self::Mod(v) => v.refs(),
+            Self::Fn(v) => v.refs(),
+            Self::Enum(v) => v.refs(),
         }
     }
 }
