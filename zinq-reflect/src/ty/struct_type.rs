@@ -33,7 +33,7 @@ impl ZinqType for StructType {
         let mut size = 0;
 
         for field in self.fields.iter() {
-            size += match field.ty.size() {
+            size += match field.ty.size {
                 Size::Dynamic => return Size::Dynamic,
                 Size::Static(v) => v,
             };

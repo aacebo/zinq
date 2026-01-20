@@ -14,12 +14,13 @@ repository = "https://www.github.com/aacebo/zinq"
 
 [workspace.dependencies]
 zinq = { path = "./zinq", version = "0.0.1" }
+zinq-hash = { path = "./zinq-hash", version = "0.0.1" }
 zinq-syntax = { path = "./zinq-syntax", version = "0.0.1" }
 zinq-error = { path = "./zinq-error", version = "0.0.1" }
 zinq-token = { path = "./zinq-token", version = "0.0.1" }
 zinq-parse = { path = "./zinq-parse", version = "0.0.1" }
 zinq-sema = { path = "./zinq-sema", version = "0.0.1" }
-zinq-types = { path = "./zinq-types", version = "0.0.1" }
+zinq-runtime = { path = "./zinq-runtime", version = "0.0.1" }
 zinq-reflect = { path = "./zinq-reflect", version = "0.0.1" }
 
 blake3 = { version = "1.8" }

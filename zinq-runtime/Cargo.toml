@@ -1,5 +1,5 @@
 [package]
-name = "zinq-types"
+name = "zinq-runtime"
 readme = "README.md"
 version.workspace = true
 edition.workspace = true
@@ -12,3 +12,6 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
+zinq-hash = { workspace = true }
+zinq-error = { workspace = true }
+zinq-reflect = { workspace = true }

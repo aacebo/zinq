@@ -2,12 +2,12 @@ mod method_item;
 
 pub use method_item::*;
 
-use crate::Path;
+use crate::{Path, ty::PtrType};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Impl {
     pub module: Path,
-    pub for_ty: Path,
+    pub for_ty: PtrType,
     pub items: Vec<ImplItem>,
 }
 

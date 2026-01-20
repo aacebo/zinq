@@ -33,7 +33,7 @@ impl ZinqType for EnumType {
 
         for variant in self.variants.iter() {
             for field in &variant.fields {
-                size += match field.ty.size() {
+                size += match field.ty.size {
                     Size::Dynamic => return Size::Dynamic,
                     Size::Static(v) => v,
                 };

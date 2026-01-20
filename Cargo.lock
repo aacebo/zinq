@@ -91,6 +91,13 @@ name = "zinq-error"
 version = "0.0.1"
 
 [[package]]
+name = "zinq-hash"
+version = "0.0.1"
+dependencies = [
+ "blake3",
+]
+
+[[package]]
 name = "zinq-parse"
 version = "0.0.1"
 dependencies = [
@@ -102,6 +109,16 @@ name = "zinq-reflect"
 version = "0.0.1"
 dependencies = [
  "zinq-error",
+ "zinq-hash",
+]
+
+[[package]]
+name = "zinq-runtime"
+version = "0.0.1"
+dependencies = [
+ "zinq-error",
+ "zinq-hash",
+ "zinq-reflect",
 ]
 
 [[package]]
@@ -131,7 +148,3 @@ dependencies = [
  "zinq-error",
  "zinq-parse",
 ]
-
-[[package]]
-name = "zinq-types"
-version = "0.0.1"

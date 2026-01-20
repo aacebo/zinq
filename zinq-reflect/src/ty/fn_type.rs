@@ -1,5 +1,5 @@
 use crate::{
-    Param, Size, TypePath,
+    Param, Path, Size, TypePath, TypePtr,
     ty::{Type, ZinqType},
 };
 
@@ -7,7 +7,7 @@ use crate::{
 pub struct FnType {
     pub path: TypePath,
     pub params: Vec<Param>,
-    pub return_ty: Option<Box<Type>>,
+    pub return_ty: Option<TypePtr>,
 }
 
 impl ZinqType for FnType {
@@ -15,7 +15,7 @@ impl ZinqType for FnType {
         self.path.ident.clone()
     }
 
-    fn module(&self) -> Option<crate::Path> {
+    fn module(&self) -> Option<Path> {
         Some(self.path.module.clone())
     }
 

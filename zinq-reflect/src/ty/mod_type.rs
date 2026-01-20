@@ -1,12 +1,12 @@
 use crate::{
-    Path, Size, TypePath,
+    Path, Size, TypePath, TypePtr,
     ty::{Type, ZinqType},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModType {
     pub path: TypePath,
-    pub types: Vec<Type>,
+    pub types: Vec<TypePtr>,
 }
 
 impl ZinqType for ModType {
@@ -22,7 +22,7 @@ impl ZinqType for ModType {
         let mut size = 0;
 
         for ty in self.types.iter() {
-            size += match ty.size() {
+            size += match ty.size {
                 Size::Dynamic => return Size::Dynamic,
                 Size::Static(v) => v,
             };

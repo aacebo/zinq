@@ -1,3 +1,3 @@
-# Zinq Types
+# Zinq Runtime
 
 TypeId, TypeStore, unification

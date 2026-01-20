@@ -1,11 +1,11 @@
 use crate::{
-    Size,
+    Size, TypePtr,
     ty::{Type, ZinqType},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayType {
-    pub item: Box<Type>,
+    pub item: TypePtr,
     pub length: usize,
 }
 
@@ -15,7 +15,7 @@ impl ZinqType for ArrayType {
     }
 
     fn size(&self) -> Size {
-        match self.item.size() {
+        match self.item.size {
             Size::Dynamic => Size::Dynamic,
             Size::Static(v) => Size::Static(v * self.length),
         }

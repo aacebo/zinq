@@ -1,12 +1,13 @@
 use crate::{
+    TypePtr,
     ty::{PtrType, Type},
-    value::{RefId, Value, ZinqValue},
+    value::{Value, ValueId, ZinqValue},
 };
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefValue {
-    pub id: RefId,
-    pub ty: Type,
+    pub id: ValueId,
+    pub ty: TypePtr,
 }
 
 impl From<RefValue> for Value {
@@ -24,7 +25,7 @@ impl std::fmt::Display for RefValue {
 impl ZinqValue for RefValue {
     fn ty(&self) -> Type {
         PtrType {
-            ty: Box::new(self.ty.clone()),
+            ty: self.ty.clone(),
         }
         .into()
     }

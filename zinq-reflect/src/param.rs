@@ -1,9 +1,9 @@
-use crate::ty::Type;
+use crate::TypePtr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Param {
     pub name: String,
-    pub ty: Type,
+    pub ty: TypePtr,
 }
 
 impl std::fmt::Display for Param {

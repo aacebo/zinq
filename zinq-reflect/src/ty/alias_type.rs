@@ -1,12 +1,12 @@
 use crate::{
-    Path, Size, TypePath,
+    Path, Size, TypePath, TypePtr,
     ty::{Type, ZinqType},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AliasType {
     pub path: TypePath,
-    pub ty: Box<Type>,
+    pub ty: TypePtr,
 }
 
 impl ZinqType for AliasType {
@@ -19,7 +19,7 @@ impl ZinqType for AliasType {
     }
 
     fn size(&self) -> Size {
-        self.ty.size()
+        self.ty.size
     }
 }
 

@@ -1,5 +1,5 @@
 use crate::{
-    ty::{TupleType, Type},
+    ty::{TupleType, Type, ZinqType},
     value::{Value, ZinqValue},
 };
 
@@ -16,7 +16,7 @@ impl std::ops::Deref for TupleValue {
 
 impl ZinqValue for TupleValue {
     fn ty(&self) -> Type {
-        TupleType::new(self.0.iter().map(|v| v.ty()).collect::<Vec<_>>()).into()
+        TupleType::new(self.0.iter().map(|v| v.ty().ptr()).collect::<Vec<_>>()).into()
     }
 }
 

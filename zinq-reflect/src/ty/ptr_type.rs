@@ -1,11 +1,11 @@
 use crate::{
-    Size,
+    Size, TypePtr,
     ty::{Type, ZinqType},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PtrType {
-    pub ty: Box<Type>,
+    pub ty: TypePtr,
 }
 
 impl ZinqType for PtrType {

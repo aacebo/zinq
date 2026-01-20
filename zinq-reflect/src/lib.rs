@@ -6,6 +6,7 @@ mod path;
 mod size;
 pub mod ty;
 mod type_path;
+mod type_ptr;
 pub mod value;
 mod variant;
 
@@ -15,4 +16,5 @@ pub use param::*;
 pub use path::*;
 pub use size::*;
 pub use type_path::*;
+pub use type_ptr::*;
 pub use variant::*;

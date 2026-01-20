@@ -26,11 +26,38 @@ pub use struct_type::*;
 pub use tuple_type::*;
 pub use uint_type::*;
 
-use crate::{Path, Size};
+use crate::{Path, Size, TypePtr};
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub struct TypeId(zinq_hash::Object);
+
+impl std::fmt::Display for TypeId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", &self.0)
+    }
+}
 
 pub trait ZinqType {
     fn name(&self) -> String;
     fn size(&self) -> Size;
+    fn ptr(&self) -> TypePtr
+    where
+        Self: Sized,
+    {
+        TypePtr::from(self)
+    }
+
+    fn id(&self) -> TypeId {
+        let mut hasher = zinq_hash::Hasher::v1();
+
+        if let Some(module) = &self.module() {
+            hasher.push(&module);
+        }
+
+        hasher.push_str(&self.name());
+        TypeId(hasher.build())
+    }
+
     fn module(&self) -> Option<Path> {
         None
     }

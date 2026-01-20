@@ -1,5 +1,5 @@
 [package]
-name = "zinq-reflect"
+name = "zinq-hash"
 readme = "README.md"
 version.workspace = true
 edition.workspace = true
@@ -12,5 +12,4 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
-zinq-error = { workspace = true }
-zinq-hash = { workspace = true }
+blake3 = { workspace = true }

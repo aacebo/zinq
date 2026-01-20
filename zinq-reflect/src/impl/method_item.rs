@@ -1,10 +1,10 @@
-use crate::{ImplItem, Param, ty::Type};
+use crate::{ImplItem, Param, TypePtr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MethodItem {
     pub name: String,
     pub params: Vec<Param>,
-    pub return_ty: Option<Type>,
+    pub return_ty: Option<TypePtr>,
 }
 
 impl From<MethodItem> for ImplItem {

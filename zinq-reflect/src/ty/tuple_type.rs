@@ -1,19 +1,19 @@
 use crate::{
-    Size,
+    Size, TypePtr,
     ty::{Type, ZinqType},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TupleType(Vec<Type>);
+pub struct TupleType(Vec<TypePtr>);
 
 impl TupleType {
-    pub fn new(types: Vec<Type>) -> Self {
+    pub fn new(types: Vec<TypePtr>) -> Self {
         Self(types)
     }
 }
 
 impl std::ops::Deref for TupleType {
-    type Target = [Type];
+    type Target = [TypePtr];
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -37,7 +37,7 @@ impl ZinqType for TupleType {
         let mut size = 0;
 
         for ty in self.0.iter() {
-            size += match ty.size() {
+            size += match ty.size {
                 Size::Dynamic => return Size::Dynamic,
                 Size::Static(v) => v,
             };
