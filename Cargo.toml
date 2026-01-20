@@ -20,7 +20,7 @@ zinq-error = { path = "./zinq-error", version = "0.0.1" }
 zinq-token = { path = "./zinq-token", version = "0.0.1" }
 zinq-parse = { path = "./zinq-parse", version = "0.0.1" }
 zinq-sema = { path = "./zinq-sema", version = "0.0.1" }
-zinq-runtime = { path = "./zinq-runtime", version = "0.0.1" }
-zinq-reflect = { path = "./zinq-reflect", version = "0.0.1" }
+zinq-types = { path = "./zinq-types", version = "0.0.1" }
+zinq-vm = { path = "./zinq-vm", version = "0.0.1" }
 
 blake3 = { version = "1.8" }
