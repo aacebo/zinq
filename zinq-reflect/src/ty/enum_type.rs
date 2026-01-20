@@ -1,5 +1,5 @@
 use crate::{
-    Path, Size, TypePath, TypePtr, Variant,
+    Impl, Path, Size, TypePath, TypePtr, Variant,
     ty::{Type, ZinqType},
 };
 
@@ -7,6 +7,7 @@ use crate::{
 pub struct EnumType {
     pub path: TypePath,
     pub variants: Vec<Variant>,
+    pub impls: Vec<Impl>,
 }
 
 impl EnumType {
@@ -49,7 +50,12 @@ impl ZinqType for EnumType {
             .iter()
             .flat_map(|v| v.fields.iter().map(|f| f.ty.clone()))
             .collect::<Vec<_>>();
-        variants.into_boxed_slice()
+        let impls = self
+            .impls
+            .iter()
+            .flat_map(|im| im.refs())
+            .collect::<Vec<_>>();
+        vec![variants, impls].concat().into_boxed_slice()
     }
 }
 

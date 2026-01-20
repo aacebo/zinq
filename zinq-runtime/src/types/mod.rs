@@ -1,7 +1,7 @@
-mod entry;
+mod cell;
 mod registry;
 
-pub use entry::*;
+pub use cell::*;
 pub use registry::*;
 
 use zinq_error::Result;

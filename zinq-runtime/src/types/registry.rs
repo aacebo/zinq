@@ -5,11 +5,11 @@ use zinq_reflect::ty::{
     BoolType, FloatType, IntType, PtrType, StringType, Type, TypeId, UIntType, ZinqType,
 };
 
-use crate::types::TypeEntry;
+use crate::types::TypeCell;
 
 #[derive(Debug)]
 pub struct TypeRegistry {
-    items: HashMap<TypeId, TypeEntry>,
+    items: HashMap<TypeId, TypeCell>,
 }
 
 impl TypeRegistry {
@@ -85,9 +85,17 @@ impl TypeRegistry {
 
         let ptr_ty: Type = Type::from(PtrType::from(ty.clone()));
 
-        self.items.insert(ty.id(), TypeEntry::from(ty));
-        self.items.insert(ptr_ty.id(), TypeEntry::from(ptr_ty));
+        self.items.insert(ty.id(), TypeCell::from(ty));
+        self.items.insert(ptr_ty.id(), TypeCell::from(ptr_ty));
         Ok(self)
+    }
+}
+
+impl std::ops::Index<&TypeId> for TypeRegistry {
+    type Output = TypeCell;
+
+    fn index(&self, index: &TypeId) -> &Self::Output {
+        &self.items[index]
     }
 }
 
@@ -113,24 +121,26 @@ mod tests {
             impls: vec![],
         };
 
-        registry.add(a.clone().into()).unwrap();
-        registry
-            .add(
-                EnumType {
-                    path: TypePath::from("main::B"),
-                    variants: vec![Variant {
-                        path: TypePath::from("Main"),
-                        fields: vec![Field {
-                            name: "a".to_string(),
-                            ty: a.ptr(),
-                        }],
-                    }],
-                }
-                .into(),
-            )
-            .unwrap();
+        let b = EnumType {
+            path: TypePath::from("main::B"),
+            variants: vec![Variant {
+                path: TypePath::from("main::B::Main"),
+                fields: vec![Field {
+                    name: "a".to_string(),
+                    ty: a.ptr(),
+                }],
+            }],
+            impls: vec![],
+        };
+
+        registry.add(a.clone().into())?;
+        registry.add(b.clone().into())?;
 
         debug_assert_eq!(registry.len(), 28, "{:#?}", &registry);
+        debug_assert!(registry.get_or_err(&a.id())?.is_struct());
+        debug_assert!(registry.get_or_err(&b.id())?.is_enum());
+        debug_assert_eq!(registry[&a.id()].ref_count(), 1);
+        debug_assert_eq!(registry[&b.id()].ref_count(), 0);
         Ok(())
     }
 }
