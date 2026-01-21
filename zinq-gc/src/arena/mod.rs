@@ -1,3 +1,3 @@
-mod id;
+mod arena_id;
 
-pub use id::*;
+pub use arena_id::*;

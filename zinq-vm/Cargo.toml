@@ -15,3 +15,4 @@ doctest = false
 zinq-error = { workspace = true }
 zinq-hash = { workspace = true }
 zinq-types = { workspace = true }
+zinq-gc = { workspace = true }

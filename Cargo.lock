@@ -94,6 +94,7 @@ version = "0.0.1"
 name = "zinq-gc"
 version = "0.0.1"
 dependencies = [
+ "zinq-error",
  "zinq-types",
 ]
 
@@ -152,6 +153,7 @@ name = "zinq-vm"
 version = "0.0.1"
 dependencies = [
  "zinq-error",
+ "zinq-gc",
  "zinq-hash",
  "zinq-types",
 ]

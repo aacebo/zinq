@@ -12,4 +12,5 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
+zinq-error = { workspace = true }
 zinq-types = { workspace = true }
