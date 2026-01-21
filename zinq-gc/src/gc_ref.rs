@@ -9,6 +9,6 @@ use crate::GcMeta;
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone)]
 pub struct GcRef<T> {
-    __pd__: PhantomData<T>,
+    __data__: PhantomData<T>,
     ptr: NonNull<GcMeta>,
 }
