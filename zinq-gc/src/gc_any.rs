@@ -1,6 +1,6 @@
 use std::ptr::NonNull;
 
-use crate::GcHeader;
+use crate::{GcFooter, GcHeader};
 
 ///
 /// ### GcAny
@@ -15,11 +15,24 @@ impl GcAny {
         unsafe { self.0.as_ref() }
     }
 
-    pub fn value<T>(&self) -> &T {
-        unsafe { self.0.cast().as_ref() }
+    pub fn footer(&self) -> &GcFooter {
+        let base = self.0.as_ptr() as *const u8;
+
+        unsafe {
+            let ptr = base.add(self.size() - size_of::<GcFooter>()) as *const GcFooter;
+
+            match ptr.as_ref() {
+                None => &GcFooter::Fixed,
+                Some(v) => v,
+            }
+        }
     }
 
-    pub fn value_ptr<T>(&self) -> *mut T {
-        self.0.cast().as_ptr()
+    pub fn size(&self) -> usize {
+        (*self.header().size()) as usize
+    }
+
+    pub fn value<T>(&self) -> &T {
+        unsafe { self.0.cast().as_ref() }
     }
 }

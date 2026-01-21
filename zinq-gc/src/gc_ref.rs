@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::GcAny;
+use crate::{GcAny, GcFooter, GcHeader};
 
 ///
 /// ### GcRef
@@ -14,6 +14,18 @@ pub struct GcRef<T> {
 }
 
 impl<T> GcRef<T> {
+    pub fn header(&self) -> &GcHeader {
+        self.inner.header()
+    }
+
+    pub fn footer(&self) -> &GcFooter {
+        self.inner.footer()
+    }
+
+    pub fn size(&self) -> usize {
+        self.inner.size()
+    }
+
     pub fn value(&self) -> &T {
         self.inner.value()
     }

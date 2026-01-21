@@ -1,3 +1,5 @@
+use std::any::type_name_of_val;
+
 ///
 /// ### GcFooter
 /// Compact “footer” stored at the *end* of an allocation.
@@ -7,14 +9,14 @@
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub enum GcFooter {
-    Fixed(GcFixedFooter),
+    Fixed,
     Array(GcArrayFooter),
 }
 
 impl GcFooter {
     pub fn is_fixed(&self) -> bool {
         match self {
-            Self::Fixed(_) => true,
+            Self::Fixed => true,
             _ => false,
         }
     }
@@ -25,17 +27,16 @@ impl GcFooter {
             _ => false,
         }
     }
-}
 
-///
-/// ### GcFixedFooter
-/// Fixed-size object (non-variable payload).
-///
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GcFixedFooter {
-    /// header + payload + footer
-    size: u32,
+    pub fn as_array(&self) -> &GcArrayFooter {
+        match self {
+            Self::Array(v) => v,
+            v => panic!(
+                "{}",
+                format!("expected GcArrayFooter, received {}", type_name_of_val(v))
+            ),
+        }
+    }
 }
 
 ///
@@ -45,21 +46,24 @@ pub struct GcFixedFooter {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct GcArrayFooter {
-    /// header + payload + footer
-    size: u32,
-
     /// max capacity
-    cap: u32,
+    pub cap: u32,
 
     /// length of data
-    length: u32,
+    pub length: u32,
 
     /// element stride in bytes
-    stride: u32,
+    pub stride: u32,
 
     /// flags used to describe the data
-    flags: u8,
+    pub flags: u8,
 
     /// reserved for future use
-    padding: u16,
+    pub padding: u16,
+}
+
+impl From<GcArrayFooter> for GcFooter {
+    fn from(value: GcArrayFooter) -> Self {
+        Self::Array(value)
+    }
 }
