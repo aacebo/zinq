@@ -1,10 +1,12 @@
 pub mod arena;
 mod gc_any;
+mod gc_footer;
 mod gc_header;
 mod gc_mark;
 mod gc_ref;
 
 pub use gc_any::*;
+pub use gc_footer::*;
 pub use gc_header::*;
 pub use gc_mark::*;
 pub use gc_ref::*;

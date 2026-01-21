@@ -22,9 +22,3 @@ impl<T> GcRef<T> {
         &self.inner
     }
 }
-
-impl<T> AsRef<GcAny> for GcRef<T> {
-    fn as_ref(&self) -> &GcAny {
-        &self.inner
-    }
-}
