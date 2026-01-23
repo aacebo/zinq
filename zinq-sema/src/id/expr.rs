@@ -1,16 +1,14 @@
-use crate::id::Builder;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ExprId(blake3::Hash);
+pub struct ExprId(zinq_hash::Object);
 
 impl ExprId {
-    pub fn new(name: &str) -> Builder {
-        Builder::new().attr(name.into())
+    pub fn new(name: &str) -> zinq_hash::Object {
+        zinq_hash::v1().push_str(name).build()
     }
 }
 
-impl From<blake3::Hash> for ExprId {
-    fn from(value: blake3::Hash) -> Self {
+impl From<zinq_hash::Object> for ExprId {
+    fn from(value: zinq_hash::Object) -> Self {
         Self(value)
     }
 }
@@ -22,7 +20,7 @@ impl std::fmt::Display for ExprId {
 }
 
 impl std::ops::Deref for ExprId {
-    type Target = blake3::Hash;
+    type Target = zinq_hash::Object;
 
     fn deref(&self) -> &Self::Target {
         &self.0

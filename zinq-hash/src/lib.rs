@@ -15,3 +15,7 @@ impl<T: ToString> Hash for T {
         hasher.push_str(&self.to_string());
     }
 }
+
+pub fn v1() -> Hasher {
+    Hasher::v1()
+}

@@ -1,6 +1,6 @@
 use zinq_types::{TypeId, ZinqType, ty::FloatType};
 
-use crate::value::{Value, ZinqValue};
+use crate::{Value, ZinqValue};
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]

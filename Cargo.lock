@@ -116,8 +116,8 @@ dependencies = [
 name = "zinq-sema"
 version = "0.0.1"
 dependencies = [
- "blake3",
  "zinq-error",
+ "zinq-hash",
  "zinq-parse",
  "zinq-syntax",
  "zinq-token",
@@ -149,11 +149,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "zinq-vm"
+name = "zinq-values"
 version = "0.0.1"
 dependencies = [
- "zinq-error",
  "zinq-gc",
- "zinq-hash",
  "zinq-types",
 ]

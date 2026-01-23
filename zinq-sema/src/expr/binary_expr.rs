@@ -24,10 +24,11 @@ impl Build for zinq_syntax::expr::ArithmeticExpr {
         let left = self.left.build(ctx)?;
         let right = self.right.build(ctx)?;
         let op = BinaryOp::from(self.op.clone());
-        let id = ExprId::new(self.name())
-            .field("left", left.to_string().into())
-            .field("op", (op as u8).into())
-            .field("right", right.to_string().into())
+        let id = zinq_hash::v1()
+            .push_str(self.name())
+            .push_field("left", &left.to_string())
+            .push_field("op", op as u8)
+            .push_field("right", &right.to_string())
             .build()
             .into();
 
