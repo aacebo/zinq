@@ -1,1 +1,1 @@
-# Zinq GC
+# Zinq: Garbage Collector

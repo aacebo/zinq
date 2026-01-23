@@ -2,17 +2,17 @@ use zinq_parse::Spanned;
 use zinq_syntax::Syntax;
 use zinq_token::{Arithmetic, Cmp, Logical};
 
-use crate::{Build, expr::SemaExpr, id::ExprId};
+use crate::{Build, expr::HirExpr, id::ExprId};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SemaBinaryExpr {
+pub struct HirBinaryExpr {
     pub left: ExprId,
     pub op: BinaryOp,
     pub right: ExprId,
 }
 
-impl From<SemaBinaryExpr> for SemaExpr {
-    fn from(value: SemaBinaryExpr) -> Self {
+impl From<HirBinaryExpr> for HirExpr {
+    fn from(value: HirBinaryExpr) -> Self {
         Self::Binary(value)
     }
 }
@@ -33,7 +33,7 @@ impl Build for zinq_syntax::expr::ArithmeticExpr {
             .into();
 
         ctx.exprs
-            .add(id, SemaBinaryExpr { left, op, right }.into(), self.span());
+            .add(id, HirBinaryExpr { left, op, right }.into(), self.span());
 
         Ok(id)
     }

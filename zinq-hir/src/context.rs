@@ -1,8 +1,8 @@
-use crate::{Arena, expr::SemaExpr, id::ExprId};
+use crate::{Arena, expr::HirExpr, id::ExprId};
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct Context {
-    pub exprs: Arena<ExprId, SemaExpr>,
+    pub exprs: Arena<ExprId, HirExpr>,
 }
 
 impl Context {

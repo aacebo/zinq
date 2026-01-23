@@ -1,4 +1,4 @@
-# Zinq Parse
+# Zinq: Parse
 
 Parsing helpers/traits/types for Zinq.
 

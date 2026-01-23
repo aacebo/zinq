@@ -12,4 +12,4 @@ repository.workspace = true
 doctest = false
 
 [dependencies]
-blake3 = { workspace = true }
+blake3 = { version = "1.8" }

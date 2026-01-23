@@ -1,1 +1,1 @@
-# Zinq Types
+# Zinq: Types

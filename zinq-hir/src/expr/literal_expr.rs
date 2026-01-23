@@ -1,10 +1,10 @@
-use crate::expr::SemaExpr;
+use crate::expr::HirExpr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SemaLiteralExpr {}
+pub enum HirLiteralExpr {}
 
-impl From<SemaLiteralExpr> for SemaExpr {
-    fn from(value: SemaLiteralExpr) -> Self {
+impl From<HirLiteralExpr> for HirExpr {
+    fn from(value: HirLiteralExpr) -> Self {
         Self::Literal(value)
     }
 }
@@ -19,7 +19,7 @@ impl From<SemaLiteralExpr> for SemaExpr {
 //             .into();
 
 //         ctx.exprs
-//             .add(id, SemaLiteralExpr {  }.into(), self.span());
+//             .add(id, HirLiteralExpr {  }.into(), self.span());
 
 //         Ok(id)
 //     }

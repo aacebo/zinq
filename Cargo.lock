@@ -106,14 +106,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zinq-parse"
-version = "0.0.1"
-dependencies = [
- "zinq-error",
-]
-
-[[package]]
-name = "zinq-sema"
+name = "zinq-hir"
 version = "0.0.1"
 dependencies = [
  "zinq-error",
@@ -121,6 +114,13 @@ dependencies = [
  "zinq-parse",
  "zinq-syntax",
  "zinq-token",
+]
+
+[[package]]
+name = "zinq-parse"
+version = "0.0.1"
+dependencies = [
+ "zinq-error",
 ]
 
 [[package]]

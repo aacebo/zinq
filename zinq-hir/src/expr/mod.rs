@@ -10,10 +10,10 @@ use crate::{Build, id::ExprId};
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SemaExpr {
-    Binary(SemaBinaryExpr),
-    Literal(SemaLiteralExpr),
-    Unary(SemaUnaryExpr),
+pub enum HirExpr {
+    Binary(HirBinaryExpr),
+    Literal(HirLiteralExpr),
+    Unary(HirUnaryExpr),
 }
 
 impl Build for zinq_syntax::expr::Expr {

@@ -1,4 +1,4 @@
-# Zinq Token
+# Zinq: Token
 
 Token implementation for Zinq.
 
